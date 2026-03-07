@@ -142,6 +142,13 @@ function removeArrayItem<T>(items: T[], index: number) {
   return items.filter((_, itemIndex) => itemIndex !== index);
 }
 
+function moveArrayItem<T>(items: T[], from: number, to: number) {
+  const next = [...items];
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
 function toggleString(items: string[], value: string) {
   return items.includes(value) ? items.filter((item) => item !== value) : [...items, value];
 }
@@ -385,6 +392,7 @@ function ListManager({
   onSelect,
   onAdd,
   onRemove,
+  onMove,
   renderLabel,
 }: {
   label: string;
@@ -393,6 +401,7 @@ function ListManager({
   onSelect: (index: number) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
+  onMove: (from: number, to: number) => void;
   renderLabel: (index: number) => string;
 }) {
   return (
@@ -425,13 +434,31 @@ function ListManager({
               >
                 {renderLabel(index)}
               </button>
-              <button
-                type="button"
-                onClick={() => onRemove(index)}
-                className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
-              >
-                删除
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onMove(index, Math.max(0, index - 1))}
+                  disabled={index === 0}
+                  className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  上移
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onMove(index, Math.min(items.length - 1, index + 1))}
+                  disabled={index === items.length - 1}
+                  className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  下移
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRemove(index)}
+                  className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                >
+                  删除
+                </button>
+              </div>
             </div>
           ))
         ) : (
@@ -820,6 +847,9 @@ export function AdminVisualEditor({
             value={value.ogImagePath}
             onChange={(next) => updateDraft((item) => ((item as SiteConfigContent).ogImagePath = next))}
             note="可上传用于 Open Graph / 社交分享的图片，也可以保留现有生成图。"
+            previewRatio="landscape"
+            recommendedUse="分享链接时的预览图"
+            recommendedSize="1200 x 630 像素，横图"
           />
           <div className="grid gap-4 md:grid-cols-2">
             <TextField
@@ -2132,6 +2162,9 @@ export function AdminVisualEditor({
             value={value.heroImage ?? ""}
             onChange={(next) => updateDraft((item) => ((item as BrandIntroContent).heroImage = next))}
             note="用于首页首屏主图。上传后保存即可更新。"
+            previewRatio="landscape"
+            recommendedUse="首页首屏主视觉"
+            recommendedSize="1600 x 1400 像素以上，接近 1.15:1"
           />
           <BilingualInput
             label="首页主图说明"
@@ -2382,6 +2415,14 @@ export function AdminVisualEditor({
                 });
                 setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
               }}
+              onMove={(from, to) => {
+                if (from === to) return;
+                updateDraft((item) => {
+                  const next = moveArrayItem(item as Artwork[], from, to);
+                  (item as Artwork[]).splice(0, (item as Artwork[]).length, ...next);
+                });
+                setSelectedIndex(to);
+              }}
               renderLabel={(index) =>
                 `${items[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
                   items[index]?.title.zh || items[index]?.slug || `藏品 ${index + 1}`
@@ -2412,6 +2453,9 @@ export function AdminVisualEditor({
                     label="藏品主图"
                     folder="artworks"
                     value={current.image}
+                    previewRatio="portrait"
+                    recommendedUse="藏品列表与藏品详情主图"
+                    recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>
                       updateDraft((item) => {
                         (item as Artwork[])[selectedIndex].image = next;
@@ -2940,6 +2984,14 @@ export function AdminVisualEditor({
                 });
                 setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
               }}
+              onMove={(from, to) => {
+                if (from === to) return;
+                updateDraft((item) => {
+                  const next = moveArrayItem(item as Exhibition[], from, to);
+                  (item as Exhibition[]).splice(0, (item as Exhibition[]).length, ...next);
+                });
+                setSelectedIndex(to);
+              }}
               renderLabel={(index) =>
                 `${items[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
                   items[index]?.title.zh || items[index]?.slug || `展览 ${index + 1}`
@@ -2968,6 +3020,9 @@ export function AdminVisualEditor({
                     label="展览封面"
                     folder="exhibitions"
                     value={current.cover}
+                    previewRatio="landscape"
+                    recommendedUse="首页专题与展览列表封面"
+                    recommendedSize="1600 x 1000 像素以上，横图约 1.45:1"
                     onChange={(next) =>
                       updateDraft((item) => {
                         (item as Exhibition[])[selectedIndex].cover = next;
@@ -3235,6 +3290,14 @@ export function AdminVisualEditor({
               });
               setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
             }}
+            onMove={(from, to) => {
+              if (from === to) return;
+              updateDraft((item) => {
+                const next = moveArrayItem(item as Article[], from, to);
+                (item as Article[]).splice(0, (item as Article[]).length, ...next);
+              });
+              setSelectedIndex(to);
+            }}
             renderLabel={(index) =>
               `${articleItems[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
                 articleItems[index]?.title.zh || articleItems[index]?.slug || `文章 ${index + 1}`
@@ -3263,6 +3326,9 @@ export function AdminVisualEditor({
                   label="文章封面"
                   folder="articles"
                   value={currentArticle.cover}
+                  previewRatio="landscape"
+                  recommendedUse="文章列表与文章详情头图"
+                  recommendedSize="1400 x 900 像素以上，横图约 1.55:1"
                   onChange={(next) =>
                     updateDraft((item) => {
                       (item as Article[])[selectedIndex].cover = next;

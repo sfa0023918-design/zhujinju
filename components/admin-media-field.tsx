@@ -9,6 +9,9 @@ type AdminMediaFieldProps = {
   folder: string;
   value: string;
   onChange: (value: string) => void;
+  previewRatio?: "portrait" | "landscape" | "square";
+  recommendedSize?: string;
+  recommendedUse?: string;
 };
 
 export function AdminMediaField({
@@ -17,6 +20,9 @@ export function AdminMediaField({
   folder,
   value,
   onChange,
+  previewRatio = "portrait",
+  recommendedSize,
+  recommendedUse,
 }: AdminMediaFieldProps) {
   const inputId = useId();
   const [uploading, setUploading] = useState(false);
@@ -61,6 +67,13 @@ export function AdminMediaField({
     }
   }
 
+  const previewClassName =
+    previewRatio === "landscape"
+      ? "aspect-[1.45/1]"
+      : previewRatio === "square"
+        ? "aspect-square"
+        : "aspect-[4/5]";
+
   return (
     <div className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
       <div className="space-y-1">
@@ -68,6 +81,12 @@ export function AdminMediaField({
           {label}
         </label>
         {note ? <p className="text-xs leading-6 text-[var(--muted)]">{note}</p> : null}
+        {recommendedUse || recommendedSize ? (
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs leading-6 text-[var(--accent)]/82">
+            {recommendedUse ? <p>{`用途：${recommendedUse}`}</p> : null}
+            {recommendedSize ? <p>{`建议尺寸：${recommendedSize}`}</p> : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
@@ -79,10 +98,10 @@ export function AdminMediaField({
               width={800}
               height={1000}
               unoptimized
-              className="aspect-[4/5] h-full w-full object-cover"
+              className={`${previewClassName} h-full w-full object-cover`}
             />
           ) : (
-            <div className="flex aspect-[4/5] items-center justify-center text-xs tracking-[0.16em] text-[var(--accent)]">
+            <div className={`flex ${previewClassName} items-center justify-center text-xs tracking-[0.16em] text-[var(--accent)]`}>
               暂无图片
             </div>
           )}

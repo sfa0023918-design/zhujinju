@@ -1,15 +1,18 @@
 import Link from "next/link";
 
 import { AdminShell } from "@/components/admin-shell";
-import { editableSections, loadSiteContent } from "@/lib/site-data";
+import { editableSections, getPublicArticles, getPublicArtworks, getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
 
 export default async function AdminDashboardPage() {
   const content = await loadSiteContent();
+  const publishedArtworks = getPublicArtworks(content).length;
+  const publishedExhibitions = getPublicExhibitions(content).length;
+  const publishedArticles = getPublicArticles(content).length;
 
   const overview = [
-    { label: "藏品", value: content.artworks.length },
-    { label: "展览", value: content.exhibitions.length },
-    { label: "文章", value: content.articles.length },
+    { label: "藏品", value: `${publishedArtworks} / ${content.artworks.length}` },
+    { label: "展览", value: `${publishedExhibitions} / ${content.exhibitions.length}` },
+    { label: "文章", value: `${publishedArticles} / ${content.articles.length}` },
     { label: "收藏方向", value: content.collectingDirections.length },
   ];
 
@@ -83,6 +86,9 @@ export default async function AdminDashboardPage() {
             <p className="mt-4 font-serif text-[2rem] leading-none tracking-[-0.04em] text-[var(--ink)]">
               {item.value}
             </p>
+            {typeof item.value === "string" && item.value.includes("/") ? (
+              <p className="mt-2 text-xs leading-6 text-[var(--muted)]">已发布 / 全部</p>
+            ) : null}
           </div>
         ))}
       </div>
