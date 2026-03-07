@@ -890,9 +890,7 @@
       "image": "/uploads/artworks/1772895592888-img-0002.jpg",
       "featured": true,
       "gallery": [
-        "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait",
-        "",
-        ""
+        "/uploads/artworks/1772902356916-b00013133fr1771928731.jpg"
       ],
       "publicationStatus": "published"
     },
@@ -1013,9 +1011,7 @@
       ],
       "image": "/api/placeholder/green-tara-malla?kind=portrait",
       "featured": true,
-      "gallery": [
-        "/api/placeholder/green-tara-malla?kind=portrait"
-      ],
+      "gallery": [],
       "publicationStatus": "published"
     },
     {
@@ -1126,9 +1122,7 @@
       ],
       "image": "/api/placeholder/shakyamuni-bhumisparsha?kind=portrait",
       "featured": true,
-      "gallery": [
-        "/api/placeholder/shakyamuni-bhumisparsha?kind=portrait"
-      ],
+      "gallery": [],
       "publicationStatus": "published"
     },
     {
@@ -1243,9 +1237,7 @@
       ],
       "image": "/api/placeholder/manjushri-thangka?kind=portrait",
       "featured": true,
-      "gallery": [
-        "/api/placeholder/manjushri-thangka?kind=portrait"
-      ],
+      "gallery": [],
       "publicationStatus": "published"
     },
     {
@@ -1355,9 +1347,7 @@
         "silent-radiance"
       ],
       "image": "/api/placeholder/vajrapani-thangka?kind=portrait",
-      "gallery": [
-        "/api/placeholder/vajrapani-thangka?kind=portrait"
-      ],
+      "gallery": [],
       "publicationStatus": "published"
     },
     {
@@ -1466,9 +1456,7 @@
         "between-gilding-and-pigment"
       ],
       "image": "/api/placeholder/ritual-conch-set?kind=portrait",
-      "gallery": [
-        "/api/placeholder/ritual-conch-set?kind=portrait"
-      ],
+      "gallery": [],
       "publicationStatus": "published"
     },
     {
@@ -1577,9 +1565,7 @@
         "silent-radiance"
       ],
       "image": "/api/placeholder/amitayus-western-tibet?kind=portrait",
-      "gallery": [
-        "/api/placeholder/amitayus-western-tibet?kind=portrait"
-      ],
+      "gallery": [],
       "publicationStatus": "published"
     },
     {
