@@ -65,9 +65,10 @@ export default async function ExhibitionDetailPage({
             <BilingualText
               as="p"
               text={exhibition.subtitle}
-              className="flex flex-col gap-1 text-[var(--accent)]"
+              mode="inline"
+              className="text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
             />
             <BilingualText
               as="h1"
@@ -79,16 +80,16 @@ export default async function ExhibitionDetailPage({
             <BilingualText
               as="p"
               text={exhibition.intro}
-              className="max-w-3xl flex flex-col gap-3 text-[var(--muted)] md:text-[0.98rem]"
+              className="max-w-3xl text-[var(--muted)] md:text-[0.98rem]"
               zhClassName="text-sm leading-8"
-              enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+              enClassName="hidden"
             />
           </div>
         </div>
         <div className="space-y-4 border-t border-[var(--line)] pt-5 text-sm leading-7 text-[var(--muted)] md:pt-0">
-          <BilingualText as="p" text={exhibition.period} className="flex flex-col gap-1" zhClassName="block" enClassName="block text-[0.72rem] text-[var(--accent)]/80" />
-          <BilingualText as="p" text={exhibition.venue} className="flex flex-col gap-1" zhClassName="block" enClassName="block text-[0.72rem] text-[var(--accent)]/80" />
-          <BilingualText as="p" text={exhibition.catalogueTitle} className="flex flex-col gap-1" zhClassName="block" enClassName="block text-[0.72rem] text-[var(--accent)]/80" />
+          <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
+          <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
+          <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
         </div>
       </section>
 
@@ -109,14 +110,9 @@ export default async function ExhibitionDetailPage({
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.92fr)_minmax(0,0.8fr)] md:px-10 md:py-20">
         <div className="space-y-6">
           {exhibition.description.map((paragraph) => (
-            <BilingualText
-              key={paragraph.zh}
-              as="p"
-              text={paragraph}
-              className="flex flex-col gap-3 text-[var(--muted)]"
-              zhClassName="text-[0.98rem] leading-8"
-              enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80"
-            />
+            <p key={paragraph.zh} className="text-[0.98rem] leading-8 text-[var(--muted)]">
+              {paragraph.zh}
+            </p>
           ))}
         </div>
         <div className="border-t border-[var(--line)] pt-5 text-sm leading-8 text-[var(--muted)] md:border-t-0 md:border-l md:pl-8 md:pt-0">
@@ -130,9 +126,9 @@ export default async function ExhibitionDetailPage({
           <BilingualText
             as="p"
             text={exhibition.catalogueIntro}
-            className="flex flex-col gap-3"
+            className="block"
             zhClassName="text-sm leading-8"
-            enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+            enClassName="hidden"
           />
           <BilingualText
             as="p"
@@ -140,9 +136,9 @@ export default async function ExhibitionDetailPage({
               "图录页面当前以 mock 数据展示封面与简介，后续可扩展为 PDF 下载、图录目录与引用页码。",
               "The catalogue section currently uses mock content and can later expand to include PDF downloads, full contents, and referenced page numbers."
             )}
-            className="mt-4 flex flex-col gap-3"
+            className="mt-4 block"
             zhClassName="text-sm leading-8"
-            enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+            enClassName="hidden"
           />
         </div>
       </section>

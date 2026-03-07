@@ -40,9 +40,10 @@ export function SiteHeader() {
               <BilingualText
                 as="span"
                 text={item.label}
-                className="flex flex-col gap-1"
-                zhClassName="block text-[0.92rem]"
-                enClassName="block text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+                mode="inline"
+                className="text-[0.92rem]"
+                zhClassName="text-[0.92rem]"
+                enClassName="text-[0.52rem] uppercase tracking-[0.16em] text-[var(--accent)]"
               />
             </Link>
           ))}

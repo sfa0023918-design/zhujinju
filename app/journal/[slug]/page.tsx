@@ -63,9 +63,10 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
           <BilingualText
             as="p"
             text={article.category}
-            className="flex flex-col gap-1 text-[var(--accent)]"
+            mode="inline"
+            className="text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
-            enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+            enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
           />
           <BilingualText
             as="h1"
@@ -91,14 +92,9 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
 
         <div className="mt-10 space-y-6">
           {article.body.map((paragraph) => (
-            <BilingualText
-              key={paragraph.zh}
-              as="p"
-              text={paragraph}
-              className="max-w-3xl flex flex-col gap-3 text-[var(--muted)]"
-              zhClassName="text-[1rem] leading-8 md:text-[1.05rem]"
-              enClassName="text-[0.84rem] leading-7 text-[var(--accent)]/80"
-            />
+            <p key={paragraph.zh} className="max-w-3xl text-[1rem] leading-8 text-[var(--muted)] md:text-[1.05rem]">
+              {paragraph.zh}
+            </p>
           ))}
         </div>
       </article>

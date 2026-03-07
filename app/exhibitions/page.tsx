@@ -48,9 +48,10 @@ export default function ExhibitionsPage() {
                   <BilingualText
                     as="p"
                     text={exhibition.subtitle}
-                    className="flex flex-col gap-1 text-[var(--accent)]"
+                    mode="inline"
+                    className="text-[var(--accent)]"
                     zhClassName="text-[0.72rem] tracking-[0.22em]"
-                    enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+                    enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
                   />
                   <div>
                     <BilingualText
@@ -61,21 +62,21 @@ export default function ExhibitionsPage() {
                       enClassName="mt-3 block font-sans text-[0.76rem] uppercase tracking-[0.22em] text-[var(--accent)]"
                     />
                     <div className="mt-3 flex flex-col gap-2 text-sm leading-7 text-[var(--muted)]">
-                      <BilingualText as="p" text={exhibition.period} className="flex flex-col gap-1" zhClassName="block" enClassName="block text-[0.72rem] text-[var(--accent)]/80" />
-                      <BilingualText as="p" text={exhibition.venue} className="flex flex-col gap-1" zhClassName="block" enClassName="block text-[0.72rem] text-[var(--accent)]/80" />
+                      <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
+                      <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
                     </div>
                   </div>
                   <BilingualText
                     as="p"
                     text={exhibition.intro}
-                    className="flex flex-col gap-3 text-[var(--muted)] md:text-[0.98rem]"
+                    className="text-[var(--muted)] md:text-[0.98rem]"
                     zhClassName="text-sm leading-8"
-                    enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+                    enClassName="hidden"
                   />
                 </div>
                 <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm leading-7 text-[var(--muted)]">
-                  <BilingualText as="p" text={exhibition.catalogueTitle} className="flex flex-col gap-1" zhClassName="block" enClassName="block text-[0.72rem] text-[var(--accent)]/80" />
-                  <BilingualText as="p" text={exhibition.catalogueIntro} className="flex flex-col gap-2" zhClassName="block" enClassName="block text-[0.76rem] leading-6 text-[var(--accent)]/80" />
+                  <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
+                  <p>{exhibition.catalogueIntro.zh}</p>
                   <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex text-[var(--ink)]">
                     查看展览详情 / View Exhibition
                   </Link>

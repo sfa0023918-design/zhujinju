@@ -71,9 +71,10 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           <BilingualText
             as="span"
             text={{ zh: "姓名", en: "Name" }}
-            className="flex flex-col gap-1"
+            mode="inline"
+            className="block"
             zhClassName="text-sm"
-            enClassName="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]"
           />
           <input
             required
@@ -85,9 +86,10 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           <BilingualText
             as="span"
             text={{ zh: "邮箱", en: "Email" }}
-            className="flex flex-col gap-1"
+            mode="inline"
+            className="block"
             zhClassName="text-sm"
-            enClassName="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]"
           />
           <input
             required
@@ -102,9 +104,10 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           <BilingualText
             as="span"
             text={{ zh: "机构 / 公司", en: "Institution / Company" }}
-            className="flex flex-col gap-1"
+            mode="inline"
+            className="block"
             zhClassName="text-sm"
-            enClassName="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]"
           />
           <input
             name="organization"
@@ -115,9 +118,10 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           <BilingualText
             as="span"
             text={{ zh: "身份", en: "Role" }}
-            className="flex flex-col gap-1"
+            mode="inline"
+            className="block"
             zhClassName="text-sm"
-            enClassName="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]"
           />
           <select
             name="identity"
@@ -133,13 +137,14 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         </label>
       </div>
       <label className="grid gap-2 text-sm text-[var(--muted)]">
-        <BilingualText
-          as="span"
-          text={{ zh: "意向作品", en: "Artwork of Interest" }}
-          className="flex flex-col gap-1"
-          zhClassName="text-sm"
-          enClassName="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]"
-        />
+          <BilingualText
+            as="span"
+            text={{ zh: "意向作品", en: "Artwork of Interest" }}
+            mode="inline"
+            className="block"
+            zhClassName="text-sm"
+            enClassName="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]"
+          />
         <input
           name="artwork"
           defaultValue={initialArtwork}
@@ -147,13 +152,14 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         />
       </label>
       <label className="grid gap-2 text-sm text-[var(--muted)]">
-        <BilingualText
-          as="span"
-          text={{ zh: "留言", en: "Message" }}
-          className="flex flex-col gap-1"
-          zhClassName="text-sm"
-          enClassName="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]"
-        />
+          <BilingualText
+            as="span"
+            text={{ zh: "留言", en: "Message" }}
+            mode="inline"
+            className="block"
+            zhClassName="text-sm"
+            enClassName="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]"
+          />
         <textarea
           required
           name="message"

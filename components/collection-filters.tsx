@@ -32,9 +32,10 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
           <BilingualText
             as="span"
             text={field.label}
-            className="flex flex-col gap-1 text-[var(--accent)]"
+            mode="inline"
+            className="text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.18em]"
-            enClassName="text-[0.54rem] uppercase tracking-[0.2em]"
+            enClassName="text-[0.5rem] uppercase tracking-[0.16em]"
           />
           <select
             name={field.name}

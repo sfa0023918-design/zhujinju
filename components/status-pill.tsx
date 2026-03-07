@@ -18,9 +18,10 @@ export function StatusPill({ status }: StatusPillProps) {
     <BilingualText
       as="span"
       text={getArtworkStatusText(status)}
-      className={`inline-flex flex-col rounded-full border px-3 py-1 ${statusClassMap[status]}`}
+      mode="inline"
+      className={`inline-flex items-center rounded-full border px-3 py-1 ${statusClassMap[status]}`}
       zhClassName="text-[0.72rem] tracking-[0.18em]"
-      enClassName="text-[0.52rem] uppercase tracking-[0.2em]"
+      enClassName="text-[0.5rem] uppercase tracking-[0.16em]"
     />
   );
 }

@@ -38,9 +38,10 @@ export function SiteFooter() {
           <BilingualText
             as="p"
             text={bt("联络", "Contact")}
-            className="flex flex-col gap-1 text-[var(--ink)]"
+            mode="inline"
+            className="text-[var(--ink)]"
             zhClassName="text-sm"
-            enClassName="text-[0.58rem] uppercase tracking-[0.24em] text-[var(--accent)]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]"
           />
           <a className="block" href={`mailto:${siteConfig.contact.email}`}>
             {siteConfig.contact.email}
@@ -52,18 +53,20 @@ export function SiteFooter() {
           <BilingualText
             as="p"
             text={bt("页面", "Pages")}
-            className="flex flex-col gap-1 text-[var(--ink)]"
+            mode="inline"
+            className="text-[var(--ink)]"
             zhClassName="text-sm"
-            enClassName="text-[0.58rem] uppercase tracking-[0.24em] text-[var(--accent)]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]"
           />
           {footerLinks.map((item) => (
             <Link key={item.href} className="block" href={item.href}>
               <BilingualText
                 as="span"
                 text={item.label}
-                className="flex flex-col gap-1"
+                mode="inline"
+                className="block"
                 zhClassName="block"
-                enClassName="block text-[0.58rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+                enClassName="text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]"
               />
             </Link>
           ))}

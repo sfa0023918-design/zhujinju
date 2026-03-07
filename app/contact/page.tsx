@@ -71,20 +71,8 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <p className="text-[var(--muted)]">{siteConfig.contact.whatsapp}</p>
           </div>
           <div className="border-t border-[var(--line)] pt-5">
-            <BilingualText
-              as="p"
-              text={siteConfig.contact.address}
-              className="flex flex-col gap-3 text-[var(--muted)]"
-              zhClassName="text-sm leading-8"
-              enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
-            />
-            <BilingualText
-              as="p"
-              text={bt("以预约制会面为主，亦可安排线上交流。", "Meetings are generally by appointment, with online conversations also available.")}
-              className="mt-3 flex flex-col gap-3 text-[var(--muted)]"
-              zhClassName="text-sm leading-8"
-              enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
-            />
+            <p className="text-sm leading-8 text-[var(--muted)]">{siteConfig.contact.address.zh}</p>
+            <p className="mt-3 text-sm leading-8 text-[var(--muted)]">以预约制会面为主，亦可安排线上交流。</p>
           </div>
         </div>
         <ContactForm initialArtwork={params.artwork} />

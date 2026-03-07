@@ -47,18 +47,20 @@ export default function HomePage() {
             <BilingualText
               as="p"
               text={brandIntro.statement}
-              className="max-w-xl flex flex-col gap-4 text-[var(--muted)]"
+              mode="inline"
+              className="max-w-xl text-[var(--muted)]"
               zhClassName="text-[1rem] leading-8 md:text-[1.08rem]"
-              enClassName="text-[0.84rem] leading-7 text-[var(--accent)]/80 md:text-[0.9rem]"
+              enClassName="text-[0.78rem] leading-7 text-[var(--accent)]/75 md:text-[0.82rem]"
             />
           </div>
           <div className="grid gap-5 border-t border-[var(--line)] pt-6">
             <BilingualText
               as="p"
               text={brandIntro.about}
-              className="max-w-lg flex flex-col gap-4 text-[var(--muted)]"
+              mode="inline"
+              className="max-w-lg text-[var(--muted)]"
               zhClassName="text-sm leading-8"
-              enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+              enClassName="text-[0.74rem] leading-7 text-[var(--accent)]/75"
             />
             <div className="flex flex-wrap gap-3">
               <Link
@@ -99,24 +101,26 @@ export default function HomePage() {
             <BilingualText
               as="p"
               text={currentExhibition.description[0]}
-              className="flex flex-col gap-3 text-[var(--muted)] md:text-[0.98rem]"
+              className="text-[var(--muted)] md:text-[0.98rem]"
               zhClassName="text-sm leading-8"
-              enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+              enClassName="hidden"
             />
             <div className="space-y-4 text-sm leading-7 text-[var(--muted)]">
               <BilingualText
                 as="p"
                 text={currentExhibition.period}
-                className="flex flex-col gap-1"
+                mode="inline"
+                className="block"
                 zhClassName="block"
-                enClassName="block text-[0.74rem] text-[var(--accent)]/80"
+                enClassName="text-[0.66rem] text-[var(--accent)]/75"
               />
               <BilingualText
                 as="p"
                 text={currentExhibition.venue}
-                className="flex flex-col gap-1"
+                mode="inline"
+                className="block"
                 zhClassName="block"
-                enClassName="block text-[0.74rem] text-[var(--accent)]/80"
+                enClassName="text-[0.66rem] text-[var(--accent)]/75"
               />
               <Link
                 href={`/exhibitions/${currentExhibition.slug}`}
@@ -167,9 +171,9 @@ export default function HomePage() {
               <BilingualText
                 as="p"
                 text={direction.description}
-                className="mt-4 flex flex-col gap-3 text-[var(--muted)]"
+                className="mt-4 text-[var(--muted)]"
                 zhClassName="text-sm leading-7"
-                enClassName="text-[0.78rem] leading-6 text-[var(--accent)]/80"
+                enClassName="hidden"
               />
             </div>
           ))}
@@ -198,9 +202,9 @@ export default function HomePage() {
               <BilingualText
                 as="p"
                 text={pillar.description}
-                className="mt-4 flex flex-col gap-3 text-[var(--muted)]"
+                className="mt-4 text-[var(--muted)]"
                 zhClassName="text-sm leading-7"
-                enClassName="text-[0.78rem] leading-6 text-[var(--accent)]/80"
+                enClassName="hidden"
               />
             </div>
           ))}
@@ -229,9 +233,10 @@ export default function HomePage() {
               "如需咨询具体作品、专题合作、机构借展、图录交换或研究交流，可通过联系页面提交信息。",
               "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page."
             )}
-            className="max-w-2xl flex flex-col gap-3 text-[var(--muted)] md:text-[0.98rem]"
+            mode="inline"
+            className="max-w-2xl text-[var(--muted)] md:text-[0.98rem]"
             zhClassName="text-sm leading-8"
-            enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+            enClassName="text-[0.76rem] leading-7 text-[var(--accent)]/75"
           />
         </div>
         <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm text-[var(--muted)] md:pt-0">

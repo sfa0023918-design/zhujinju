@@ -47,9 +47,10 @@ export default function JournalPage() {
                 <BilingualText
                   as="p"
                   text={article.category}
-                  className="flex flex-col gap-1 text-[var(--accent)]"
+                  mode="inline"
+                  className="text-[var(--accent)]"
                   zhClassName="text-[0.72rem] tracking-[0.22em]"
-                  enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+                  enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
                 />
                 <div>
                   <BilingualText
@@ -61,13 +62,9 @@ export default function JournalPage() {
                   />
                   <p className="mt-3 text-sm text-[var(--muted)]">{article.date}</p>
                 </div>
-                <BilingualText
-                  as="p"
-                  text={article.excerpt}
-                  className="max-w-2xl flex flex-col gap-3 text-[var(--muted)] md:text-[0.98rem]"
-                  zhClassName="text-sm leading-8"
-                  enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
-                />
+                <p className="max-w-2xl text-sm leading-8 text-[var(--muted)] md:text-[0.98rem]">
+                  {article.excerpt.zh}
+                </p>
                 <Link href={`/journal/${article.slug}`} className="inline-flex text-sm text-[var(--ink)]">
                   阅读全文 / Read Article
                 </Link>

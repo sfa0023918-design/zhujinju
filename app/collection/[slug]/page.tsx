@@ -88,9 +88,10 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                 <BilingualText
                   as="p"
                   text={artwork.category}
-                  className="flex flex-col gap-1 text-[var(--accent)]"
+                  mode="inline"
+                  className="text-[var(--accent)]"
                   zhClassName="text-[0.74rem] tracking-[0.16em]"
-                  enClassName="text-[0.54rem] uppercase tracking-[0.22em]"
+                  enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
                 />
                 <StatusPill status={artwork.status} />
               </div>
@@ -105,18 +106,13 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                 <BilingualText
                   as="p"
                   text={artwork.subtitle}
-                  className="mt-3 flex flex-col gap-2 text-[var(--muted)]"
+                  mode="inline"
+                  className="mt-2 text-[var(--muted)]"
                   zhClassName="text-sm leading-7 md:text-[0.98rem]"
-                  enClassName="text-[0.78rem] leading-6 text-[var(--accent)]/80"
+                  enClassName="text-[0.72rem] leading-6 text-[var(--accent)]/75"
                 />
               </div>
-              <BilingualText
-                as="p"
-                text={artwork.excerpt}
-                className="flex flex-col gap-3 text-[var(--muted)]"
-                zhClassName="text-sm leading-8"
-                enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
-              />
+              <p className="text-sm leading-8 text-[var(--muted)]">{artwork.excerpt.zh}</p>
             </div>
 
             <dl className="grid gap-4 border-t border-[var(--line)] pt-5 text-sm">
@@ -125,16 +121,18 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                   <BilingualText
                     as="dt"
                     text={field.label}
-                    className="flex flex-col gap-1 text-[var(--accent)]"
+                    mode="inline"
+                    className="text-[var(--accent)]"
                     zhClassName="text-[0.72rem] tracking-[0.18em]"
-                    enClassName="text-[0.52rem] uppercase tracking-[0.2em]"
+                    enClassName="text-[0.48rem] uppercase tracking-[0.16em]"
                   />
                   <BilingualText
                     as="dd"
                     text={artwork[field.key]}
-                    className="flex flex-col gap-1 text-[var(--muted)]"
+                    mode="inline"
+                    className="text-[var(--muted)]"
                     zhClassName="block"
-                    enClassName="block text-[0.72rem] leading-6 text-[var(--accent)]/80"
+                    enClassName="text-[0.66rem] leading-6 text-[var(--accent)]/75"
                   />
                 </div>
               ))}
@@ -169,14 +167,9 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           />
           <div className="space-y-6">
             {artwork.statement.map((paragraph) => (
-              <BilingualText
-                key={paragraph.zh}
-                as="p"
-                text={paragraph}
-                className="rich-text flex flex-col gap-3 text-[var(--muted)]"
-                zhClassName="text-[0.98rem] leading-8"
-                enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80"
-              />
+              <p key={paragraph.zh} className="rich-text text-[0.98rem] leading-8 text-[var(--muted)]">
+                {paragraph.zh}
+              </p>
             ))}
           </div>
         </div>
@@ -195,9 +188,9 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                   <BilingualText
                     as="p"
                     text={item}
-                    className="flex flex-col gap-2 text-[var(--muted)]"
+                    className="text-[var(--muted)]"
                     zhClassName="text-sm leading-7"
-                    enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
+                    enClassName="hidden"
                   />
                 </li>
               ))}
@@ -217,9 +210,9 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                   <BilingualText
                     as="p"
                     text={item}
-                    className="flex flex-col gap-2 text-[var(--muted)]"
+                    className="text-[var(--muted)]"
                     zhClassName="text-sm leading-7"
-                    enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
+                    enClassName="hidden"
                   />
                 </li>
               ))}
@@ -239,9 +232,9 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                   <BilingualText
                     as="p"
                     text={item}
-                    className="flex flex-col gap-2 text-[var(--muted)]"
+                    className="text-[var(--muted)]"
                     zhClassName="text-sm leading-7"
-                    enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
+                    enClassName="hidden"
                   />
                 </li>
               ))}

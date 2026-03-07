@@ -21,9 +21,10 @@ export function SectionIntro({
         <BilingualText
           as="p"
           text={eyebrow}
-          className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
+          mode="inline"
+          className="mb-3 text-[var(--accent)]"
           zhClassName="text-[0.78rem] tracking-[0.18em]"
-          enClassName="text-[0.68rem] uppercase tracking-[0.24em]"
+          enClassName="text-[0.62rem] uppercase tracking-[0.22em]"
         />
       ) : null}
       <BilingualText
@@ -36,10 +37,11 @@ export function SectionIntro({
       {description ? (
         <BilingualText
           as="p"
+          mode="inline"
           text={description}
-          className="mt-5 max-w-2xl flex flex-col gap-3 text-[var(--muted)]"
+          className="mt-5 max-w-2xl text-[var(--muted)]"
           zhClassName="text-base leading-8 md:text-[1.02rem]"
-          enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80 md:text-[0.88rem]"
+          enClassName="text-[0.76rem] leading-7 text-[var(--accent)]/75 md:text-[0.82rem]"
         />
       ) : null}
     </div>

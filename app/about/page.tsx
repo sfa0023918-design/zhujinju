@@ -31,9 +31,10 @@ export default function AboutPage() {
           <BilingualText
             as="p"
             text={bt("定位", "Position")}
-            className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+            mode="inline"
+            className="mb-4 text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
-            enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+            enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
           />
           <BilingualText
             as="h2"
@@ -44,33 +45,13 @@ export default function AboutPage() {
           />
         </div>
         <div className="space-y-6">
-          <BilingualText
-            as="p"
-            text={brandIntro.about}
-            className="flex flex-col gap-3 text-[var(--muted)]"
-            zhClassName="text-[0.98rem] leading-8"
-            enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80"
-          />
-          <BilingualText
-            as="p"
-            text={bt(
-              "我们不以“海量上新”定义专业，也不将古代艺术处理为泛化的装饰品类。每一次展示、每一件作品与每一段文字，都应指向更准确的观看。",
-              "We do not define professionalism through volume, nor treat historical art as a generalized decorative category. Each display, object, and text should lead toward more accurate seeing."
-            )}
-            className="flex flex-col gap-3 text-[var(--muted)]"
-            zhClassName="text-[0.98rem] leading-8"
-            enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80"
-          />
-          <BilingualText
-            as="p"
-            text={bt(
-              "对竹瑾居而言，品牌并不独立于学术判断之外；网站、展览与图录，本身就是专业工作持续公开的一部分。",
-              "For Zhu Jin Ju, brand identity is not separate from scholarly judgement; the website, exhibitions, and catalogues are themselves part of that work made public."
-            )}
-            className="flex flex-col gap-3 text-[var(--muted)]"
-            zhClassName="text-[0.98rem] leading-8"
-            enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80"
-          />
+          <p className="text-[0.98rem] leading-8 text-[var(--muted)]">{brandIntro.about.zh}</p>
+          <p className="text-[0.98rem] leading-8 text-[var(--muted)]">
+            我们不以“海量上新”定义专业，也不将古代艺术处理为泛化的装饰品类。每一次展示、每一件作品与每一段文字，都应指向更准确的观看。
+          </p>
+          <p className="text-[0.98rem] leading-8 text-[var(--muted)]">
+            对竹瑾居而言，品牌并不独立于学术判断之外；网站、展览与图录，本身就是专业工作持续公开的一部分。
+          </p>
         </div>
       </section>
 
@@ -90,7 +71,7 @@ export default function AboutPage() {
                 text={item}
                 className="font-serif text-[var(--ink)]"
                 zhClassName="block text-[1.55rem] leading-snug tracking-[-0.03em]"
-                enClassName="mt-3 block font-sans text-[0.78rem] leading-7 text-[var(--accent)]"
+                enClassName="hidden"
               />
             </div>
           ))}
@@ -111,9 +92,9 @@ export default function AboutPage() {
               <BilingualText
                 as="p"
                 text={pillar.description}
-                className="mt-4 flex flex-col gap-3 text-[var(--muted)]"
+                className="mt-4 text-[var(--muted)]"
                 zhClassName="text-sm leading-7"
-                enClassName="text-[0.78rem] leading-6 text-[var(--accent)]/80"
+                enClassName="hidden"
               />
             </div>
           ))}
