@@ -19,9 +19,9 @@ export function StatusPill({ status }: StatusPillProps) {
       as="span"
       text={getArtworkStatusText(status)}
       mode="inline"
-      className={`inline-flex items-center rounded-full border px-3 py-1 ${statusClassMap[status]}`}
+      className={`inline-flex items-center rounded-full border px-3 py-[0.28rem] ${statusClassMap[status]}`}
       zhClassName="text-[0.72rem] tracking-[0.18em]"
-      enClassName="text-[0.46rem] uppercase tracking-[0.14em] opacity-75"
+      enClassName="text-[0.44rem] uppercase tracking-[0.12em] opacity-70"
     />
   );
 }

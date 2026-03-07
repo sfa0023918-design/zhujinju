@@ -20,8 +20,8 @@ const fieldLabels = {
 
 export function ArtworkCard({ artwork, priority = false }: ArtworkCardProps) {
   return (
-    <article className="group border-t border-[var(--line)] pt-5 md:pt-6">
-      <Link href={`/collection/${artwork.slug}`} className="grid gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(260px,0.55fr)] md:gap-8">
+    <article className="group border-t border-[var(--line)] pt-6 md:pt-7">
+      <Link href={`/collection/${artwork.slug}`} className="grid gap-6 md:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.52fr)] md:gap-10">
         <div className="relative overflow-hidden bg-[var(--surface-strong)]">
           <Image
             src={artwork.image}
@@ -30,10 +30,10 @@ export function ArtworkCard({ artwork, priority = false }: ArtworkCardProps) {
             height={1200}
             priority={priority}
             unoptimized
-            className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.015]"
+            className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.008]"
           />
         </div>
-        <div className="flex flex-col justify-between gap-6 py-1">
+        <div className="flex flex-col justify-between gap-7 py-1">
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
               <BilingualText
@@ -52,7 +52,7 @@ export function ArtworkCard({ artwork, priority = false }: ArtworkCardProps) {
                 text={artwork.title}
                 className="font-serif text-[var(--ink)]"
                 zhClassName="block text-[1.7rem] leading-tight tracking-[-0.03em] md:text-[2.2rem]"
-                enClassName="mt-2 block font-sans text-[0.74rem] uppercase tracking-[0.2em] text-[var(--accent)]"
+                enClassName="mt-2 block font-sans text-[0.66rem] uppercase tracking-[0.18em] text-[var(--accent)]/78"
               />
               <BilingualText
                 as="p"
@@ -67,7 +67,7 @@ export function ArtworkCard({ artwork, priority = false }: ArtworkCardProps) {
               {artwork.excerpt.zh}
             </p>
           </div>
-          <dl className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm text-[var(--muted)] md:max-w-sm">
+          <dl className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-[var(--muted)] md:max-w-[22rem]">
             {(Object.keys(fieldLabels) as Array<keyof typeof fieldLabels>).map((key) => (
               <div key={key}>
                 <BilingualText

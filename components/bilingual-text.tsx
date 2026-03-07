@@ -19,7 +19,7 @@ export function BilingualText<T extends ElementType = "div">({
   zhClassName,
   enClassName,
   mode = "stacked",
-  separator = " / ",
+  separator = "·",
   ...props
 }: BilingualTextProps<T>) {
   const Component = as ?? "div";
@@ -28,7 +28,7 @@ export function BilingualText<T extends ElementType = "div">({
     return (
       <Component className={className} {...props}>
         <span className={zhClassName}>{text.zh}</span>
-        <span aria-hidden="true" className="mx-1 opacity-50">
+        <span aria-hidden="true" className="mx-[0.45em] opacity-40">
           {separator}
         </span>
         <span className={enClassName}>{text.en}</span>

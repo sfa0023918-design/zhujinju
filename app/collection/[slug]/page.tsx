@@ -70,7 +70,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <span className="px-2">/</span>
           <span>{formatInlineText(artwork.title)}</span>
         </div>
-        <div className="grid gap-10 md:grid-cols-[minmax(0,1.02fr)_minmax(280px,0.5fr)] md:gap-12">
+        <div className="grid gap-10 md:grid-cols-[minmax(0,1.04fr)_minmax(280px,0.48fr)] md:gap-14">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
             <Image
               src={artwork.image}
@@ -101,7 +101,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                   text={artwork.title}
                   className="font-serif text-[var(--ink)]"
                   zhClassName="block text-[2.5rem] leading-[0.96] tracking-[-0.05em] md:text-[4.35rem]"
-                  enClassName="mt-3 block font-sans text-[0.78rem] uppercase tracking-[0.22em] text-[var(--accent)] md:text-[0.9rem]"
+                  enClassName="mt-2 block font-sans text-[0.68rem] uppercase tracking-[0.18em] text-[var(--accent)]/78 md:text-[0.76rem]"
                 />
                 <BilingualText
                   as="p"
@@ -117,7 +117,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
 
             <dl className="grid gap-4 border-t border-[var(--line)] pt-5 text-sm">
               {fieldRows.map((field) => (
-                <div key={field.key} className="grid grid-cols-[112px_1fr] gap-4">
+                <div key={field.key} className="grid grid-cols-[118px_1fr] gap-4">
                   <BilingualText
                     as="dt"
                     text={field.label}
@@ -141,13 +141,13 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div className="grid gap-3 border-t border-[var(--line)] pt-5">
               <Link
                 href={`/contact?artwork=${encodeURIComponent(formatInlineText(artwork.title))}`}
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-sm tracking-[0.01em] text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
                 询洽此件作品 / Inquire
               </Link>
               <Link
                 href="/collection"
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-sm text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+                className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-sm tracking-[0.01em] text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
                 返回藏品浏览 / Back to Collection
               </Link>

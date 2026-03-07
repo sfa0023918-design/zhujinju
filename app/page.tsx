@@ -97,7 +97,7 @@ export default function HomePage() {
               className="aspect-[1.45/1] h-full w-full object-cover"
             />
           </div>
-          <div className="grid gap-6 border-t border-[var(--line)] pt-5 md:grid-cols-[0.65fr_0.35fr]">
+          <div className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-[0.68fr_0.32fr]">
             <BilingualText
               as="p"
               text={currentExhibition.description[0]}
@@ -105,7 +105,7 @@ export default function HomePage() {
               zhClassName="text-sm leading-8"
               enClassName="hidden"
             />
-            <div className="space-y-4 text-sm leading-7 text-[var(--muted)]">
+            <div className="space-y-3 text-sm leading-7 text-[var(--muted)]">
               <BilingualText
                 as="p"
                 text={currentExhibition.period}
@@ -124,7 +124,7 @@ export default function HomePage() {
               />
               <Link
                 href={`/exhibitions/${currentExhibition.slug}`}
-                className="inline-flex pt-2 text-[var(--ink)]"
+                className="inline-flex pt-3 text-[0.92rem] text-[var(--ink)]"
               >
                 进入专题详情 / View Exhibition
               </Link>
@@ -142,7 +142,7 @@ export default function HomePage() {
             "The homepage foregrounds works of stylistic weight and visual tension, with a structure designed to serve the object rather than decorative excess."
           )}
         />
-        <div className="mt-10 grid gap-8">
+        <div className="mt-11 grid gap-9">
           {featuredArtworks.slice(0, 4).map((artwork, index) => (
             <ArtworkCard key={artwork.slug} artwork={artwork} priority={index < 2} />
           ))}
