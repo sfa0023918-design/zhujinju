@@ -13,6 +13,7 @@ const IMAGE_EXTENSIONS: Record<string, string> = {
   "image/gif": ".gif",
   "image/svg+xml": ".svg",
 };
+const MAX_SERVER_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 function slugifyFilePart(value: string) {
   return value
@@ -46,8 +47,8 @@ function assertImageFile(file: File) {
     throw new Error("仅支持上传图片文件。");
   }
 
-  if (file.size > 10 * 1024 * 1024) {
-    throw new Error("单张图片请控制在 10MB 以内。");
+  if (file.size > MAX_SERVER_UPLOAD_BYTES) {
+    throw new Error("单张图片请控制在 4MB 以内。");
   }
 }
 
