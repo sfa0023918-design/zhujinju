@@ -71,13 +71,13 @@ export default async function HomePage() {
                 href="/collection"
                 className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
-                <ActionLabel text={bt("浏览藏品", "Browse Collection")} />
+                <ActionLabel text={pageCopy.home.heroPrimaryAction} />
               </Link>
               <Link
                 href="/exhibitions"
                 className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
-                <ActionLabel text={bt("查看展览与图录", "View Exhibitions")} />
+                <ActionLabel text={pageCopy.home.heroSecondaryAction} />
               </Link>
             </div>
           </div>
@@ -127,13 +127,14 @@ export default async function HomePage() {
                 enClassName="text-[0.66rem] text-[var(--accent)]/75"
               />
               <p className="text-[0.92rem] text-[var(--muted)]">
-                {currentExhibition.highlightCount} 件重点作品 · {currentExhibition.cataloguePages} 页图录
+                {currentExhibition.highlightCount} {pageCopy.home.focusSummaryLine.highlightUnit.zh} · {currentExhibition.cataloguePages}{" "}
+                {pageCopy.home.focusSummaryLine.catalogueUnit.zh}
               </p>
               <Link
                 href={`/exhibitions/${currentExhibition.slug}`}
                 className="inline-flex pt-3 text-[var(--ink)]"
               >
-                <ActionLabel text={bt("进入专题详情", "View Exhibition")} align="start" />
+                <ActionLabel text={pageCopy.home.focusAction} align="start" />
               </Link>
             </div>
           </div>
@@ -244,10 +245,10 @@ export default async function HomePage() {
         </div>
         <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm text-[var(--muted)] md:border-t-0 md:border-l md:pl-8 md:pt-0">
           <Link href="/contact" className="inline-flex text-[var(--ink)]">
-            <ActionLabel text={bt("前往联系页面", "Contact Page")} align="start" />
+            <ActionLabel text={pageCopy.home.contactPrimaryAction} align="start" />
           </Link>
           <Link href="/journal" className="block">
-            <ActionLabel text={bt("查看文章与研究", "Read Journal")} align="start" />
+            <ActionLabel text={pageCopy.home.contactSecondaryAction} align="start" />
           </Link>
         </div>
       </section>

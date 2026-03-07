@@ -37,8 +37,8 @@ export async function generateMetadata({
 
   if (!article) {
     return buildMetadata({
-      title: bt("文章未找到", "Article Not Found"),
-      description: bt("当前文章不存在或尚未公开。", "This article is unavailable or not yet published."),
+      title: content.pageCopy.articleDetail.errorTitle,
+      description: content.pageCopy.articleDetail.errorDescription,
       path: "/journal",
       site: content.siteConfig,
     });
@@ -64,12 +64,13 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
 
   const relatedExhibitions = getExhibitionsBySlugs(content, article.relatedExhibitionSlugs);
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
+  const detailCopy = content.pageCopy.articleDetail;
 
   return (
     <>
       <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-10 md:py-12">
         <Link href="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-          <ActionLabel text={bt("返回文章", "Back to Journal")} align="start" />
+          <ActionLabel text={detailCopy.backAction} align="start" />
         </Link>
       </section>
 
@@ -130,7 +131,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
               <div>
                 <BilingualText
                   as="p"
-                  text={bt("相关展览", "Related Exhibition")}
+                  text={detailCopy.relatedExhibitions}
                   mode="inline"
                   className="mb-4 text-[var(--accent)]"
                   zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -153,7 +154,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
               <div>
                 <BilingualText
                   as="p"
-                  text={bt("相关藏品", "Related Works")}
+                  text={detailCopy.relatedWorks}
                   mode="inline"
                   className="mb-4 text-[var(--accent)]"
                   zhClassName="text-[0.72rem] tracking-[0.22em]"

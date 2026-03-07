@@ -43,7 +43,11 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
       />
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
-        <CollectionFilters current={filters} options={filterOptions} />
+        <CollectionFilters
+          current={filters}
+          options={filterOptions}
+          labels={pageCopy.collection.filters}
+        />
         <div className="mt-10 grid gap-8">
           {artworks.length > 0 ? (
             artworks.map((artwork) => <ArtworkCard key={artwork.slug} artwork={artwork} />)

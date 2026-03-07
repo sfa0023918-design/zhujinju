@@ -29,14 +29,24 @@ export const editableSections: Array<{
   description: BilingualText;
 }> = [
   {
-    key: "siteConfig",
-    title: bt("站点设置", "Site Settings"),
-    description: bt("网站名、SEO、域名与联系方式。", "Site name, SEO, domain, and contact details."),
-  },
-  {
     key: "pageCopy",
     title: bt("页面文案", "Page Copy"),
-    description: bt("按前台页面顺序编辑首页、关于、联系、藏品、展览与文章页文案。", "Edit homepage, about, contact, collection, exhibition, and journal copy in front-end order."),
+    description: bt("推荐先改：按前台页面顺序编辑首页、关于、联系、藏品、展览与文章页文案。", "Recommended first: edit homepage, about, contact, collection, exhibition, and journal copy in front-end order."),
+  },
+  {
+    key: "artworks",
+    title: bt("藏品", "Artworks"),
+    description: bt("新增、编辑或下线藏品资料。", "Create, edit, or unpublish artworks."),
+  },
+  {
+    key: "exhibitions",
+    title: bt("展览", "Exhibitions"),
+    description: bt("展览项目、图录页数与相关作品。", "Exhibitions, catalogue pagination, and related works."),
+  },
+  {
+    key: "articles",
+    title: bt("文章", "Articles"),
+    description: bt("文章、作者、关键词与互链信息。", "Articles, authors, keywords, and cross-linking."),
   },
   {
     key: "brandIntro",
@@ -54,19 +64,9 @@ export const editableSections: Array<{
     description: bt("首页与关于页使用的专业积累信息。", "Professional facts used on the homepage and about page."),
   },
   {
-    key: "artworks",
-    title: bt("藏品", "Artworks"),
-    description: bt("新增、编辑或下线藏品资料。", "Create, edit, or unpublish artworks."),
-  },
-  {
-    key: "exhibitions",
-    title: bt("展览", "Exhibitions"),
-    description: bt("展览项目、图录页数与相关作品。", "Exhibitions, catalogue pagination, and related works."),
-  },
-  {
-    key: "articles",
-    title: bt("文章", "Articles"),
-    description: bt("文章、作者、关键词与互链信息。", "Articles, authors, keywords, and cross-linking."),
+    key: "siteConfig",
+    title: bt("站点设置", "Site Settings"),
+    description: bt("网站名、SEO、域名与联系方式。", "Site name, SEO, domain, and contact details."),
   },
 ];
 
@@ -141,7 +141,133 @@ export async function saveSiteSection(
 function normalizeSiteContent(content: SiteContent): SiteContent {
   return {
     ...content,
-    pageCopy: content.pageCopy ?? structuredClone(defaultPageCopy),
+    pageCopy: {
+      ...structuredClone(defaultPageCopy),
+      ...content.pageCopy,
+      siteChrome: {
+        ...structuredClone(defaultPageCopy.siteChrome),
+        ...content.pageCopy?.siteChrome,
+        footer: {
+          ...structuredClone(defaultPageCopy.siteChrome.footer),
+          ...content.pageCopy?.siteChrome?.footer,
+        },
+        contactForm: {
+          ...structuredClone(defaultPageCopy.siteChrome.contactForm),
+          ...content.pageCopy?.siteChrome?.contactForm,
+          roleOptions:
+            content.pageCopy?.siteChrome?.contactForm?.roleOptions ??
+            structuredClone(defaultPageCopy.siteChrome.contactForm.roleOptions),
+        },
+      },
+      home: {
+        ...structuredClone(defaultPageCopy.home),
+        ...content.pageCopy?.home,
+        focusCurrent: {
+          ...structuredClone(defaultPageCopy.home.focusCurrent),
+          ...content.pageCopy?.home?.focusCurrent,
+        },
+        focusRecent: {
+          ...structuredClone(defaultPageCopy.home.focusRecent),
+          ...content.pageCopy?.home?.focusRecent,
+        },
+        focusSummaryLine: {
+          ...structuredClone(defaultPageCopy.home.focusSummaryLine),
+          ...content.pageCopy?.home?.focusSummaryLine,
+        },
+        selectedWorks: {
+          ...structuredClone(defaultPageCopy.home.selectedWorks),
+          ...content.pageCopy?.home?.selectedWorks,
+        },
+        collectingDirections: {
+          ...structuredClone(defaultPageCopy.home.collectingDirections),
+          ...content.pageCopy?.home?.collectingDirections,
+        },
+        operationalFacts: {
+          ...structuredClone(defaultPageCopy.home.operationalFacts),
+          ...content.pageCopy?.home?.operationalFacts,
+        },
+        contact: {
+          ...structuredClone(defaultPageCopy.home.contact),
+          ...content.pageCopy?.home?.contact,
+        },
+      },
+      about: {
+        ...structuredClone(defaultPageCopy.about),
+        ...content.pageCopy?.about,
+        hero: {
+          ...structuredClone(defaultPageCopy.about.hero),
+          ...content.pageCopy?.about?.hero,
+        },
+        position: {
+          ...structuredClone(defaultPageCopy.about.position),
+          ...content.pageCopy?.about?.position,
+        },
+      },
+      contact: {
+        ...structuredClone(defaultPageCopy.contact),
+        ...content.pageCopy?.contact,
+        hero: {
+          ...structuredClone(defaultPageCopy.contact.hero),
+          ...content.pageCopy?.contact?.hero,
+        },
+        infoLabels: {
+          ...structuredClone(defaultPageCopy.contact.infoLabels),
+          ...content.pageCopy?.contact?.infoLabels,
+        },
+      },
+      collection: {
+        ...structuredClone(defaultPageCopy.collection),
+        ...content.pageCopy?.collection,
+        hero: {
+          ...structuredClone(defaultPageCopy.collection.hero),
+          ...content.pageCopy?.collection?.hero,
+        },
+        filters: {
+          ...structuredClone(defaultPageCopy.collection.filters),
+          ...content.pageCopy?.collection?.filters,
+        },
+      },
+      artworkDetail: {
+        ...structuredClone(defaultPageCopy.artworkDetail),
+        ...content.pageCopy?.artworkDetail,
+        fieldLabels: {
+          ...structuredClone(defaultPageCopy.artworkDetail.fieldLabels),
+          ...content.pageCopy?.artworkDetail?.fieldLabels,
+        },
+      },
+      exhibitions: {
+        ...structuredClone(defaultPageCopy.exhibitions),
+        ...content.pageCopy?.exhibitions,
+        hero: {
+          ...structuredClone(defaultPageCopy.exhibitions.hero),
+          ...content.pageCopy?.exhibitions?.hero,
+        },
+        cardLabels: {
+          ...structuredClone(defaultPageCopy.exhibitions.cardLabels),
+          ...content.pageCopy?.exhibitions?.cardLabels,
+        },
+      },
+      exhibitionDetail: {
+        ...structuredClone(defaultPageCopy.exhibitionDetail),
+        ...content.pageCopy?.exhibitionDetail,
+        summaryLine: {
+          ...structuredClone(defaultPageCopy.exhibitionDetail.summaryLine),
+          ...content.pageCopy?.exhibitionDetail?.summaryLine,
+        },
+      },
+      journal: {
+        ...structuredClone(defaultPageCopy.journal),
+        ...content.pageCopy?.journal,
+        hero: {
+          ...structuredClone(defaultPageCopy.journal.hero),
+          ...content.pageCopy?.journal?.hero,
+        },
+      },
+      articleDetail: {
+        ...structuredClone(defaultPageCopy.articleDetail),
+        ...content.pageCopy?.articleDetail,
+      },
+    },
     brandIntro: {
       ...content.brandIntro,
       heroImage: content.brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape",

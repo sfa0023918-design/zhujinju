@@ -38,8 +38,8 @@ export async function generateMetadata({
 
   if (!exhibition) {
     return buildMetadata({
-      title: bt("展览未找到", "Exhibition Not Found"),
-      description: bt("当前展览不存在或尚未公开。", "This exhibition is unavailable or not yet published."),
+      title: content.pageCopy.exhibitionDetail.errorTitle,
+      description: content.pageCopy.exhibitionDetail.errorDescription,
       path: "/exhibitions",
       site: content.siteConfig,
     });
@@ -66,13 +66,14 @@ export default async function ExhibitionDetailPage({
 
   const highlightArtworks = getHighlightedArtworks(content, exhibition.highlightArtworkSlugs);
   const relatedArticles = getArticlesBySlugs(content, exhibition.relatedArticleSlugs);
+  const detailCopy = content.pageCopy.exhibitionDetail;
 
   return (
     <>
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-8 md:grid-cols-[minmax(0,1fr)_320px] md:px-10 md:py-12">
         <div className="space-y-6">
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-            <ActionLabel text={bt("返回展览与图录", "Back to Exhibitions")} align="start" />
+            <ActionLabel text={detailCopy.backAction} align="start" />
           </Link>
           <div className="space-y-4">
             <BilingualText
@@ -103,7 +104,10 @@ export default async function ExhibitionDetailPage({
           <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
           <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
           <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
-          <p>{exhibition.highlightCount} 件重点作品 · {exhibition.cataloguePages} 页图录</p>
+          <p>
+            {exhibition.highlightCount} {detailCopy.summaryLine.highlightUnit.zh} · {exhibition.cataloguePages}{" "}
+            {detailCopy.summaryLine.catalogueUnit.zh}
+          </p>
         </div>
       </section>
 
@@ -132,7 +136,7 @@ export default async function ExhibitionDetailPage({
         <div className="border-t border-[var(--line)] pt-5 text-sm leading-8 text-[var(--muted)] md:border-t-0 md:border-l md:pl-8 md:pt-0">
           <BilingualText
             as="p"
-            text={bt("图录说明", "Catalogue Note")}
+            text={detailCopy.catalogueNote}
             className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
             enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
@@ -151,7 +155,7 @@ export default async function ExhibitionDetailPage({
             <div className="mt-6 border-t border-[var(--line)] pt-5">
               <BilingualText
                 as="p"
-                text={bt("相关文字", "Related Writing")}
+                text={detailCopy.relatedWriting}
                 mode="inline"
                 className="mb-4 text-[var(--accent)]"
                 zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -178,14 +182,14 @@ export default async function ExhibitionDetailPage({
           <div>
             <BilingualText
               as="p"
-              text={bt("重点作品", "Highlighted Works")}
+              text={detailCopy.highlightedWorks}
               className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
               enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
             />
             <BilingualText
               as="h2"
-              text={bt("展览中的关键观看节点", "Key Viewing Points Within the Exhibition")}
+              text={detailCopy.highlightedWorksTitle}
               className="font-serif text-[var(--ink)]"
               zhClassName="block text-[2rem] leading-none tracking-[-0.04em] md:text-[3.5rem]"
               enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"

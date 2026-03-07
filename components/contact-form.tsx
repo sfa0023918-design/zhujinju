@@ -2,16 +2,31 @@
 
 import { useState } from "react";
 
-import { bt } from "@/lib/bilingual";
+import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
 import { ActionLabel } from "./action-label";
 import { BilingualText } from "./bilingual-text";
 
 type ContactFormProps = {
   initialArtwork?: string;
+  copy: {
+    introIdle: BilingualValue;
+    introSubmitting: BilingualValue;
+    introSuccess: BilingualValue;
+    introError: BilingualValue;
+    nameLabel: BilingualValue;
+    emailLabel: BilingualValue;
+    organizationLabel: BilingualValue;
+    roleLabel: BilingualValue;
+    artworkLabel: BilingualValue;
+    messageLabel: BilingualValue;
+    submitLabel: BilingualValue;
+    submittingLabel: BilingualValue;
+    roleOptions: BilingualValue[];
+  };
 };
 
-export function ContactForm({ initialArtwork }: ContactFormProps) {
+export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
   async function handleSubmit(formData: FormData) {
@@ -46,22 +61,10 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
   }
 
   const statusCopy = {
-    idle: {
-      zh: "欢迎藏家、机构、策展人与研究者联系。",
-      en: "Collectors, institutions, curators, and researchers are welcome to get in touch.",
-    },
-    submitting: {
-      zh: "提交中",
-      en: "Sending",
-    },
-    success: {
-      zh: "已收到信息。竹瑾居通常会于一个工作日内回复。",
-      en: "Message received. Zhu Jin Ju usually replies within one working day.",
-    },
-    error: {
-      zh: "提交失败，请稍后再试。",
-      en: "Submission failed. Please try again later.",
-    },
+    idle: copy.introIdle,
+    submitting: copy.introSubmitting,
+    success: copy.introSuccess,
+    error: copy.introError,
   } as const;
 
   return (
@@ -73,7 +76,7 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "姓名", en: "Name" }}
+            text={copy.nameLabel}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -88,7 +91,7 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "邮箱", en: "Email" }}
+            text={copy.emailLabel}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -106,7 +109,7 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "机构与公司", en: "Institution / Company" }}
+            text={copy.organizationLabel}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -120,7 +123,7 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "身份", en: "Role" }}
+            text={copy.roleLabel}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -128,21 +131,19 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           />
           <select
             name="identity"
-            defaultValue="藏家 · Collector"
+            defaultValue={`${copy.roleOptions[0]?.zh ?? ""} · ${copy.roleOptions[0]?.en ?? ""}`}
             className="h-11 border border-[var(--line)] bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           >
-            <option>藏家 · Collector</option>
-            <option>机构 · Institution</option>
-            <option>策展人 · Curator</option>
-            <option>研究者 · Researcher</option>
-            <option>媒体 · Press</option>
+            {copy.roleOptions.map((option) => (
+              <option key={option.zh}>{`${option.zh} · ${option.en}`}</option>
+            ))}
           </select>
         </label>
       </div>
       <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "意向作品", en: "Artwork of Interest" }}
+            text={copy.artworkLabel}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -157,7 +158,7 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
       <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "留言", en: "Message" }}
+            text={copy.messageLabel}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -177,9 +178,9 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-6 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === "submitting" ? (
-            <ActionLabel text={bt("提交中", "Sending")} />
+            <ActionLabel text={copy.submittingLabel} />
           ) : (
-            <ActionLabel text={bt("发送联系信息", "Send Inquiry")} />
+            <ActionLabel text={copy.submitLabel} />
           )}
         </button>
         <BilingualText

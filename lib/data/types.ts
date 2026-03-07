@@ -138,9 +138,41 @@ export type PageIntroCopy = {
 };
 
 export type PageCopyContent = {
+  siteChrome: {
+    footer: {
+      intro: BilingualText;
+      appointment: BilingualText;
+      copyrightLabel: BilingualText;
+      contactHeading: BilingualText;
+      informationHeading: BilingualText;
+      collectionLink: BilingualText;
+      exhibitionsLink: BilingualText;
+      journalLink: BilingualText;
+      pdfRequestLabel: BilingualText;
+      instagramLabel: BilingualText;
+      wechatLabel: BilingualText;
+    };
+    contactForm: {
+      introIdle: BilingualText;
+      introSubmitting: BilingualText;
+      introSuccess: BilingualText;
+      introError: BilingualText;
+      nameLabel: BilingualText;
+      emailLabel: BilingualText;
+      organizationLabel: BilingualText;
+      roleLabel: BilingualText;
+      artworkLabel: BilingualText;
+      messageLabel: BilingualText;
+      submitLabel: BilingualText;
+      submittingLabel: BilingualText;
+      roleOptions: BilingualText[];
+    };
+  };
   home: {
     heroEyebrow: BilingualText;
     heroTitle: BilingualText;
+    heroPrimaryAction: BilingualText;
+    heroSecondaryAction: BilingualText;
     focusCurrent: {
       eyebrow: BilingualText;
       description: BilingualText;
@@ -149,10 +181,17 @@ export type PageCopyContent = {
       eyebrow: BilingualText;
       description: BilingualText;
     };
+    focusSummaryLine: {
+      highlightUnit: BilingualText;
+      catalogueUnit: BilingualText;
+    };
+    focusAction: BilingualText;
     selectedWorks: PageIntroCopy;
     collectingDirections: PageIntroCopy;
     operationalFacts: PageIntroCopy;
     contact: PageIntroCopy;
+    contactPrimaryAction: BilingualText;
+    contactSecondaryAction: BilingualText;
   };
   about: {
     hero: PageHeroCopy;
@@ -167,16 +206,80 @@ export type PageCopyContent = {
     hero: PageHeroCopy;
     appointmentLine: BilingualText;
     cooperationLine: BilingualText;
+    infoLabels: {
+      email: BilingualText;
+      wechat: BilingualText;
+      phoneWhatsapp: BilingualText;
+    };
   };
   collection: {
     hero: PageHeroCopy;
     emptyState: BilingualText;
+    filters: {
+      category: BilingualText;
+      region: BilingualText;
+      period: BilingualText;
+      material: BilingualText;
+      actions: BilingualText;
+      apply: BilingualText;
+      reset: BilingualText;
+    };
+  };
+  artworkDetail: {
+    errorTitle: BilingualText;
+    errorDescription: BilingualText;
+    breadcrumb: BilingualText;
+    inquireAction: BilingualText;
+    backAction: BilingualText;
+    scholarlyNote: BilingualText;
+    viewingNote: BilingualText;
+    comparisonNote: BilingualText;
+    provenance: BilingualText;
+    exhibitions: BilingualText;
+    publications: BilingualText;
+    relatedExhibitions: BilingualText;
+    relatedArticles: BilingualText;
+    relatedWorks: BilingualText;
+    relatedWorksTitle: BilingualText;
+    fieldLabels: {
+      period: BilingualText;
+      regionOrigin: BilingualText;
+      material: BilingualText;
+      dimensions: BilingualText;
+    };
   };
   exhibitions: {
     hero: PageHeroCopy;
+    cardLabels: {
+      highlightWorks: BilingualText;
+      cataloguePages: BilingualText;
+      catalogueTitle: BilingualText;
+      viewAction: BilingualText;
+    };
+  };
+  exhibitionDetail: {
+    errorTitle: BilingualText;
+    errorDescription: BilingualText;
+    backAction: BilingualText;
+    summaryLine: {
+      highlightUnit: BilingualText;
+      catalogueUnit: BilingualText;
+    };
+    catalogueNote: BilingualText;
+    relatedWriting: BilingualText;
+    highlightedWorks: BilingualText;
+    highlightedWorksTitle: BilingualText;
   };
   journal: {
     hero: PageHeroCopy;
+    readAction: BilingualText;
+  };
+  articleDetail: {
+    errorTitle: BilingualText;
+    errorDescription: BilingualText;
+    backAction: BilingualText;
+    relatedExhibitions: BilingualText;
+    relatedWorks: BilingualText;
   };
 };
 

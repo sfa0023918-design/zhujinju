@@ -25,6 +25,7 @@ export async function generateMetadata() {
 export default async function ContactPage({ searchParams }: ContactPageProps) {
   const params = (await searchParams) ?? {};
   const { siteConfig, pageCopy } = await loadSiteContent();
+  const labels = pageCopy.contact.infoLabels;
 
   return (
     <>
@@ -40,7 +41,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="p"
-              text={bt("邮箱", "Email")}
+              text={labels.email}
               className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
               enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
@@ -52,7 +53,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="p"
-              text={bt("微信", "WeChat")}
+              text={labels.wechat}
               className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
               enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
@@ -62,7 +63,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="p"
-              text={bt("电话 / WhatsApp", "Phone / WhatsApp")}
+              text={labels.phoneWhatsapp}
               mode="inline"
               className="mb-3 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -81,7 +82,10 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <p className="mt-2 text-sm leading-8 text-[var(--muted)]">{pageCopy.contact.cooperationLine.zh}</p>
           </div>
         </div>
-        <ContactForm initialArtwork={params.artwork} />
+        <ContactForm
+          initialArtwork={params.artwork}
+          copy={pageCopy.siteChrome.contactForm}
+        />
       </section>
     </>
   );

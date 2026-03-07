@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { bt, formatInlineText } from "@/lib/bilingual";
+import { formatInlineText } from "@/lib/bilingual";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
 import { ActionLabel } from "./action-label";
@@ -20,14 +20,23 @@ type CollectionFiltersProps = {
     periods: BilingualValue[];
     materials: BilingualValue[];
   };
+  labels: {
+    category: BilingualValue;
+    region: BilingualValue;
+    period: BilingualValue;
+    material: BilingualValue;
+    actions: BilingualValue;
+    apply: BilingualValue;
+    reset: BilingualValue;
+  };
 };
 
-export function CollectionFilters({ current, options }: CollectionFiltersProps) {
+export function CollectionFilters({ current, options, labels }: CollectionFiltersProps) {
   const filterFields = [
-    { name: "category", label: bt("品类", "Category"), options: options.categories },
-    { name: "region", label: bt("地区", "Region"), options: options.regions },
-    { name: "period", label: bt("年代", "Period"), options: options.periods },
-    { name: "material", label: bt("材质", "Material"), options: options.materials },
+    { name: "category", label: labels.category, options: options.categories },
+    { name: "region", label: labels.region, options: options.regions },
+    { name: "period", label: labels.period, options: options.periods },
+    { name: "material", label: labels.material, options: options.materials },
   ] as const;
 
   return (
@@ -62,7 +71,7 @@ export function CollectionFilters({ current, options }: CollectionFiltersProps) 
       <div className="grid gap-2 text-sm text-[var(--muted)]">
         <BilingualText
           as="span"
-          text={bt("操作", "Actions")}
+          text={labels.actions}
           mode="inline"
           className="text-[var(--accent)]"
           zhClassName="text-[0.72rem] tracking-[0.18em]"
@@ -73,13 +82,13 @@ export function CollectionFilters({ current, options }: CollectionFiltersProps) 
             type="submit"
             className="inline-flex h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
           >
-            <ActionLabel text={bt("筛选结果", "Apply Filters")} />
+            <ActionLabel text={labels.apply} />
           </button>
           <Link
             href="/collection"
             className="inline-flex h-11 items-center justify-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
           >
-            <ActionLabel text={bt("重置筛选", "Reset Filters")} />
+            <ActionLabel text={labels.reset} />
           </Link>
         </div>
       </div>

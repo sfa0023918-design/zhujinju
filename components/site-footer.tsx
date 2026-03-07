@@ -1,19 +1,17 @@
 import Link from "next/link";
 
-import { bt } from "@/lib/bilingual";
 import { loadSiteContent } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
 
-const footerLinks = [
-  { href: "/collection", label: bt("藏品浏览", "Browse Collection") },
-  { href: "/exhibitions", label: bt("展览与图录", "Exhibitions & Catalogues") },
-  { href: "/journal", label: bt("文章与研究", "Journal & Research") },
-];
-
 export async function SiteFooter() {
-  const { siteConfig } = await loadSiteContent();
+  const { siteConfig, pageCopy } = await loadSiteContent();
   const year = new Date().getFullYear();
+  const footerLinks = [
+    { href: "/collection", label: pageCopy.siteChrome.footer.collectionLink },
+    { href: "/exhibitions", label: pageCopy.siteChrome.footer.exhibitionsLink },
+    { href: "/journal", label: pageCopy.siteChrome.footer.journalLink },
+  ];
 
   return (
     <footer className="border-t border-[var(--line)]">
@@ -28,21 +26,20 @@ export async function SiteFooter() {
           />
           <BilingualText
             as="p"
-            text={bt(
-              "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
-              "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
-            )}
+            text={pageCopy.siteChrome.footer.intro}
             className="flex flex-col gap-3"
             zhClassName="leading-7"
             enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
           />
-          <p className="text-sm leading-7 text-[var(--muted)]">By Appointment in Shanghai</p>
-          <p className="text-sm leading-7 text-[var(--muted)]">Copyright © {year} 竹瑾居 Zhu Jin Ju</p>
+          <p className="text-sm leading-7 text-[var(--muted)]">{pageCopy.siteChrome.footer.appointment.zh}</p>
+          <p className="text-sm leading-7 text-[var(--muted)]">
+            {pageCopy.siteChrome.footer.copyrightLabel.zh} © {year} {siteConfig.siteName.zh} {siteConfig.siteName.en}
+          </p>
         </div>
         <div className="space-y-3">
           <BilingualText
             as="p"
-            text={bt("联络", "Contact")}
+            text={pageCopy.siteChrome.footer.contactHeading}
             mode="inline"
             className="text-[var(--ink)]"
             zhClassName="text-sm"
@@ -58,7 +55,7 @@ export async function SiteFooter() {
         <div className="space-y-3">
           <BilingualText
             as="p"
-            text={bt("信息与请求", "Information")}
+            text={pageCopy.siteChrome.footer.informationHeading}
             mode="inline"
             className="text-[var(--ink)]"
             zhClassName="text-sm"
@@ -77,10 +74,10 @@ export async function SiteFooter() {
             </Link>
           ))}
           <a className="block" href={`mailto:${siteConfig.contact.pdfRequest}`}>
-            PDF Request
+            {pageCopy.siteChrome.footer.pdfRequestLabel.zh}
           </a>
-          <p>Instagram: {siteConfig.contact.instagram}</p>
-          <p>WeChat: {siteConfig.contact.wechat}</p>
+          <p>{pageCopy.siteChrome.footer.instagramLabel.zh}: {siteConfig.contact.instagram}</p>
+          <p>{pageCopy.siteChrome.footer.wechatLabel.zh}: {siteConfig.contact.wechat}</p>
         </div>
       </div>
     </footer>

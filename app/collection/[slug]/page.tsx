@@ -41,8 +41,8 @@ export async function generateMetadata({
 
   if (!artwork) {
     return buildMetadata({
-      title: bt("作品未找到", "Artwork Not Found"),
-      description: bt("当前作品不存在或尚未公开。", "This work is unavailable or not yet published."),
+      title: content.pageCopy.artworkDetail.errorTitle,
+      description: content.pageCopy.artworkDetail.errorDescription,
       path: "/collection",
       site: content.siteConfig,
     });
@@ -56,13 +56,6 @@ export async function generateMetadata({
   });
 }
 
-const fieldRows = [
-  { label: bt("年代", "Period"), key: "period" },
-  { label: bt("地区 / 产地", "Region / Origin"), key: "regionOrigin" },
-  { label: bt("材质", "Material"), key: "material" },
-  { label: bt("尺寸", "Dimensions"), key: "dimensions" },
-] as const;
-
 export default async function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const { slug } = await params;
   const content = await loadSiteContent();
@@ -75,13 +68,20 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
   const related = getRelatedArtworks(content, artwork.slug, artwork.category.zh);
   const relatedArticles = getArticlesBySlugs(content, artwork.relatedArticleSlugs);
   const relatedExhibitions = getExhibitionsBySlugs(content, artwork.relatedExhibitionSlugs);
+  const detailCopy = content.pageCopy.artworkDetail;
+  const fieldRows = [
+    { label: detailCopy.fieldLabels.period, key: "period" },
+    { label: detailCopy.fieldLabels.regionOrigin, key: "regionOrigin" },
+    { label: detailCopy.fieldLabels.material, key: "material" },
+    { label: detailCopy.fieldLabels.dimensions, key: "dimensions" },
+  ] as const;
 
   return (
     <>
       <section className="mx-auto w-full max-w-[1480px] px-5 py-8 md:px-10 md:py-12">
         <div className="mb-8 text-sm text-[var(--muted)]">
           <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
-            藏品·Collection
+            {formatInlineText(detailCopy.breadcrumb)}
           </Link>
           <span className="px-2">/</span>
           <span>{formatInlineText(artwork.title)}</span>
@@ -157,7 +157,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                 href={`/contact?artwork=${encodeURIComponent(formatInlineText(artwork.title))}`}
                 className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
-                <ActionLabel text={bt("询洽此件作品", "Inquire")} />
+                <ActionLabel text={detailCopy.inquireAction} />
               </Link>
               <ul className="grid gap-px border border-[var(--line)] bg-[var(--line)] text-[0.82rem] leading-6 text-[var(--muted)]">
                 {artwork.inquirySupport.map((item) => (
@@ -170,7 +170,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                 href="/collection"
                 className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
-                <ActionLabel text={bt("返回藏品浏览", "Back to Collection")} />
+                <ActionLabel text={detailCopy.backAction} />
               </Link>
             </div>
           </aside>
@@ -181,7 +181,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
         <div>
           <BilingualText
             as="p"
-            text={bt("学术说明", "Scholarly Note")}
+            text={detailCopy.scholarlyNote}
             mode="inline"
             className="mb-4 text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -191,7 +191,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div>
               <BilingualText
                 as="h2"
-                text={bt("观看描述", "Visual Description")}
+                text={detailCopy.viewingNote}
                 mode="inline"
                 className="mb-3 text-[var(--accent)]"
                 zhClassName="text-[0.78rem] tracking-[0.16em]"
@@ -204,7 +204,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div>
               <BilingualText
                 as="h2"
-                text={bt("比较判断", "Comparative Assessment")}
+                text={detailCopy.comparisonNote}
                 mode="inline"
                 className="mb-3 text-[var(--accent)]"
                 zhClassName="text-[0.78rem] tracking-[0.16em]"
@@ -220,7 +220,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="h2"
-              text={bt("来源", "Provenance")}
+              text={detailCopy.provenance}
               mode="inline"
               className="mb-4 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -240,7 +240,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="h2"
-              text={bt("展览", "Exhibitions")}
+              text={detailCopy.exhibitions}
               mode="inline"
               className="mb-4 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -260,7 +260,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="h2"
-              text={bt("出版", "Publications")}
+              text={detailCopy.publications}
               mode="inline"
               className="mb-4 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -284,7 +284,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div className="border-t border-[var(--line)] pt-5">
               <BilingualText
                 as="h2"
-                text={bt("相关展览", "Related Exhibition")}
+                text={detailCopy.relatedExhibitions}
                 mode="inline"
                 className="mb-4 text-[var(--accent)]"
                 zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -307,7 +307,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div className="border-t border-[var(--line)] pt-5">
               <BilingualText
                 as="h2"
-                text={bt("相关文章", "Related Writing")}
+                text={detailCopy.relatedArticles}
                 mode="inline"
                 className="mb-4 text-[var(--accent)]"
                 zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -335,7 +335,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div>
               <BilingualText
                 as="p"
-                text={bt("相关推荐", "Related Works")}
+                text={detailCopy.relatedWorks}
                 mode="inline"
                 className="mb-3 text-[var(--accent)]"
                 zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -343,7 +343,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               />
               <BilingualText
                 as="h2"
-                text={bt("同类方向中的其他作品", "Other Works in the Same Direction")}
+                text={detailCopy.relatedWorksTitle}
                 className="font-serif text-[var(--ink)]"
                 zhClassName="block text-[2rem] leading-none tracking-[-0.04em] md:text-[3.5rem]"
                 enClassName="mt-2 block font-sans text-[0.68rem] uppercase tracking-[0.18em] text-[var(--accent)]/78"

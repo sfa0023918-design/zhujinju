@@ -22,8 +22,23 @@ export default async function AdminDashboardPage() {
           内容后台
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-          这里管理的是网站正式内容。你可以直接通过表单修改文字、添加条目、上传图片；保存后会更新仓库内容，并触发 Vercel 自动重新部署。
+          这里管理的是网站正式内容。推荐先进入“页面文案”，按前台页面顺序从上到下修改；作品、展览、文章再分别进入对应分区补充。
         </p>
+      </div>
+
+      <div className="grid gap-4 border border-[var(--line)] bg-[var(--surface)] p-6 md:grid-cols-3">
+        <div>
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">推荐第一步</p>
+          <p className="mt-3 text-sm leading-7 text-[var(--muted)]">先修改“页面文案”，它会按网站页面顺序展示，最不容易漏。</p>
+        </div>
+        <div>
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">推荐第二步</p>
+          <p className="mt-3 text-sm leading-7 text-[var(--muted)]">再进入“藏品 / 展览 / 文章”，新增条目、替换图片、补充互链。</p>
+        </div>
+        <div>
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">保存方式</p>
+          <p className="mt-3 text-sm leading-7 text-[var(--muted)]">每个分区单独保存一次。保存后正式网站会自动重新部署更新。</p>
+        </div>
       </div>
 
       <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-4">

@@ -705,16 +705,331 @@ export function AdminVisualEditor({
 
       return (
         <div className="grid gap-6">
+          <div className="border border-[var(--line)] bg-[var(--surface)] p-5">
+            <p className="text-sm leading-7 text-[var(--muted)]">
+              推荐先修改这个分区。这里按网站前台的阅读顺序排列页面，并尽量把每一页会看到的固定文案都收在同一个地方。一般只改中文也可以，英文可以后补。
+            </p>
+          </div>
+
           <SectionMenu
             items={[
+              { id: "page-site-chrome", label: "通用信息" },
               { id: "page-home", label: "首页" },
               { id: "page-about", label: "关于页" },
               { id: "page-contact", label: "联系页" },
-              { id: "page-collection", label: "藏品页" },
+              { id: "page-collection", label: "藏品列表页" },
+              { id: "page-artwork-detail", label: "藏品详情页" },
               { id: "page-exhibitions", label: "展览页" },
+              { id: "page-exhibition-detail", label: "展览详情页" },
               { id: "page-journal", label: "文章页" },
+              { id: "page-article-detail", label: "文章详情页" },
             ]}
           />
+
+          <EditorSection
+            id="page-site-chrome"
+            title="通用信息"
+            description="这里放页脚和联系表单这类会在多个页面重复出现的固定文案。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页脚</Label>
+                <BilingualTextarea
+                  label="页脚品牌简介"
+                  rows={4}
+                  value={value.siteChrome.footer.intro}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).siteChrome.footer.intro = next;
+                    })
+                  }
+                />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="预约说明"
+                    value={value.siteChrome.footer.appointment}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.appointment = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="版权标签"
+                    value={value.siteChrome.footer.copyrightLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.copyrightLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="联络标题"
+                    value={value.siteChrome.footer.contactHeading}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.contactHeading = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="信息与请求标题"
+                    value={value.siteChrome.footer.informationHeading}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.informationHeading = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="藏品链接文字"
+                    value={value.siteChrome.footer.collectionLink}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.collectionLink = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="展览链接文字"
+                    value={value.siteChrome.footer.exhibitionsLink}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.exhibitionsLink = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="文章链接文字"
+                    value={value.siteChrome.footer.journalLink}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.journalLink = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="PDF 请求标签"
+                    value={value.siteChrome.footer.pdfRequestLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.pdfRequestLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="Instagram 标签"
+                    value={value.siteChrome.footer.instagramLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.instagramLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="微信标签"
+                    value={value.siteChrome.footer.wechatLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.footer.wechatLabel = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>联系表单</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualTextarea
+                    label="默认提示"
+                    rows={3}
+                    value={value.siteChrome.contactForm.introIdle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.introIdle = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="提交中提示"
+                    rows={3}
+                    value={value.siteChrome.contactForm.introSubmitting}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.introSubmitting = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="提交成功提示"
+                    rows={3}
+                    value={value.siteChrome.contactForm.introSuccess}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.introSuccess = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="提交失败提示"
+                    rows={3}
+                    value={value.siteChrome.contactForm.introError}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.introError = next;
+                      })
+                    }
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="姓名字段"
+                    value={value.siteChrome.contactForm.nameLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.nameLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="邮箱字段"
+                    value={value.siteChrome.contactForm.emailLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.emailLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="机构字段"
+                    value={value.siteChrome.contactForm.organizationLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.organizationLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="身份字段"
+                    value={value.siteChrome.contactForm.roleLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.roleLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="意向作品字段"
+                    value={value.siteChrome.contactForm.artworkLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.artworkLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="留言字段"
+                    value={value.siteChrome.contactForm.messageLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.messageLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="提交按钮"
+                    value={value.siteChrome.contactForm.submitLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.submitLabel = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="提交中按钮"
+                    value={value.siteChrome.contactForm.submittingLabel}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).siteChrome.contactForm.submittingLabel = next;
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <Label>身份选项</Label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateDraft((item) =>
+                          (item as PageCopyContent).siteChrome.contactForm.roleOptions.push(emptyBilingual()),
+                        )
+                      }
+                      className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                    >
+                      新增身份
+                    </button>
+                  </div>
+                  <div className="grid gap-4">
+                    {value.siteChrome.contactForm.roleOptions.map((option, index) => (
+                      <div key={`contact-role-${index}`} className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <Label>{`身份 ${index + 1}`}</Label>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateDraft((item) => {
+                                (item as PageCopyContent).siteChrome.contactForm.roleOptions = removeArrayItem(
+                                  (item as PageCopyContent).siteChrome.contactForm.roleOptions,
+                                  index,
+                                );
+                              })
+                            }
+                            className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                          >
+                            删除
+                          </button>
+                        </div>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <TextField
+                            label="中文"
+                            value={option.zh}
+                            onChange={(next) =>
+                              updateDraft((item) => {
+                                (item as PageCopyContent).siteChrome.contactForm.roleOptions = updateArrayItem(
+                                  (item as PageCopyContent).siteChrome.contactForm.roleOptions,
+                                  index,
+                                  (target) => {
+                                    target.zh = next;
+                                  },
+                                );
+                              })
+                            }
+                          />
+                          <TextField
+                            label="英文"
+                            value={option.en}
+                            onChange={(next) =>
+                              updateDraft((item) => {
+                                (item as PageCopyContent).siteChrome.contactForm.roleOptions = updateArrayItem(
+                                  (item as PageCopyContent).siteChrome.contactForm.roleOptions,
+                                  index,
+                                  (target) => {
+                                    target.en = next;
+                                  },
+                                );
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </EditorSection>
 
           <EditorSection
             id="page-home"
@@ -742,6 +1057,26 @@ export function AdminVisualEditor({
                     })
                   }
                 />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="首屏主按钮"
+                    value={value.home.heroPrimaryAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.heroPrimaryAction = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="首屏次按钮"
+                    value={value.home.heroSecondaryAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.heroSecondaryAction = next;
+                      })
+                    }
+                  />
+                </div>
               </div>
 
               <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
@@ -784,6 +1119,35 @@ export function AdminVisualEditor({
                     })
                   }
                 />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="专题统计：重点作品单位"
+                    value={value.home.focusSummaryLine.highlightUnit}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.focusSummaryLine.highlightUnit = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="专题统计：图录页数单位"
+                    value={value.home.focusSummaryLine.catalogueUnit}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.focusSummaryLine.catalogueUnit = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="专题详情按钮"
+                    value={value.home.focusAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.focusAction = next;
+                      })
+                    }
+                  />
+                </div>
               </div>
 
               {[
@@ -844,6 +1208,30 @@ export function AdminVisualEditor({
                   </div>
                 );
               })}
+
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>首页联系区按钮</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="联系页面按钮"
+                    value={value.home.contactPrimaryAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.contactPrimaryAction = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="文章页面按钮"
+                    value={value.home.contactSecondaryAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).home.contactSecondaryAction = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
             </div>
           </EditorSection>
 
@@ -947,6 +1335,35 @@ export function AdminVisualEditor({
                     })
                   }
                 />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="邮箱标签"
+                    value={value.contact.infoLabels.email}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).contact.infoLabels.email = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="微信标签"
+                    value={value.contact.infoLabels.wechat}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).contact.infoLabels.wechat = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="电话 / WhatsApp 标签"
+                    value={value.contact.infoLabels.phoneWhatsapp}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).contact.infoLabels.phoneWhatsapp = next;
+                      })
+                    }
+                  />
+                </div>
               </div>
             </div>
           </EditorSection>
@@ -981,37 +1398,530 @@ export function AdminVisualEditor({
                   }
                 />
               </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>筛选栏文字</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="品类"
+                    value={value.collection.filters.category}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.category = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="地区"
+                    value={value.collection.filters.region}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.region = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="年代"
+                    value={value.collection.filters.period}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.period = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="材质"
+                    value={value.collection.filters.material}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.material = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="操作分组标题"
+                    value={value.collection.filters.actions}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.actions = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="筛选按钮"
+                    value={value.collection.filters.apply}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.apply = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="重置按钮"
+                    value={value.collection.filters.reset}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).collection.filters.reset = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-artwork-detail"
+            title="藏品详情页"
+            description="按藏品详情页从上到下编辑面包屑、按钮、字段标题与正文分区标题。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页面状态与顶部信息</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="未找到标题"
+                    value={value.artworkDetail.errorTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.errorTitle = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="未找到说明"
+                    rows={3}
+                    value={value.artworkDetail.errorDescription}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.errorDescription = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="面包屑返回文字"
+                    value={value.artworkDetail.breadcrumb}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.breadcrumb = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="询洽按钮"
+                    value={value.artworkDetail.inquireAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.inquireAction = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="返回列表按钮"
+                    value={value.artworkDetail.backAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.backAction = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>字段标题</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="年代"
+                    value={value.artworkDetail.fieldLabels.period}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.fieldLabels.period = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="地区 / 产地"
+                    value={value.artworkDetail.fieldLabels.regionOrigin}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.fieldLabels.regionOrigin = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="材质"
+                    value={value.artworkDetail.fieldLabels.material}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.fieldLabels.material = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="尺寸"
+                    value={value.artworkDetail.fieldLabels.dimensions}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.fieldLabels.dimensions = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>正文分区标题</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="学术说明"
+                    value={value.artworkDetail.scholarlyNote}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.scholarlyNote = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="观看描述"
+                    value={value.artworkDetail.viewingNote}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.viewingNote = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="比较判断"
+                    value={value.artworkDetail.comparisonNote}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.comparisonNote = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="来源"
+                    value={value.artworkDetail.provenance}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.provenance = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="展览"
+                    value={value.artworkDetail.exhibitions}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.exhibitions = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="出版"
+                    value={value.artworkDetail.publications}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.publications = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="相关展览"
+                    value={value.artworkDetail.relatedExhibitions}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.relatedExhibitions = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="相关文章"
+                    value={value.artworkDetail.relatedArticles}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.relatedArticles = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="相关推荐小标题"
+                    value={value.artworkDetail.relatedWorks}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.relatedWorks = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="相关推荐主标题"
+                    value={value.artworkDetail.relatedWorksTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).artworkDetail.relatedWorksTitle = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
             </div>
           </EditorSection>
 
           <EditorSection
             id="page-exhibitions"
             title="展览页"
-            description="按展览页从上到下编辑页头说明。"
+            description="按展览页从上到下编辑页头与展览卡片固定标签。"
           >
-            <PageHeroFields
-              value={value.exhibitions.hero}
-              onChange={(next) =>
-                updateDraft((item) => {
-                  (item as PageCopyContent).exhibitions.hero = next;
-                })
-              }
-            />
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页头</Label>
+                <PageHeroFields
+                  value={value.exhibitions.hero}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).exhibitions.hero = next;
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>展览卡片固定标签</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="重点作品"
+                    value={value.exhibitions.cardLabels.highlightWorks}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitions.cardLabels.highlightWorks = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="图录页数"
+                    value={value.exhibitions.cardLabels.cataloguePages}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitions.cardLabels.cataloguePages = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="图录"
+                    value={value.exhibitions.cardLabels.catalogueTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitions.cardLabels.catalogueTitle = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="查看详情按钮"
+                    value={value.exhibitions.cardLabels.viewAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitions.cardLabels.viewAction = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-exhibition-detail"
+            title="展览详情页"
+            description="按展览详情页从上到下编辑返回按钮、统计语句和各分区标题。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>顶部与错误状态</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="未找到标题"
+                    value={value.exhibitionDetail.errorTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.errorTitle = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="未找到说明"
+                    rows={3}
+                    value={value.exhibitionDetail.errorDescription}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.errorDescription = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="返回按钮"
+                    value={value.exhibitionDetail.backAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.backAction = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="统计语句：重点作品单位"
+                    value={value.exhibitionDetail.summaryLine.highlightUnit}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.summaryLine.highlightUnit = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="统计语句：图录页数单位"
+                    value={value.exhibitionDetail.summaryLine.catalogueUnit}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.summaryLine.catalogueUnit = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>正文分区标题</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="图录说明"
+                    value={value.exhibitionDetail.catalogueNote}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.catalogueNote = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="相关文字"
+                    value={value.exhibitionDetail.relatedWriting}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.relatedWriting = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="重点作品小标题"
+                    value={value.exhibitionDetail.highlightedWorks}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.highlightedWorks = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="重点作品主标题"
+                    value={value.exhibitionDetail.highlightedWorksTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).exhibitionDetail.highlightedWorksTitle = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
           </EditorSection>
 
           <EditorSection
             id="page-journal"
             title="文章页"
-            description="按文章页从上到下编辑页头说明。"
+            description="按文章列表页从上到下编辑页头和按钮。"
           >
-            <PageHeroFields
-              value={value.journal.hero}
-              onChange={(next) =>
-                updateDraft((item) => {
-                  (item as PageCopyContent).journal.hero = next;
-                })
-              }
-            />
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页头</Label>
+                <PageHeroFields
+                  value={value.journal.hero}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).journal.hero = next;
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>列表动作按钮</Label>
+                <BilingualInput
+                  label="阅读全文按钮"
+                  value={value.journal.readAction}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).journal.readAction = next;
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-article-detail"
+            title="文章详情页"
+            description="按文章详情页从上到下编辑返回按钮、错误提示和底部关联模块标题。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>顶部与错误状态</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="未找到标题"
+                    value={value.articleDetail.errorTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).articleDetail.errorTitle = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="未找到说明"
+                    rows={3}
+                    value={value.articleDetail.errorDescription}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).articleDetail.errorDescription = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="返回按钮"
+                    value={value.articleDetail.backAction}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).articleDetail.backAction = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>底部关联模块标题</Label>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <BilingualInput
+                    label="相关展览"
+                    value={value.articleDetail.relatedExhibitions}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).articleDetail.relatedExhibitions = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="相关藏品"
+                    value={value.articleDetail.relatedWorks}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as PageCopyContent).articleDetail.relatedWorks = next;
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
           </EditorSection>
         </div>
       );

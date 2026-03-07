@@ -21,6 +21,7 @@ export async function generateMetadata() {
 
 export default async function JournalPage() {
   const { articles, pageCopy } = await loadSiteContent();
+  const readAction = pageCopy.journal.readAction;
 
   return (
     <>
@@ -82,7 +83,7 @@ export default async function JournalPage() {
                     ))}
                   </div>
                   <Link href={`/journal/${article.slug}`} className="inline-flex text-sm text-[var(--ink)]">
-                    <ActionLabel text={bt("阅读全文", "Read Article")} align="start" />
+                    <ActionLabel text={readAction} align="start" />
                   </Link>
                 </div>
               </div>

@@ -21,6 +21,7 @@ export async function generateMetadata() {
 
 export default async function ExhibitionsPage() {
   const { exhibitions, pageCopy } = await loadSiteContent();
+  const cardLabels = pageCopy.exhibitions.cardLabels;
 
   return (
     <>
@@ -77,17 +78,17 @@ export default async function ExhibitionsPage() {
                   />
                 </div>
                 <div className="space-y-4 border-t border-[var(--line)] pt-5 text-sm leading-7 text-[var(--muted)]">
-                  <div className="grid gap-3 md:grid-cols-3">
-                    <div>
-                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">重点作品</p>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div>
+                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">{cardLabels.highlightWorks.zh}</p>
                       <p className="mt-2 text-[0.95rem] text-[var(--ink)]">{exhibition.highlightCount} 件</p>
                     </div>
                     <div>
-                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">图录页数</p>
+                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">{cardLabels.cataloguePages.zh}</p>
                       <p className="mt-2 text-[0.95rem] text-[var(--ink)]">{exhibition.cataloguePages} 页</p>
                     </div>
                     <div>
-                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">图录</p>
+                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">{cardLabels.catalogueTitle.zh}</p>
                       <p className="mt-2 text-[0.95rem] text-[var(--ink)]">{exhibition.catalogueTitle.zh}</p>
                     </div>
                   </div>
@@ -99,7 +100,7 @@ export default async function ExhibitionsPage() {
                     <p>{exhibition.catalogueIntro.zh}</p>
                   </div>
                   <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex text-[var(--ink)]">
-                    <ActionLabel text={bt("查看展览详情", "View Exhibition")} align="start" />
+                    <ActionLabel text={cardLabels.viewAction} align="start" />
                   </Link>
                 </div>
               </div>

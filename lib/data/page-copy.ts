@@ -1,9 +1,56 @@
 import { bt } from "../bilingual";
 
 export const pageCopy = {
+  siteChrome: {
+    footer: {
+      intro: bt(
+        "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
+        "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research.",
+      ),
+      appointment: bt("By Appointment in Shanghai", "By Appointment in Shanghai"),
+      copyrightLabel: bt("版权所有", "Copyright"),
+      contactHeading: bt("联络", "Contact"),
+      informationHeading: bt("信息与请求", "Information"),
+      collectionLink: bt("藏品浏览", "Browse Collection"),
+      exhibitionsLink: bt("展览与图录", "Exhibitions & Catalogues"),
+      journalLink: bt("文章与研究", "Journal & Research"),
+      pdfRequestLabel: bt("PDF 索取", "PDF Request"),
+      instagramLabel: bt("Instagram", "Instagram"),
+      wechatLabel: bt("微信", "WeChat"),
+    },
+    contactForm: {
+      introIdle: bt(
+        "欢迎藏家、机构、策展人与研究者联系。",
+        "Collectors, institutions, curators, and researchers are welcome to get in touch.",
+      ),
+      introSubmitting: bt("提交中", "Sending"),
+      introSuccess: bt(
+        "已收到信息。竹瑾居通常会于一个工作日内回复。",
+        "Message received. Zhu Jin Ju usually replies within one working day.",
+      ),
+      introError: bt("提交失败，请稍后再试。", "Submission failed. Please try again later."),
+      nameLabel: bt("姓名", "Name"),
+      emailLabel: bt("邮箱", "Email"),
+      organizationLabel: bt("机构与公司", "Institution / Company"),
+      roleLabel: bt("身份", "Role"),
+      artworkLabel: bt("意向作品", "Artwork of Interest"),
+      messageLabel: bt("留言", "Message"),
+      submitLabel: bt("发送联系信息", "Send Inquiry"),
+      submittingLabel: bt("提交中", "Sending"),
+      roleOptions: [
+        bt("藏家", "Collector"),
+        bt("机构", "Institution"),
+        bt("策展人", "Curator"),
+        bt("研究者", "Researcher"),
+        bt("媒体", "Press"),
+      ],
+    },
+  },
   home: {
     heroEyebrow: bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art and Asian Antiquities"),
     heroTitle: bt("让作品先说话。", "Let the Work Speak First."),
+    heroPrimaryAction: bt("浏览藏品", "Browse Collection"),
+    heroSecondaryAction: bt("查看展览与图录", "View Exhibitions"),
     focusCurrent: {
       eyebrow: bt("当前专题", "Current Focus"),
       description: bt(
@@ -18,6 +65,11 @@ export const pageCopy = {
         "A recent exhibition continuing Zhu Jin Ju's object-centered approach, with related catalogues and texts still available on request.",
       ),
     },
+    focusSummaryLine: {
+      highlightUnit: bt("件重点作品", "highlighted works"),
+      catalogueUnit: bt("页图录", "catalogue pages"),
+    },
+    focusAction: bt("进入专题详情", "View Exhibition"),
     selectedWorks: {
       eyebrow: bt("精选作品", "Selected Works"),
       title: bt("以作品为核心组织观看顺序", "A Viewing Order Built Around the Object"),
@@ -50,6 +102,8 @@ export const pageCopy = {
         "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page.",
       ),
     },
+    contactPrimaryAction: bt("前往联系页面", "Contact Page"),
+    contactSecondaryAction: bt("查看文章与研究", "Read Journal"),
   },
   about: {
     hero: {
@@ -95,6 +149,11 @@ export const pageCopy = {
       "借展、研究合作、图录交换与机构看件，请在留言中说明机构名称、时间安排与需求方向。",
       "For loans, research collaboration, catalogue exchange, and institutional viewings, please include your institution, schedule, and requirements.",
     ),
+    infoLabels: {
+      email: bt("邮箱", "Email"),
+      wechat: bt("微信", "WeChat"),
+      phoneWhatsapp: bt("电话 / WhatsApp", "Phone / WhatsApp"),
+    },
   },
   collection: {
     hero: {
@@ -113,6 +172,38 @@ export const pageCopy = {
       "当前筛选下暂无结果，可重置条件后继续浏览。",
       "No works match the current filters. Reset the criteria to continue browsing.",
     ),
+    filters: {
+      category: bt("品类", "Category"),
+      region: bt("地区", "Region"),
+      period: bt("年代", "Period"),
+      material: bt("材质", "Material"),
+      actions: bt("操作", "Actions"),
+      apply: bt("筛选结果", "Apply Filters"),
+      reset: bt("重置筛选", "Reset Filters"),
+    },
+  },
+  artworkDetail: {
+    errorTitle: bt("作品未找到", "Artwork Not Found"),
+    errorDescription: bt("当前作品不存在或尚未公开。", "This work is unavailable or not yet published."),
+    breadcrumb: bt("藏品", "Collection"),
+    inquireAction: bt("询洽此件作品", "Inquire"),
+    backAction: bt("返回藏品浏览", "Back to Collection"),
+    scholarlyNote: bt("学术说明", "Scholarly Note"),
+    viewingNote: bt("观看描述", "Visual Description"),
+    comparisonNote: bt("比较判断", "Comparative Assessment"),
+    provenance: bt("来源", "Provenance"),
+    exhibitions: bt("展览", "Exhibitions"),
+    publications: bt("出版", "Publications"),
+    relatedExhibitions: bt("相关展览", "Related Exhibition"),
+    relatedArticles: bt("相关文章", "Related Writing"),
+    relatedWorks: bt("相关推荐", "Related Works"),
+    relatedWorksTitle: bt("同类方向中的其他作品", "Other Works in the Same Direction"),
+    fieldLabels: {
+      period: bt("年代", "Period"),
+      regionOrigin: bt("地区 / 产地", "Region / Origin"),
+      material: bt("材质", "Material"),
+      dimensions: bt("尺寸", "Dimensions"),
+    },
   },
   exhibitions: {
     hero: {
@@ -127,6 +218,25 @@ export const pageCopy = {
         "Each exhibition entry includes highlighted works, catalogue pagination, and a curatorial lead to give collectors and researchers a clear line of reading.",
       ),
     },
+    cardLabels: {
+      highlightWorks: bt("重点作品", "Highlighted Works"),
+      cataloguePages: bt("图录页数", "Catalogue Pages"),
+      catalogueTitle: bt("图录", "Catalogue"),
+      viewAction: bt("查看展览详情", "View Exhibition"),
+    },
+  },
+  exhibitionDetail: {
+    errorTitle: bt("展览未找到", "Exhibition Not Found"),
+    errorDescription: bt("当前展览不存在或尚未公开。", "This exhibition is unavailable or not yet published."),
+    backAction: bt("返回展览与图录", "Back to Exhibitions"),
+    summaryLine: {
+      highlightUnit: bt("件重点作品", "highlighted works"),
+      catalogueUnit: bt("页图录", "catalogue pages"),
+    },
+    catalogueNote: bt("图录说明", "Catalogue Note"),
+    relatedWriting: bt("相关文字", "Related Writing"),
+    highlightedWorks: bt("重点作品", "Highlighted Works"),
+    highlightedWorksTitle: bt("展览中的关键观看节点", "Key Viewing Points Within the Exhibition"),
   },
   journal: {
     hero: {
@@ -141,5 +251,13 @@ export const pageCopy = {
         "Texts are organized around ways of looking, object judgement, and curatorial practice so that articles, exhibitions, and works can be read in relation.",
       ),
     },
+    readAction: bt("阅读全文", "Read Article"),
+  },
+  articleDetail: {
+    errorTitle: bt("文章未找到", "Article Not Found"),
+    errorDescription: bt("当前文章不存在或尚未公开。", "This article is unavailable or not yet published."),
+    backAction: bt("返回文章", "Back to Journal"),
+    relatedExhibitions: bt("相关展览", "Related Exhibition"),
+    relatedWorks: bt("相关藏品", "Related Works"),
   },
 };
