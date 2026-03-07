@@ -6,6 +6,8 @@ export const articles: Article[] = [
     slug: "how-to-look-at-a-bronze",
     title: bt("一件铜造像为何值得反复观看", "Why a Bronze Deserves Repeated Looking"),
     category: bt("研究短文", "Research Note"),
+    column: bt("观看方法", "Ways of Looking"),
+    author: bt("竹瑾居研究部", "Zhu Jin Ju Research Desk"),
     date: "2025.11.06",
     excerpt: bt(
       "真正重要的观看，不是迅速确认题材，而是在比例、体量与工艺节奏里建立判断。",
@@ -25,12 +27,25 @@ export const articles: Article[] = [
         "For this reason, Zhu Jin Ju favors close viewing and comparative display rather than allowing a single label to stand in for complete judgement."
       ),
     ],
+    keywords: [
+      bt("铜造像", "Bronze Sculpture"),
+      bt("观看方法", "Close Looking"),
+      bt("比例判断", "Proportion"),
+    ],
+    relatedArtworkSlugs: [
+      "ekadasamukha-avalokiteshvara",
+      "green-tara-malla",
+      "shakyamuni-bhumisparsha",
+    ],
+    relatedExhibitionSlugs: ["silent-radiance"],
     cover: "/api/placeholder/how-to-look-at-a-bronze?kind=landscape",
   },
   {
     slug: "thangka-as-structure",
     title: bt("唐卡的价值，不只在设色", "The Value of a Thangka Is Not Only Color"),
     category: bt("市场观察", "Market Observation"),
+    column: bt("作品判断", "Object Judgement"),
+    author: bt("竹瑾居", "Zhu Jin Ju"),
     date: "2025.08.14",
     excerpt: bt(
       "设色只是表层入口，图像秩序、尺幅关系与保存状态同样决定作品能否成立。",
@@ -50,12 +65,21 @@ export const articles: Article[] = [
         "This is why our exhibitions and catalogues give equal weight to details and the total composition."
       ),
     ],
+    keywords: [
+      bt("唐卡", "Thangka"),
+      bt("设色", "Pigment"),
+      bt("保存状态", "Condition"),
+    ],
+    relatedArtworkSlugs: ["manjushri-thangka", "vajrapani-thangka"],
+    relatedExhibitionSlugs: ["between-gilding-and-pigment"],
     cover: "/api/placeholder/thangka-as-structure?kind=landscape",
   },
   {
     slug: "why-exhibitions-matter",
     title: bt("为什么我们持续做展览与图录", "Why We Continue to Make Exhibitions and Catalogues"),
     category: bt("展览札记", "Exhibition Note"),
+    column: bt("策展工作", "Curatorial Practice"),
+    author: bt("竹瑾居", "Zhu Jin Ju"),
     date: "2025.03.21",
     excerpt: bt(
       "展览不是销售陈列的延伸，而是把判断公开、把研究组织成可被观看的方式。",
@@ -71,10 +95,17 @@ export const articles: Article[] = [
         "The catalogue serves another purpose, condensing the exhibition experience into searchable, citable texts and images."
       ),
       bt(
-        "竹瑾居把展览与图录视为品牌工作的核心，而不是外围附属，因为它们直接决定了专业判断是否能够被长期保存与传递。",
-        "Zhu Jin Ju treats exhibitions and catalogues as central to its practice, not peripheral additions, because they determine whether professional judgement can be preserved and transmitted over time."
+        "竹瑾居把展览与图录视为品牌工作的核心，因为它们直接决定专业判断是否能够被长期保存与传递。",
+        "Zhu Jin Ju treats exhibitions and catalogues as central to its practice because they directly determine whether professional judgement can be preserved and transmitted over time."
       ),
     ],
+    keywords: [
+      bt("展览", "Exhibition"),
+      bt("图录", "Catalogue"),
+      bt("研究输出", "Research Output"),
+    ],
+    relatedArtworkSlugs: ["ekadasamukha-avalokiteshvara", "manjushri-thangka", "ritual-conch-set"],
+    relatedExhibitionSlugs: ["silent-radiance", "between-gilding-and-pigment"],
     cover: "/api/placeholder/why-exhibitions-matter?kind=landscape",
   },
 ];

@@ -12,9 +12,11 @@ const footerLinks = [
 ];
 
 export function SiteFooter() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="border-t border-[var(--line)]">
-      <div className="mx-auto grid w-full max-w-[1480px] gap-12 px-5 py-10 text-sm text-[var(--muted)] md:grid-cols-[1.2fr_0.8fr_0.8fr] md:px-10 md:py-14">
+      <div className="mx-auto grid w-full max-w-[1480px] gap-12 px-5 py-10 text-sm text-[var(--muted)] md:grid-cols-[1.12fr_0.78fr_0.9fr] md:px-10 md:py-14">
         <div className="max-w-xl space-y-4">
           <BilingualText
             as="p"
@@ -26,13 +28,15 @@ export function SiteFooter() {
           <BilingualText
             as="p"
             text={bt(
-              "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，持续整理收藏、展览、图录与研究内容。",
-              "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with ongoing work in collecting, exhibitions, catalogues, and research."
+              "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
+              "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
             )}
             className="flex flex-col gap-3"
             zhClassName="leading-7"
             enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
           />
+          <p className="text-sm leading-7 text-[var(--muted)]">By Appointment in Shanghai</p>
+          <p className="text-sm leading-7 text-[var(--muted)]">Copyright © {year} 竹瑾居 Zhu Jin Ju</p>
         </div>
         <div className="space-y-3">
           <BilingualText
@@ -46,13 +50,14 @@ export function SiteFooter() {
           <a className="block" href={`mailto:${siteConfig.contact.email}`}>
             {siteConfig.contact.email}
           </a>
-          <p>{siteConfig.contact.wechat}</p>
           <p>{siteConfig.contact.phone}</p>
+          <p>{siteConfig.contact.whatsapp}</p>
+          <p>WeChat: {siteConfig.contact.wechat}</p>
         </div>
         <div className="space-y-3">
           <BilingualText
             as="p"
-            text={bt("页面", "Pages")}
+            text={bt("信息与请求", "Information")}
             mode="inline"
             className="text-[var(--ink)]"
             zhClassName="text-sm"
@@ -70,6 +75,11 @@ export function SiteFooter() {
               />
             </Link>
           ))}
+          <a className="block" href={`mailto:${siteConfig.contact.pdfRequest}`}>
+            PDF Request
+          </a>
+          <p>Instagram: {siteConfig.contact.instagram}</p>
+          <p>WeChat: {siteConfig.contact.wechat}</p>
         </div>
       </div>
     </footer>

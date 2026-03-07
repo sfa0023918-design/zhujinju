@@ -25,8 +25,8 @@ export default function JournalPage() {
           "A space for short research writing, exhibition notes, and market observations, conceived more as a gallery journal than a news portal."
         )}
         aside={bt(
-          "文章页采用低干扰阅读布局，便于后续接入更完整的编辑内容与目录结构。",
-          "The reading layout is intentionally quiet and can later expand into fuller editorial structure and navigation."
+          "栏目按观看方法、作品判断与策展工作展开，使文章、展览与藏品之间可以互相参照。",
+          "Texts are organized around ways of looking, object judgement, and curatorial practice so that articles, exhibitions, and works can be read in relation."
         )}
       />
 
@@ -63,9 +63,20 @@ export default function JournalPage() {
                   />
                   <p className="mt-3 text-sm text-[var(--muted)]">{article.date}</p>
                 </div>
+                <div className="grid gap-3 text-sm leading-7 text-[var(--muted)] md:grid-cols-[0.9fr_1.1fr]">
+                  <p>{article.author.zh}</p>
+                  <p>{article.column.zh}</p>
+                </div>
                 <p className="max-w-2xl text-sm leading-8 text-[var(--muted)] md:text-[0.98rem]">
                   {article.excerpt.zh}
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  {article.keywords.map((keyword) => (
+                    <span key={keyword.zh} className="border border-[var(--line)] px-3 py-1 text-[0.72rem] tracking-[0.08em] text-[var(--muted)]">
+                      {keyword.zh}
+                    </span>
+                  ))}
+                </div>
                 <Link href={`/journal/${article.slug}`} className="inline-flex text-sm text-[var(--ink)]">
                   <ActionLabel text={bt("阅读全文", "Read Article")} align="start" />
                 </Link>

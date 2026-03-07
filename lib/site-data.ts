@@ -1,7 +1,7 @@
 export type { Article, Artwork, ArtworkStatus, BilingualText, Exhibition } from "./data/types";
 export { articles } from "./data/articles";
 export { artworks } from "./data/artworks";
-export { brandIntro, collectingDirections, trustPillars } from "./data/brand";
+export { brandIntro, collectingDirections, operationalFacts } from "./data/brand";
 export { exhibitions } from "./data/exhibitions";
 export { siteConfig } from "./site-config";
 
@@ -48,10 +48,22 @@ export function getArticleBySlug(slug: string) {
   return articles.find((article) => article.slug === slug);
 }
 
+export function getArticlesBySlugs(slugs: string[]) {
+  return slugs
+    .map((slug) => getArticleBySlug(slug))
+    .filter((article): article is NonNullable<typeof article> => Boolean(article));
+}
+
 export function getRelatedArtworks(currentSlug: string, categoryZh: string) {
   return artworks
     .filter((artwork) => artwork.slug !== currentSlug && artwork.category.zh === categoryZh)
     .slice(0, 3);
+}
+
+export function getExhibitionsBySlugs(slugs: string[]) {
+  return slugs
+    .map((slug) => getExhibitionBySlug(slug))
+    .filter((exhibition): exhibition is NonNullable<typeof exhibition> => Boolean(exhibition));
 }
 
 export function getFilteredArtworks(filters: {

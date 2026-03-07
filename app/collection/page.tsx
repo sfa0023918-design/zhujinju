@@ -38,8 +38,8 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
           "Filter by category, region, period, and material to build a clearer viewing path. The listing remains object-centered rather than retail-oriented."
         )}
         aside={bt(
-          "当前内容由本地 mock data 驱动，字段结构已按后续接入 CMS 的方式整理。",
-          "Current content is driven by local mock data, with a field structure already prepared for future CMS integration."
+          "字段沿用古董商与研究型图录常见的信息结构，便于从作品浏览直接进入深入比较与询洽。",
+          "The entries follow the information structure common to dealership and research catalogues, allowing browsing to move naturally into comparison and inquiry."
         )}
       />
 

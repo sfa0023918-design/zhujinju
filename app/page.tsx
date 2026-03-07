@@ -11,10 +11,14 @@ import {
   collectingDirections,
   currentExhibition,
   featuredArtworks,
-  trustPillars,
+  operationalFacts,
 } from "@/lib/site-data";
 
 export default function HomePage() {
+  const focusEyebrow = currentExhibition.current
+    ? bt("当前专题", "Current Focus")
+    : bt("近期展览", "Recent Exhibition");
+
   return (
     <>
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-10 md:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] md:px-10 md:py-14">
@@ -83,9 +87,16 @@ export default function HomePage() {
 
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-20">
         <SectionIntro
-          eyebrow={bt("当前专题", "Current Focus")}
+          eyebrow={focusEyebrow}
           title={currentExhibition.title}
-          description={currentExhibition.intro}
+          description={bt(
+            currentExhibition.current
+              ? "围绕当前正在进行的专题展览，继续呈现重点作品、图录整理与观看方法。"
+              : "近期展览延续了竹瑾居以作品为核心的研究路径，相关图录与文章仍可继续索取与查阅。",
+            currentExhibition.current
+              ? "A current exhibition continuing Zhu Jin Ju's object-centered approach through selected works, catalogues, and ways of looking."
+              : "A recent exhibition continuing Zhu Jin Ju's object-centered approach, with related catalogues and texts still available on request."
+          )}
         />
         <div className="grid gap-6">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
@@ -101,7 +112,7 @@ export default function HomePage() {
           <div className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-[0.68fr_0.32fr]">
             <BilingualText
               as="p"
-              text={currentExhibition.description[0]}
+              text={currentExhibition.curatorialLead}
               className="text-[var(--muted)] md:text-[0.98rem]"
               zhClassName="text-sm leading-8"
               enClassName="hidden"
@@ -123,6 +134,9 @@ export default function HomePage() {
                 zhClassName="block"
                 enClassName="text-[0.66rem] text-[var(--accent)]/75"
               />
+              <p className="text-[0.92rem] text-[var(--muted)]">
+                {currentExhibition.highlightCount} 件重点作品 · {currentExhibition.cataloguePages} 页图录
+              </p>
               <Link
                 href={`/exhibitions/${currentExhibition.slug}`}
                 className="inline-flex pt-3 text-[var(--ink)]"
@@ -139,8 +153,8 @@ export default function HomePage() {
           eyebrow={bt("精选作品", "Selected Works")}
           title={bt("以作品为核心组织观看顺序", "A Viewing Order Built Around the Object")}
           description={bt(
-            "首页优先呈现具有风格代表性与观看张力的作品，页面结构服务于图像与器物本体，而不是服务于冗余装饰。",
-            "The homepage foregrounds works of stylistic weight and visual tension, with a structure designed to serve the object rather than decorative excess."
+            "优先呈现具有风格代表性、可比较性与观看张力的作品，版式始终服务于图像与器物本体。",
+            "Works of stylistic weight, comparative value, and visual tension are foregrounded, with the layout kept in service of the object."
           )}
         />
         <div className="mt-11 grid gap-9">
@@ -184,21 +198,28 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
         <SectionIntro
           eyebrow={bt("专业信任", "Professional Trust")}
-          title={bt("展览、图录与研究共同构成品牌的方法", "Exhibitions, Catalogues, and Research Form the Method")}
+          title={bt("由展览、图录与研究累积出的公开方法", "A Public Method Built Through Exhibitions, Catalogues, and Research")}
           description={bt(
-            "对高净值藏家、机构与研究者而言，可信赖并不来自夸张表达，而来自判断的一致性、信息结构的清晰度与长期积累。",
-            "For collectors, institutions, and researchers, trust does not come from emphasis or spectacle, but from consistency of judgement, clarity of information, and long-term work."
+            "对藏家、机构与研究者而言，可信赖并不来自夸张表达，而来自判断的一致性、公开资料的清晰度与持续积累。",
+            "For collectors, institutions, and researchers, trust comes not from spectacle but from consistent judgement, clear public documentation, and sustained work."
           )}
         />
-        <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-4">
-          {trustPillars.map((pillar) => (
+        <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
+          {operationalFacts.map((pillar) => (
             <div key={pillar.title.zh} className="bg-[var(--surface)] p-6 md:p-7">
               <BilingualText
                 as="h3"
                 text={pillar.title}
                 className="font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.55rem] tracking-[-0.03em]"
+                zhClassName="block text-[1.2rem] tracking-[-0.03em]"
                 enClassName="mt-2 block font-sans text-[0.64rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+              />
+              <BilingualText
+                as="p"
+                text={pillar.value}
+                className="mt-4 font-serif text-[var(--ink)]"
+                zhClassName="block text-[1.75rem] leading-none tracking-[-0.04em]"
+                enClassName="mt-2 block font-sans text-[0.7rem] uppercase tracking-[0.18em] text-[var(--accent)]/76"
               />
               <BilingualText
                 as="p"

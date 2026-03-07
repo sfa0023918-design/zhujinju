@@ -6,8 +6,8 @@ export const brandIntro = {
     "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their broader dialogues with Asian antiquities, with work structured around collecting, research, exhibitions, and catalogues."
   ),
   about: bt(
-    "我们以作品本体为起点，在图像学、风格学、材质工艺与流传脉络之间建立判断。网站首版以真实内容结构搭建，后续可无缝接入 CMS 与正式图像资产。",
-    "We begin with the object itself, building judgement through iconography, style, material, craftsmanship, and provenance. This first edition is structured with real content logic and can later connect directly to a CMS and final photography."
+    "我们以作品本体为起点，在图像学、风格学、材质工艺与流传脉络之间建立判断，并通过展览、图录与研究文字持续公开这些判断。",
+    "We begin with the object itself, building judgement through iconography, style, material, craftsmanship, and provenance, and making that judgement public through exhibitions, catalogues, and research writing."
   ),
   methodology: [
     bt(
@@ -63,33 +63,45 @@ export const collectingDirections = [
   },
 ];
 
-export const trustPillars = [
+export const operationalFacts = [
   {
-    title: bt("图录", "Catalogues"),
+    title: bt("展览数量", "Exhibitions"),
+    value: bt("2 项专题展览", "2 exhibitions"),
     description: bt(
-      "以清晰结构整理作品信息、参考资料与研究判断，形成长期可检索的内容资产。",
-      "Structured catalogues organize object data, references, and research judgements into long-term, searchable records."
+      "已公开的展览项目围绕观看方式、材质判断与作品比较展开。",
+      "Published exhibition projects structured around ways of seeing, material judgement, and comparison."
     ),
   },
   {
-    title: bt("展览", "Exhibitions"),
+    title: bt("图录数量", "Catalogues"),
+    value: bt("2 册研究图录", "2 catalogues"),
     description: bt(
-      "通过主题化展示与重点作品并置，建立更准确的观看方式，而非简单陈列。",
-      "Exhibitions are conceived as ways of seeing, not simple displays, with thematic framing and carefully chosen juxtapositions."
+      "图录以作品信息、页码索引与研究摘要构成稳定的引用基础。",
+      "Catalogues provide stable reference through object entries, pagination, and research summaries."
     ),
   },
   {
-    title: bt("研究", "Research"),
+    title: bt("研究文章", "Research Writing"),
+    value: bt("3 篇公开文章", "3 published texts"),
     description: bt(
-      "以风格、工艺、来源与文献为线索，持续推进学术短文、市场观察与专题研究。",
-      "Research follows style, craftsmanship, provenance, and literature, producing essays, observations, and focused studies."
+      "围绕观看方法、展览方法与市场判断持续发布研究与札记。",
+      "Research notes continue to address methods of looking, exhibition practice, and market judgement."
     ),
   },
   {
-    title: bt("专业积累", "Professional Depth"),
+    title: bt("服务对象", "Clients & Partners"),
+    value: bt("藏家、机构、策展人与研究者", "Collectors, institutions, curators, researchers"),
     description: bt(
-      "与藏家、机构、策展人和研究者保持长期合作，重视判断的一致性与可信度。",
-      "Long-term work with collectors, institutions, curators, and researchers, with emphasis on consistency and credibility."
+      "服务对象涵盖私人藏家、博物馆、学术机构与跨区域研究合作。",
+      "The clientele includes private collectors, museums, scholarly institutions, and cross-regional research collaborators."
+    ),
+  },
+  {
+    title: bt("上海预约制空间", "By Appointment in Shanghai"),
+    value: bt("上海 · 预约制会面", "Shanghai appointment space"),
+    description: bt(
+      "以预约制接待作品查看、借展洽谈、研究交流与图录交换。",
+      "Meetings are arranged by appointment for viewings, loan discussion, research exchange, and catalogue requests."
     ),
   },
 ];

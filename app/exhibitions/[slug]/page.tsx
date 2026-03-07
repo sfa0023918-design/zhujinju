@@ -8,7 +8,12 @@ import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { exhibitions, getExhibitionBySlug, getHighlightedArtworks } from "@/lib/site-data";
+import {
+  exhibitions,
+  getArticlesBySlugs,
+  getExhibitionBySlug,
+  getHighlightedArtworks,
+} from "@/lib/site-data";
 
 type ExhibitionDetailPageProps = {
   params: Promise<{
@@ -54,6 +59,7 @@ export default async function ExhibitionDetailPage({
   }
 
   const highlightArtworks = getHighlightedArtworks(exhibition.highlightArtworkSlugs);
+  const relatedArticles = getArticlesBySlugs(exhibition.relatedArticleSlugs);
 
   return (
     <>
@@ -91,6 +97,7 @@ export default async function ExhibitionDetailPage({
           <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
           <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
           <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
+          <p>{exhibition.highlightCount} 件重点作品 · {exhibition.cataloguePages} 页图录</p>
         </div>
       </section>
 
@@ -131,16 +138,32 @@ export default async function ExhibitionDetailPage({
             zhClassName="text-sm leading-8"
             enClassName="hidden"
           />
-          <BilingualText
-            as="p"
-            text={bt(
-              "图录页面当前以 mock 数据展示封面与简介，后续可扩展为 PDF 下载、图录目录与引用页码。",
-              "The catalogue section currently uses mock content and can later expand to include PDF downloads, full contents, and referenced page numbers."
-            )}
-            className="mt-4 block"
-            zhClassName="text-sm leading-8"
-            enClassName="hidden"
-          />
+          <p className="mt-4 border-l border-[var(--line)] pl-4 text-sm leading-8 text-[var(--muted)]">
+            {exhibition.curatorialLead.zh}
+          </p>
+          {relatedArticles.length > 0 ? (
+            <div className="mt-6 border-t border-[var(--line)] pt-5">
+              <BilingualText
+                as="p"
+                text={bt("相关文字", "Related Writing")}
+                mode="inline"
+                className="mb-4 text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.22em]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+              />
+              <div className="space-y-3">
+                {relatedArticles.map((article) => (
+                  <Link
+                    key={article.slug}
+                    href={`/journal/${article.slug}`}
+                    className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                  >
+                    {article.title.zh}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 

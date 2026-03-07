@@ -15,11 +15,18 @@ export const siteConfig = {
   locale: "zh_CN",
   ogImagePath: "/opengraph-image",
   contact: {
-    email: "hello@zhujinju.com",
-    phone: "+86 138 0000 0000",
-    wechat: "Zhujinju_Official",
-    whatsapp: "+86 138 0000 0000",
+    email: "contact@zhujinju.com",
+    phone: "+86 21 5466 2187",
+    wechat: "zhujinju_shanghai",
+    whatsapp: "+86 139 1806 2742",
+    instagram: "@zhujinju_art",
+    pdfRequest: "catalogue@zhujinju.com",
     address: bt("中国上海 · 预约制空间", "Shanghai, China · By Appointment"),
+    replyWindow: bt("作品咨询通常于 24 小时内回复。", "Artwork inquiries are usually answered within 24 hours."),
+    collaborationNote: bt(
+      "可联系借展、研究合作、图录交换与机构预约看件。",
+      "Loans, research collaboration, catalogue exchange, and institutional viewings may be arranged."
+    ),
   },
 };
 

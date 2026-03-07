@@ -37,11 +37,10 @@ export function SectionIntro({
       {description ? (
         <BilingualText
           as="p"
-          mode="inline"
           text={description}
-          className="mt-5 max-w-2xl text-[var(--muted)]"
+          className="mt-5 flex max-w-2xl flex-col gap-3 text-[var(--muted)]"
           zhClassName="text-base leading-8 md:text-[1.02rem]"
-          enClassName="text-[0.76rem] leading-7 text-[var(--accent)]/75 md:text-[0.82rem]"
+          enClassName="text-[0.72rem] leading-7 text-[var(--accent)]/68 md:text-[0.78rem]"
         />
       ) : null}
     </div>

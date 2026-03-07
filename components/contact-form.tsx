@@ -55,8 +55,8 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
       en: "Sending",
     },
     success: {
-      zh: "已收到信息。当前为本地演示接口，后续可接入邮箱或 CRM。",
-      en: "Message received. This is currently a local demo endpoint and can later be connected to email or a CRM.",
+      zh: "已收到信息。竹瑾居通常会于一个工作日内回复。",
+      en: "Message received. Zhu Jin Ju usually replies within one working day.",
     },
     error: {
       zh: "提交失败，请稍后再试。",

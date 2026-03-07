@@ -7,7 +7,12 @@ import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { articles, getArticleBySlug } from "@/lib/site-data";
+import {
+  articles,
+  getArticleBySlug,
+  getExhibitionsBySlugs,
+  getHighlightedArtworks,
+} from "@/lib/site-data";
 
 type ArticleDetailPageProps = {
   params: Promise<{
@@ -51,6 +56,9 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
     notFound();
   }
 
+  const relatedExhibitions = getExhibitionsBySlugs(article.relatedExhibitionSlugs);
+  const relatedArtworks = getHighlightedArtworks(article.relatedArtworkSlugs);
+
   return (
     <>
       <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-10 md:py-12">
@@ -76,7 +84,18 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
             zhClassName="block text-[2.8rem] leading-[0.94] tracking-[-0.05em] md:text-[5rem]"
             enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"
           />
-          <p className="text-sm text-[var(--muted)]">{article.date}</p>
+          <div className="grid gap-3 text-sm text-[var(--muted)] md:grid-cols-3">
+            <p>{article.date}</p>
+            <p>{article.author.zh}</p>
+            <p>{article.column.zh}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {article.keywords.map((keyword) => (
+              <span key={keyword.zh} className="border border-[var(--line)] px-3 py-1 text-[0.72rem] tracking-[0.08em] text-[var(--muted)]">
+                {keyword.zh}
+              </span>
+            ))}
+          </div>
         </header>
 
         <div className="relative mt-8 overflow-hidden bg-[var(--surface-strong)]">
@@ -98,6 +117,57 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
             </p>
           ))}
         </div>
+
+        {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (
+          <section className="mt-16 grid gap-10 border-t border-[var(--line)] pt-8 md:grid-cols-2">
+            {relatedExhibitions.length > 0 ? (
+              <div>
+                <BilingualText
+                  as="p"
+                  text={bt("相关展览", "Related Exhibition")}
+                  mode="inline"
+                  className="mb-4 text-[var(--accent)]"
+                  zhClassName="text-[0.72rem] tracking-[0.22em]"
+                  enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+                />
+                <div className="space-y-3">
+                  {relatedExhibitions.map((exhibition) => (
+                    <Link
+                      key={exhibition.slug}
+                      href={`/exhibitions/${exhibition.slug}`}
+                      className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                    >
+                      {exhibition.title.zh}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {relatedArtworks.length > 0 ? (
+              <div>
+                <BilingualText
+                  as="p"
+                  text={bt("相关藏品", "Related Works")}
+                  mode="inline"
+                  className="mb-4 text-[var(--accent)]"
+                  zhClassName="text-[0.72rem] tracking-[0.22em]"
+                  enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+                />
+                <div className="space-y-3">
+                  {relatedArtworks.map((artwork) => (
+                    <Link
+                      key={artwork.slug}
+                      href={`/collection/${artwork.slug}`}
+                      className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                    >
+                      {artwork.title.zh}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
       </article>
     </>
   );

@@ -25,8 +25,8 @@ export default function ExhibitionsPage() {
           "Exhibitions and catalogues are not supplementary gestures but part of the core practice itself. This page places both together to show continuity in research output."
         )}
         aside={bt(
-          "每个展览包含时间、地点、简介与重点作品，便于后续接入真实展览资料与图录下载。",
-          "Each exhibition includes dates, venue, summary, and highlighted works, ready for later integration with full documentation and downloads."
+          "展览条目同步整理重点作品、图录页数与策展前言，便于藏家、机构与研究者快速建立阅读线索。",
+          "Each exhibition entry includes highlighted works, catalogue pagination, and a curatorial lead to give collectors and researchers a clear line of reading."
         )}
       />
 
@@ -75,7 +75,24 @@ export default function ExhibitionsPage() {
                     enClassName="hidden"
                   />
                 </div>
-                <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm leading-7 text-[var(--muted)]">
+                <div className="space-y-4 border-t border-[var(--line)] pt-5 text-sm leading-7 text-[var(--muted)]">
+                  <div className="grid gap-3 md:grid-cols-3">
+                    <div>
+                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">重点作品</p>
+                      <p className="mt-2 text-[0.95rem] text-[var(--ink)]">{exhibition.highlightCount} 件</p>
+                    </div>
+                    <div>
+                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">图录页数</p>
+                      <p className="mt-2 text-[0.95rem] text-[var(--ink)]">{exhibition.cataloguePages} 页</p>
+                    </div>
+                    <div>
+                      <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">图录</p>
+                      <p className="mt-2 text-[0.95rem] text-[var(--ink)]">{exhibition.catalogueTitle.zh}</p>
+                    </div>
+                  </div>
+                  <p className="border-l border-[var(--line)] pl-4 text-sm leading-7 text-[var(--muted)]">
+                    {exhibition.curatorialLead.zh}
+                  </p>
                   <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
                   <p>{exhibition.catalogueIntro.zh}</p>
                   <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex text-[var(--ink)]">

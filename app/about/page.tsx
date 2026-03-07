@@ -2,7 +2,7 @@ import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { brandIntro, trustPillars } from "@/lib/site-data";
+import { brandIntro, operationalFacts } from "@/lib/site-data";
 
 export const metadata = buildMetadata({
   title: bt("关于", "About"),
@@ -79,15 +79,22 @@ export default function AboutPage() {
       </section>
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
-        <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-4">
-          {trustPillars.map((pillar) => (
+        <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
+          {operationalFacts.map((pillar) => (
             <div key={pillar.title.zh} className="bg-[var(--surface-strong)] p-7">
               <BilingualText
                 as="h3"
                 text={pillar.title}
                 className="font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.5rem] tracking-[-0.03em]"
+                zhClassName="block text-[1.2rem] tracking-[-0.03em]"
                 enClassName="mt-2 block font-sans text-[0.64rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+              />
+              <BilingualText
+                as="p"
+                text={pillar.value}
+                className="mt-4 font-serif text-[var(--ink)]"
+                zhClassName="block text-[1.7rem] leading-none tracking-[-0.04em]"
+                enClassName="mt-2 block font-sans text-[0.7rem] uppercase tracking-[0.18em] text-[var(--accent)]/76"
               />
               <BilingualText
                 as="p"

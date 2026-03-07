@@ -35,19 +35,17 @@ export function PageHero({ eyebrow, title, description, aside }: PageHeroProps) 
         <BilingualText
           as="p"
           text={description}
-          mode="inline"
-          className="text-[var(--muted)]"
+          className="flex flex-col gap-3 text-[var(--muted)]"
           zhClassName="text-[0.97rem] leading-8"
-          enClassName="text-[0.76rem] leading-7 text-[var(--accent)]/75"
+          enClassName="text-[0.72rem] leading-7 text-[var(--accent)]/68"
         />
         {aside ? (
           <BilingualText
             as="p"
             text={aside}
-            mode="inline"
-            className="text-[var(--muted)]"
+            className="flex flex-col gap-3 text-[var(--muted)]"
             zhClassName="text-[0.94rem] leading-8"
-            enClassName="text-[0.74rem] leading-7 text-[var(--accent)]/75"
+            enClassName="text-[0.7rem] leading-7 text-[var(--accent)]/64"
           />
         ) : null}
       </div>

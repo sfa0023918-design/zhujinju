@@ -5,6 +5,24 @@ export type BilingualText = {
 
 export type ArtworkStatus = "inquiry" | "sold" | "reserved";
 
+export type ProvenanceEntry = {
+  label: BilingualText;
+  note?: BilingualText;
+};
+
+export type ExhibitionReference = {
+  title: BilingualText;
+  venue: BilingualText;
+  year: string;
+};
+
+export type PublicationReference = {
+  title: BilingualText;
+  year: string;
+  pages: BilingualText;
+  note?: BilingualText;
+};
+
 export type Artwork = {
   slug: string;
   title: BilingualText;
@@ -17,10 +35,14 @@ export type Artwork = {
   dimensions: BilingualText;
   status: ArtworkStatus;
   excerpt: BilingualText;
-  statement: BilingualText[];
-  provenance: BilingualText[];
-  exhibitions: BilingualText[];
-  publications: BilingualText[];
+  viewingNote: BilingualText;
+  comparisonNote: BilingualText;
+  provenance: ProvenanceEntry[];
+  exhibitions: ExhibitionReference[];
+  publications: PublicationReference[];
+  inquirySupport: BilingualText[];
+  relatedArticleSlugs: string[];
+  relatedExhibitionSlugs: string[];
   image: string;
   featured?: boolean;
 };
@@ -34,8 +56,12 @@ export type Exhibition = {
   intro: BilingualText;
   description: BilingualText[];
   highlightArtworkSlugs: string[];
+  highlightCount: number;
   catalogueTitle: BilingualText;
   catalogueIntro: BilingualText;
+  cataloguePages: number;
+  curatorialLead: BilingualText;
+  relatedArticleSlugs: string[];
   cover: string;
   current?: boolean;
 };
@@ -44,8 +70,13 @@ export type Article = {
   slug: string;
   title: BilingualText;
   category: BilingualText;
+  column: BilingualText;
+  author: BilingualText;
   date: string;
   excerpt: BilingualText;
   body: BilingualText[];
+  keywords: BilingualText[];
+  relatedArtworkSlugs: string[];
+  relatedExhibitionSlugs: string[];
   cover: string;
 };

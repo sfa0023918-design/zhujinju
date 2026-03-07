@@ -9,7 +9,13 @@ import { ArtworkCard } from "@/components/artwork-card";
 import { StatusPill } from "@/components/status-pill";
 import { bt, formatInlineText } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { artworks, getArtworkBySlug, getRelatedArtworks } from "@/lib/site-data";
+import {
+  artworks,
+  getArticlesBySlugs,
+  getArtworkBySlug,
+  getExhibitionsBySlugs,
+  getRelatedArtworks,
+} from "@/lib/site-data";
 
 type ArtworkDetailPageProps = {
   params: Promise<{
@@ -46,7 +52,7 @@ export async function generateMetadata({
 
 const fieldRows = [
   { label: bt("年代", "Period"), key: "period" },
-  { label: bt("地区 / 产地", "Region / Origin"), key: "region" },
+  { label: bt("地区 / 产地", "Region / Origin"), key: "regionOrigin" },
   { label: bt("材质", "Material"), key: "material" },
   { label: bt("尺寸", "Dimensions"), key: "dimensions" },
 ] as const;
@@ -60,6 +66,8 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
   }
 
   const related = getRelatedArtworks(artwork.slug, artwork.category.zh);
+  const relatedArticles = getArticlesBySlugs(artwork.relatedArticleSlugs);
+  const relatedExhibitions = getExhibitionsBySlugs(artwork.relatedExhibitionSlugs);
 
   return (
     <>
@@ -129,7 +137,11 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
                   />
                   <BilingualText
                     as="dd"
-                    text={artwork[field.key]}
+                    text={
+                      field.key === "regionOrigin"
+                        ? bt(`${artwork.region.zh} · ${artwork.origin.zh}`, `${artwork.region.en} · ${artwork.origin.en}`)
+                        : artwork[field.key]
+                    }
                     mode="inline"
                     className="text-[var(--muted)]"
                     zhClassName="block"
@@ -146,6 +158,13 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               >
                 <ActionLabel text={bt("询洽此件作品", "Inquire")} />
               </Link>
+              <ul className="grid gap-2 text-[0.84rem] leading-6 text-[var(--muted)]">
+                {artwork.inquirySupport.map((item) => (
+                  <li key={item.zh} className="border-l border-[var(--line)] pl-3">
+                    {item.zh}
+                  </li>
+                ))}
+              </ul>
               <Link
                 href="/collection"
                 className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
@@ -167,18 +186,39 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             zhClassName="text-[0.72rem] tracking-[0.22em]"
             enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
           />
-          <div className="space-y-6">
-            {artwork.statement.map((paragraph) => (
-              <p key={paragraph.zh} className="rich-text text-[0.98rem] leading-8 text-[var(--muted)]">
-                {paragraph.zh}
+          <div className="space-y-8">
+            <div>
+              <BilingualText
+                as="h2"
+                text={bt("观看描述", "Visual Description")}
+                mode="inline"
+                className="mb-3 text-[var(--accent)]"
+                zhClassName="text-[0.78rem] tracking-[0.16em]"
+                enClassName="text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]/72"
+              />
+              <p className="rich-text text-[0.98rem] leading-8 text-[var(--muted)]">
+                {artwork.viewingNote.zh}
               </p>
-            ))}
+            </div>
+            <div>
+              <BilingualText
+                as="h2"
+                text={bt("比较判断", "Comparative Assessment")}
+                mode="inline"
+                className="mb-3 text-[var(--accent)]"
+                zhClassName="text-[0.78rem] tracking-[0.16em]"
+                enClassName="text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]/72"
+              />
+              <p className="rich-text text-[0.98rem] leading-8 text-[var(--muted)]">
+                {artwork.comparisonNote.zh}
+              </p>
+            </div>
           </div>
         </div>
         <div className="grid gap-8">
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
-              as="p"
+              as="h2"
               text={bt("来源", "Provenance")}
               mode="inline"
               className="mb-4 text-[var(--accent)]"
@@ -187,21 +227,18 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             />
             <ul className="space-y-3">
               {artwork.provenance.map((item) => (
-                <li key={item.zh}>
-                  <BilingualText
-                    as="p"
-                    text={item}
-                    className="text-[var(--muted)]"
-                    zhClassName="text-sm leading-7"
-                    enClassName="hidden"
-                  />
+                <li key={item.label.zh}>
+                  <p className="text-sm leading-7 text-[var(--muted)]">{item.label.zh}</p>
+                  {item.note ? (
+                    <p className="mt-1 text-[0.82rem] leading-6 text-[var(--accent)]/78">{item.note.zh}</p>
+                  ) : null}
                 </li>
               ))}
             </ul>
           </div>
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
-              as="p"
+              as="h2"
               text={bt("展览", "Exhibitions")}
               mode="inline"
               className="mb-4 text-[var(--accent)]"
@@ -210,21 +247,18 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             />
             <ul className="space-y-3">
               {artwork.exhibitions.map((item) => (
-                <li key={item.zh}>
-                  <BilingualText
-                    as="p"
-                    text={item}
-                    className="text-[var(--muted)]"
-                    zhClassName="text-sm leading-7"
-                    enClassName="hidden"
-                  />
+                <li key={`${item.title.zh}-${item.year}`}>
+                  <p className="text-sm leading-7 text-[var(--muted)]">{item.title.zh}</p>
+                  <p className="mt-1 text-[0.82rem] leading-6 text-[var(--accent)]/78">
+                    {item.venue.zh}，{item.year}
+                  </p>
                 </li>
               ))}
             </ul>
           </div>
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
-              as="p"
+              as="h2"
               text={bt("出版", "Publications")}
               mode="inline"
               className="mb-4 text-[var(--accent)]"
@@ -233,18 +267,64 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             />
             <ul className="space-y-3">
               {artwork.publications.map((item) => (
-                <li key={item.zh}>
-                  <BilingualText
-                    as="p"
-                    text={item}
-                    className="text-[var(--muted)]"
-                    zhClassName="text-sm leading-7"
-                    enClassName="hidden"
-                  />
+                <li key={`${item.title.zh}-${item.year}`}>
+                  <p className="text-sm leading-7 text-[var(--muted)]">{item.title.zh}</p>
+                  <p className="mt-1 text-[0.82rem] leading-6 text-[var(--accent)]/78">
+                    {item.year}，{item.pages.zh}
+                  </p>
+                  {item.note ? (
+                    <p className="mt-1 text-[0.82rem] leading-6 text-[var(--accent)]/78">{item.note.zh}</p>
+                  ) : null}
                 </li>
               ))}
             </ul>
           </div>
+          {relatedExhibitions.length > 0 ? (
+            <div className="border-t border-[var(--line)] pt-5">
+              <BilingualText
+                as="h2"
+                text={bt("相关展览", "Related Exhibition")}
+                mode="inline"
+                className="mb-4 text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.22em]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+              />
+              <div className="space-y-3">
+                {relatedExhibitions.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/exhibitions/${item.slug}`}
+                    className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                  >
+                    {item.title.zh}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {relatedArticles.length > 0 ? (
+            <div className="border-t border-[var(--line)] pt-5">
+              <BilingualText
+                as="h2"
+                text={bt("相关文章", "Related Writing")}
+                mode="inline"
+                className="mb-4 text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.22em]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+              />
+              <div className="space-y-3">
+                {relatedArticles.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/journal/${item.slug}`}
+                    className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+                  >
+                    {item.title.zh}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 
