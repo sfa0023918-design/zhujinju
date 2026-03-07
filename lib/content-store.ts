@@ -15,6 +15,7 @@ import type {
   SiteContent,
   SiteConfigContent,
 } from "./data/types";
+import { putRepoUtf8File } from "./github-repo";
 import { siteConfig as defaultSiteConfig } from "./site-config";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -102,74 +103,12 @@ function canWriteLocalContentFile() {
   return process.env.NODE_ENV !== "production";
 }
 
-type GitHubConfig = {
-  token: string;
-  owner: string;
-  repo: string;
-  branch: string;
-};
-
-function getGitHubConfig(): GitHubConfig | null {
-  const token = process.env.GITHUB_CONTENTS_TOKEN;
-  const owner = process.env.GITHUB_REPO_OWNER;
-  const repo = process.env.GITHUB_REPO_NAME;
-  const branch = process.env.GITHUB_REPO_BRANCH ?? "main";
-
-  if (!token || !owner || !repo) {
-    return null;
-  }
-
-  return { token, owner, repo, branch };
-}
-
 async function pushContentToGitHub(content: SiteContent, message: string) {
-  const config = getGitHubConfig();
-
-  if (!config) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("未配置 GitHub 内容写入环境变量，生产环境无法保存内容。");
-    }
-
-    return;
-  }
-
-  const endpoint = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${CONTENT_REPO_PATH}`;
-  const headers = {
-    Authorization: `Bearer ${config.token}`,
-    Accept: "application/vnd.github+json",
-    "Content-Type": "application/json",
-    "User-Agent": "zhujinju-content-admin",
-  };
-
-  let sha: string | undefined;
-
-  const existing = await fetch(`${endpoint}?ref=${config.branch}`, {
-    headers,
-    cache: "no-store",
-  });
-
-  if (existing.ok) {
-    const payload = (await existing.json()) as { sha?: string };
-    sha = payload.sha;
-  } else if (existing.status !== 404) {
-    throw new Error("无法读取 GitHub 当前内容文件。");
-  }
-
-  const response = await fetch(endpoint, {
-    method: "PUT",
-    headers,
-    body: JSON.stringify({
-      message,
-      branch: config.branch,
-      sha,
-      content: Buffer.from(`${JSON.stringify(content, null, 2)}\n`, "utf8").toString("base64"),
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`GitHub 保存失败：${errorText}`);
-  }
+  await putRepoUtf8File(
+    CONTENT_REPO_PATH,
+    `${JSON.stringify(content, null, 2)}\n`,
+    message,
+  );
 }
 
 export async function saveSiteSection(

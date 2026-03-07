@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
           内容后台
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-          这里管理的是网站正式内容。各分区保存后，会更新仓库中的内容文件，并触发 Vercel 自动重新部署。
+          这里管理的是网站正式内容。你可以直接通过表单修改文字、添加条目、上传图片；保存后会更新仓库内容，并触发 Vercel 自动重新部署。
         </p>
       </div>
 

@@ -26,8 +26,8 @@ export default async function HomePage() {
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-10 md:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] md:px-10 md:py-14">
         <div className="relative overflow-hidden bg-[var(--surface-strong)]">
           <Image
-            src="/api/placeholder/home-hero?kind=landscape"
-            alt="竹瑾居首页主视觉 Zhu Jin Ju homepage hero"
+            src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
+            alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
             width={1600}
             height={1080}
             priority

@@ -1,6 +1,8 @@
 import { bt } from "../bilingual";
 
 export const brandIntro = {
+  heroImage: "/api/placeholder/home-hero?kind=landscape",
+  heroAlt: bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
   statement: bt(
     "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
     "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their broader dialogues with Asian antiquities, with work structured around collecting, research, exhibitions, and catalogues."

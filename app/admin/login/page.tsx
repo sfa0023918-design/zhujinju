@@ -25,9 +25,9 @@ export default async function AdminLoginPage() {
         <h1 className="max-w-[8ch] font-serif text-[2.6rem] leading-[0.94] tracking-[-0.05em] text-[var(--ink)] md:text-[4.6rem]">
           网站内容管理
         </h1>
-        <p className="max-w-xl text-sm leading-8 text-[var(--muted)]">
-          后台用于修改网站上的品牌信息、联系方式、藏品、展览与文章内容。保存后会写回 GitHub 仓库，并触发 Vercel 自动部署。
-        </p>
+          <p className="max-w-xl text-sm leading-8 text-[var(--muted)]">
+            后台用于修改网站上的品牌信息、联系方式、藏品、展览与文章内容，并支持上传本地图片。保存后会写回 GitHub 仓库，并触发 Vercel 自动部署。
+          </p>
         {!isAdminConfigured() ? (
           <div className="border border-[var(--line)] bg-[var(--surface)] p-5 text-sm leading-7 text-[#8e4e3b]">
             生产环境尚未配置 `ADMIN_EMAIL`、`ADMIN_PASSWORD` 与 `ADMIN_SESSION_SECRET`。请先配置环境变量后再使用后台。

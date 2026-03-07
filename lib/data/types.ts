@@ -108,6 +108,8 @@ export type BrandIntroContent = {
   statement: BilingualText;
   about: BilingualText;
   methodology: BilingualText[];
+  heroImage?: string;
+  heroAlt?: BilingualText;
 };
 
 export type CollectingDirection = {
