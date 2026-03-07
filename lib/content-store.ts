@@ -6,6 +6,7 @@ import { articles as defaultArticles } from "./data/articles";
 import { artworks as defaultArtworks } from "./data/artworks";
 import { brandIntro as defaultBrandIntro, collectingDirections as defaultCollectingDirections, operationalFacts as defaultOperationalFacts } from "./data/brand";
 import { exhibitions as defaultExhibitions } from "./data/exhibitions";
+import { pageCopy as defaultPageCopy } from "./data/page-copy";
 import type {
   Article,
   Artwork,
@@ -31,6 +32,11 @@ export const editableSections: Array<{
     key: "siteConfig",
     title: bt("站点设置", "Site Settings"),
     description: bt("网站名、SEO、域名与联系方式。", "Site name, SEO, domain, and contact details."),
+  },
+  {
+    key: "pageCopy",
+    title: bt("页面文案", "Page Copy"),
+    description: bt("按前台页面顺序编辑首页、关于、联系、藏品、展览与文章页文案。", "Edit homepage, about, contact, collection, exhibition, and journal copy in front-end order."),
   },
   {
     key: "brandIntro",
@@ -67,6 +73,7 @@ export const editableSections: Array<{
 export function getDefaultSiteContent(): SiteContent {
   return normalizeSiteContent({
     siteConfig: structuredClone(defaultSiteConfig) as SiteConfigContent,
+    pageCopy: structuredClone(defaultPageCopy),
     brandIntro: structuredClone(defaultBrandIntro),
     collectingDirections: structuredClone(defaultCollectingDirections),
     operationalFacts: structuredClone(defaultOperationalFacts),
@@ -134,6 +141,7 @@ export async function saveSiteSection(
 function normalizeSiteContent(content: SiteContent): SiteContent {
   return {
     ...content,
+    pageCopy: content.pageCopy ?? structuredClone(defaultPageCopy),
     brandIntro: {
       ...content.brandIntro,
       heroImage: content.brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape",

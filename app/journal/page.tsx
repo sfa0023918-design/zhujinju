@@ -9,32 +9,26 @@ import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
 
 export async function generateMetadata() {
-  const { siteConfig } = await loadSiteContent();
+  const { siteConfig, pageCopy } = await loadSiteContent();
 
   return buildMetadata({
     title: bt("文章", "Journal"),
-    description: bt("阅读竹瑾居发布的展览资讯、研究文章、市场观察与学术短文。", "Read exhibition notes, research writing, market observations, and short scholarly texts from Zhu Jin Ju."),
+    description: pageCopy.journal.hero.description,
     path: "/journal",
     site: siteConfig,
   });
 }
 
 export default async function JournalPage() {
-  const { articles } = await loadSiteContent();
+  const { articles, pageCopy } = await loadSiteContent();
 
   return (
     <>
       <PageHero
-        eyebrow={bt("文章", "Journal")}
-        title={bt("文章", "Journal")}
-        description={bt(
-          "用于发布研究短文、展览札记与市场观察。整体样式更接近艺廊 journal，而非资讯门户。",
-          "A space for short research writing, exhibition notes, and market observations, conceived more as a gallery journal than a news portal."
-        )}
-        aside={bt(
-          "栏目按观看方法、作品判断与策展工作展开，使文章、展览与藏品之间可以互相参照。",
-          "Texts are organized around ways of looking, object judgement, and curatorial practice so that articles, exhibitions, and works can be read in relation."
-        )}
+        eyebrow={pageCopy.journal.hero.eyebrow}
+        title={pageCopy.journal.hero.title}
+        description={pageCopy.journal.hero.description}
+        aside={pageCopy.journal.hero.aside}
       />
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">

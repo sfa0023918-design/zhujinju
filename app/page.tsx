@@ -14,12 +14,10 @@ import {
 
 export default async function HomePage() {
   const content = await loadSiteContent();
-  const { brandIntro, collectingDirections, operationalFacts } = content;
+  const { brandIntro, collectingDirections, operationalFacts, pageCopy } = content;
   const currentExhibition = getCurrentExhibition(content);
   const featuredArtworks = getFeaturedArtworks(content);
-  const focusEyebrow = currentExhibition.current
-    ? bt("当前专题", "Current Focus")
-    : bt("近期展览", "Recent Exhibition");
+  const focusCopy = currentExhibition.current ? pageCopy.home.focusCurrent : pageCopy.home.focusRecent;
 
   return (
     <>
@@ -39,20 +37,19 @@ export default async function HomePage() {
           <div className="space-y-5">
             <BilingualText
               as="p"
-              text={bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art and Asian Antiquities")}
+              text={pageCopy.home.heroEyebrow}
               mode="inline"
               className="text-[var(--accent)]"
               zhClassName="text-[0.76rem] tracking-[0.18em]"
               enClassName="text-[0.56rem] uppercase tracking-[0.2em] text-[var(--accent)]/80"
             />
-            <div>
-              <h1 className="max-w-[11ch] text-balance font-serif text-[2.9rem] leading-[0.94] tracking-[-0.05em] text-[var(--ink)] md:text-[5.9rem]">
-                让作品先说话。
-              </h1>
-              <p className="mt-4 text-[0.68rem] uppercase tracking-[0.22em] text-[var(--accent)]/78 md:text-[0.76rem]">
-                Let the Work Speak First.
-              </p>
-            </div>
+            <BilingualText
+              as="h1"
+              text={pageCopy.home.heroTitle}
+              className="font-serif text-[var(--ink)]"
+              zhClassName="block max-w-[11ch] text-balance text-[2.9rem] leading-[0.94] tracking-[-0.05em] md:text-[5.9rem]"
+              enClassName="mt-4 block font-sans text-[0.68rem] uppercase tracking-[0.22em] text-[var(--accent)]/78 md:text-[0.76rem]"
+            />
             <div className="max-w-xl">
               <p className="text-[1rem] leading-8 text-[var(--muted)] md:text-[1.08rem]">
                 {brandIntro.statement.zh}
@@ -89,16 +86,9 @@ export default async function HomePage() {
 
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-24">
         <SectionIntro
-          eyebrow={focusEyebrow}
+          eyebrow={focusCopy.eyebrow}
           title={currentExhibition.title}
-          description={bt(
-            currentExhibition.current
-              ? "围绕当前正在进行的专题展览，继续呈现重点作品、图录整理与观看方法。"
-              : "近期展览延续了竹瑾居以作品为核心的研究路径，相关图录与文章仍可继续索取与查阅。",
-            currentExhibition.current
-              ? "A current exhibition continuing Zhu Jin Ju's object-centered approach through selected works, catalogues, and ways of looking."
-              : "A recent exhibition continuing Zhu Jin Ju's object-centered approach, with related catalogues and texts still available on request."
-          )}
+          description={focusCopy.description}
         />
         <div className="grid gap-6">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
@@ -152,12 +142,9 @@ export default async function HomePage() {
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro
-          eyebrow={bt("精选作品", "Selected Works")}
-          title={bt("以作品为核心组织观看顺序", "A Viewing Order Built Around the Object")}
-          description={bt(
-            "优先呈现具有风格代表性、可比较性与观看张力的作品，版式始终服务于图像与器物本体。",
-            "Works of stylistic weight, comparative value, and visual tension are foregrounded, with the layout kept in service of the object."
-          )}
+          eyebrow={pageCopy.home.selectedWorks.eyebrow}
+          title={pageCopy.home.selectedWorks.title}
+          description={pageCopy.home.selectedWorks.description}
         />
         <div className="mt-10 grid gap-8">
           {featuredArtworks.slice(0, 4).map((artwork, index) => (
@@ -168,12 +155,9 @@ export default async function HomePage() {
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro
-          eyebrow={bt("收藏方向", "Collecting Directions")}
-          title={bt("围绕明确而长期的研究线索展开", "Structured by Clear and Long-Term Research Lines")}
-          description={bt(
-            "竹瑾居不追求门类堆叠，而是在少数真正重要的方向上持续积累判断、图像档案与展览经验。",
-            "Zhu Jin Ju does not pursue breadth for its own sake, but builds judgement, image archives, and exhibition experience within a few important fields."
-          )}
+          eyebrow={pageCopy.home.collectingDirections.eyebrow}
+          title={pageCopy.home.collectingDirections.title}
+          description={pageCopy.home.collectingDirections.description}
         />
         <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
           {collectingDirections.map((direction) => (
@@ -199,12 +183,9 @@ export default async function HomePage() {
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro
-          eyebrow={bt("专业信任", "Professional Trust")}
-          title={bt("由展览、图录与研究累积出的公开方法", "A Public Method Built Through Exhibitions, Catalogues, and Research")}
-          description={bt(
-            "对藏家、机构与研究者而言，可信赖并不来自夸张表达，而来自判断的一致性、公开资料的清晰度与持续积累。",
-            "For collectors, institutions, and researchers, trust comes not from spectacle but from consistent judgement, clear public documentation, and sustained work."
-          )}
+          eyebrow={pageCopy.home.operationalFacts.eyebrow}
+          title={pageCopy.home.operationalFacts.title}
+          description={pageCopy.home.operationalFacts.description}
         />
         <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
           {operationalFacts.map((pillar) => (
@@ -239,7 +220,7 @@ export default async function HomePage() {
         <div className="space-y-4">
           <BilingualText
             as="p"
-            text={bt("联系", "Contact")}
+            text={pageCopy.home.contact.eyebrow}
             mode="inline"
             className="text-[var(--accent)]"
             zhClassName="text-[0.76rem] tracking-[0.18em]"
@@ -247,17 +228,14 @@ export default async function HomePage() {
           />
           <BilingualText
             as="h2"
-            text={bt("欢迎藏家、机构、策展人与研究者联系。", "Collectors, Institutions, Curators, and Researchers Are Welcome.")}
+            text={pageCopy.home.contact.title}
             className="font-serif leading-none tracking-[-0.04em]"
             zhClassName="block text-[2.2rem] md:text-[3.8rem]"
             enClassName="mt-3 block font-sans text-[0.86rem] uppercase tracking-[0.24em] text-[var(--accent)]"
           />
           <BilingualText
             as="p"
-            text={bt(
-              "如需咨询具体作品、专题合作、机构借展、图录交换或研究交流，可通过联系页面提交信息。",
-              "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page."
-            )}
+            text={pageCopy.home.contact.description}
             mode="inline"
             className="max-w-2xl text-[var(--muted)] md:text-[0.98rem]"
             zhClassName="text-sm leading-8"

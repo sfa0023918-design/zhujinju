@@ -12,6 +12,7 @@ import type {
   EditableSectionKey,
   Exhibition,
   OperationalFact,
+  PageCopyContent,
   SiteConfigContent,
   SiteContent,
 } from "@/lib/site-data";
@@ -260,6 +261,45 @@ function BilingualTextarea({
           onChange={(en) => onChange({ ...value, en })}
         />
       </div>
+    </div>
+  );
+}
+
+function PageHeroFields({
+  value,
+  onChange,
+  titleLabel = "页面标题",
+}: {
+  value: { eyebrow: BilingualText; title: BilingualText; description: BilingualText; aside?: BilingualText };
+  onChange: (value: { eyebrow: BilingualText; title: BilingualText; description: BilingualText; aside?: BilingualText }) => void;
+  titleLabel?: string;
+}) {
+  return (
+    <div className="grid gap-4">
+      <BilingualInput
+        label="页眉标签"
+        value={value.eyebrow}
+        onChange={(next) => onChange({ ...value, eyebrow: next })}
+      />
+      <BilingualInput
+        label={titleLabel}
+        value={value.title}
+        onChange={(next) => onChange({ ...value, title: next })}
+      />
+      <BilingualTextarea
+        label="页面说明"
+        rows={4}
+        value={value.description}
+        onChange={(next) => onChange({ ...value, description: next })}
+      />
+      {"aside" in value ? (
+        <BilingualTextarea
+          label="右侧辅助说明"
+          rows={4}
+          value={value.aside ?? emptyBilingual()}
+          onChange={(next) => onChange({ ...value, aside: next })}
+        />
+      ) : null}
     </div>
   );
 }
@@ -656,6 +696,323 @@ export function AdminVisualEditor({
               updateDraft((item) => ((item as SiteConfigContent).contact.collaborationNote = next))
             }
           />
+        </div>
+      );
+    }
+
+    if (section === "pageCopy") {
+      const value = draft as PageCopyContent;
+
+      return (
+        <div className="grid gap-6">
+          <SectionMenu
+            items={[
+              { id: "page-home", label: "首页" },
+              { id: "page-about", label: "关于页" },
+              { id: "page-contact", label: "联系页" },
+              { id: "page-collection", label: "藏品页" },
+              { id: "page-exhibitions", label: "展览页" },
+              { id: "page-journal", label: "文章页" },
+            ]}
+          />
+
+          <EditorSection
+            id="page-home"
+            title="首页"
+            description="按首页从上到下的顺序编辑首屏、专题、精选作品、收藏方向、专业信任和联系区文案。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>首屏</Label>
+                <BilingualInput
+                  label="首屏眉题"
+                  value={value.home.heroEyebrow}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).home.heroEyebrow = next;
+                    })
+                  }
+                />
+                <BilingualInput
+                  label="首屏主标题"
+                  value={value.home.heroTitle}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).home.heroTitle = next;
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>首页第二屏 / 专题模块</Label>
+                <BilingualInput
+                  label="当前专题标签"
+                  value={value.home.focusCurrent.eyebrow}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).home.focusCurrent.eyebrow = next;
+                    })
+                  }
+                />
+                <BilingualTextarea
+                  label="当前专题说明"
+                  rows={3}
+                  value={value.home.focusCurrent.description}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).home.focusCurrent.description = next;
+                    })
+                  }
+                />
+                <BilingualInput
+                  label="近期展览标签"
+                  value={value.home.focusRecent.eyebrow}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).home.focusRecent.eyebrow = next;
+                    })
+                  }
+                />
+                <BilingualTextarea
+                  label="近期展览说明"
+                  rows={3}
+                  value={value.home.focusRecent.description}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).home.focusRecent.description = next;
+                    })
+                  }
+                />
+              </div>
+
+              {[
+                { key: "selectedWorks", title: "精选作品模块" },
+                { key: "collectingDirections", title: "收藏方向模块" },
+                { key: "operationalFacts", title: "专业信任模块" },
+                { key: "contact", title: "首页联系模块" },
+              ].map((sectionMeta) => {
+                const sectionValue = value.home[sectionMeta.key as keyof PageCopyContent["home"]] as {
+                  eyebrow: BilingualText;
+                  title: BilingualText;
+                  description: BilingualText;
+                };
+
+                return (
+                  <div key={sectionMeta.key} className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                    <Label>{sectionMeta.title}</Label>
+                    <BilingualInput
+                      label="模块标签"
+                      value={sectionValue.eyebrow}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (
+                            (item as PageCopyContent).home[
+                              sectionMeta.key as keyof PageCopyContent["home"]
+                            ] as { eyebrow: BilingualText }
+                          ).eyebrow = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="模块标题"
+                      value={sectionValue.title}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (
+                            (item as PageCopyContent).home[
+                              sectionMeta.key as keyof PageCopyContent["home"]
+                            ] as { title: BilingualText }
+                          ).title = next;
+                        })
+                      }
+                    />
+                    <BilingualTextarea
+                      label="模块说明"
+                      rows={3}
+                      value={sectionValue.description}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (
+                            (item as PageCopyContent).home[
+                              sectionMeta.key as keyof PageCopyContent["home"]
+                            ] as { description: BilingualText }
+                          ).description = next;
+                        })
+                      }
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-about"
+            title="关于页"
+            description="按关于页从上到下编辑页头与正文。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页头</Label>
+                <PageHeroFields
+                  value={value.about.hero}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).about.hero = next;
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>正文第一模块</Label>
+                <BilingualInput
+                  label="模块标签"
+                  value={value.about.position.eyebrow}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).about.position.eyebrow = next;
+                    })
+                  }
+                />
+                <BilingualInput
+                  label="模块标题"
+                  value={value.about.position.title}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).about.position.title = next;
+                    })
+                  }
+                />
+                <BilingualTextarea
+                  label="第二段文字"
+                  rows={4}
+                  value={value.about.position.paragraphTwo}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).about.position.paragraphTwo = next;
+                    })
+                  }
+                />
+                <BilingualTextarea
+                  label="第三段文字"
+                  rows={4}
+                  value={value.about.position.paragraphThree}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).about.position.paragraphThree = next;
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-contact"
+            title="联系页"
+            description="按联系页从上到下编辑页头和补充说明。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页头</Label>
+                <PageHeroFields
+                  value={value.contact.hero}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).contact.hero = next;
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>正文补充说明</Label>
+                <BilingualTextarea
+                  label="预约说明"
+                  rows={3}
+                  value={value.contact.appointmentLine}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).contact.appointmentLine = next;
+                    })
+                  }
+                />
+                <BilingualTextarea
+                  label="合作说明补充"
+                  rows={3}
+                  value={value.contact.cooperationLine}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).contact.cooperationLine = next;
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-collection"
+            title="藏品列表页"
+            description="按藏品列表页从上到下编辑页头和空状态提示。"
+          >
+            <div className="grid gap-6">
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>页头</Label>
+                <PageHeroFields
+                  value={value.collection.hero}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).collection.hero = next;
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
+                <Label>空结果提示</Label>
+                <BilingualTextarea
+                  label="筛选无结果时显示的说明"
+                  rows={3}
+                  value={value.collection.emptyState}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as PageCopyContent).collection.emptyState = next;
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </EditorSection>
+
+          <EditorSection
+            id="page-exhibitions"
+            title="展览页"
+            description="按展览页从上到下编辑页头说明。"
+          >
+            <PageHeroFields
+              value={value.exhibitions.hero}
+              onChange={(next) =>
+                updateDraft((item) => {
+                  (item as PageCopyContent).exhibitions.hero = next;
+                })
+              }
+            />
+          </EditorSection>
+
+          <EditorSection
+            id="page-journal"
+            title="文章页"
+            description="按文章页从上到下编辑页头说明。"
+          >
+            <PageHeroFields
+              value={value.journal.hero}
+              onChange={(next) =>
+                updateDraft((item) => {
+                  (item as PageCopyContent).journal.hero = next;
+                })
+              }
+            />
+          </EditorSection>
         </div>
       );
     }

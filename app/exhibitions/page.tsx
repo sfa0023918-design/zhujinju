@@ -9,32 +9,26 @@ import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
 
 export async function generateMetadata() {
-  const { siteConfig } = await loadSiteContent();
+  const { siteConfig, pageCopy } = await loadSiteContent();
 
   return buildMetadata({
     title: bt("展览与图录", "Exhibitions & Catalogues"),
-    description: bt("查看竹瑾居的展览项目、图录与持续研究输出。", "View Zhu Jin Ju exhibitions, catalogues, and ongoing research output."),
+    description: pageCopy.exhibitions.hero.description,
     path: "/exhibitions",
     site: siteConfig,
   });
 }
 
 export default async function ExhibitionsPage() {
-  const { exhibitions } = await loadSiteContent();
+  const { exhibitions, pageCopy } = await loadSiteContent();
 
   return (
     <>
       <PageHero
-        eyebrow={bt("展览与图录", "Exhibitions")}
-        title={bt("展览与图录", "Exhibitions & Catalogues")}
-        description={bt(
-          "持续做展览与图录，不是附加动作，而是竹瑾居专业工作本身。页面将展览项目与图录内容并置，以展示研究输出的连续性。",
-          "Exhibitions and catalogues are not supplementary gestures but part of the core practice itself. This page places both together to show continuity in research output."
-        )}
-        aside={bt(
-          "展览条目同步整理重点作品、图录页数与策展前言，便于藏家、机构与研究者快速建立阅读线索。",
-          "Each exhibition entry includes highlighted works, catalogue pagination, and a curatorial lead to give collectors and researchers a clear line of reading."
-        )}
+        eyebrow={pageCopy.exhibitions.hero.eyebrow}
+        title={pageCopy.exhibitions.hero.title}
+        description={pageCopy.exhibitions.hero.description}
+        aside={pageCopy.exhibitions.hero.aside}
       />
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">

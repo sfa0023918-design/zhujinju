@@ -9,6 +9,9 @@ export type {
   EditableSectionKey,
   Exhibition,
   OperationalFact,
+  PageCopyContent,
+  PageHeroCopy,
+  PageIntroCopy,
   SiteConfigContent,
   SiteContent,
 } from "./data/types";
@@ -36,4 +39,5 @@ export { articles } from "./data/articles";
 export { artworks } from "./data/artworks";
 export { brandIntro, collectingDirections, operationalFacts } from "./data/brand";
 export { exhibitions } from "./data/exhibitions";
+export { pageCopy } from "./data/page-copy";
 export { siteConfig } from "./site-config";

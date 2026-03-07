@@ -124,8 +124,65 @@ export type OperationalFact = {
   description: BilingualText;
 };
 
+export type PageHeroCopy = {
+  eyebrow: BilingualText;
+  title: BilingualText;
+  description: BilingualText;
+  aside?: BilingualText;
+};
+
+export type PageIntroCopy = {
+  eyebrow: BilingualText;
+  title: BilingualText;
+  description: BilingualText;
+};
+
+export type PageCopyContent = {
+  home: {
+    heroEyebrow: BilingualText;
+    heroTitle: BilingualText;
+    focusCurrent: {
+      eyebrow: BilingualText;
+      description: BilingualText;
+    };
+    focusRecent: {
+      eyebrow: BilingualText;
+      description: BilingualText;
+    };
+    selectedWorks: PageIntroCopy;
+    collectingDirections: PageIntroCopy;
+    operationalFacts: PageIntroCopy;
+    contact: PageIntroCopy;
+  };
+  about: {
+    hero: PageHeroCopy;
+    position: {
+      eyebrow: BilingualText;
+      title: BilingualText;
+      paragraphTwo: BilingualText;
+      paragraphThree: BilingualText;
+    };
+  };
+  contact: {
+    hero: PageHeroCopy;
+    appointmentLine: BilingualText;
+    cooperationLine: BilingualText;
+  };
+  collection: {
+    hero: PageHeroCopy;
+    emptyState: BilingualText;
+  };
+  exhibitions: {
+    hero: PageHeroCopy;
+  };
+  journal: {
+    hero: PageHeroCopy;
+  };
+};
+
 export type SiteContent = {
   siteConfig: SiteConfigContent;
+  pageCopy: PageCopyContent;
   brandIntro: BrandIntroContent;
   collectingDirections: CollectingDirection[];
   operationalFacts: OperationalFact[];
@@ -136,6 +193,7 @@ export type SiteContent = {
 
 export type EditableSectionKey =
   | "siteConfig"
+  | "pageCopy"
   | "brandIntro"
   | "collectingDirections"
   | "operationalFacts"
