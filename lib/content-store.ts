@@ -13,6 +13,7 @@ import type {
   BilingualText,
   EditableSectionKey,
   Exhibition,
+  PublicationStatus,
   SiteContent,
   SiteConfigContent,
 } from "./data/types";
@@ -275,12 +276,21 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
     },
     artworks: content.artworks.map((artwork) => ({
       ...artwork,
+      publicationStatus: artwork.publicationStatus ?? "published",
       gallery:
         artwork.gallery && artwork.gallery.length > 0
           ? artwork.gallery
           : artwork.image
             ? [artwork.image]
             : [],
+    })),
+    exhibitions: content.exhibitions.map((exhibition) => ({
+      ...exhibition,
+      publicationStatus: exhibition.publicationStatus ?? "published",
+    })),
+    articles: content.articles.map((article) => ({
+      ...article,
+      publicationStatus: article.publicationStatus ?? "published",
     })),
   };
 }
@@ -298,33 +308,68 @@ function getUniqueBilingual(items: BilingualText[]) {
 }
 
 export function getFeaturedArtworks(content: SiteContent) {
-  return content.artworks.filter((artwork) => artwork.featured);
+  return getPublicArtworks(content).filter((artwork) => artwork.featured);
 }
 
 export function getCurrentExhibition(content: SiteContent) {
-  return content.exhibitions.find((exhibition) => exhibition.current) ?? content.exhibitions[0];
+  const published = getPublicExhibitions(content);
+  return published.find((exhibition) => exhibition.current) ?? published[0];
 }
 
 export function getFilterOptions(content: SiteContent) {
+  const publicArtworks = getPublicArtworks(content);
+
   return {
     all: bt("全部", "All"),
-    categories: getUniqueBilingual(content.artworks.map((artwork) => artwork.category)),
-    regions: getUniqueBilingual(content.artworks.map((artwork) => artwork.region)),
-    periods: getUniqueBilingual(content.artworks.map((artwork) => artwork.period)),
-    materials: getUniqueBilingual(content.artworks.map((artwork) => artwork.material)),
+    categories: getUniqueBilingual(publicArtworks.map((artwork) => artwork.category)),
+    regions: getUniqueBilingual(publicArtworks.map((artwork) => artwork.region)),
+    periods: getUniqueBilingual(publicArtworks.map((artwork) => artwork.period)),
+    materials: getUniqueBilingual(publicArtworks.map((artwork) => artwork.material)),
   };
 }
 
-export function getArtworkBySlug(content: SiteContent, slug: string) {
-  return content.artworks.find((artwork) => artwork.slug === slug);
+function isPublished(status?: PublicationStatus) {
+  return (status ?? "published") === "published";
 }
 
-export function getExhibitionBySlug(content: SiteContent, slug: string) {
-  return content.exhibitions.find((exhibition) => exhibition.slug === slug);
+export function getPublicArtworks(content: SiteContent) {
+  return content.artworks.filter((artwork) => isPublished(artwork.publicationStatus));
 }
 
-export function getArticleBySlug(content: SiteContent, slug: string) {
-  return content.articles.find((article) => article.slug === slug);
+export function getPublicExhibitions(content: SiteContent) {
+  return content.exhibitions
+    .map((exhibition) => ({
+      ...exhibition,
+      publicationStatus: exhibition.publicationStatus ?? "published",
+    }))
+    .filter((exhibition) => isPublished(exhibition.publicationStatus));
+}
+
+export function getPublicArticles(content: SiteContent) {
+  return content.articles
+    .map((article) => ({
+      ...article,
+      publicationStatus: article.publicationStatus ?? "published",
+    }))
+    .filter((article) => isPublished(article.publicationStatus));
+}
+
+export function getArtworkBySlug(content: SiteContent, slug: string, options?: { includeDrafts?: boolean }) {
+  return (options?.includeDrafts ? content.artworks : getPublicArtworks(content)).find(
+    (artwork) => artwork.slug === slug,
+  );
+}
+
+export function getExhibitionBySlug(content: SiteContent, slug: string, options?: { includeDrafts?: boolean }) {
+  return (options?.includeDrafts ? content.exhibitions : getPublicExhibitions(content)).find(
+    (exhibition) => exhibition.slug === slug,
+  );
+}
+
+export function getArticleBySlug(content: SiteContent, slug: string, options?: { includeDrafts?: boolean }) {
+  return (options?.includeDrafts ? content.articles : getPublicArticles(content)).find(
+    (article) => article.slug === slug,
+  );
 }
 
 export function getArticlesBySlugs(content: SiteContent, slugs: string[]) {
@@ -346,7 +391,7 @@ export function getHighlightedArtworks(content: SiteContent, slugs: string[]) {
 }
 
 export function getRelatedArtworks(content: SiteContent, currentSlug: string, categoryZh: string) {
-  return content.artworks
+  return getPublicArtworks(content)
     .filter((artwork) => artwork.slug !== currentSlug && artwork.category.zh === categoryZh)
     .slice(0, 3);
 }
@@ -362,7 +407,7 @@ export function getFilteredArtworks(
 ) {
   const filterOptions = getFilterOptions(content);
 
-  return content.artworks.filter((artwork) => {
+  return getPublicArtworks(content).filter((artwork) => {
     const categoryMatch =
       !filters.category ||
       filters.category === filterOptions.all.zh ||

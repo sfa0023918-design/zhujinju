@@ -4,6 +4,7 @@ export type BilingualText = {
 };
 
 export type ArtworkStatus = "inquiry" | "sold" | "reserved";
+export type PublicationStatus = "draft" | "published";
 
 export type ProvenanceEntry = {
   label: BilingualText;
@@ -25,6 +26,7 @@ export type PublicationReference = {
 
 export type Artwork = {
   slug: string;
+  publicationStatus?: PublicationStatus;
   title: BilingualText;
   subtitle: BilingualText;
   period: BilingualText;
@@ -50,6 +52,7 @@ export type Artwork = {
 
 export type Exhibition = {
   slug: string;
+  publicationStatus?: PublicationStatus;
   title: BilingualText;
   subtitle: BilingualText;
   period: BilingualText;
@@ -69,6 +72,7 @@ export type Exhibition = {
 
 export type Article = {
   slug: string;
+  publicationStatus?: PublicationStatus;
   title: BilingualText;
   category: BilingualText;
   column: BilingualText;

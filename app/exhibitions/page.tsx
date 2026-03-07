@@ -6,7 +6,7 @@ import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { loadSiteContent } from "@/lib/site-data";
+import { getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
@@ -20,7 +20,9 @@ export async function generateMetadata() {
 }
 
 export default async function ExhibitionsPage() {
-  const { exhibitions, pageCopy } = await loadSiteContent();
+  const content = await loadSiteContent();
+  const exhibitions = getPublicExhibitions(content);
+  const { pageCopy } = content;
   const cardLabels = pageCopy.exhibitions.cardLabels;
 
   return (

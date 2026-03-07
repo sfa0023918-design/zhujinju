@@ -8,11 +8,13 @@ import { ArtworkGallery } from "@/components/artwork-gallery";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { StatusPill } from "@/components/status-pill";
+import { getAdminSession } from "@/lib/admin-auth";
 import { bt, formatInlineText } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticlesBySlugs,
   getArtworkBySlug,
+  getPublicArtworks,
   getExhibitionsBySlugs,
   getRelatedArtworks,
   loadSiteContent,
@@ -22,22 +24,28 @@ type ArtworkDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
+  searchParams?: Promise<{
+    preview?: string;
+  }>;
 };
 
 export async function generateStaticParams() {
   const content = await loadSiteContent();
 
-  return content.artworks.map((artwork) => ({
+  return getPublicArtworks(content).map((artwork) => ({
     slug: artwork.slug,
   }));
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: ArtworkDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const artwork = getArtworkBySlug(content, slug);
+  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const artwork = getArtworkBySlug(content, slug, { includeDrafts });
 
   if (!artwork) {
     return buildMetadata({
@@ -56,10 +64,12 @@ export async function generateMetadata({
   });
 }
 
-export default async function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
+export default async function ArtworkDetailPage({ params, searchParams }: ArtworkDetailPageProps) {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const artwork = getArtworkBySlug(content, slug);
+  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const artwork = getArtworkBySlug(content, slug, { includeDrafts });
 
   if (!artwork) {
     notFound();

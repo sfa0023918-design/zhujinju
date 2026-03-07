@@ -5,12 +5,13 @@ import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
-import { bt } from "@/lib/bilingual";
+import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticleBySlug,
   getExhibitionsBySlugs,
   getHighlightedArtworks,
+  getPublicArticles,
   loadSiteContent,
 } from "@/lib/site-data";
 
@@ -18,22 +19,28 @@ type ArticleDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
+  searchParams?: Promise<{
+    preview?: string;
+  }>;
 };
 
 export async function generateStaticParams() {
   const content = await loadSiteContent();
 
-  return content.articles.map((article) => ({
+  return getPublicArticles(content).map((article) => ({
     slug: article.slug,
   }));
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: ArticleDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const article = getArticleBySlug(content, slug);
+  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const article = getArticleBySlug(content, slug, { includeDrafts });
 
   if (!article) {
     return buildMetadata({
@@ -53,10 +60,12 @@ export async function generateMetadata({
   });
 }
 
-export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
+export default async function ArticleDetailPage({ params, searchParams }: ArticleDetailPageProps) {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const article = getArticleBySlug(content, slug);
+  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const article = getArticleBySlug(content, slug, { includeDrafts });
 
   if (!article) {
     notFound();

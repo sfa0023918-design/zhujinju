@@ -6,12 +6,13 @@ import { notFound } from "next/navigation";
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
-import { bt } from "@/lib/bilingual";
+import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticlesBySlugs,
   getExhibitionBySlug,
   getHighlightedArtworks,
+  getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
 
@@ -19,22 +20,28 @@ type ExhibitionDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
+  searchParams?: Promise<{
+    preview?: string;
+  }>;
 };
 
 export async function generateStaticParams() {
   const content = await loadSiteContent();
 
-  return content.exhibitions.map((exhibition) => ({
+  return getPublicExhibitions(content).map((exhibition) => ({
     slug: exhibition.slug,
   }));
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: ExhibitionDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const exhibition = getExhibitionBySlug(content, slug);
+  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const exhibition = getExhibitionBySlug(content, slug, { includeDrafts });
 
   if (!exhibition) {
     return buildMetadata({
@@ -55,10 +62,13 @@ export async function generateMetadata({
 
 export default async function ExhibitionDetailPage({
   params,
+  searchParams,
 }: ExhibitionDetailPageProps) {
   const { slug } = await params;
+  const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const exhibition = getExhibitionBySlug(content, slug);
+  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const exhibition = getExhibitionBySlug(content, slug, { includeDrafts });
 
   if (!exhibition) {
     notFound();

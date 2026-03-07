@@ -5,7 +5,6 @@ import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { SectionIntro } from "@/components/section-intro";
-import { bt } from "@/lib/bilingual";
 import {
   getCurrentExhibition,
   getFeaturedArtworks,
@@ -17,7 +16,7 @@ export default async function HomePage() {
   const { brandIntro, collectingDirections, operationalFacts, pageCopy } = content;
   const currentExhibition = getCurrentExhibition(content);
   const featuredArtworks = getFeaturedArtworks(content);
-  const focusCopy = currentExhibition.current ? pageCopy.home.focusCurrent : pageCopy.home.focusRecent;
+  const focusCopy = currentExhibition?.current ? pageCopy.home.focusCurrent : pageCopy.home.focusRecent;
 
   return (
     <>
@@ -84,62 +83,64 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-24">
-        <SectionIntro
-          eyebrow={focusCopy.eyebrow}
-          title={currentExhibition.title}
-          description={focusCopy.description}
-        />
-        <div className="grid gap-6">
-          <div className="relative overflow-hidden bg-[var(--surface-strong)]">
-            <Image
-              src={currentExhibition.cover}
-              alt={`${currentExhibition.title.zh} ${currentExhibition.title.en}`}
-              width={1600}
-              height={1000}
-              unoptimized
-              className="aspect-[1.45/1] h-full w-full object-cover"
-            />
-          </div>
-          <div className="grid gap-7 border-t border-[var(--line)] pt-7 md:grid-cols-[0.68fr_0.32fr]">
-            <BilingualText
-              as="p"
-              text={currentExhibition.curatorialLead}
-              className="text-[var(--muted)] md:text-[0.98rem]"
-              zhClassName="text-sm leading-8"
-              enClassName="hidden"
-            />
-            <div className="space-y-3 text-sm leading-7 text-[var(--muted)]">
+      {currentExhibition ? (
+        <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-24">
+          <SectionIntro
+            eyebrow={focusCopy.eyebrow}
+            title={currentExhibition.title}
+            description={focusCopy.description}
+          />
+          <div className="grid gap-6">
+            <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+              <Image
+                src={currentExhibition.cover}
+                alt={`${currentExhibition.title.zh} ${currentExhibition.title.en}`}
+                width={1600}
+                height={1000}
+                unoptimized
+                className="aspect-[1.45/1] h-full w-full object-cover"
+              />
+            </div>
+            <div className="grid gap-7 border-t border-[var(--line)] pt-7 md:grid-cols-[0.68fr_0.32fr]">
               <BilingualText
                 as="p"
-                text={currentExhibition.period}
-                mode="inline"
-                className="block"
-                zhClassName="block"
-                enClassName="text-[0.66rem] text-[var(--accent)]/75"
+                text={currentExhibition.curatorialLead}
+                className="text-[var(--muted)] md:text-[0.98rem]"
+                zhClassName="text-sm leading-8"
+                enClassName="hidden"
               />
-              <BilingualText
-                as="p"
-                text={currentExhibition.venue}
-                mode="inline"
-                className="block"
-                zhClassName="block"
-                enClassName="text-[0.66rem] text-[var(--accent)]/75"
-              />
-              <p className="text-[0.92rem] text-[var(--muted)]">
-                {currentExhibition.highlightCount} {pageCopy.home.focusSummaryLine.highlightUnit.zh} · {currentExhibition.cataloguePages}{" "}
-                {pageCopy.home.focusSummaryLine.catalogueUnit.zh}
-              </p>
-              <Link
-                href={`/exhibitions/${currentExhibition.slug}`}
-                className="inline-flex pt-3 text-[var(--ink)]"
-              >
-                <ActionLabel text={pageCopy.home.focusAction} align="start" />
-              </Link>
+              <div className="space-y-3 text-sm leading-7 text-[var(--muted)]">
+                <BilingualText
+                  as="p"
+                  text={currentExhibition.period}
+                  mode="inline"
+                  className="block"
+                  zhClassName="block"
+                  enClassName="text-[0.66rem] text-[var(--accent)]/75"
+                />
+                <BilingualText
+                  as="p"
+                  text={currentExhibition.venue}
+                  mode="inline"
+                  className="block"
+                  zhClassName="block"
+                  enClassName="text-[0.66rem] text-[var(--accent)]/75"
+                />
+                <p className="text-[0.92rem] text-[var(--muted)]">
+                  {currentExhibition.highlightCount} {pageCopy.home.focusSummaryLine.highlightUnit.zh} · {currentExhibition.cataloguePages}{" "}
+                  {pageCopy.home.focusSummaryLine.catalogueUnit.zh}
+                </p>
+                <Link
+                  href={`/exhibitions/${currentExhibition.slug}`}
+                  className="inline-flex pt-3 text-[var(--ink)]"
+                >
+                  <ActionLabel text={pageCopy.home.focusAction} align="start" />
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro

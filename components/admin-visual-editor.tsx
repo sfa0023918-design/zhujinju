@@ -13,6 +13,7 @@ import type {
   Exhibition,
   OperationalFact,
   PageCopyContent,
+  PublicationStatus,
   SiteConfigContent,
   SiteContent,
 } from "@/lib/site-data";
@@ -42,6 +43,7 @@ function createSlug(prefix: string) {
 function createArtwork(): Artwork {
   return {
     slug: createSlug("artwork"),
+    publicationStatus: "draft",
     title: emptyBilingual(),
     subtitle: emptyBilingual(),
     period: emptyBilingual(),
@@ -73,6 +75,7 @@ function createArtwork(): Artwork {
 function createExhibition(): Exhibition {
   return {
     slug: createSlug("exhibition"),
+    publicationStatus: "draft",
     title: emptyBilingual(),
     subtitle: emptyBilingual(),
     period: emptyBilingual(),
@@ -94,6 +97,7 @@ function createExhibition(): Exhibition {
 function createArticle(): Article {
   return {
     slug: createSlug("article"),
+    publicationStatus: "draft",
     title: emptyBilingual(),
     category: emptyBilingual(),
     column: emptyBilingual(),
@@ -514,6 +518,28 @@ function HelperNote({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PublicationStatusField({
+  value,
+  onChange,
+}: {
+  value: PublicationStatus;
+  onChange: (value: PublicationStatus) => void;
+}) {
+  return (
+    <label className="grid gap-2">
+      <Label>发布状态</Label>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value as PublicationStatus)}
+        className="min-h-11 border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+      >
+        <option value="draft">草稿</option>
+        <option value="published">已发布</option>
+      </select>
+    </label>
+  );
+}
+
 function MediaGalleryEditor({
   label,
   folder,
@@ -581,14 +607,40 @@ export function AdminVisualEditor({
   const [state, formAction, pending] = useActionState(action, initialState);
   const [draft, setDraft] = useState<SiteContent[EditableSectionKey]>(() => cloneValue(initialValue));
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [hydrated, setHydrated] = useState(false);
+  const [autosaveState, setAutosaveState] = useState<"idle" | "restored" | "saved">("idle");
 
   useEffect(() => {
     setDraft(cloneValue(initialValue));
     setSelectedIndex(0);
+    setHydrated(false);
+    setAutosaveState("idle");
   }, [initialValue, section]);
 
   useEffect(() => {
-    if (!autoCreate) {
+    if (hydrated || autoCreate) {
+      return;
+    }
+    const storageKey = `zhujinju-admin-draft-${section}`;
+
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+
+      if (raw) {
+        const parsed = JSON.parse(raw) as { draft: SiteContent[EditableSectionKey]; selectedIndex?: number };
+        setDraft(parsed.draft);
+        setSelectedIndex(parsed.selectedIndex ?? 0);
+        setAutosaveState("restored");
+      }
+    } catch {
+      window.localStorage.removeItem(storageKey);
+    } finally {
+      setHydrated(true);
+    }
+  }, [hydrated, section, autoCreate]);
+
+  useEffect(() => {
+    if (hydrated || !autoCreate) {
       return;
     }
 
@@ -599,6 +651,7 @@ export function AdminVisualEditor({
         return items as SiteContent[EditableSectionKey];
       });
       setSelectedIndex((initialValue as Artwork[]).length);
+      setHydrated(true);
       return;
     }
 
@@ -609,6 +662,7 @@ export function AdminVisualEditor({
         return items as SiteContent[EditableSectionKey];
       });
       setSelectedIndex((initialValue as Exhibition[]).length);
+      setHydrated(true);
       return;
     }
 
@@ -619,8 +673,42 @@ export function AdminVisualEditor({
         return items as SiteContent[EditableSectionKey];
       });
       setSelectedIndex((initialValue as Article[]).length);
+      setHydrated(true);
+      return;
     }
-  }, [autoCreate, initialValue, section]);
+
+    setHydrated(true);
+  }, [autoCreate, hydrated, initialValue, section]);
+
+  useEffect(() => {
+    if (!hydrated || pending) {
+      return;
+    }
+
+    const storageKey = `zhujinju-admin-draft-${section}`;
+    const timer = window.setTimeout(() => {
+      window.localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          draft,
+          selectedIndex,
+        }),
+      );
+      setAutosaveState("saved");
+    }, 600);
+
+    return () => window.clearTimeout(timer);
+  }, [draft, hydrated, pending, section, selectedIndex]);
+
+  useEffect(() => {
+    if (!state.success) {
+      return;
+    }
+
+    const storageKey = `zhujinju-admin-draft-${section}`;
+    window.localStorage.removeItem(storageKey);
+    setAutosaveState("idle");
+  }, [section, state.success]);
 
   function updateDraft(recipe: (value: SiteContent[EditableSectionKey]) => void) {
     setDraft((current) => {
@@ -646,6 +734,44 @@ export function AdminVisualEditor({
     title: artwork.title.zh || artwork.slug,
     note: artwork.title.en || artwork.period.zh,
   }));
+
+  function resetBrowserDraft() {
+    const storageKey = `zhujinju-admin-draft-${section}`;
+    window.localStorage.removeItem(storageKey);
+    setDraft(cloneValue(initialValue));
+    setSelectedIndex(0);
+    setAutosaveState("idle");
+  }
+
+  function getPreviewHref() {
+    if (section === "artworks") {
+      const item = (draft as Artwork[])[selectedIndex];
+      if (!item?.slug) return null;
+      return item.publicationStatus === "draft"
+        ? `/collection/${item.slug}?preview=1`
+        : `/collection/${item.slug}`;
+    }
+
+    if (section === "exhibitions") {
+      const item = (draft as Exhibition[])[selectedIndex];
+      if (!item?.slug) return null;
+      return item.publicationStatus === "draft"
+        ? `/exhibitions/${item.slug}?preview=1`
+        : `/exhibitions/${item.slug}`;
+    }
+
+    if (section === "articles") {
+      const item = (draft as Article[])[selectedIndex];
+      if (!item?.slug) return null;
+      return item.publicationStatus === "draft"
+        ? `/journal/${item.slug}?preview=1`
+        : `/journal/${item.slug}`;
+    }
+
+    return null;
+  }
+
+  const previewHref = getPreviewHref();
 
   const renderSection = () => {
     if (section === "siteConfig") {
@@ -2256,7 +2382,11 @@ export function AdminVisualEditor({
                 });
                 setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
               }}
-              renderLabel={(index) => items[index]?.title.zh || items[index]?.slug || `藏品 ${index + 1}`}
+              renderLabel={(index) =>
+                `${items[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
+                  items[index]?.title.zh || items[index]?.slug || `藏品 ${index + 1}`
+                }`
+              }
             />
           </div>
 
@@ -2298,13 +2428,21 @@ export function AdminVisualEditor({
                       })
                     }
                   />
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-3">
                     <TextField
                       label="URL 标识（slug）"
                       value={current.slug}
                       onChange={(next) =>
                         updateDraft((item) => {
                           (item as Artwork[])[selectedIndex].slug = next;
+                        })
+                      }
+                    />
+                    <PublicationStatusField
+                      value={current.publicationStatus ?? "published"}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].publicationStatus = next;
                         })
                       }
                     />
@@ -2352,7 +2490,7 @@ export function AdminVisualEditor({
                       })
                     }
                   />
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-3">
                     <BilingualInput
                       label="年代"
                       value={current.period}
@@ -2802,7 +2940,11 @@ export function AdminVisualEditor({
                 });
                 setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
               }}
-              renderLabel={(index) => items[index]?.title.zh || items[index]?.slug || `展览 ${index + 1}`}
+              renderLabel={(index) =>
+                `${items[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
+                  items[index]?.title.zh || items[index]?.slug || `展览 ${index + 1}`
+                }`
+              }
             />
           </div>
 
@@ -2839,6 +2981,14 @@ export function AdminVisualEditor({
                       onChange={(next) =>
                         updateDraft((item) => {
                           (item as Exhibition[])[selectedIndex].slug = next;
+                        })
+                      }
+                    />
+                    <PublicationStatusField
+                      value={current.publicationStatus ?? "published"}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Exhibition[])[selectedIndex].publicationStatus = next;
                         })
                       }
                     />
@@ -3085,7 +3235,11 @@ export function AdminVisualEditor({
               });
               setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
             }}
-            renderLabel={(index) => articleItems[index]?.title.zh || articleItems[index]?.slug || `文章 ${index + 1}`}
+            renderLabel={(index) =>
+              `${articleItems[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
+                articleItems[index]?.title.zh || articleItems[index]?.slug || `文章 ${index + 1}`
+              }`
+            }
           />
         </div>
 
@@ -3115,13 +3269,21 @@ export function AdminVisualEditor({
                     })
                   }
                 />
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-3">
                   <TextField
                     label="URL 标识（slug）"
                     value={currentArticle.slug}
                     onChange={(next) =>
                       updateDraft((item) => {
                         (item as Article[])[selectedIndex].slug = next;
+                      })
+                    }
+                  />
+                  <PublicationStatusField
+                    value={currentArticle.publicationStatus ?? "published"}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Article[])[selectedIndex].publicationStatus = next;
                       })
                     }
                   />
@@ -3369,17 +3531,31 @@ export function AdminVisualEditor({
         <div className="space-y-1 text-sm text-[var(--muted)]">
           <p>内容通过可视化表单保存到 `content/site-content.json`。</p>
           <p>图片会上传到仓库资源目录，并在下一次 Vercel 部署完成后对外可见。</p>
+          <p>
+            {autosaveState === "restored"
+              ? "已恢复你上次未保存的浏览器草稿。"
+              : autosaveState === "saved"
+                ? "当前分区已自动保存在这台电脑的浏览器里。"
+                : "编辑过程中会自动保存在当前浏览器。"}
+          </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          {previewHref ? (
+            <a
+              href={previewHref}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+            >
+              预览当前内容
+            </a>
+          ) : null}
           <button
             type="button"
-            onClick={() => {
-              setDraft(cloneValue(initialValue));
-              setSelectedIndex(0);
-            }}
+            onClick={resetBrowserDraft}
             className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
           >
-            放弃本页修改
+            清除浏览器草稿
           </button>
           <button
             type="submit"
