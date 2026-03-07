@@ -44,6 +44,7 @@ export type Artwork = {
   relatedArticleSlugs: string[];
   relatedExhibitionSlugs: string[];
   image: string;
+  gallery?: string[];
   featured?: boolean;
 };
 

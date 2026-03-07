@@ -65,7 +65,7 @@ export const editableSections: Array<{
 ];
 
 export function getDefaultSiteContent(): SiteContent {
-  return {
+  return normalizeSiteContent({
     siteConfig: structuredClone(defaultSiteConfig) as SiteConfigContent,
     brandIntro: structuredClone(defaultBrandIntro),
     collectingDirections: structuredClone(defaultCollectingDirections),
@@ -73,7 +73,7 @@ export function getDefaultSiteContent(): SiteContent {
     artworks: structuredClone(defaultArtworks),
     exhibitions: structuredClone(defaultExhibitions),
     articles: structuredClone(defaultArticles),
-  };
+  });
 }
 
 async function readLocalContentFile() {
@@ -87,11 +87,11 @@ async function readLocalContentFile() {
 
 export async function loadSiteContent(): Promise<SiteContent> {
   const localContent = await readLocalContentFile();
-  return localContent ?? getDefaultSiteContent();
+  return normalizeSiteContent(localContent ?? getDefaultSiteContent());
 }
 
 export async function readSiteContentFresh() {
-  return (await readLocalContentFile()) ?? getDefaultSiteContent();
+  return normalizeSiteContent((await readLocalContentFile()) ?? getDefaultSiteContent());
 }
 
 export async function writeLocalContentFile(content: SiteContent) {
@@ -117,10 +117,10 @@ export async function saveSiteSection(
   actor: string,
 ) {
   const current = await readSiteContentFresh();
-  const nextContent = {
+  const nextContent = normalizeSiteContent({
     ...current,
     [section]: nextValue,
-  } as SiteContent;
+  } as SiteContent);
 
   if (canWriteLocalContentFile()) {
     await writeLocalContentFile(nextContent);
@@ -129,6 +129,26 @@ export async function saveSiteSection(
   await pushContentToGitHub(nextContent, `Update ${section} from admin by ${actor}`);
 
   return nextContent;
+}
+
+function normalizeSiteContent(content: SiteContent): SiteContent {
+  return {
+    ...content,
+    brandIntro: {
+      ...content.brandIntro,
+      heroImage: content.brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape",
+      heroAlt: content.brandIntro.heroAlt ?? bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
+    },
+    artworks: content.artworks.map((artwork) => ({
+      ...artwork,
+      gallery:
+        artwork.gallery && artwork.gallery.length > 0
+          ? artwork.gallery
+          : artwork.image
+            ? [artwork.image]
+            : [],
+    })),
+  };
 }
 
 function getUniqueBilingual(items: BilingualText[]) {

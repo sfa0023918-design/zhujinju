@@ -63,6 +63,7 @@ function createArtwork(): Artwork {
     relatedArticleSlugs: [],
     relatedExhibitionSlugs: [],
     image: "",
+    gallery: [],
     featured: false,
   };
 }
@@ -391,6 +392,106 @@ function ListManager({
         ) : (
           <p className="text-sm leading-7 text-[var(--muted)]">当前分区还没有内容，点击上方“新增”开始添加。</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+function SectionMenu({
+  items,
+}: {
+  items: Array<{ id: string; label: string }>;
+}) {
+  return (
+    <div className="sticky top-4 z-10 flex flex-wrap gap-2 border border-[var(--line)] bg-[var(--surface)]/95 p-3 backdrop-blur">
+      {items.map((item) => (
+        <a
+          key={item.id}
+          href={`#${item.id}`}
+          className="inline-flex min-h-9 items-center border border-[var(--line)] px-3 text-xs tracking-[0.12em] text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function EditorSection({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id: string;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      className="scroll-mt-24 space-y-4 border border-[var(--line)] bg-[var(--surface)] p-5 md:p-6"
+    >
+      <div className="space-y-1 border-b border-[var(--line)] pb-4">
+        <Label>{title}</Label>
+        {description ? <p className="text-sm leading-7 text-[var(--muted)]">{description}</p> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function MediaGalleryEditor({
+  label,
+  folder,
+  images,
+  onChange,
+}: {
+  label: string;
+  folder: string;
+  images: string[];
+  onChange: (images: string[]) => void;
+}) {
+  const safeImages = images.length ? images : [""];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <Label>{label}</Label>
+        <button
+          type="button"
+          onClick={() => onChange([...images, ""])}
+          className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+        >
+          新增图片
+        </button>
+      </div>
+      <div className="grid gap-4">
+        {safeImages.map((image, index) => (
+          <div key={`gallery-image-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+            <div className="flex items-center justify-between gap-4">
+              <Label>{`图片 ${index + 1}`}</Label>
+              <button
+                type="button"
+                onClick={() => onChange(removeArrayItem(safeImages, index))}
+                className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+              >
+                删除
+              </button>
+            </div>
+            <AdminMediaField
+              label={`细节图 ${index + 1}`}
+              folder={folder}
+              value={image}
+              onChange={(next) => {
+                const nextImages = [...safeImages];
+                nextImages[index] = next;
+                onChange(nextImages);
+              }}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -815,157 +916,199 @@ export function AdminVisualEditor({
 
           {current ? (
             <div className="grid gap-6">
-              <AdminMediaField
-                label="藏品主图"
-                folder="artworks"
-                value={current.image}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].image = next;
-                  })
-                }
-              />
-              <div className="grid gap-4 md:grid-cols-2">
-                <TextField
-                  label="URL 标识（slug）"
-                  value={current.slug}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].slug = next;
-                    })
-                  }
-                />
-                <label className="grid gap-2">
-                  <Label>作品状态</Label>
-                  <select
-                    value={current.status}
-                    onChange={(event) =>
-                      updateDraft((item) => {
-                        (item as Artwork[])[selectedIndex].status = event.target.value as Artwork["status"];
-                      })
-                    }
-                    className="min-h-11 border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-                  >
-                    <option value="inquiry">可洽询</option>
-                    <option value="sold">已售</option>
-                    <option value="reserved">暂留</option>
-                  </select>
-                </label>
-              </div>
-              <SwitchField
-                label="设为首页精选作品"
-                checked={Boolean(current.featured)}
-                onChange={(checked) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].featured = checked;
-                  })
-                }
-              />
-              <BilingualInput
-                label="作品标题"
-                value={current.title}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].title = next;
-                  })
-                }
-              />
-              <BilingualInput
-                label="副标题"
-                value={current.subtitle}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].subtitle = next;
-                  })
-                }
-              />
-              <div className="grid gap-4 md:grid-cols-2">
-                <BilingualInput
-                  label="年代"
-                  value={current.period}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].period = next;
-                    })
-                  }
-                />
-                <BilingualInput
-                  label="地区"
-                  value={current.region}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].region = next;
-                    })
-                  }
-                />
-                <BilingualInput
-                  label="产地"
-                  value={current.origin}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].origin = next;
-                    })
-                  }
-                />
-                <BilingualInput
-                  label="材质"
-                  value={current.material}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].material = next;
-                    })
-                  }
-                />
-                <BilingualInput
-                  label="品类"
-                  value={current.category}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].category = next;
-                    })
-                  }
-                />
-                <BilingualInput
-                  label="尺寸"
-                  value={current.dimensions}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Artwork[])[selectedIndex].dimensions = next;
-                    })
-                  }
-                />
-              </div>
-              <BilingualTextarea
-                label="简述"
-                rows={4}
-                value={current.excerpt}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].excerpt = next;
-                  })
-                }
-              />
-              <BilingualTextarea
-                label="观看描述"
-                rows={6}
-                value={current.viewingNote}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].viewingNote = next;
-                  })
-                }
-              />
-              <BilingualTextarea
-                label="比较判断"
-                rows={6}
-                value={current.comparisonNote}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Artwork[])[selectedIndex].comparisonNote = next;
-                  })
-                }
+              <SectionMenu
+                items={[
+                  { id: "artwork-media", label: "图片与主信息" },
+                  { id: "artwork-description", label: "说明文字" },
+                  { id: "artwork-records", label: "来源与记录" },
+                  { id: "artwork-relations", label: "关联内容" },
+                ]}
               />
 
+              <EditorSection
+                id="artwork-media"
+                title="图片与主信息"
+                description="先整理主图、细节图、标题和作品基础信息。"
+              >
+                <div className="grid gap-4">
+                  <AdminMediaField
+                    label="藏品主图"
+                    folder="artworks"
+                    value={current.image}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].image = next;
+                      })
+                    }
+                  />
+                  <MediaGalleryEditor
+                    label="细节图画廊"
+                    folder="artworks"
+                    images={current.gallery ?? []}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].gallery = next;
+                      })
+                    }
+                  />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <TextField
+                      label="URL 标识（slug）"
+                      value={current.slug}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].slug = next;
+                        })
+                      }
+                    />
+                    <label className="grid gap-2">
+                      <Label>作品状态</Label>
+                      <select
+                        value={current.status}
+                        onChange={(event) =>
+                          updateDraft((item) => {
+                            (item as Artwork[])[selectedIndex].status = event.target.value as Artwork["status"];
+                          })
+                        }
+                        className="min-h-11 border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+                      >
+                        <option value="inquiry">可洽询</option>
+                        <option value="sold">已售</option>
+                        <option value="reserved">暂留</option>
+                      </select>
+                    </label>
+                  </div>
+                  <SwitchField
+                    label="设为首页精选作品"
+                    checked={Boolean(current.featured)}
+                    onChange={(checked) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].featured = checked;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="作品标题"
+                    value={current.title}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].title = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="副标题"
+                    value={current.subtitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].subtitle = next;
+                      })
+                    }
+                  />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <BilingualInput
+                      label="年代"
+                      value={current.period}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].period = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="地区"
+                      value={current.region}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].region = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="产地"
+                      value={current.origin}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].origin = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="材质"
+                      value={current.material}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].material = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="品类"
+                      value={current.category}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].category = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="尺寸"
+                      value={current.dimensions}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].dimensions = next;
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </EditorSection>
+
+              <EditorSection
+                id="artwork-description"
+                title="说明文字"
+                description="这部分对应前台藏品详情页的摘要、观看描述和比较判断。"
+              >
+                <div className="grid gap-4">
+                  <BilingualTextarea
+                    label="简述"
+                    rows={4}
+                    value={current.excerpt}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].excerpt = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="观看描述"
+                    rows={6}
+                    value={current.viewingNote}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].viewingNote = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="比较判断"
+                    rows={6}
+                    value={current.comparisonNote}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Artwork[])[selectedIndex].comparisonNote = next;
+                      })
+                    }
+                  />
+                </div>
+              </EditorSection>
+
+              <EditorSection
+                id="artwork-records"
+                title="来源与记录"
+                description="管理 provenance、展览记录和出版信息。"
+              >
+                <div className="grid gap-6">
               <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
                 <div className="flex items-center justify-between gap-4">
                   <Label>来源 / Provenance</Label>
@@ -1176,7 +1319,15 @@ export function AdminVisualEditor({
                   </div>
                 ))}
               </div>
+                </div>
+              </EditorSection>
 
+              <EditorSection
+                id="artwork-relations"
+                title="关联内容"
+                description="控制询洽补充说明，以及作品和展览、文章之间的互链。"
+              >
+                <div className="grid gap-6">
               <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
                 <div className="flex items-center justify-between gap-4">
                   <Label>询洽补充信息</Label>
@@ -1261,6 +1412,8 @@ export function AdminVisualEditor({
                   })
                 }
               />
+                </div>
+              </EditorSection>
             </div>
           ) : null}
         </div>
@@ -1294,214 +1447,243 @@ export function AdminVisualEditor({
 
           {current ? (
             <div className="grid gap-6">
-              <AdminMediaField
-                label="展览封面"
-                folder="exhibitions"
-                value={current.cover}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].cover = next;
-                  })
-                }
+              <SectionMenu
+                items={[
+                  { id: "exhibition-basic", label: "基本信息" },
+                  { id: "exhibition-content", label: "正文与图录" },
+                  { id: "exhibition-relations", label: "关联内容" },
+                ]}
               />
-              <div className="grid gap-4 md:grid-cols-2">
-                <TextField
-                  label="URL 标识（slug）"
-                  value={current.slug}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Exhibition[])[selectedIndex].slug = next;
-                    })
-                  }
-                />
-                <TextField
-                  label="图录页数"
-                  type="number"
-                  value={String(current.cataloguePages)}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Exhibition[])[selectedIndex].cataloguePages = Number(next || 0);
-                    })
-                  }
-                />
-              </div>
-              <SwitchField
-                label="设为首页当前专题 / 近期展览"
-                checked={Boolean(current.current)}
-                onChange={(checked) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[]).forEach((entry, index) => {
-                      entry.current = checked ? index === selectedIndex : false;
-                    });
-                  })
-                }
-              />
-              <BilingualInput
-                label="展览标题"
-                value={current.title}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].title = next;
-                  })
-                }
-              />
-              <BilingualInput
-                label="副标题"
-                value={current.subtitle}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].subtitle = next;
-                  })
-                }
-              />
-              <div className="grid gap-4 md:grid-cols-2">
-                <BilingualInput
-                  label="时间"
-                  value={current.period}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Exhibition[])[selectedIndex].period = next;
-                    })
-                  }
-                />
-                <BilingualInput
-                  label="地点"
-                  value={current.venue}
-                  onChange={(next) =>
-                    updateDraft((item) => {
-                      (item as Exhibition[])[selectedIndex].venue = next;
-                    })
-                  }
-                />
-              </div>
-              <BilingualTextarea
-                label="导语"
-                rows={4}
-                value={current.intro}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].intro = next;
-                  })
-                }
-              />
-              <BilingualTextarea
-                label="策展前言"
-                rows={4}
-                value={current.curatorialLead}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].curatorialLead = next;
-                  })
-                }
-              />
-              <BilingualInput
-                label="图录标题"
-                value={current.catalogueTitle}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].catalogueTitle = next;
-                  })
-                }
-              />
-              <BilingualTextarea
-                label="图录简介"
-                rows={4}
-                value={current.catalogueIntro}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].catalogueIntro = next;
-                  })
-                }
-              />
-
-              <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <Label>正文段落</Label>
-                  <button
-                    type="button"
-                    onClick={() =>
+              <EditorSection
+                id="exhibition-basic"
+                title="基本信息"
+                description="封面、标题、首页状态、时间地点和图录页数。"
+              >
+                <div className="grid gap-4">
+                  <AdminMediaField
+                    label="展览封面"
+                    folder="exhibitions"
+                    value={current.cover}
+                    onChange={(next) =>
                       updateDraft((item) => {
-                        (item as Exhibition[])[selectedIndex].description.push(emptyBilingual());
+                        (item as Exhibition[])[selectedIndex].cover = next;
                       })
                     }
-                    className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                  >
-                    新增段落
-                  </button>
+                  />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <TextField
+                      label="URL 标识（slug）"
+                      value={current.slug}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Exhibition[])[selectedIndex].slug = next;
+                        })
+                      }
+                    />
+                    <TextField
+                      label="图录页数"
+                      type="number"
+                      value={String(current.cataloguePages)}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Exhibition[])[selectedIndex].cataloguePages = Number(next || 0);
+                        })
+                      }
+                    />
+                  </div>
+                  <SwitchField
+                    label="设为首页当前专题 / 近期展览"
+                    checked={Boolean(current.current)}
+                    onChange={(checked) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[]).forEach((entry, index) => {
+                          entry.current = checked ? index === selectedIndex : false;
+                        });
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="展览标题"
+                    value={current.title}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].title = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="副标题"
+                    value={current.subtitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].subtitle = next;
+                      })
+                    }
+                  />
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <BilingualInput
+                      label="时间"
+                      value={current.period}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Exhibition[])[selectedIndex].period = next;
+                        })
+                      }
+                    />
+                    <BilingualInput
+                      label="地点"
+                      value={current.venue}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Exhibition[])[selectedIndex].venue = next;
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                {current.description.map((entry, index) => (
-                  <div key={`exhibition-paragraph-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+              </EditorSection>
+              <EditorSection
+                id="exhibition-content"
+                title="正文与图录"
+                description="维护导语、策展前言、图录说明和正文段落。"
+              >
+                <div className="grid gap-4">
+                  <BilingualTextarea
+                    label="导语"
+                    rows={4}
+                    value={current.intro}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].intro = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="策展前言"
+                    rows={4}
+                    value={current.curatorialLead}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].curatorialLead = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="图录标题"
+                    value={current.catalogueTitle}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].catalogueTitle = next;
+                      })
+                    }
+                  />
+                  <BilingualTextarea
+                    label="图录简介"
+                    rows={4}
+                    value={current.catalogueIntro}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].catalogueIntro = next;
+                      })
+                    }
+                  />
+                  <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
                     <div className="flex items-center justify-between gap-4">
-                      <Label>{`段落 ${index + 1}`}</Label>
+                      <Label>正文段落</Label>
                       <button
                         type="button"
                         onClick={() =>
                           updateDraft((item) => {
-                            (item as Exhibition[])[selectedIndex].description = removeArrayItem(
-                              (item as Exhibition[])[selectedIndex].description,
-                              index,
-                            );
+                            (item as Exhibition[])[selectedIndex].description.push(emptyBilingual());
                           })
                         }
-                        className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                        className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
                       >
-                        删除
+                        新增段落
                       </button>
                     </div>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <TextAreaField
-                        label="中文"
-                        rows={4}
-                        value={entry.zh}
-                        onChange={(next) =>
-                          updateDraft((item) => {
-                            (item as Exhibition[])[selectedIndex].description[index].zh = next;
-                          })
-                        }
-                      />
-                      <TextAreaField
-                        label="英文"
-                        rows={4}
-                        value={entry.en}
-                        onChange={(next) =>
-                          updateDraft((item) => {
-                            (item as Exhibition[])[selectedIndex].description[index].en = next;
-                          })
-                        }
-                      />
-                    </div>
+                    {current.description.map((entry, index) => (
+                      <div key={`exhibition-paragraph-${index}`} className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <Label>{`段落 ${index + 1}`}</Label>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateDraft((item) => {
+                                (item as Exhibition[])[selectedIndex].description = removeArrayItem(
+                                  (item as Exhibition[])[selectedIndex].description,
+                                  index,
+                                );
+                              })
+                            }
+                            className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                          >
+                            删除
+                          </button>
+                        </div>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <TextAreaField
+                            label="中文"
+                            rows={4}
+                            value={entry.zh}
+                            onChange={(next) =>
+                              updateDraft((item) => {
+                                (item as Exhibition[])[selectedIndex].description[index].zh = next;
+                              })
+                            }
+                          />
+                          <TextAreaField
+                            label="英文"
+                            rows={4}
+                            value={entry.en}
+                            onChange={(next) =>
+                              updateDraft((item) => {
+                                (item as Exhibition[])[selectedIndex].description[index].en = next;
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-
-              <RelationChecklist
-                label="重点作品"
-                options={artworkOptions}
-                selected={current.highlightArtworkSlugs}
-                onToggle={(slug) =>
-                  updateDraft((item) => {
-                    const next = toggleString(
-                      (item as Exhibition[])[selectedIndex].highlightArtworkSlugs,
-                      slug,
-                    );
-                    (item as Exhibition[])[selectedIndex].highlightArtworkSlugs = next;
-                    (item as Exhibition[])[selectedIndex].highlightCount = next.length;
-                  })
-                }
-              />
-              <RelationChecklist
-                label="关联文章"
-                options={articleOptions}
-                selected={current.relatedArticleSlugs}
-                onToggle={(slug) =>
-                  updateDraft((item) => {
-                    (item as Exhibition[])[selectedIndex].relatedArticleSlugs = toggleString(
-                      (item as Exhibition[])[selectedIndex].relatedArticleSlugs,
-                      slug,
-                    );
-                  })
-                }
-              />
+                </div>
+              </EditorSection>
+              <EditorSection
+                id="exhibition-relations"
+                title="关联内容"
+                description="控制重点作品与相关文章。"
+              >
+                <div className="grid gap-6">
+                  <RelationChecklist
+                    label="重点作品"
+                    options={artworkOptions}
+                    selected={current.highlightArtworkSlugs}
+                    onToggle={(slug) =>
+                      updateDraft((item) => {
+                        const next = toggleString(
+                          (item as Exhibition[])[selectedIndex].highlightArtworkSlugs,
+                          slug,
+                        );
+                        (item as Exhibition[])[selectedIndex].highlightArtworkSlugs = next;
+                        (item as Exhibition[])[selectedIndex].highlightCount = next.length;
+                      })
+                    }
+                  />
+                  <RelationChecklist
+                    label="关联文章"
+                    options={articleOptions}
+                    selected={current.relatedArticleSlugs}
+                    onToggle={(slug) =>
+                      updateDraft((item) => {
+                        (item as Exhibition[])[selectedIndex].relatedArticleSlugs = toggleString(
+                          (item as Exhibition[])[selectedIndex].relatedArticleSlugs,
+                          slug,
+                        );
+                      })
+                    }
+                  />
+                </div>
+              </EditorSection>
             </div>
           ) : null}
         </div>
@@ -1534,227 +1716,258 @@ export function AdminVisualEditor({
 
         {currentArticle ? (
           <div className="grid gap-6">
-            <AdminMediaField
-              label="文章封面"
-              folder="articles"
-              value={currentArticle.cover}
-              onChange={(next) =>
-                updateDraft((item) => {
-                  (item as Article[])[selectedIndex].cover = next;
-                })
-              }
+            <SectionMenu
+              items={[
+                { id: "article-basic", label: "基本信息" },
+                { id: "article-body", label: "正文与关键词" },
+                { id: "article-relations", label: "关联内容" },
+              ]}
             />
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextField
-                label="URL 标识（slug）"
-                value={currentArticle.slug}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Article[])[selectedIndex].slug = next;
-                  })
-                }
-              />
-              <TextField
-                label="发布日期"
-                type="date"
-                value={currentArticle.date}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Article[])[selectedIndex].date = next;
-                  })
-                }
-              />
-            </div>
-            <BilingualInput
-              label="文章标题"
-              value={currentArticle.title}
-              onChange={(next) =>
-                updateDraft((item) => {
-                  (item as Article[])[selectedIndex].title = next;
-                })
-              }
-            />
-            <div className="grid gap-4 md:grid-cols-3">
-              <BilingualInput
-                label="分类"
-                value={currentArticle.category}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Article[])[selectedIndex].category = next;
-                  })
-                }
-              />
-              <BilingualInput
-                label="栏目"
-                value={currentArticle.column}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Article[])[selectedIndex].column = next;
-                  })
-                }
-              />
-              <BilingualInput
-                label="作者"
-                value={currentArticle.author}
-                onChange={(next) =>
-                  updateDraft((item) => {
-                    (item as Article[])[selectedIndex].author = next;
-                  })
-                }
-              />
-            </div>
-            <BilingualTextarea
-              label="摘要"
-              rows={4}
-              value={currentArticle.excerpt}
-              onChange={(next) =>
-                updateDraft((item) => {
-                  (item as Article[])[selectedIndex].excerpt = next;
-                })
-              }
-            />
-            <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
-              <div className="flex items-center justify-between gap-4">
-                <Label>正文段落</Label>
-                <button
-                  type="button"
-                  onClick={() =>
+            <EditorSection
+              id="article-basic"
+              title="基本信息"
+              description="封面、标题、作者、栏目、分类与发布时间。"
+            >
+              <div className="grid gap-4">
+                <AdminMediaField
+                  label="文章封面"
+                  folder="articles"
+                  value={currentArticle.cover}
+                  onChange={(next) =>
                     updateDraft((item) => {
-                      (item as Article[])[selectedIndex].body.push(emptyBilingual());
+                      (item as Article[])[selectedIndex].cover = next;
                     })
                   }
-                  className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                >
-                  新增段落
-                </button>
+                />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <TextField
+                    label="URL 标识（slug）"
+                    value={currentArticle.slug}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Article[])[selectedIndex].slug = next;
+                      })
+                    }
+                  />
+                  <TextField
+                    label="发布日期"
+                    type="date"
+                    value={currentArticle.date}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Article[])[selectedIndex].date = next;
+                      })
+                    }
+                  />
+                </div>
+                <BilingualInput
+                  label="文章标题"
+                  value={currentArticle.title}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as Article[])[selectedIndex].title = next;
+                    })
+                  }
+                />
+                <div className="grid gap-4 md:grid-cols-3">
+                  <BilingualInput
+                    label="分类"
+                    value={currentArticle.category}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Article[])[selectedIndex].category = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="栏目"
+                    value={currentArticle.column}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Article[])[selectedIndex].column = next;
+                      })
+                    }
+                  />
+                  <BilingualInput
+                    label="作者"
+                    value={currentArticle.author}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as Article[])[selectedIndex].author = next;
+                      })
+                    }
+                  />
+                </div>
+                <BilingualTextarea
+                  label="摘要"
+                  rows={4}
+                  value={currentArticle.excerpt}
+                  onChange={(next) =>
+                    updateDraft((item) => {
+                      (item as Article[])[selectedIndex].excerpt = next;
+                    })
+                  }
+                />
               </div>
-              {currentArticle.body.map((entry, index) => (
-                <div key={`article-body-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+            </EditorSection>
+            <EditorSection
+              id="article-body"
+              title="正文与关键词"
+              description="维护文章段落和前台展示关键词。"
+            >
+              <div className="grid gap-6">
+                <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <Label>{`段落 ${index + 1}`}</Label>
+                    <Label>正文段落</Label>
                     <button
                       type="button"
                       onClick={() =>
                         updateDraft((item) => {
-                          (item as Article[])[selectedIndex].body = removeArrayItem(
-                            (item as Article[])[selectedIndex].body,
-                            index,
-                          );
+                          (item as Article[])[selectedIndex].body.push(emptyBilingual());
                         })
                       }
-                      className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                      className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
                     >
-                      删除
+                      新增段落
                     </button>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <TextAreaField
-                      label="中文"
-                      rows={5}
-                      value={entry.zh}
-                      onChange={(next) =>
-                        updateDraft((item) => {
-                          (item as Article[])[selectedIndex].body[index].zh = next;
-                        })
-                      }
-                    />
-                    <TextAreaField
-                      label="英文"
-                      rows={5}
-                      value={entry.en}
-                      onChange={(next) =>
-                        updateDraft((item) => {
-                          (item as Article[])[selectedIndex].body[index].en = next;
-                        })
-                      }
-                    />
-                  </div>
+                  {currentArticle.body.map((entry, index) => (
+                    <div key={`article-body-${index}`} className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <Label>{`段落 ${index + 1}`}</Label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateDraft((item) => {
+                              (item as Article[])[selectedIndex].body = removeArrayItem(
+                                (item as Article[])[selectedIndex].body,
+                                index,
+                              );
+                            })
+                          }
+                          className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                        >
+                          删除
+                        </button>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <TextAreaField
+                          label="中文"
+                          rows={5}
+                          value={entry.zh}
+                          onChange={(next) =>
+                            updateDraft((item) => {
+                              (item as Article[])[selectedIndex].body[index].zh = next;
+                            })
+                          }
+                        />
+                        <TextAreaField
+                          label="英文"
+                          rows={5}
+                          value={entry.en}
+                          onChange={(next) =>
+                            updateDraft((item) => {
+                              (item as Article[])[selectedIndex].body[index].en = next;
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
-              <div className="flex items-center justify-between gap-4">
-                <Label>关键词</Label>
-                <button
-                  type="button"
-                  onClick={() =>
-                    updateDraft((item) => {
-                      (item as Article[])[selectedIndex].keywords.push(emptyBilingual());
-                    })
-                  }
-                  className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                >
-                  新增关键词
-                </button>
-              </div>
-              {currentArticle.keywords.map((entry, index) => (
-                <div key={`keyword-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+                <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <Label>{`关键词 ${index + 1}`}</Label>
+                    <Label>关键词</Label>
                     <button
                       type="button"
                       onClick={() =>
                         updateDraft((item) => {
-                          (item as Article[])[selectedIndex].keywords = removeArrayItem(
-                            (item as Article[])[selectedIndex].keywords,
-                            index,
-                          );
+                          (item as Article[])[selectedIndex].keywords.push(emptyBilingual());
                         })
                       }
-                      className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                      className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
                     >
-                      删除
+                      新增关键词
                     </button>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <TextField
-                      label="中文"
-                      value={entry.zh}
-                      onChange={(next) =>
-                        updateDraft((item) => {
-                          (item as Article[])[selectedIndex].keywords[index].zh = next;
-                        })
-                      }
-                    />
-                    <TextField
-                      label="英文"
-                      value={entry.en}
-                      onChange={(next) =>
-                        updateDraft((item) => {
-                          (item as Article[])[selectedIndex].keywords[index].en = next;
-                        })
-                      }
-                    />
-                  </div>
+                  {currentArticle.keywords.map((entry, index) => (
+                    <div key={`keyword-${index}`} className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+                      <div className="flex items-center justify-between gap-4">
+                        <Label>{`关键词 ${index + 1}`}</Label>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateDraft((item) => {
+                              (item as Article[])[selectedIndex].keywords = removeArrayItem(
+                                (item as Article[])[selectedIndex].keywords,
+                                index,
+                              );
+                            })
+                          }
+                          className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                        >
+                          删除
+                        </button>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <TextField
+                          label="中文"
+                          value={entry.zh}
+                          onChange={(next) =>
+                            updateDraft((item) => {
+                              (item as Article[])[selectedIndex].keywords[index].zh = next;
+                            })
+                          }
+                        />
+                        <TextField
+                          label="英文"
+                          value={entry.en}
+                          onChange={(next) =>
+                            updateDraft((item) => {
+                              (item as Article[])[selectedIndex].keywords[index].en = next;
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <RelationChecklist
-              label="关联藏品"
-              options={artworkOptions}
-              selected={currentArticle.relatedArtworkSlugs}
-              onToggle={(slug) =>
-                updateDraft((item) => {
-                  (item as Article[])[selectedIndex].relatedArtworkSlugs = toggleString(
-                    (item as Article[])[selectedIndex].relatedArtworkSlugs,
-                    slug,
-                  );
-                })
-              }
-            />
-            <RelationChecklist
-              label="关联展览"
-              options={exhibitionOptions}
-              selected={currentArticle.relatedExhibitionSlugs}
-              onToggle={(slug) =>
-                updateDraft((item) => {
-                  (item as Article[])[selectedIndex].relatedExhibitionSlugs = toggleString(
-                    (item as Article[])[selectedIndex].relatedExhibitionSlugs,
-                    slug,
-                  );
-                })
-              }
-            />
+              </div>
+            </EditorSection>
+            <EditorSection
+              id="article-relations"
+              title="关联内容"
+              description="维护文章与藏品、展览之间的关联关系。"
+            >
+              <div className="grid gap-6">
+                <RelationChecklist
+                  label="关联藏品"
+                  options={artworkOptions}
+                  selected={currentArticle.relatedArtworkSlugs}
+                  onToggle={(slug) =>
+                    updateDraft((item) => {
+                      (item as Article[])[selectedIndex].relatedArtworkSlugs = toggleString(
+                        (item as Article[])[selectedIndex].relatedArtworkSlugs,
+                        slug,
+                      );
+                    })
+                  }
+                />
+                <RelationChecklist
+                  label="关联展览"
+                  options={exhibitionOptions}
+                  selected={currentArticle.relatedExhibitionSlugs}
+                  onToggle={(slug) =>
+                    updateDraft((item) => {
+                      (item as Article[])[selectedIndex].relatedExhibitionSlugs = toggleString(
+                        (item as Article[])[selectedIndex].relatedExhibitionSlugs,
+                        slug,
+                      );
+                    })
+                  }
+                />
+              </div>
+            </EditorSection>
           </div>
         ) : null}
       </div>

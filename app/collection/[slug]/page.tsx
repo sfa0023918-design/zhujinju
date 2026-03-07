@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
+import { ArtworkGallery } from "@/components/artwork-gallery";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { StatusPill } from "@/components/status-pill";
@@ -86,17 +87,11 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <span>{formatInlineText(artwork.title)}</span>
         </div>
         <div className="grid gap-10 md:grid-cols-[minmax(0,1.04fr)_minmax(280px,0.48fr)] md:gap-14">
-          <div className="relative overflow-hidden bg-[var(--surface-strong)]">
-            <Image
-              src={artwork.image}
-              alt={formatInlineText(artwork.title)}
-              width={1200}
-              height={1500}
-              priority
-              unoptimized
-              className="aspect-[4/5] h-full w-full object-cover"
-            />
-          </div>
+          <ArtworkGallery
+            title={formatInlineText(artwork.title)}
+            primaryImage={artwork.image}
+            gallery={artwork.gallery}
+          />
           <aside className="space-y-7 md:sticky md:top-8 md:self-start">
             <div className="space-y-5 border-t border-[var(--line)] pt-5">
               <div className="flex items-center justify-between gap-4">
