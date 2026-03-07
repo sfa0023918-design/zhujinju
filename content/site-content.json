@@ -887,10 +887,10 @@
       "relatedExhibitionSlugs": [
         "silent-radiance"
       ],
-      "image": "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait",
+      "image": "/uploads/artworks/1772894645653-img-0002.jpg",
       "featured": true,
       "gallery": [
-        "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait"
+        "/uploads/artworks/1772895468492-img-0006.jpg"
       ],
       "publicationStatus": "published"
     },
@@ -1685,9 +1685,10 @@
       "relatedExhibitionSlugs": [
         "between-gilding-and-pigment"
       ],
-      "image": "/uploads/artworks/1772894500888-img-0006.jpg",
+      "image": "/api/placeholder/newar-shakyamuni?kind=portrait",
       "gallery": [
-        "/api/placeholder/newar-shakyamuni?kind=portrait"
+        "/api/placeholder/newar-shakyamuni?kind=portrait",
+        ""
       ],
       "publicationStatus": "published"
     }
