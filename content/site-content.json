@@ -890,8 +890,7 @@
       "image": "/uploads/artworks/1772895592888-img-0002.jpg",
       "featured": true,
       "gallery": [
-        "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait",
-        "/uploads/artworks/1772902465896-b00008503fr1770280981-denoised-p.jpg"
+        "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait"
       ],
       "publicationStatus": "published"
     },
