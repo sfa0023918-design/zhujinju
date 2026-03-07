@@ -22,10 +22,10 @@
       "wechat": "zhujinju_art",
       "whatsapp": "+86 188 0738 1234",
       "instagram": "@zhujinju_art",
-      "pdfRequest": "catalogue@zhujinju.com",
+      "pdfRequest": "sfa0023918@gmail.com",
       "address": {
         "zh": "中国成都·竹瑾居艺术空间",
-        "en": "Chengdu, China · By Appointment"
+        "en": "Chengdu, China · Zhujinju Art Gallery"
       },
       "replyWindow": {
         "zh": "作品咨询通常于 24 小时内回复。",
@@ -312,7 +312,10 @@
         "silent-radiance"
       ],
       "image": "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait",
-      "featured": true
+      "featured": true,
+      "gallery": [
+        "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait"
+      ]
     },
     {
       "slug": "green-tara-malla",
@@ -430,7 +433,10 @@
         "between-gilding-and-pigment"
       ],
       "image": "/api/placeholder/green-tara-malla?kind=portrait",
-      "featured": true
+      "featured": true,
+      "gallery": [
+        "/api/placeholder/green-tara-malla?kind=portrait"
+      ]
     },
     {
       "slug": "shakyamuni-bhumisparsha",
@@ -539,7 +545,10 @@
         "silent-radiance"
       ],
       "image": "/api/placeholder/shakyamuni-bhumisparsha?kind=portrait",
-      "featured": true
+      "featured": true,
+      "gallery": [
+        "/api/placeholder/shakyamuni-bhumisparsha?kind=portrait"
+      ]
     },
     {
       "slug": "manjushri-thangka",
@@ -652,7 +661,10 @@
         "between-gilding-and-pigment"
       ],
       "image": "/api/placeholder/manjushri-thangka?kind=portrait",
-      "featured": true
+      "featured": true,
+      "gallery": [
+        "/api/placeholder/manjushri-thangka?kind=portrait"
+      ]
     },
     {
       "slug": "vajrapani-thangka",
@@ -760,7 +772,10 @@
       "relatedExhibitionSlugs": [
         "silent-radiance"
       ],
-      "image": "/api/placeholder/vajrapani-thangka?kind=portrait"
+      "image": "/api/placeholder/vajrapani-thangka?kind=portrait",
+      "gallery": [
+        "/api/placeholder/vajrapani-thangka?kind=portrait"
+      ]
     },
     {
       "slug": "ritual-conch-set",
@@ -867,7 +882,10 @@
       "relatedExhibitionSlugs": [
         "between-gilding-and-pigment"
       ],
-      "image": "/api/placeholder/ritual-conch-set?kind=portrait"
+      "image": "/api/placeholder/ritual-conch-set?kind=portrait",
+      "gallery": [
+        "/api/placeholder/ritual-conch-set?kind=portrait"
+      ]
     },
     {
       "slug": "amitayus-western-tibet",
@@ -974,7 +992,10 @@
       "relatedExhibitionSlugs": [
         "silent-radiance"
       ],
-      "image": "/api/placeholder/amitayus-western-tibet?kind=portrait"
+      "image": "/api/placeholder/amitayus-western-tibet?kind=portrait",
+      "gallery": [
+        "/api/placeholder/amitayus-western-tibet?kind=portrait"
+      ]
     },
     {
       "slug": "newar-shakyamuni",
@@ -1081,7 +1102,10 @@
       "relatedExhibitionSlugs": [
         "between-gilding-and-pigment"
       ],
-      "image": "/api/placeholder/newar-shakyamuni?kind=portrait"
+      "image": "/api/placeholder/newar-shakyamuni?kind=portrait",
+      "gallery": [
+        "/api/placeholder/newar-shakyamuni?kind=portrait"
+      ]
     }
   ],
   "exhibitions": [
