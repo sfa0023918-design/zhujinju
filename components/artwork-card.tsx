@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { withImageVersion } from "@/lib/image-url";
 import type { Artwork } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
@@ -24,7 +25,7 @@ export function ArtworkCard({ artwork, priority = false }: ArtworkCardProps) {
       <Link href={`/collection/${artwork.slug}`} className="grid gap-6 md:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.52fr)] md:gap-10">
         <div className="relative overflow-hidden bg-[var(--surface-strong)]">
           <Image
-            src={artwork.image}
+            src={withImageVersion(artwork.image)}
             alt={`${artwork.title.zh} ${artwork.title.en}`}
             width={900}
             height={1200}

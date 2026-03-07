@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
+import { withImageVersion } from "@/lib/image-url";
+
 type ArtworkGalleryProps = {
   title: string;
   primaryImage: string;
@@ -34,11 +36,13 @@ export function ArtworkGallery({
     setActiveImage(primaryImage);
   }, [primaryImage]);
 
+  const activeImageSrc = withImageVersion(activeImage);
+
   return (
     <div className="grid gap-4">
       <div className="relative overflow-hidden bg-[var(--surface-strong)]">
         <Image
-          src={activeImage}
+          src={activeImageSrc}
           alt={title}
           width={1200}
           height={1500}
@@ -77,7 +81,7 @@ export function ArtworkGallery({
                   }`}
                 >
                   <Image
-                    src={image}
+                    src={withImageVersion(image)}
                     alt={`${title} 细节图 ${index + 1}`}
                     width={320}
                     height={400}
