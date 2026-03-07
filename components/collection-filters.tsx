@@ -3,6 +3,7 @@ import Link from "next/link";
 import { bt, formatInlineText } from "@/lib/bilingual";
 import { filterOptions } from "@/lib/site-data";
 
+import { ActionLabel } from "./action-label";
 import { BilingualText } from "./bilingual-text";
 
 type CollectionFiltersProps = {
@@ -53,15 +54,15 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
       ))}
       <button
         type="submit"
-        className="h-11 self-end border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
+        className="inline-flex h-11 items-center justify-center self-end border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
       >
-        筛选·Filter
+        <ActionLabel text={bt("筛选结果", "Apply Filters")} />
       </button>
       <Link
         href="/collection"
-        className="flex h-11 items-center justify-center self-end border border-[var(--line)] px-5 text-sm text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+        className="inline-flex h-11 items-center justify-center self-end border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
       >
-        重置·Reset
+        <ActionLabel text={bt("重置筛选", "Reset Filters")} />
       </Link>
     </form>
   );

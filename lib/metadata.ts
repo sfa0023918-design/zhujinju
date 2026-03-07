@@ -27,6 +27,13 @@ export function buildMetadata({
     metadataBase: new URL(siteBaseUrl),
     title: fullTitle,
     description: resolvedDescription,
+    icons: {
+      icon: [
+        { url: "/icon.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico", rel: "shortcut icon" },
+      ],
+      shortcut: ["/favicon.ico"],
+    },
     alternates: {
       canonical,
     },

@@ -29,7 +29,7 @@ export function SiteHeader() {
         </Link>
         <nav
           aria-label="主导航"
-          className="flex flex-1 justify-end gap-4 overflow-x-auto text-sm text-[var(--muted)] md:gap-7"
+          className="flex flex-1 justify-end gap-3 overflow-x-auto text-sm text-[var(--muted)] md:gap-7"
         >
           {navigation.map((item) => (
             <Link
@@ -41,9 +41,9 @@ export function SiteHeader() {
                 as="span"
                 text={item.label}
                 mode="inline"
-                className="text-[0.92rem]"
-                zhClassName="text-[0.92rem]"
-                enClassName="text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/76"
+                className="text-[0.88rem] md:text-[0.92rem]"
+                zhClassName="text-[0.88rem] md:text-[0.92rem]"
+                enClassName="text-[0.42rem] uppercase tracking-[0.12em] text-[var(--accent)]/72 md:text-[0.46rem] md:tracking-[0.14em]"
               />
             </Link>
           ))}
