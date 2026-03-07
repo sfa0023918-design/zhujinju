@@ -38,6 +38,126 @@
     }
   },
   "pageCopy": {
+    "siteChrome": {
+      "footer": {
+        "intro": {
+          "zh": "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
+          "en": "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
+        },
+        "appointment": {
+          "zh": "By Appointment in Shanghai",
+          "en": "By Appointment in Shanghai"
+        },
+        "copyrightLabel": {
+          "zh": "版权所有",
+          "en": "Copyright"
+        },
+        "contactHeading": {
+          "zh": "联络",
+          "en": "Contact"
+        },
+        "informationHeading": {
+          "zh": "信息与请求",
+          "en": "Information"
+        },
+        "collectionLink": {
+          "zh": "藏品浏览",
+          "en": "Browse Collection"
+        },
+        "exhibitionsLink": {
+          "zh": "展览与图录",
+          "en": "Exhibitions & Catalogues"
+        },
+        "journalLink": {
+          "zh": "文章与研究",
+          "en": "Journal & Research"
+        },
+        "pdfRequestLabel": {
+          "zh": "PDF 索取",
+          "en": "PDF Request"
+        },
+        "instagramLabel": {
+          "zh": "Instagram",
+          "en": "Instagram"
+        },
+        "wechatLabel": {
+          "zh": "微信",
+          "en": "WeChat"
+        }
+      },
+      "contactForm": {
+        "introIdle": {
+          "zh": "欢迎藏家、机构、策展人与研究者联系。",
+          "en": "Collectors, institutions, curators, and researchers are welcome to get in touch."
+        },
+        "introSubmitting": {
+          "zh": "提交中",
+          "en": "Sending"
+        },
+        "introSuccess": {
+          "zh": "已收到信息。竹瑾居通常会于一个工作日内回复。",
+          "en": "Message received. Zhu Jin Ju usually replies within one working day."
+        },
+        "introError": {
+          "zh": "提交失败，请稍后再试。",
+          "en": "Submission failed. Please try again later."
+        },
+        "nameLabel": {
+          "zh": "姓名",
+          "en": "Name"
+        },
+        "emailLabel": {
+          "zh": "邮箱",
+          "en": "Email"
+        },
+        "organizationLabel": {
+          "zh": "机构与公司",
+          "en": "Institution / Company"
+        },
+        "roleLabel": {
+          "zh": "身份",
+          "en": "Role"
+        },
+        "artworkLabel": {
+          "zh": "意向作品",
+          "en": "Artwork of Interest"
+        },
+        "messageLabel": {
+          "zh": "留言",
+          "en": "Message"
+        },
+        "submitLabel": {
+          "zh": "发送联系信息",
+          "en": "Send Inquiry"
+        },
+        "submittingLabel": {
+          "zh": "提交中",
+          "en": "Sending"
+        },
+        "roleOptions": [
+          {
+            "zh": "藏家",
+            "en": "Collector"
+          },
+          {
+            "zh": "机构",
+            "en": "Institution"
+          },
+          {
+            "zh": "策展人",
+            "en": "Curator"
+          },
+          {
+            "zh": "研究者",
+            "en": "Researcher"
+          },
+          {
+            "zh": "媒体",
+            "en": "Press"
+          }
+        ]
+      }
+    },
     "home": {
       "heroEyebrow": {
         "zh": "喜马拉雅艺术与亚洲古代艺术",
@@ -46,6 +166,14 @@
       "heroTitle": {
         "zh": "让作品先说话。",
         "en": "Let the Work Speak First."
+      },
+      "heroPrimaryAction": {
+        "zh": "浏览藏品",
+        "en": "Browse Collection"
+      },
+      "heroSecondaryAction": {
+        "zh": "查看展览与图录",
+        "en": "View Exhibitions"
       },
       "focusCurrent": {
         "eyebrow": {
@@ -66,6 +194,20 @@
           "zh": "近期展览延续了竹瑾居以作品为核心的研究路径，相关图录与文章仍可继续索取与查阅。",
           "en": "A recent exhibition continuing Zhu Jin Ju's object-centered approach, with related catalogues and texts still available on request."
         }
+      },
+      "focusSummaryLine": {
+        "highlightUnit": {
+          "zh": "件重点作品",
+          "en": "highlighted works"
+        },
+        "catalogueUnit": {
+          "zh": "页图录",
+          "en": "catalogue pages"
+        }
+      },
+      "focusAction": {
+        "zh": "进入专题详情",
+        "en": "View Exhibition"
       },
       "selectedWorks": {
         "eyebrow": {
@@ -122,6 +264,14 @@
           "zh": "如需咨询具体作品、专题合作、机构借展、图录交换或研究交流，可通过联系页面提交信息。",
           "en": "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page."
         }
+      },
+      "contactPrimaryAction": {
+        "zh": "前往联系页面",
+        "en": "Contact Page"
+      },
+      "contactSecondaryAction": {
+        "zh": "查看文章与研究",
+        "en": "Read Journal"
       }
     },
     "about": {
@@ -188,6 +338,20 @@
       "cooperationLine": {
         "zh": "借展、研究合作、图录交换与机构看件，请在留言中说明机构名称、时间安排与需求方向。",
         "en": "For loans, research collaboration, catalogue exchange, and institutional viewings, please include your institution, schedule, and requirements."
+      },
+      "infoLabels": {
+        "email": {
+          "zh": "邮箱",
+          "en": "Email"
+        },
+        "wechat": {
+          "zh": "微信",
+          "en": "WeChat"
+        },
+        "phoneWhatsapp": {
+          "zh": "电话 / WhatsApp",
+          "en": "Phone / WhatsApp"
+        }
       }
     },
     "collection": {
@@ -212,6 +376,116 @@
       "emptyState": {
         "zh": "当前筛选下暂无结果，可重置条件后继续浏览。",
         "en": "No works match the current filters. Reset the criteria to continue browsing."
+      },
+      "filters": {
+        "category": {
+          "zh": "品类",
+          "en": "Category"
+        },
+        "region": {
+          "zh": "地区",
+          "en": "Region"
+        },
+        "period": {
+          "zh": "年代",
+          "en": "Period"
+        },
+        "material": {
+          "zh": "材质",
+          "en": "Material"
+        },
+        "actions": {
+          "zh": "操作",
+          "en": "Actions"
+        },
+        "apply": {
+          "zh": "筛选结果",
+          "en": "Apply Filters"
+        },
+        "reset": {
+          "zh": "重置筛选",
+          "en": "Reset Filters"
+        }
+      }
+    },
+    "artworkDetail": {
+      "errorTitle": {
+        "zh": "作品未找到",
+        "en": "Artwork Not Found"
+      },
+      "errorDescription": {
+        "zh": "当前作品不存在或尚未公开。",
+        "en": "This work is unavailable or not yet published."
+      },
+      "breadcrumb": {
+        "zh": "藏品",
+        "en": "Collection"
+      },
+      "inquireAction": {
+        "zh": "询洽此件作品",
+        "en": "Inquire"
+      },
+      "backAction": {
+        "zh": "返回藏品浏览",
+        "en": "Back to Collection"
+      },
+      "scholarlyNote": {
+        "zh": "学术说明",
+        "en": "Scholarly Note"
+      },
+      "viewingNote": {
+        "zh": "观看描述",
+        "en": "Visual Description"
+      },
+      "comparisonNote": {
+        "zh": "比较判断",
+        "en": "Comparative Assessment"
+      },
+      "provenance": {
+        "zh": "来源",
+        "en": "Provenance"
+      },
+      "exhibitions": {
+        "zh": "展览",
+        "en": "Exhibitions"
+      },
+      "publications": {
+        "zh": "出版",
+        "en": "Publications"
+      },
+      "relatedExhibitions": {
+        "zh": "相关展览",
+        "en": "Related Exhibition"
+      },
+      "relatedArticles": {
+        "zh": "相关文章",
+        "en": "Related Writing"
+      },
+      "relatedWorks": {
+        "zh": "相关推荐",
+        "en": "Related Works"
+      },
+      "relatedWorksTitle": {
+        "zh": "同类方向中的其他作品",
+        "en": "Other Works in the Same Direction"
+      },
+      "fieldLabels": {
+        "period": {
+          "zh": "年代",
+          "en": "Period"
+        },
+        "regionOrigin": {
+          "zh": "地区 / 产地",
+          "en": "Region / Origin"
+        },
+        "material": {
+          "zh": "材质",
+          "en": "Material"
+        },
+        "dimensions": {
+          "zh": "尺寸",
+          "en": "Dimensions"
+        }
       }
     },
     "exhibitions": {
@@ -232,6 +506,64 @@
           "zh": "展览条目同步整理重点作品、图录页数与策展前言，便于藏家、机构与研究者快速建立阅读线索。",
           "en": "Each exhibition entry includes highlighted works, catalogue pagination, and a curatorial lead to give collectors and researchers a clear line of reading."
         }
+      },
+      "cardLabels": {
+        "highlightWorks": {
+          "zh": "重点作品",
+          "en": "Highlighted Works"
+        },
+        "cataloguePages": {
+          "zh": "图录页数",
+          "en": "Catalogue Pages"
+        },
+        "catalogueTitle": {
+          "zh": "图录",
+          "en": "Catalogue"
+        },
+        "viewAction": {
+          "zh": "查看展览详情",
+          "en": "View Exhibition"
+        }
+      }
+    },
+    "exhibitionDetail": {
+      "errorTitle": {
+        "zh": "展览未找到",
+        "en": "Exhibition Not Found"
+      },
+      "errorDescription": {
+        "zh": "当前展览不存在或尚未公开。",
+        "en": "This exhibition is unavailable or not yet published."
+      },
+      "backAction": {
+        "zh": "返回展览与图录",
+        "en": "Back to Exhibitions"
+      },
+      "summaryLine": {
+        "highlightUnit": {
+          "zh": "件重点作品",
+          "en": "highlighted works"
+        },
+        "catalogueUnit": {
+          "zh": "页图录",
+          "en": "catalogue pages"
+        }
+      },
+      "catalogueNote": {
+        "zh": "图录说明",
+        "en": "Catalogue Note"
+      },
+      "relatedWriting": {
+        "zh": "相关文字",
+        "en": "Related Writing"
+      },
+      "highlightedWorks": {
+        "zh": "重点作品",
+        "en": "Highlighted Works"
+      },
+      "highlightedWorksTitle": {
+        "zh": "展览中的关键观看节点",
+        "en": "Key Viewing Points Within the Exhibition"
       }
     },
     "journal": {
@@ -252,6 +584,32 @@
           "zh": "栏目按观看方法、作品判断与策展工作展开，使文章、展览与藏品之间可以互相参照。",
           "en": "Texts are organized around ways of looking, object judgement, and curatorial practice so that articles, exhibitions, and works can be read in relation."
         }
+      },
+      "readAction": {
+        "zh": "阅读全文",
+        "en": "Read Article"
+      }
+    },
+    "articleDetail": {
+      "errorTitle": {
+        "zh": "文章未找到",
+        "en": "Article Not Found"
+      },
+      "errorDescription": {
+        "zh": "当前文章不存在或尚未公开。",
+        "en": "This article is unavailable or not yet published."
+      },
+      "backAction": {
+        "zh": "返回文章",
+        "en": "Back to Journal"
+      },
+      "relatedExhibitions": {
+        "zh": "相关展览",
+        "en": "Related Exhibition"
+      },
+      "relatedWorks": {
+        "zh": "相关藏品",
+        "en": "Related Works"
       }
     }
   },
@@ -533,7 +891,8 @@
       "featured": true,
       "gallery": [
         "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "green-tara-malla",
@@ -654,7 +1013,8 @@
       "featured": true,
       "gallery": [
         "/api/placeholder/green-tara-malla?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "shakyamuni-bhumisparsha",
@@ -766,7 +1126,8 @@
       "featured": true,
       "gallery": [
         "/api/placeholder/shakyamuni-bhumisparsha?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "manjushri-thangka",
@@ -882,7 +1243,8 @@
       "featured": true,
       "gallery": [
         "/api/placeholder/manjushri-thangka?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "vajrapani-thangka",
@@ -993,7 +1355,8 @@
       "image": "/api/placeholder/vajrapani-thangka?kind=portrait",
       "gallery": [
         "/api/placeholder/vajrapani-thangka?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "ritual-conch-set",
@@ -1103,7 +1466,8 @@
       "image": "/api/placeholder/ritual-conch-set?kind=portrait",
       "gallery": [
         "/api/placeholder/ritual-conch-set?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "amitayus-western-tibet",
@@ -1213,7 +1577,8 @@
       "image": "/api/placeholder/amitayus-western-tibet?kind=portrait",
       "gallery": [
         "/api/placeholder/amitayus-western-tibet?kind=portrait"
-      ]
+      ],
+      "publicationStatus": "published"
     },
     {
       "slug": "newar-shakyamuni",
@@ -1322,8 +1687,10 @@
       ],
       "image": "/api/placeholder/newar-shakyamuni?kind=portrait",
       "gallery": [
-        "/api/placeholder/newar-shakyamuni?kind=portrait"
-      ]
+        "/api/placeholder/newar-shakyamuni?kind=portrait",
+        ""
+      ],
+      "publicationStatus": "published"
     }
   ],
   "exhibitions": [
@@ -1386,7 +1753,8 @@
         "how-to-look-at-a-bronze",
         "why-exhibitions-matter"
       ],
-      "cover": "/api/placeholder/silent-radiance?kind=landscape"
+      "cover": "/api/placeholder/silent-radiance?kind=landscape",
+      "publicationStatus": "published"
     },
     {
       "slug": "between-gilding-and-pigment",
@@ -1447,7 +1815,8 @@
         "thangka-as-structure",
         "why-exhibitions-matter"
       ],
-      "cover": "/api/placeholder/between-gilding-and-pigment?kind=landscape"
+      "cover": "/api/placeholder/between-gilding-and-pigment?kind=landscape",
+      "publicationStatus": "published"
     }
   ],
   "articles": [
@@ -1510,7 +1879,8 @@
       "relatedExhibitionSlugs": [
         "silent-radiance"
       ],
-      "cover": "/api/placeholder/how-to-look-at-a-bronze?kind=landscape"
+      "cover": "/api/placeholder/how-to-look-at-a-bronze?kind=landscape",
+      "publicationStatus": "published"
     },
     {
       "slug": "thangka-as-structure",
@@ -1570,7 +1940,8 @@
       "relatedExhibitionSlugs": [
         "between-gilding-and-pigment"
       ],
-      "cover": "/api/placeholder/thangka-as-structure?kind=landscape"
+      "cover": "/api/placeholder/thangka-as-structure?kind=landscape",
+      "publicationStatus": "published"
     },
     {
       "slug": "why-exhibitions-matter",
@@ -1632,7 +2003,8 @@
         "silent-radiance",
         "between-gilding-and-pigment"
       ],
-      "cover": "/api/placeholder/why-exhibitions-matter?kind=landscape"
+      "cover": "/api/placeholder/why-exhibitions-matter?kind=landscape",
+      "publicationStatus": "published"
     }
   ]
 }
