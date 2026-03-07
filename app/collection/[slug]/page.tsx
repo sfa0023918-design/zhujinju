@@ -161,9 +161,10 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <BilingualText
             as="p"
             text={bt("学术说明", "Scholarly Note")}
-            className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+            mode="inline"
+            className="mb-4 text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
-            enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+            enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
           />
           <div className="space-y-6">
             {artwork.statement.map((paragraph) => (
@@ -178,9 +179,10 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <BilingualText
               as="p"
               text={bt("来源", "Provenance")}
-              className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+              mode="inline"
+              className="mb-4 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
             />
             <ul className="space-y-3">
               {artwork.provenance.map((item) => (
@@ -200,9 +202,10 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <BilingualText
               as="p"
               text={bt("展览", "Exhibitions")}
-              className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+              mode="inline"
+              className="mb-4 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
             />
             <ul className="space-y-3">
               {artwork.exhibitions.map((item) => (
@@ -222,9 +225,10 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <BilingualText
               as="p"
               text={bt("出版", "Publications")}
-              className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+              mode="inline"
+              className="mb-4 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
             />
             <ul className="space-y-3">
               {artwork.publications.map((item) => (
@@ -250,16 +254,17 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               <BilingualText
                 as="p"
                 text={bt("相关推荐", "Related Works")}
-                className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
+                mode="inline"
+                className="mb-3 text-[var(--accent)]"
                 zhClassName="text-[0.72rem] tracking-[0.22em]"
-                enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
               />
               <BilingualText
                 as="h2"
                 text={bt("同类方向中的其他作品", "Other Works in the Same Direction")}
                 className="font-serif text-[var(--ink)]"
                 zhClassName="block text-[2rem] leading-none tracking-[-0.04em] md:text-[3.5rem]"
-                enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+                enClassName="mt-2 block font-sans text-[0.68rem] uppercase tracking-[0.18em] text-[var(--accent)]/78"
               />
             </div>
           </div>

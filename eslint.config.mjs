@@ -9,4 +9,11 @@ const compat = new FlatCompat({
   baseDirectory: dirname(fileURLToPath(import.meta.url)),
 });
 
-export default compat.config(nextVitals, nextTypeScript);
+const config = [
+  {
+    ignores: [".next/**", "node_modules/**", "dist/**", "coverage/**"],
+  },
+  ...compat.config(nextVitals, nextTypeScript),
+];
+
+export default config;
