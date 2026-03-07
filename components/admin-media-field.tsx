@@ -13,6 +13,7 @@ type AdminMediaFieldProps = {
   folder: string;
   value: string;
   onChange: (value: string) => void;
+  autoSaveAfterUpload?: boolean;
   previewRatio?: "portrait" | "landscape" | "square";
   recommendedSize?: string;
   recommendedUse?: string;
@@ -24,6 +25,7 @@ export function AdminMediaField({
   folder,
   value,
   onChange,
+  autoSaveAfterUpload = true,
   previewRatio = "portrait",
   recommendedSize,
   recommendedUse,
@@ -172,12 +174,19 @@ export function AdminMediaField({
       }
 
       onChange(payload.url);
-      setLocalPreview(null);
       setMessage(
-        prepared.compressed
-          ? "图片已自动压缩并上传。保存当前内容后，网站会在下一次部署完成后显示新图片。"
-          : payload.message ?? "图片上传成功。",
+        autoSaveAfterUpload
+          ? "图片已上传，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
+          : prepared.compressed
+            ? "图片已自动压缩并上传。保存当前内容后，网站会在下一次部署完成后显示新图片。"
+            : payload.message ?? "图片上传成功。",
       );
+
+      if (autoSaveAfterUpload) {
+        window.setTimeout(() => {
+          event.currentTarget.form?.requestSubmit();
+        }, 80);
+      }
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "图片上传失败。");
     } finally {
