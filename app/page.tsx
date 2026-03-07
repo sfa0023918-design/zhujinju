@@ -33,35 +33,35 @@ export default function HomePage() {
             <BilingualText
               as="p"
               text={bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art and Asian Antiquities")}
-              className="flex flex-col gap-1 text-[var(--accent)]"
-              zhClassName="text-[0.76rem] tracking-[0.18em]"
-              enClassName="text-[0.62rem] uppercase tracking-[0.24em]"
-            />
-            <BilingualText
-              as="h1"
-              text={bt("让作品先说话。", "Let the Work Speak First.")}
-              className="max-w-[11ch] text-balance font-serif text-[var(--ink)]"
-              zhClassName="block text-[2.9rem] leading-[0.94] tracking-[-0.05em] md:text-[5.9rem]"
-              enClassName="mt-4 block font-sans text-[0.85rem] uppercase tracking-[0.24em] text-[var(--accent)] md:text-[0.95rem]"
-            />
-            <BilingualText
-              as="p"
-              text={brandIntro.statement}
               mode="inline"
-              className="max-w-xl text-[var(--muted)]"
-              zhClassName="text-[1rem] leading-8 md:text-[1.08rem]"
-              enClassName="text-[0.78rem] leading-7 text-[var(--accent)]/75 md:text-[0.82rem]"
+              className="text-[var(--accent)]"
+              zhClassName="text-[0.76rem] tracking-[0.18em]"
+              enClassName="text-[0.56rem] uppercase tracking-[0.2em] text-[var(--accent)]/80"
             />
+            <div>
+              <h1 className="max-w-[11ch] text-balance font-serif text-[2.9rem] leading-[0.94] tracking-[-0.05em] text-[var(--ink)] md:text-[5.9rem]">
+                让作品先说话。
+              </h1>
+              <p className="mt-4 text-[0.68rem] uppercase tracking-[0.22em] text-[var(--accent)]/78 md:text-[0.76rem]">
+                Let the Work Speak First.
+              </p>
+            </div>
+            <div className="max-w-xl">
+              <p className="text-[1rem] leading-8 text-[var(--muted)] md:text-[1.08rem]">
+                {brandIntro.statement.zh}
+              </p>
+              <p className="mt-3 text-[0.74rem] leading-7 text-[var(--accent)]/72 md:text-[0.78rem]">
+                {brandIntro.statement.en}
+              </p>
+            </div>
           </div>
           <div className="grid gap-5 border-t border-[var(--line)] pt-6">
-            <BilingualText
-              as="p"
-              text={brandIntro.about}
-              mode="inline"
-              className="max-w-lg text-[var(--muted)]"
-              zhClassName="text-sm leading-8"
-              enClassName="text-[0.74rem] leading-7 text-[var(--accent)]/75"
-            />
+            <div className="max-w-lg">
+              <p className="text-sm leading-8 text-[var(--muted)]">{brandIntro.about.zh}</p>
+              <p className="mt-3 text-[0.72rem] leading-7 text-[var(--accent)]/72">
+                {brandIntro.about.en}
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/collection"
@@ -216,9 +216,10 @@ export default function HomePage() {
           <BilingualText
             as="p"
             text={bt("联系", "Contact")}
-            className="flex flex-col gap-1 text-[var(--accent)]"
+            mode="inline"
+            className="text-[var(--accent)]"
             zhClassName="text-[0.76rem] tracking-[0.18em]"
-            enClassName="text-[0.62rem] uppercase tracking-[0.24em]"
+            enClassName="text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]/80"
           />
           <BilingualText
             as="h2"

@@ -28,7 +28,7 @@ export function PageHero({ eyebrow, title, description, aside }: PageHeroProps) 
           text={title}
           className="max-w-5xl text-balance font-serif tracking-[-0.05em] text-[var(--ink)]"
           zhClassName="block text-[2.7rem] leading-[0.95] md:text-[5.6rem]"
-          enClassName="mt-3 block font-sans text-[0.88rem] uppercase tracking-[0.24em] text-[var(--accent)] md:text-[1rem]"
+          enClassName="mt-2 block font-sans text-[0.72rem] uppercase tracking-[0.2em] text-[var(--accent)]/78 md:text-[0.8rem]"
         />
       </div>
       <div className="space-y-5 border-t border-[var(--line)] pt-5 md:border-t-0 md:border-l md:pl-8 md:pt-0">

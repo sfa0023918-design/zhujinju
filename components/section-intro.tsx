@@ -32,7 +32,7 @@ export function SectionIntro({
         text={title}
         className="max-w-4xl text-balance font-serif text-[var(--ink)]"
         zhClassName="block text-[2.3rem] leading-none tracking-[-0.04em] md:text-[4rem]"
-        enClassName="mt-3 block font-sans text-[0.85rem] uppercase tracking-[0.24em] text-[var(--accent)] md:text-[0.95rem]"
+        enClassName="mt-2 block font-sans text-[0.68rem] uppercase tracking-[0.18em] text-[var(--accent)]/78 md:text-[0.74rem]"
       />
       {description ? (
         <BilingualText

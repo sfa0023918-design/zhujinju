@@ -41,7 +41,7 @@ export function SiteFooter() {
             mode="inline"
             className="text-[var(--ink)]"
             zhClassName="text-sm"
-            enClassName="text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+            enClassName="text-[0.5rem] uppercase tracking-[0.14em] text-[var(--accent)]/76"
           />
           <a className="block" href={`mailto:${siteConfig.contact.email}`}>
             {siteConfig.contact.email}
@@ -56,7 +56,7 @@ export function SiteFooter() {
             mode="inline"
             className="text-[var(--ink)]"
             zhClassName="text-sm"
-            enClassName="text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]"
+            enClassName="text-[0.5rem] uppercase tracking-[0.14em] text-[var(--accent)]/76"
           />
           {footerLinks.map((item) => (
             <Link key={item.href} className="block" href={item.href}>
@@ -66,7 +66,7 @@ export function SiteFooter() {
                 mode="inline"
                 className="block"
                 zhClassName="block"
-                enClassName="text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.14em] text-[var(--accent)]/76"
               />
             </Link>
           ))}

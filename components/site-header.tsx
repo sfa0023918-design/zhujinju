@@ -43,7 +43,7 @@ export function SiteHeader() {
                 mode="inline"
                 className="text-[0.92rem]"
                 zhClassName="text-[0.92rem]"
-                enClassName="text-[0.52rem] uppercase tracking-[0.16em] text-[var(--accent)]"
+                enClassName="text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/76"
               />
             </Link>
           ))}

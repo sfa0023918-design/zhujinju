@@ -21,7 +21,7 @@ export function StatusPill({ status }: StatusPillProps) {
       mode="inline"
       className={`inline-flex items-center rounded-full border px-3 py-1 ${statusClassMap[status]}`}
       zhClassName="text-[0.72rem] tracking-[0.18em]"
-      enClassName="text-[0.5rem] uppercase tracking-[0.16em]"
+      enClassName="text-[0.46rem] uppercase tracking-[0.14em] opacity-75"
     />
   );
 }
