@@ -890,7 +890,8 @@
       "image": "/uploads/artworks/1772895592888-img-0002.jpg",
       "featured": true,
       "gallery": [
-        "/uploads/artworks/1772902356916-b00013133fr1771928731.jpg"
+        "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait",
+        "/uploads/artworks/1772902430368-l1005117.jpg"
       ],
       "publicationStatus": "published"
     },
