@@ -2391,12 +2391,13 @@ export function AdminVisualEditor({
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
           <div className="space-y-4">
             <WorkflowSteps
-              title="藏品编辑建议顺序"
+              title="藏品页编辑顺序"
               steps={[
-                { label: "先新增或选中一件作品", description: "左侧选中已有作品，或点“新增”自动打开新条目。" },
-                { label: "先填主图和基础信息", description: "先填标题、年代、地区、材质，前台列表就能成形。" },
-                { label: "再补学术说明和来源记录", description: "观看描述、比较判断、来源、展览、出版建议后补。" },
-                { label: "最后勾选关联文章和展览", description: "这样前台详情页会自动出现互链。" },
+                { label: "第 1 步：上传主图", description: "先上传主图和细节图。前台最先看到的就是这里。" },
+                { label: "第 2 步：填写标题和基本信息", description: "接着填写标题、年代、地区、材质、尺寸。" },
+                { label: "第 3 步：填写学术说明", description: "按前台顺序填写简述、观看描述、比较判断。" },
+                { label: "第 4 步：补来源与记录", description: "再补来源、展览、出版。没有的可以先留空。" },
+                { label: "第 5 步：补询洽和关联内容", description: "最后补询洽提示，并勾选相关展览和文章。" },
               ]}
             />
             <ListManager
@@ -2435,20 +2436,21 @@ export function AdminVisualEditor({
             <div className="grid gap-6">
               <SectionMenu
                 items={[
-                  { id: "artwork-media", label: "图片与主信息" },
-                  { id: "artwork-description", label: "说明文字" },
-                  { id: "artwork-records", label: "来源与记录" },
-                  { id: "artwork-relations", label: "关联内容" },
+                  { id: "artwork-media", label: "第 1 步 上传主图" },
+                  { id: "artwork-basic", label: "第 2 步 基本信息" },
+                  { id: "artwork-description", label: "第 3 步 学术说明" },
+                  { id: "artwork-records", label: "第 4 步 来源与记录" },
+                  { id: "artwork-relations", label: "第 5 步 询洽与关联" },
                 ]}
               />
 
               <EditorSection
                 id="artwork-media"
-                title="图片与主信息"
-                description="先整理主图、细节图、标题和作品基础信息。"
+                title="第 1 步：上传主图与细节图"
+                description="这一块对应前台藏品详情页最上方的大图区域。先把图片传好，再继续往下填写文字。"
               >
                 <div className="grid gap-4">
-                  <HelperNote>最少先填 5 项：主图、作品标题、年代、地区、材质。这样前台列表和详情页就已经能正常显示。</HelperNote>
+                  <HelperNote>这是前台页面最先出现的位置。先上传主图，前台列表页和详情页就会先有视觉内容。</HelperNote>
                   <AdminMediaField
                     label="藏品主图"
                     folder="artworks"
@@ -2472,6 +2474,16 @@ export function AdminVisualEditor({
                       })
                     }
                   />
+                </div>
+              </EditorSection>
+
+              <EditorSection
+                id="artwork-basic"
+                title="第 2 步：标题与基本信息"
+                description="这一块对应前台图片右侧和图片下方的基础信息。按页面阅读顺序依次填写即可。"
+              >
+                <div className="grid gap-4">
+                  <HelperNote>最少先填 5 项：作品标题、年代、地区、材质、尺寸。这样前台列表和详情页就已经能正常显示。</HelperNote>
                   <div className="grid gap-4 md:grid-cols-3">
                     <TextField
                       label="URL 标识（slug）"
@@ -2595,8 +2607,8 @@ export function AdminVisualEditor({
 
               <EditorSection
                 id="artwork-description"
-                title="说明文字"
-                description="这部分对应前台藏品详情页的摘要、观看描述和比较判断。"
+                title="第 3 步：学术说明"
+                description="这一块对应前台详情页图片下方的文字说明区。按前台阅读顺序填写即可。"
               >
                 <div className="grid gap-4">
                   <HelperNote>如果时间有限，先写“简述”。观看描述和比较判断可以后补。</HelperNote>
@@ -2635,8 +2647,8 @@ export function AdminVisualEditor({
 
               <EditorSection
                 id="artwork-records"
-                title="来源与记录"
-                description="管理 provenance、展览记录和出版信息。"
+                title="第 4 步：来源、展览与出版"
+                description="这一块对应前台详情页中段的来源、展览、出版信息。"
               >
                 <div className="grid gap-6">
               <HelperNote>来源、展览、出版都支持一条一条新增。暂时没有的信息可以先留空，不会影响保存。</HelperNote>
@@ -2855,8 +2867,8 @@ export function AdminVisualEditor({
 
               <EditorSection
                 id="artwork-relations"
-                title="关联内容"
-                description="控制询洽补充说明，以及作品和展览、文章之间的互链。"
+                title="第 5 步：询洽与关联内容"
+                description="这一块对应前台详情页底部的询洽提示和相关推荐。"
               >
                 <div className="grid gap-6">
               <HelperNote>这一步不是必填，但建议至少关联一篇文章或一个展览，前台会更完整。</HelperNote>
@@ -2960,12 +2972,12 @@ export function AdminVisualEditor({
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
           <div className="space-y-4">
             <WorkflowSteps
-              title="展览编辑建议顺序"
+              title="展览页编辑顺序"
               steps={[
-                { label: "先新增或选中一个展览", description: "左侧新增后会自动打开新展览。" },
-                { label: "先填封面、标题、时间地点", description: "这些信息会先出现在前台列表页。" },
-                { label: "再补导语、图录和正文", description: "图录标题、页数、策展前言和正文可分步完善。" },
-                { label: "最后勾选重点作品和相关文章", description: "这样展览页会自动形成互链。" },
+                { label: "第 1 步：上传封面", description: "先上传封面图。前台列表页和首页专题最先用到它。" },
+                { label: "第 2 步：填写标题与时间地点", description: "接着填写标题、时间、地点和首页专题状态。" },
+                { label: "第 3 步：填写前言、图录和正文", description: "导语、策展前言、图录标题与正文按顺序往下填。" },
+                { label: "第 4 步：勾选重点作品和文章", description: "最后补重点作品和相关文章，前台会自动形成互链。" },
               ]}
             />
             <ListManager
@@ -3004,15 +3016,15 @@ export function AdminVisualEditor({
             <div className="grid gap-6">
               <SectionMenu
                 items={[
-                  { id: "exhibition-basic", label: "基本信息" },
-                  { id: "exhibition-content", label: "正文与图录" },
-                  { id: "exhibition-relations", label: "关联内容" },
+                  { id: "exhibition-basic", label: "第 1 步 封面与标题" },
+                  { id: "exhibition-content", label: "第 2 步 前言与图录" },
+                  { id: "exhibition-relations", label: "第 3 步 重点作品与文章" },
                 ]}
               />
               <EditorSection
                 id="exhibition-basic"
-                title="基本信息"
-                description="封面、标题、首页状态、时间地点和图录页数。"
+                title="第 1 步：封面、标题与时间地点"
+                description="这一块对应前台展览列表卡片和展览详情页顶部。"
               >
                 <div className="grid gap-4">
                   <HelperNote>如果这个展览要显示在首页专题，把“设为首页当前专题 / 近期展览”打开即可。</HelperNote>
@@ -3111,8 +3123,8 @@ export function AdminVisualEditor({
               </EditorSection>
               <EditorSection
                 id="exhibition-content"
-                title="正文与图录"
-                description="维护导语、策展前言、图录说明和正文段落。"
+                title="第 2 步：前言、图录与正文"
+                description="这一块对应前台展览详情页中部的导语、策展前言、图录说明和正文。"
               >
                 <div className="grid gap-4">
                   <HelperNote>正文段落可以只有中文，英文可以以后再补。</HelperNote>
@@ -3218,8 +3230,8 @@ export function AdminVisualEditor({
               </EditorSection>
               <EditorSection
                 id="exhibition-relations"
-                title="关联内容"
-                description="控制重点作品与相关文章。"
+                title="第 3 步：重点作品与相关文章"
+                description="这一块对应前台展览详情页底部的重点作品和相关文章。"
               >
                 <div className="grid gap-6">
                   <HelperNote>重点作品数量会根据你勾选的作品自动计算，不需要手动填写。</HelperNote>
@@ -3266,12 +3278,12 @@ export function AdminVisualEditor({
       <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
         <div className="space-y-4">
           <WorkflowSteps
-            title="文章编辑建议顺序"
+            title="文章页编辑顺序"
             steps={[
-              { label: "先新增或选中文章", description: "左侧新增后会自动打开新文章。" },
-              { label: "先填封面、标题、作者和日期", description: "文章列表页会先显示这些基本信息。" },
-              { label: "再写摘要、正文和关键词", description: "摘要先写好，前台列表就会更完整。" },
-              { label: "最后关联展览和藏品", description: "这样文章详情页能自动出现相关内容。" },
+              { label: "第 1 步：上传封面", description: "先上传封面图。文章列表页和详情页顶部最先使用这张图。" },
+              { label: "第 2 步：填写标题、作者和日期", description: "接着填写文章列表里最先出现的标题、作者、栏目和日期。" },
+              { label: "第 3 步：填写摘要与正文", description: "摘要和正文按前台阅读顺序填写，关键词可以后补。" },
+              { label: "第 4 步：勾选相关展览和藏品", description: "最后补关联内容，文章详情页底部会自动出现链接。" },
             ]}
           />
           <ListManager
@@ -3310,15 +3322,15 @@ export function AdminVisualEditor({
           <div className="grid gap-6">
             <SectionMenu
               items={[
-                { id: "article-basic", label: "基本信息" },
-                { id: "article-body", label: "正文与关键词" },
-                { id: "article-relations", label: "关联内容" },
+                { id: "article-basic", label: "第 1 步 封面与标题" },
+                { id: "article-body", label: "第 2 步 摘要与正文" },
+                { id: "article-relations", label: "第 3 步 关联内容" },
               ]}
             />
             <EditorSection
               id="article-basic"
-              title="基本信息"
-              description="封面、标题、作者、栏目、分类与发布时间。"
+              title="第 1 步：封面、标题、作者与日期"
+              description="这一块对应前台文章列表卡片和文章详情页顶部。"
             >
               <div className="grid gap-4">
                 <HelperNote>最少先填 6 项：封面、标题、日期、作者、栏目、摘要。这样前台文章列表就会正常显示。</HelperNote>
@@ -3416,8 +3428,8 @@ export function AdminVisualEditor({
             </EditorSection>
             <EditorSection
               id="article-body"
-              title="正文与关键词"
-              description="维护文章段落和前台展示关键词。"
+              title="第 2 步：摘要、正文与关键词"
+              description="这一块对应前台文章列表摘要和文章详情正文。"
             >
               <div className="grid gap-6">
                 <HelperNote>正文可以只写中文，关键词建议至少填 2 到 3 个，便于后续整理内容方向。</HelperNote>
@@ -3541,8 +3553,8 @@ export function AdminVisualEditor({
             </EditorSection>
             <EditorSection
               id="article-relations"
-              title="关联内容"
-              description="维护文章与藏品、展览之间的关联关系。"
+              title="第 3 步：关联展览与藏品"
+              description="这一块对应前台文章详情页底部的相关展览和相关藏品。"
             >
               <div className="grid gap-6">
                 <HelperNote>如果文章和某件作品或某个展览有关，建议在这里勾选，前台会自动生成互链。</HelperNote>
