@@ -17,7 +17,7 @@ import type {
   SiteContent,
   SiteConfigContent,
 } from "./data/types";
-import { putRepoUtf8File } from "./github-repo";
+import { getRepoUtf8File, hasGitHubRepoConfig, putRepoUtf8File } from "./github-repo";
 import { siteConfig as defaultSiteConfig } from "./site-config";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -93,13 +93,34 @@ async function readLocalContentFile() {
   }
 }
 
+async function readGitHubContentFile() {
+  try {
+    const raw = await getRepoUtf8File(CONTENT_REPO_PATH);
+    return raw ? (JSON.parse(raw) as SiteContent) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readBestAvailableContentFile() {
+  if (process.env.NODE_ENV === "production" && hasGitHubRepoConfig()) {
+    const remote = await readGitHubContentFile();
+
+    if (remote) {
+      return remote;
+    }
+  }
+
+  return await readLocalContentFile();
+}
+
 export async function loadSiteContent(): Promise<SiteContent> {
-  const localContent = await readLocalContentFile();
-  return normalizeSiteContent(localContent ?? getDefaultSiteContent());
+  const content = await readBestAvailableContentFile();
+  return normalizeSiteContent(content ?? getDefaultSiteContent());
 }
 
 export async function readSiteContentFresh() {
-  return normalizeSiteContent((await readLocalContentFile()) ?? getDefaultSiteContent());
+  return normalizeSiteContent((await readBestAvailableContentFile()) ?? getDefaultSiteContent());
 }
 
 export async function writeLocalContentFile(content: SiteContent) {
@@ -137,6 +158,43 @@ export async function saveSiteSection(
   await pushContentToGitHub(nextContent, `Update ${section} from admin by ${actor}`);
 
   return nextContent;
+}
+
+export async function saveArtworkMediaField(
+  slug: string,
+  field: "image" | "gallery",
+  value: string,
+  actor: string,
+  options?: { galleryIndex?: number },
+) {
+  const current = await readSiteContentFresh();
+  const artworkIndex = current.artworks.findIndex((artwork) => artwork.slug === slug);
+
+  if (artworkIndex < 0) {
+    throw new Error("未找到要更新图片的藏品。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const artwork = nextContent.artworks[artworkIndex];
+
+  if (field === "image") {
+    artwork.image = value.trim();
+  } else {
+    const slotIndex = options?.galleryIndex ?? 0;
+    const gallery = [...(artwork.gallery ?? [])];
+    gallery[slotIndex] = value.trim();
+    artwork.gallery = gallery;
+  }
+
+  const normalized = normalizeSiteContent(nextContent);
+
+  if (canWriteLocalContentFile()) {
+    await writeLocalContentFile(normalized);
+  }
+
+  await pushContentToGitHub(normalized, `Update artwork media from admin by ${actor}`);
+
+  return normalized.artworks[artworkIndex];
 }
 
 function normalizeSiteContent(content: SiteContent): SiteContent {
@@ -277,13 +335,7 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
     artworks: content.artworks.map((artwork) => ({
       ...artwork,
       publicationStatus: artwork.publicationStatus ?? "published",
-      gallery: Array.from(
-        new Set(
-          (artwork.gallery ?? [])
-            .map((image) => image.trim())
-            .filter((image) => image.length > 0 && image !== artwork.image),
-        ),
-      ),
+      gallery: normalizeArtworkGallery(artwork.gallery, artwork.image),
     })),
     exhibitions: content.exhibitions.map((exhibition) => ({
       ...exhibition,
@@ -294,6 +346,33 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
       publicationStatus: article.publicationStatus ?? "published",
     })),
   };
+}
+
+function normalizeArtworkGallery(gallery: string[] | undefined, primaryImage: string) {
+  const trimmed = (gallery ?? []).map((image) => image.trim());
+  let lastFilledIndex = -1;
+
+  trimmed.forEach((image, index) => {
+    if (image) {
+      lastFilledIndex = index;
+    }
+  });
+
+  if (lastFilledIndex < 0) {
+    return [];
+  }
+
+  const trimmedToLastFilled = trimmed.slice(0, lastFilledIndex + 1);
+  const seen = new Set<string>();
+
+  return trimmedToLastFilled.filter((image) => {
+    if (!image || image === primaryImage || image.startsWith("/api/placeholder/") || seen.has(image)) {
+      return false;
+    }
+
+    seen.add(image);
+    return true;
+  });
 }
 
 function getUniqueBilingual(items: BilingualText[]) {

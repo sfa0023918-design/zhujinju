@@ -46,6 +46,24 @@ async function getExistingSha(config: GitHubRepoConfig, repoPath: string) {
   throw new Error("无法读取 GitHub 当前文件。");
 }
 
+async function getRepoFilePayload(config: GitHubRepoConfig, repoPath: string) {
+  const endpoint = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${repoPath}`;
+  const response = await fetch(`${endpoint}?ref=${config.branch}`, {
+    headers: buildHeaders(config),
+    cache: "no-store",
+  });
+
+  if (response.ok) {
+    return (await response.json()) as { sha?: string; content?: string; encoding?: string };
+  }
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  throw new Error("无法读取 GitHub 当前文件。");
+}
+
 async function putRepoFileBase64(
   repoPath: string,
   base64Content: string,
@@ -62,21 +80,31 @@ async function putRepoFileBase64(
   }
 
   const endpoint = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${repoPath}`;
-  const sha = await getExistingSha(config, repoPath);
 
-  const response = await fetch(endpoint, {
-    method: "PUT",
-    headers: buildHeaders(config),
-    body: JSON.stringify({
-      message,
-      branch: config.branch,
-      sha,
-      content: base64Content,
-    }),
-  });
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const sha = await getExistingSha(config, repoPath);
+    const response = await fetch(endpoint, {
+      method: "PUT",
+      headers: buildHeaders(config),
+      body: JSON.stringify({
+        message,
+        branch: config.branch,
+        sha,
+        content: base64Content,
+      }),
+    });
 
-  if (!response.ok) {
+    if (response.ok) {
+      return;
+    }
+
     const errorText = await response.text();
+    const shouldRetry = response.status === 409 || response.status === 422;
+
+    if (shouldRetry && attempt < 2) {
+      continue;
+    }
+
     throw new Error(`GitHub 保存失败：${errorText}`);
   }
 }
@@ -97,7 +125,31 @@ export async function putRepoBinaryFile(
   await putRepoFileBase64(repoPath, content.toString("base64"), message);
 }
 
+export async function getRepoUtf8File(repoPath: string) {
+  const config = getGitHubRepoConfig();
+
+  if (!config) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("未配置 GitHub 内容读取环境变量，生产环境无法读取最新内容。");
+    }
+
+    return null;
+  }
+
+  const payload = await getRepoFilePayload(config, repoPath);
+
+  if (!payload) {
+    return null;
+  }
+
+  if (!payload.content) {
+    throw new Error("GitHub 返回的文件内容为空。");
+  }
+
+  const normalized = payload.content.replace(/\n/g, "");
+  return Buffer.from(normalized, payload.encoding === "base64" ? "base64" : "utf8").toString("utf8");
+}
+
 export function hasGitHubRepoConfig() {
   return Boolean(getGitHubRepoConfig());
 }
-

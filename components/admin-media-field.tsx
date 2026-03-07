@@ -12,6 +12,13 @@ type TargetSize = {
   height: number;
 };
 
+type UploadSaveTarget = {
+  section: "artworks";
+  slug: string;
+  field: "image" | "gallery";
+  index?: number;
+};
+
 type AdminMediaFieldProps = {
   label: string;
   note?: string;
@@ -24,6 +31,7 @@ type AdminMediaFieldProps = {
   targetSize?: TargetSize;
   recommendedSize?: string;
   recommendedUse?: string;
+  saveTarget?: UploadSaveTarget;
 };
 
 function getDefaultTargetSize(previewRatio: PreviewRatio): TargetSize {
@@ -62,6 +70,7 @@ export function AdminMediaField({
   targetSize,
   recommendedSize,
   recommendedUse,
+  saveTarget,
 }: AdminMediaFieldProps) {
   const inputId = useId();
   const [uploading, setUploading] = useState(false);
@@ -87,12 +96,12 @@ export function AdminMediaField({
 
     try {
       return {
-        payload: JSON.parse(raw) as { url?: string; message?: string; error?: string },
+        payload: JSON.parse(raw) as { url?: string; message?: string; error?: string; saved?: boolean },
         raw,
       };
     } catch {
       return {
-        payload: {} as { url?: string; message?: string; error?: string },
+        payload: {} as { url?: string; message?: string; error?: string; saved?: boolean },
         raw,
       };
     }
@@ -264,6 +273,14 @@ export function AdminMediaField({
       const formData = new FormData();
       formData.append("file", prepared.file);
       formData.append("folder", folder);
+      if (saveTarget) {
+        formData.append("targetSection", saveTarget.section);
+        formData.append("targetSlug", saveTarget.slug);
+        formData.append("targetField", saveTarget.field);
+        if (typeof saveTarget.index === "number") {
+          formData.append("targetIndex", String(saveTarget.index));
+        }
+      }
 
       const response = await fetch("/api/admin/upload", {
         method: "POST",
@@ -282,7 +299,9 @@ export function AdminMediaField({
 
       onChange(payload.url);
       setMessage(
-        autoSaveAfterUpload
+        payload.saved
+          ? payload.message ?? "图片已上传并写入当前内容。部署完成后，前台会显示新图片。"
+          : autoSaveAfterUpload
           ? prepared.transformed
             ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
             : "图片已上传，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
@@ -291,7 +310,7 @@ export function AdminMediaField({
             : payload.message ?? "图片上传成功。",
       );
 
-      if (autoSaveAfterUpload) {
+      if (!payload.saved && autoSaveAfterUpload) {
         onRequestAutoSave?.();
       }
     } catch (uploadError) {

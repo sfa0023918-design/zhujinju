@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 import { AdminShell } from "@/components/admin-shell";
-import { editableSections, getPublicArticles, getPublicArtworks, getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
+import { editableSections, getPublicArticles, getPublicArtworks, getPublicExhibitions, readSiteContentFresh } from "@/lib/site-data";
 
 export default async function AdminDashboardPage() {
-  const content = await loadSiteContent();
+  const content = await readSiteContentFresh();
   const publishedArtworks = getPublicArtworks(content).length;
   const publishedExhibitions = getPublicExhibitions(content).length;
   const publishedArticles = getPublicArticles(content).length;

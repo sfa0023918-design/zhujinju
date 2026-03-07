@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { saveAdminSection } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin-shell";
 import { AdminVisualEditor } from "@/components/admin-visual-editor";
-import { editableSections, loadSiteContent } from "@/lib/site-data";
+import { editableSections, readSiteContentFresh } from "@/lib/site-data";
 
 type AdminSectionPageProps = {
   params: Promise<{
@@ -23,7 +23,7 @@ export default async function AdminSectionPage({ params, searchParams }: AdminSe
     notFound();
   }
 
-  const content = await loadSiteContent();
+  const content = await readSiteContentFresh();
   const value = content[sectionMeta.key];
 
   return (

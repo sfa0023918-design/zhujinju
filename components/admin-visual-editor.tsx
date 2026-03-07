@@ -710,12 +710,14 @@ function getGallerySlots(images: string[]) {
 function MediaGalleryEditor({
   label,
   folder,
+  artworkSlug,
   images,
   onChange,
   onRequestAutoSave,
 }: {
   label: string;
   folder: string;
+  artworkSlug: string;
   images: string[];
   onChange: (images: string[]) => void;
   onRequestAutoSave?: () => void;
@@ -776,6 +778,12 @@ function MediaGalleryEditor({
               value={image}
               targetSize={{ width: 1200, height: 1500 }}
               onRequestAutoSave={onRequestAutoSave}
+              saveTarget={{
+                section: "artworks",
+                slug: artworkSlug,
+                field: "gallery",
+                index,
+              }}
               onChange={(next) => {
                 const nextImages = [...slots];
                 nextImages[index] = next;
@@ -2614,6 +2622,11 @@ export function AdminVisualEditor({
                     previewRatio="portrait"
                     targetSize={{ width: 1200, height: 1500 }}
                     onRequestAutoSave={queueAutoSaveAfterUpload}
+                    saveTarget={{
+                      section: "artworks",
+                      slug: current.slug,
+                      field: "image",
+                    }}
                     recommendedUse="藏品列表与藏品详情主图"
                     recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>
@@ -2625,6 +2638,7 @@ export function AdminVisualEditor({
                   <MediaGalleryEditor
                     label="细节图画廊"
                     folder="artworks"
+                    artworkSlug={current.slug}
                     images={current.gallery ?? []}
                     onRequestAutoSave={queueAutoSaveAfterUpload}
                     onChange={(next) =>
