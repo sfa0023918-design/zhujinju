@@ -3,7 +3,7 @@ import { CollectionFilters } from "@/components/collection-filters";
 import { PageHero } from "@/components/page-hero";
 import { buildMetadata } from "@/lib/metadata";
 import { bt } from "@/lib/bilingual";
-import { collectingDirections, getFilteredArtworks } from "@/lib/site-data";
+import { getFilterOptions, getFilteredArtworks, loadSiteContent } from "@/lib/site-data";
 import { BilingualText } from "@/components/bilingual-text";
 
 type CollectionPageProps = {
@@ -15,18 +15,26 @@ type CollectionPageProps = {
   }>;
 };
 
-export const metadata = buildMetadata({
-  title: bt("藏品", "Collection"),
-  description: bt(
-    "浏览竹瑾居所整理的铜造像、唐卡、佛教工艺与相关专题展览作品。",
-    "Browse bronzes, thangkas, ritual objects, and related works organized by Zhu Jin Ju."
-  ),
-  path: "/collection",
-});
+export async function generateMetadata() {
+  const { siteConfig } = await loadSiteContent();
+
+  return buildMetadata({
+    title: bt("藏品", "Collection"),
+    description: bt(
+      "浏览竹瑾居所整理的铜造像、唐卡、佛教工艺与相关专题展览作品。",
+      "Browse bronzes, thangkas, ritual objects, and related works organized by Zhu Jin Ju."
+    ),
+    path: "/collection",
+    site: siteConfig,
+  });
+}
 
 export default async function CollectionPage({ searchParams }: CollectionPageProps) {
   const filters = (await searchParams) ?? {};
-  const artworks = getFilteredArtworks(filters);
+  const content = await loadSiteContent();
+  const artworks = getFilteredArtworks(content, filters);
+  const filterOptions = getFilterOptions(content);
+  const { collectingDirections } = content;
 
   return (
     <>
@@ -44,7 +52,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
       />
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
-        <CollectionFilters current={filters} />
+        <CollectionFilters current={filters} options={filterOptions} />
         <div className="mt-10 grid gap-8">
           {artworks.length > 0 ? (
             artworks.map((artwork) => <ArtworkCard key={artwork.slug} artwork={artwork} />)

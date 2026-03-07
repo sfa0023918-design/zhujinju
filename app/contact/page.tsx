@@ -3,7 +3,7 @@ import { ContactForm } from "@/components/contact-form";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { siteConfig } from "@/lib/site-config";
+import { loadSiteContent } from "@/lib/site-data";
 
 type ContactPageProps = {
   searchParams?: Promise<{
@@ -11,14 +11,20 @@ type ContactPageProps = {
   }>;
 };
 
-export const metadata = buildMetadata({
-  title: bt("联系", "Contact"),
-  description: bt("联系竹瑾居，提交作品询洽、机构合作或研究交流信息。", "Contact Zhu Jin Ju regarding works, institutional collaboration, or research exchange."),
-  path: "/contact",
-});
+export async function generateMetadata() {
+  const { siteConfig } = await loadSiteContent();
+
+  return buildMetadata({
+    title: bt("联系", "Contact"),
+    description: bt("联系竹瑾居，提交作品询洽、机构合作或研究交流信息。", "Contact Zhu Jin Ju regarding works, institutional collaboration, or research exchange."),
+    path: "/contact",
+    site: siteConfig,
+  });
+}
 
 export default async function ContactPage({ searchParams }: ContactPageProps) {
   const params = (await searchParams) ?? {};
+  const { siteConfig } = await loadSiteContent();
 
   return (
     <>

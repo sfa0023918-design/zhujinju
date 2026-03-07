@@ -2,15 +2,22 @@ import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { brandIntro, operationalFacts } from "@/lib/site-data";
+import { loadSiteContent } from "@/lib/site-data";
 
-export const metadata = buildMetadata({
-  title: bt("关于", "About"),
-  description: bt("了解竹瑾居的定位、方法与长期工作的方向。", "Learn about the position, method, and long-term working direction of Zhu Jin Ju."),
-  path: "/about",
-});
+export async function generateMetadata() {
+  const { siteConfig } = await loadSiteContent();
 
-export default function AboutPage() {
+  return buildMetadata({
+    title: bt("关于", "About"),
+    description: bt("了解竹瑾居的定位、方法与长期工作的方向。", "Learn about the position, method, and long-term working direction of Zhu Jin Ju."),
+    path: "/about",
+    site: siteConfig,
+  });
+}
+
+export default async function AboutPage() {
+  const { brandIntro, operationalFacts } = await loadSiteContent();
+
   return (
     <>
       <PageHero

@@ -80,3 +80,62 @@ export type Article = {
   relatedExhibitionSlugs: string[];
   cover: string;
 };
+
+export type ContactDetails = {
+  email: string;
+  phone: string;
+  wechat: string;
+  whatsapp: string;
+  instagram: string;
+  pdfRequest: string;
+  address: BilingualText;
+  replyWindow: BilingualText;
+  collaborationNote: BilingualText;
+};
+
+export type SiteConfigContent = {
+  siteName: BilingualText;
+  title: BilingualText;
+  description: BilingualText;
+  defaultDomain: string;
+  protocol: "http" | "https";
+  locale: string;
+  ogImagePath: string;
+  contact: ContactDetails;
+};
+
+export type BrandIntroContent = {
+  statement: BilingualText;
+  about: BilingualText;
+  methodology: BilingualText[];
+};
+
+export type CollectingDirection = {
+  name: BilingualText;
+  description: BilingualText;
+};
+
+export type OperationalFact = {
+  title: BilingualText;
+  value: BilingualText;
+  description: BilingualText;
+};
+
+export type SiteContent = {
+  siteConfig: SiteConfigContent;
+  brandIntro: BrandIntroContent;
+  collectingDirections: CollectingDirection[];
+  operationalFacts: OperationalFact[];
+  artworks: Artwork[];
+  exhibitions: Exhibition[];
+  articles: Article[];
+};
+
+export type EditableSectionKey =
+  | "siteConfig"
+  | "brandIntro"
+  | "collectingDirections"
+  | "operationalFacts"
+  | "artworks"
+  | "exhibitions"
+  | "articles";

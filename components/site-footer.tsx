@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { bt } from "@/lib/bilingual";
-import { siteConfig } from "@/lib/site-config";
+import { loadSiteContent } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
 
@@ -11,7 +11,8 @@ const footerLinks = [
   { href: "/journal", label: bt("文章与研究", "Journal & Research") },
 ];
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const { siteConfig } = await loadSiteContent();
   const year = new Date().getFullYear();
 
   return (

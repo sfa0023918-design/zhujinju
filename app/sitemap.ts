@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 
-import { articles, artworks, exhibitions } from "@/lib/site-data";
-import { siteBaseUrl } from "@/lib/site-config";
+import { loadSiteContent } from "@/lib/site-data";
+import { resolveSiteBaseUrl } from "@/lib/site-config";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = siteBaseUrl;
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const content = await loadSiteContent();
+  const baseUrl = resolveSiteBaseUrl(content.siteConfig);
 
   const staticRoutes = ["", "/collection", "/exhibitions", "/journal", "/about", "/contact"].map(
     (path) => ({
@@ -13,17 +14,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const artworkRoutes = artworks.map((artwork) => ({
+  const artworkRoutes = content.artworks.map((artwork) => ({
     url: `${baseUrl}/collection/${artwork.slug}`,
     lastModified: new Date(),
   }));
 
-  const exhibitionRoutes = exhibitions.map((exhibition) => ({
+  const exhibitionRoutes = content.exhibitions.map((exhibition) => ({
     url: `${baseUrl}/exhibitions/${exhibition.slug}`,
     lastModified: new Date(),
   }));
 
-  const articleRoutes = articles.map((article) => ({
+  const articleRoutes = content.articles.map((article) => ({
     url: `${baseUrl}/journal/${article.slug}`,
     lastModified: new Date(),
   }));

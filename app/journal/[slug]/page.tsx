@@ -8,10 +8,10 @@ import { BilingualText } from "@/components/bilingual-text";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import {
-  articles,
   getArticleBySlug,
   getExhibitionsBySlugs,
   getHighlightedArtworks,
+  loadSiteContent,
 } from "@/lib/site-data";
 
 type ArticleDetailPageProps = {
@@ -21,7 +21,9 @@ type ArticleDetailPageProps = {
 };
 
 export async function generateStaticParams() {
-  return articles.map((article) => ({
+  const content = await loadSiteContent();
+
+  return content.articles.map((article) => ({
     slug: article.slug,
   }));
 }
@@ -30,13 +32,15 @@ export async function generateMetadata({
   params,
 }: ArticleDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const content = await loadSiteContent();
+  const article = getArticleBySlug(content, slug);
 
   if (!article) {
     return buildMetadata({
       title: bt("文章未找到", "Article Not Found"),
       description: bt("当前文章不存在或尚未公开。", "This article is unavailable or not yet published."),
       path: "/journal",
+      site: content.siteConfig,
     });
   }
 
@@ -45,19 +49,21 @@ export async function generateMetadata({
     description: article.excerpt,
     path: `/journal/${article.slug}`,
     type: "article",
+    site: content.siteConfig,
   });
 }
 
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const content = await loadSiteContent();
+  const article = getArticleBySlug(content, slug);
 
   if (!article) {
     notFound();
   }
 
-  const relatedExhibitions = getExhibitionsBySlugs(article.relatedExhibitionSlugs);
-  const relatedArtworks = getHighlightedArtworks(article.relatedArtworkSlugs);
+  const relatedExhibitions = getExhibitionsBySlugs(content, article.relatedExhibitionSlugs);
+  const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
 
   return (
     <>

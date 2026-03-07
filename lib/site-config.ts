@@ -1,6 +1,7 @@
 import { bt } from "./bilingual";
+import type { SiteConfigContent } from "./data/types";
 
-export const siteConfig = {
+export const siteConfig: SiteConfigContent = {
   siteName: bt("竹瑾居", "Zhu Jin Ju"),
   title: bt(
     "竹瑾居 | 喜马拉雅艺术与亚洲古代艺术",
@@ -32,6 +33,10 @@ export const siteConfig = {
 
 export const siteBaseUrl = `${siteConfig.protocol}://${siteConfig.defaultDomain}`;
 
-export function absoluteUrl(path = "/") {
-  return new URL(path, `${siteBaseUrl}/`).toString();
+export function resolveSiteBaseUrl(config: SiteConfigContent = siteConfig) {
+  return `${config.protocol}://${config.defaultDomain}`;
+}
+
+export function absoluteUrl(path = "/", config: SiteConfigContent = siteConfig) {
+  return new URL(path, `${resolveSiteBaseUrl(config)}/`).toString();
 }

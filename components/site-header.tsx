@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { bt } from "@/lib/bilingual";
-import { siteConfig } from "@/lib/site-config";
+import { loadSiteContent } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
 
@@ -14,7 +14,9 @@ const navigation = [
   { href: "/contact", label: bt("联系", "Contact") },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const { siteConfig } = await loadSiteContent();
+
   return (
     <header className="border-b border-[var(--line)]">
       <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-8 px-5 py-5 md:px-10 md:py-6">

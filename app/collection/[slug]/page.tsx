@@ -10,11 +10,11 @@ import { StatusPill } from "@/components/status-pill";
 import { bt, formatInlineText } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import {
-  artworks,
   getArticlesBySlugs,
   getArtworkBySlug,
   getExhibitionsBySlugs,
   getRelatedArtworks,
+  loadSiteContent,
 } from "@/lib/site-data";
 
 type ArtworkDetailPageProps = {
@@ -24,7 +24,9 @@ type ArtworkDetailPageProps = {
 };
 
 export async function generateStaticParams() {
-  return artworks.map((artwork) => ({
+  const content = await loadSiteContent();
+
+  return content.artworks.map((artwork) => ({
     slug: artwork.slug,
   }));
 }
@@ -33,13 +35,15 @@ export async function generateMetadata({
   params,
 }: ArtworkDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const artwork = getArtworkBySlug(slug);
+  const content = await loadSiteContent();
+  const artwork = getArtworkBySlug(content, slug);
 
   if (!artwork) {
     return buildMetadata({
       title: bt("作品未找到", "Artwork Not Found"),
       description: bt("当前作品不存在或尚未公开。", "This work is unavailable or not yet published."),
       path: "/collection",
+      site: content.siteConfig,
     });
   }
 
@@ -47,6 +51,7 @@ export async function generateMetadata({
     title: artwork.title,
     description: artwork.excerpt,
     path: `/collection/${artwork.slug}`,
+    site: content.siteConfig,
   });
 }
 
@@ -59,15 +64,16 @@ const fieldRows = [
 
 export default async function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const { slug } = await params;
-  const artwork = getArtworkBySlug(slug);
+  const content = await loadSiteContent();
+  const artwork = getArtworkBySlug(content, slug);
 
   if (!artwork) {
     notFound();
   }
 
-  const related = getRelatedArtworks(artwork.slug, artwork.category.zh);
-  const relatedArticles = getArticlesBySlugs(artwork.relatedArticleSlugs);
-  const relatedExhibitions = getExhibitionsBySlugs(artwork.relatedExhibitionSlugs);
+  const related = getRelatedArtworks(content, artwork.slug, artwork.category.zh);
+  const relatedArticles = getArticlesBySlugs(content, artwork.relatedArticleSlugs);
+  const relatedExhibitions = getExhibitionsBySlugs(content, artwork.relatedExhibitionSlugs);
 
   return (
     <>

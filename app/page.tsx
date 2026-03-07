@@ -7,14 +7,16 @@ import { ArtworkCard } from "@/components/artwork-card";
 import { SectionIntro } from "@/components/section-intro";
 import { bt } from "@/lib/bilingual";
 import {
-  brandIntro,
-  collectingDirections,
-  currentExhibition,
-  featuredArtworks,
-  operationalFacts,
+  getCurrentExhibition,
+  getFeaturedArtworks,
+  loadSiteContent,
 } from "@/lib/site-data";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const content = await loadSiteContent();
+  const { brandIntro, collectingDirections, operationalFacts } = content;
+  const currentExhibition = getCurrentExhibition(content);
+  const featuredArtworks = getFeaturedArtworks(content);
   const focusEyebrow = currentExhibition.current
     ? bt("当前专题", "Current Focus")
     : bt("近期展览", "Recent Exhibition");

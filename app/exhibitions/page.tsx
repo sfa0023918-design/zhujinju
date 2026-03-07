@@ -6,15 +6,22 @@ import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { exhibitions } from "@/lib/site-data";
+import { loadSiteContent } from "@/lib/site-data";
 
-export const metadata = buildMetadata({
-  title: bt("展览与图录", "Exhibitions & Catalogues"),
-  description: bt("查看竹瑾居的展览项目、图录与持续研究输出。", "View Zhu Jin Ju exhibitions, catalogues, and ongoing research output."),
-  path: "/exhibitions",
-});
+export async function generateMetadata() {
+  const { siteConfig } = await loadSiteContent();
 
-export default function ExhibitionsPage() {
+  return buildMetadata({
+    title: bt("展览与图录", "Exhibitions & Catalogues"),
+    description: bt("查看竹瑾居的展览项目、图录与持续研究输出。", "View Zhu Jin Ju exhibitions, catalogues, and ongoing research output."),
+    path: "/exhibitions",
+    site: siteConfig,
+  });
+}
+
+export default async function ExhibitionsPage() {
+  const { exhibitions } = await loadSiteContent();
+
   return (
     <>
       <PageHero

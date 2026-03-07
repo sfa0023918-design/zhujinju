@@ -1,0 +1,1391 @@
+{
+  "siteConfig": {
+    "siteName": {
+      "zh": "竹瑾居",
+      "en": "Zhu Jin Ju"
+    },
+    "title": {
+      "zh": "竹瑾居 | 喜马拉雅艺术与亚洲古代艺术",
+      "en": "Zhu Jin Ju | Himalayan Art and Asian Antiquities"
+    },
+    "description": {
+      "zh": "竹瑾居专注于喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，面向藏家、机构、策展人与研究者提供收藏、展览与研究服务。",
+      "en": "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, serving collectors, institutions, curators, and researchers through collecting, exhibitions, and research."
+    },
+    "defaultDomain": "www.zhujinju.com",
+    "protocol": "https",
+    "locale": "zh_CN",
+    "ogImagePath": "/opengraph-image",
+    "contact": {
+      "email": "contact@zhujinju.com",
+      "phone": "+86 21 5466 2187",
+      "wechat": "zhujinju_shanghai",
+      "whatsapp": "+86 139 1806 2742",
+      "instagram": "@zhujinju_art",
+      "pdfRequest": "catalogue@zhujinju.com",
+      "address": {
+        "zh": "中国上海 · 预约制空间",
+        "en": "Shanghai, China · By Appointment"
+      },
+      "replyWindow": {
+        "zh": "作品咨询通常于 24 小时内回复。",
+        "en": "Artwork inquiries are usually answered within 24 hours."
+      },
+      "collaborationNote": {
+        "zh": "可联系借展、研究合作、图录交换与机构预约看件。",
+        "en": "Loans, research collaboration, catalogue exchange, and institutional viewings may be arranged."
+      }
+    }
+  },
+  "brandIntro": {
+    "statement": {
+      "zh": "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
+      "en": "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their broader dialogues with Asian antiquities, with work structured around collecting, research, exhibitions, and catalogues."
+    },
+    "about": {
+      "zh": "我们以作品本体为起点，在图像学、风格学、材质工艺与流传脉络之间建立判断，并通过展览、图录与研究文字持续公开这些判断。",
+      "en": "We begin with the object itself, building judgement through iconography, style, material, craftsmanship, and provenance, and making that judgement public through exhibitions, catalogues, and research writing."
+    },
+    "methodology": [
+      {
+        "zh": "以作品为中心，尊重图像与器物自身的时间性。",
+        "en": "Place the object at the center, respecting the temporal depth held within images and ritual forms."
+      },
+      {
+        "zh": "以研究支撑判断，避免将古代艺术降格为单纯装饰消费。",
+        "en": "Ground judgement in research, rather than reducing historical art to decorative consumption."
+      },
+      {
+        "zh": "以长期主义组织内容，持续积累展览、图录与学术输出。",
+        "en": "Organize content with a long-term view, steadily building exhibitions, catalogues, and scholarly output."
+      }
+    ]
+  },
+  "collectingDirections": [
+    {
+      "name": {
+        "zh": "铜造像",
+        "en": "Bronze Sculpture"
+      },
+      "description": {
+        "zh": "聚焦十三至十八世纪西藏、尼泊尔与相关区域的金铜佛教造像。",
+        "en": "Focused on gilt and copper alloy Buddhist sculpture from Tibet, Nepal, and related regions between the 13th and 18th centuries."
+      }
+    },
+    {
+      "name": {
+        "zh": "唐卡",
+        "en": "Thangka"
+      },
+      "description": {
+        "zh": "关注图像系统完整、设色沉着、传承清晰的佛教绘画。",
+        "en": "Works selected for coherent iconographic systems, restrained color, and clear lines of transmission."
+      }
+    },
+    {
+      "name": {
+        "zh": "绘画",
+        "en": "Painting"
+      },
+      "description": {
+        "zh": "包括卷轴、纸本与跨区域图像传统中的重要作品。",
+        "en": "Including scrolls, works on paper, and important paintings across intersecting visual traditions."
+      }
+    },
+    {
+      "name": {
+        "zh": "佛教工艺",
+        "en": "Ritual Objects"
+      },
+      "description": {
+        "zh": "涵盖供器、法器与兼具宗教性与工艺价值的收藏方向。",
+        "en": "Covering offering vessels, liturgical implements, and objects valued for both ritual and material significance."
+      }
+    },
+    {
+      "name": {
+        "zh": "尼泊尔造像",
+        "en": "Nepalese Sculpture"
+      },
+      "description": {
+        "zh": "侧重尼瓦尔工匠体系与喜马拉雅区域风格流动。",
+        "en": "With particular attention to Newar craftsmanship and the movement of style across the Himalayas."
+      }
+    }
+  ],
+  "operationalFacts": [
+    {
+      "title": {
+        "zh": "展览数量",
+        "en": "Exhibitions"
+      },
+      "value": {
+        "zh": "2 项专题展览",
+        "en": "2 exhibitions"
+      },
+      "description": {
+        "zh": "已公开的展览项目围绕观看方式、材质判断与作品比较展开。",
+        "en": "Published exhibition projects structured around ways of seeing, material judgement, and comparison."
+      }
+    },
+    {
+      "title": {
+        "zh": "图录数量",
+        "en": "Catalogues"
+      },
+      "value": {
+        "zh": "2 册研究图录",
+        "en": "2 catalogues"
+      },
+      "description": {
+        "zh": "图录以作品信息、页码索引与研究摘要构成稳定的引用基础。",
+        "en": "Catalogues provide stable reference through object entries, pagination, and research summaries."
+      }
+    },
+    {
+      "title": {
+        "zh": "研究文章",
+        "en": "Research Writing"
+      },
+      "value": {
+        "zh": "3 篇公开文章",
+        "en": "3 published texts"
+      },
+      "description": {
+        "zh": "围绕观看方法、展览方法与市场判断持续发布研究与札记。",
+        "en": "Research notes continue to address methods of looking, exhibition practice, and market judgement."
+      }
+    },
+    {
+      "title": {
+        "zh": "服务对象",
+        "en": "Clients & Partners"
+      },
+      "value": {
+        "zh": "藏家、机构、策展人与研究者",
+        "en": "Collectors, institutions, curators, researchers"
+      },
+      "description": {
+        "zh": "服务对象涵盖私人藏家、博物馆、学术机构与跨区域研究合作。",
+        "en": "The clientele includes private collectors, museums, scholarly institutions, and cross-regional research collaborators."
+      }
+    },
+    {
+      "title": {
+        "zh": "上海预约制空间",
+        "en": "By Appointment in Shanghai"
+      },
+      "value": {
+        "zh": "上海 · 预约制会面",
+        "en": "Shanghai appointment space"
+      },
+      "description": {
+        "zh": "以预约制接待作品查看、借展洽谈、研究交流与图录交换。",
+        "en": "Meetings are arranged by appointment for viewings, loan discussion, research exchange, and catalogue requests."
+      }
+    }
+  ],
+  "artworks": [
+    {
+      "slug": "ekadasamukha-avalokiteshvara",
+      "title": {
+        "zh": "十一面观音坐像",
+        "en": "Seated Ekadasamukha Avalokiteshvara"
+      },
+      "subtitle": {
+        "zh": "西藏中部鎏金铜造像",
+        "en": "Gilt Bronze Sculpture, Central Tibet"
+      },
+      "period": {
+        "zh": "十六世纪",
+        "en": "16th century"
+      },
+      "region": {
+        "zh": "西藏中部",
+        "en": "Central Tibet"
+      },
+      "origin": {
+        "zh": "西藏",
+        "en": "Tibet"
+      },
+      "material": {
+        "zh": "鎏金铜",
+        "en": "Gilt copper alloy"
+      },
+      "category": {
+        "zh": "铜造像",
+        "en": "Bronze Sculpture"
+      },
+      "dimensions": {
+        "zh": "高 42 cm",
+        "en": "Height 42 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "造像比例修长，主面相与莲座处理收敛而稳定，呈现西藏中后期金铜造像成熟的静观气质。",
+        "en": "Elegant in proportion and restrained in facial treatment and lotus base, the sculpture reflects the poised maturity of later Central Tibetan gilt bronze production."
+      },
+      "viewingNote": {
+        "zh": "本件十一面观音坐像整体铸造精整，主面相宽额细目，鼻梁挺直，胸前饰链、帔帛翻折与覆莲瓣起伏之间维持着稳定而克制的装饰节奏。其观看重点不在繁缛细节，而在比例、光泽与图像秩序如何共同建立一件造像的静定感。",
+        "en": "The sculpture is crisply cast overall, with a broad brow, narrow eyes, and a straight nose. Ornaments, scarf folds, and lotus petals maintain a disciplined decorative rhythm. Its force lies less in ornate detail than in the way proportion, gilding, and iconographic order produce stillness."
+      },
+      "comparisonNote": {
+        "zh": "与依赖夸张姿态取胜的同类题材相比，此件更接近十六世纪西藏中部造像偏向内敛的面容处理与结构控制，对理解晚期西藏金铜造像如何在庄严与装饰之间取得平衡具有参考意义。",
+        "en": "Compared with related examples that rely on emphatic gesture, this work aligns more closely with the inward facial handling and structural control found in 16th-century Central Tibetan bronzes, making it a useful point of reference for how later Tibetan sculpture balanced solemnity and ornament."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "欧洲私人收藏",
+            "en": "European private collection"
+          },
+          "note": {
+            "zh": "二十世纪末入藏，后保持于同一收藏体系。",
+            "en": "Acquired in the late 20th century and retained within the same collection thereafter."
+          }
+        },
+        {
+          "label": {
+            "zh": "竹瑾居档案整理",
+            "en": "Documented by Zhu Jin Ju"
+          },
+          "note": {
+            "zh": "附高清图、细部图与尺寸记录。",
+            "en": "Accompanied by high-resolution images, detail views, and dimensional records."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "寂照：喜马拉雅造像与图像的观看",
+            "en": "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2025"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《竹瑾居图录一：铜造像》",
+            "en": "Zhu Jin Ju Catalogue I: Bronze Sculpture"
+          },
+          "year": "2025",
+          "pages": {
+            "zh": "图录页 18-21",
+            "en": "Catalogue pp. 18-21"
+          },
+          "note": {
+            "zh": "附局部对照图与尺寸页。",
+            "en": "With comparative details and dimension sheet."
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "how-to-look-at-a-bronze",
+        "why-exhibitions-matter"
+      ],
+      "relatedExhibitionSlugs": [
+        "silent-radiance"
+      ],
+      "image": "/api/placeholder/ekadasamukha-avalokiteshvara?kind=portrait",
+      "featured": true
+    },
+    {
+      "slug": "green-tara-malla",
+      "title": {
+        "zh": "绿度母坐像",
+        "en": "Seated Green Tara"
+      },
+      "subtitle": {
+        "zh": "尼泊尔马拉时期金铜造像",
+        "en": "Gilt Bronze Sculpture, Malla Period Nepal"
+      },
+      "period": {
+        "zh": "十五世纪",
+        "en": "15th century"
+      },
+      "region": {
+        "zh": "尼泊尔谷地",
+        "en": "Kathmandu Valley"
+      },
+      "origin": {
+        "zh": "尼泊尔",
+        "en": "Nepal"
+      },
+      "material": {
+        "zh": "鎏金铜嵌松石",
+        "en": "Gilt copper alloy with turquoise inlay"
+      },
+      "category": {
+        "zh": "尼泊尔造像",
+        "en": "Nepalese Sculpture"
+      },
+      "dimensions": {
+        "zh": "高 31 cm",
+        "en": "Height 31 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "体态轻盈，手指修长，珠饰与冠叶处理精细，显现尼瓦尔工匠体系的成熟工艺。",
+        "en": "Graceful in pose and refined in detail, the work exemplifies the mature precision of Newar metal craftsmanship."
+      },
+      "viewingNote": {
+        "zh": "冠叶、耳珰与璎珞层次清楚，边缘锐利而不失柔和，腹部转折与坐姿收束紧密，形成轻而不浮的整体节奏。嵌饰虽不繁复，却恰到好处地强化了作品的仪轨属性与视觉焦点。",
+        "en": "Crown leaves, earrings, and jewelry are sharply articulated yet remain supple, while the torso and compact seated pose produce a rhythm that is light without becoming insubstantial. The restrained inlay strengthens both ritual character and visual focus."
+      },
+      "comparisonNote": {
+        "zh": "与更强调表面繁饰的马拉时期造像相比，此件在精密与庄重之间保持了更好的平衡，尤其适合作为尼瓦尔工艺系统进入西藏语境前后的比较参照。",
+        "en": "Compared with Malla-period bronzes that lean more heavily on surface ornament, this work sustains a stronger balance between precision and gravity, making it an effective comparative example for the Newar idiom before and after its movement into Tibet."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "亚洲私人收藏",
+            "en": "Asian private collection"
+          },
+          "note": {
+            "zh": "二十一世纪初见于市场记录，后进入现藏。",
+            "en": "Recorded on the market in the early 21st century before entering the present collection."
+          }
+        },
+        {
+          "label": {
+            "zh": "旧标签保存",
+            "en": "Old collection labels retained"
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "金铜之间：十三至十八世纪藏传佛教艺术",
+            "en": "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2024"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《金铜之间》展览图录",
+            "en": "Between Gilding and Pigment, Exhibition Catalogue"
+          },
+          "year": "2024",
+          "pages": {
+            "zh": "图录页 34-37",
+            "en": "Catalogue pp. 34-37"
+          },
+          "note": {
+            "zh": "附冠饰与台座局部图。",
+            "en": "Including detail images of crown and lotus base."
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "how-to-look-at-a-bronze"
+      ],
+      "relatedExhibitionSlugs": [
+        "between-gilding-and-pigment"
+      ],
+      "image": "/api/placeholder/green-tara-malla?kind=portrait",
+      "featured": true
+    },
+    {
+      "slug": "shakyamuni-bhumisparsha",
+      "title": {
+        "zh": "释迦牟尼成道像",
+        "en": "Shakyamuni in Bhumisparsha Mudra"
+      },
+      "subtitle": {
+        "zh": "后藏合金铜造像",
+        "en": "Copper Alloy Sculpture, Tsang"
+      },
+      "period": {
+        "zh": "十四世纪",
+        "en": "14th century"
+      },
+      "region": {
+        "zh": "后藏",
+        "en": "Tsang"
+      },
+      "origin": {
+        "zh": "西藏",
+        "en": "Tibet"
+      },
+      "material": {
+        "zh": "合金铜",
+        "en": "Copper alloy"
+      },
+      "category": {
+        "zh": "铜造像",
+        "en": "Bronze Sculpture"
+      },
+      "dimensions": {
+        "zh": "高 28 cm",
+        "en": "Height 28 cm"
+      },
+      "status": "reserved",
+      "excerpt": {
+        "zh": "地触印清晰，衣纹处理简约，呈现早期西藏造像由尼泊尔语汇向本地风格转化的线索。",
+        "en": "The earth-touching gesture and restrained drapery offer a clear view of how Nepalese vocabulary was transformed within early Tibetan style."
+      },
+      "viewingNote": {
+        "zh": "造像面容沉静，肩部宽展，坐姿稳固，衣缘线条收束有度，未作过多细碎装饰，使观看重心集中于胸腹与双手印相之间。整体结构感明确，是一件更适合近距离观察而非远观炫示的作品。",
+        "en": "The quiet face, broad shoulders, and stable seated posture give the work clear structural weight. Drapery lines are tightly controlled and avoid excessive detail, concentrating attention on the torso and mudra. It is a work suited more to close examination than distant spectacle."
+      },
+      "comparisonNote": {
+        "zh": "其风格位置对于理解尼泊尔影响在后藏地区的本地化转化尤具参考价值，与同时期更强调装饰的作品相比，此件的学术意义大于视觉修辞。",
+        "en": "Its stylistic position is especially useful for understanding the local transformation of Nepalese influence in Tsang. Compared with contemporaneous works that emphasize ornament, its scholarly value outweighs rhetorical display."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "日本私人收藏",
+            "en": "Japanese private collection"
+          },
+          "note": {
+            "zh": "附旧木座与旧装藏记录。",
+            "en": "With an old wooden stand and earlier housing records."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "寂照：喜马拉雅造像与图像的观看",
+            "en": "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2025"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《竹瑾居图录一：铜造像》",
+            "en": "Zhu Jin Ju Catalogue I: Bronze Sculpture"
+          },
+          "year": "2025",
+          "pages": {
+            "zh": "图录页 42-45",
+            "en": "Catalogue pp. 42-45"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "how-to-look-at-a-bronze",
+        "why-exhibitions-matter"
+      ],
+      "relatedExhibitionSlugs": [
+        "silent-radiance"
+      ],
+      "image": "/api/placeholder/shakyamuni-bhumisparsha?kind=portrait",
+      "featured": true
+    },
+    {
+      "slug": "manjushri-thangka",
+      "title": {
+        "zh": "文殊菩萨唐卡",
+        "en": "Thangka of Manjushri"
+      },
+      "subtitle": {
+        "zh": "安多地区矿物彩绘画",
+        "en": "Mineral Pigment Painting, Amdo"
+      },
+      "period": {
+        "zh": "十八世纪",
+        "en": "18th century"
+      },
+      "region": {
+        "zh": "安多",
+        "en": "Amdo"
+      },
+      "origin": {
+        "zh": "中国西北地区",
+        "en": "Northwest China"
+      },
+      "material": {
+        "zh": "矿物彩、金粉、棉布",
+        "en": "Mineral pigment, gold, and cotton"
+      },
+      "category": {
+        "zh": "唐卡",
+        "en": "Thangka"
+      },
+      "dimensions": {
+        "zh": "画心 74 × 52 cm",
+        "en": "Painting 74 × 52 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "构图清整，设色偏冷，金线节奏克制，具有后期唐卡中少见的学术气质。",
+        "en": "With clear composition, cool tonality, and disciplined gold-line work, the painting carries a rare scholarly character within later thangka production."
+      },
+      "viewingNote": {
+        "zh": "主尊文殊端坐中央，周围眷属与供养图像布置清晰，图像阅读秩序完整。矿物彩层次稳定，蓝绿与赭石之间的转换沉着，使整件作品具备安静而不单薄的视觉深度。",
+        "en": "Manjushri sits centrally with attendant and offering figures arranged in a coherent iconographic order. The mineral pigments are layered steadily, and movement between blue-green and ochre tones creates depth without excess."
+      },
+      "comparisonNote": {
+        "zh": "与同时期更趋商业化的唐卡相比，此件在笔触控制、图像布局与设色收束方面更为克制，适合作为晚期唐卡中高等级学术型作品的比较案例。",
+        "en": "Compared with more commercial thangkas of the same period, this work is notably more restrained in brushwork, composition, and chromatic control, making it a useful comparative case among high-level later thangkas."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "北美私人收藏",
+            "en": "North American private collection"
+          },
+          "note": {
+            "zh": "旧装裱保存，画心状态稳定。",
+            "en": "Preserved in an earlier mounting, with the painted surface in stable condition."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "金铜之间：十三至十八世纪藏传佛教艺术",
+            "en": "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2024"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《金铜之间》展览图录",
+            "en": "Between Gilding and Pigment, Exhibition Catalogue"
+          },
+          "year": "2024",
+          "pages": {
+            "zh": "图录页 76-79",
+            "en": "Catalogue pp. 76-79"
+          },
+          "note": {
+            "zh": "附主尊局部与设色放大图。",
+            "en": "Including enlarged details of the main deity and pigments."
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "thangka-as-structure",
+        "why-exhibitions-matter"
+      ],
+      "relatedExhibitionSlugs": [
+        "between-gilding-and-pigment"
+      ],
+      "image": "/api/placeholder/manjushri-thangka?kind=portrait",
+      "featured": true
+    },
+    {
+      "slug": "vajrapani-thangka",
+      "title": {
+        "zh": "金刚手菩萨唐卡",
+        "en": "Thangka of Vajrapani"
+      },
+      "subtitle": {
+        "zh": "西藏中部设色唐卡",
+        "en": "Painted Thangka, Central Tibet"
+      },
+      "period": {
+        "zh": "十七世纪",
+        "en": "17th century"
+      },
+      "region": {
+        "zh": "西藏中部",
+        "en": "Central Tibet"
+      },
+      "origin": {
+        "zh": "西藏",
+        "en": "Tibet"
+      },
+      "material": {
+        "zh": "矿物彩、金粉、棉布",
+        "en": "Mineral pigment, gold, and cotton"
+      },
+      "category": {
+        "zh": "唐卡",
+        "en": "Thangka"
+      },
+      "dimensions": {
+        "zh": "画心 82 × 58 cm",
+        "en": "Painting 82 × 58 cm"
+      },
+      "status": "sold",
+      "excerpt": {
+        "zh": "形象力量充足，色层厚重而不浊，适合作为风格比较中的关键参照。",
+        "en": "Strong in iconographic force and dense in color without becoming heavy, the work serves as a key comparative reference."
+      },
+      "viewingNote": {
+        "zh": "主尊的动态与火焰纹外围形成强烈张力，但整幅仍以清楚的图像秩序维系观看。设色层次在深蓝与赭红之间保持足够透明度，使厚重题材不至于沉闷。",
+        "en": "The deity's motion and surrounding flame motif create strong tension, while the composition remains visually ordered. Color layers preserve enough transparency between deep blues and ochres to keep the subject from becoming ponderous."
+      },
+      "comparisonNote": {
+        "zh": "这类作品常成为理解护法图像体系的重要入口。相较于同类更重笔墨装饰的例子，此件更强调图像张力与结构清晰度之间的平衡。",
+        "en": "Works of this kind often provide an entry point into protector iconography. Compared with examples that rely more heavily on decorative brushwork, this one places greater emphasis on the balance between visual force and structural clarity."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "欧洲私人收藏",
+            "en": "European private collection"
+          },
+          "note": {
+            "zh": "旧题签与收藏编号保留。",
+            "en": "With earlier inventory label and collection number retained."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "寂照：喜马拉雅造像与图像的观看",
+            "en": "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2025"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《图像与仪轨：竹瑾居专题文集》",
+            "en": "Image and Ritual: Zhu Jin Ju Essays"
+          },
+          "year": "2025",
+          "pages": {
+            "zh": "文集页 10-13",
+            "en": "Essay pp. 10-13"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "thangka-as-structure",
+        "why-exhibitions-matter"
+      ],
+      "relatedExhibitionSlugs": [
+        "silent-radiance"
+      ],
+      "image": "/api/placeholder/vajrapani-thangka?kind=portrait"
+    },
+    {
+      "slug": "ritual-conch-set",
+      "title": {
+        "zh": "法螺与供养器组合",
+        "en": "Ritual Conch and Offering Set"
+      },
+      "subtitle": {
+        "zh": "藏传佛教工艺器物",
+        "en": "Tibetan Buddhist Ritual Object Group"
+      },
+      "period": {
+        "zh": "十八至十九世纪",
+        "en": "18th-19th century"
+      },
+      "region": {
+        "zh": "拉达克",
+        "en": "Ladakh"
+      },
+      "origin": {
+        "zh": "喜马拉雅地区",
+        "en": "Himalayan region"
+      },
+      "material": {
+        "zh": "银、铜、贝、嵌饰",
+        "en": "Silver, copper, shell, and inlay"
+      },
+      "category": {
+        "zh": "佛教工艺",
+        "en": "Ritual Objects"
+      },
+      "dimensions": {
+        "zh": "法螺长 27 cm",
+        "en": "Conch length 27 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "兼具实用与礼仪属性，适合在专题陈列中构成图像之外的物质补充。",
+        "en": "Combining practical and liturgical functions, the set offers a material counterpoint to painted and sculpted imagery."
+      },
+      "viewingNote": {
+        "zh": "法螺口沿与托座结构完整，局部银饰与嵌饰处理呈现出区域工艺传统中的审美取向。与绘画及造像并置时，此类器物能够补充宗教现场与仪轨使用的维度。",
+        "en": "The conch mouth and supporting mount remain structurally coherent, while silver fittings and inlay reflect the aesthetic preferences of a regional workshop tradition. Placed beside painting and sculpture, such objects restore the dimension of ritual setting and actual use."
+      },
+      "comparisonNote": {
+        "zh": "在收藏层面，这类作品的价值并不止于稀见，更在于帮助理解喜马拉雅物质文化的完整生态。相较单件供器，成组保存更有研究意义。",
+        "en": "Its value lies not only in rarity, but in helping reconstruct the larger ecology of Himalayan material culture. Compared with isolated ritual objects, a preserved group offers stronger research value."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "藏家旧藏",
+            "en": "Established private collection"
+          },
+          "note": {
+            "zh": "附早期收藏标签与器物清单。",
+            "en": "With early collection labels and object list."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "金铜之间：十三至十八世纪藏传佛教艺术",
+            "en": "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2024"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《金铜之间》展览图录",
+            "en": "Between Gilding and Pigment, Exhibition Catalogue"
+          },
+          "year": "2024",
+          "pages": {
+            "zh": "图录页 92-95",
+            "en": "Catalogue pp. 92-95"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "why-exhibitions-matter"
+      ],
+      "relatedExhibitionSlugs": [
+        "between-gilding-and-pigment"
+      ],
+      "image": "/api/placeholder/ritual-conch-set?kind=portrait"
+    },
+    {
+      "slug": "amitayus-western-tibet",
+      "title": {
+        "zh": "无量寿佛坐像",
+        "en": "Seated Amitayus"
+      },
+      "subtitle": {
+        "zh": "西藏西部鎏金铜造像",
+        "en": "Gilt Bronze Sculpture, Western Tibet"
+      },
+      "period": {
+        "zh": "十六世纪",
+        "en": "16th century"
+      },
+      "region": {
+        "zh": "西藏西部",
+        "en": "Western Tibet"
+      },
+      "origin": {
+        "zh": "西藏",
+        "en": "Tibet"
+      },
+      "material": {
+        "zh": "鎏金铜",
+        "en": "Gilt copper alloy"
+      },
+      "category": {
+        "zh": "铜造像",
+        "en": "Bronze Sculpture"
+      },
+      "dimensions": {
+        "zh": "高 24 cm",
+        "en": "Height 24 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "造像体量不大，但莲座、手印与冠饰比例整肃，具有精炼的收藏级完成度。",
+        "en": "Though modest in scale, the lotus base, mudra, and crown are disciplined in proportion and finished to a collector's standard."
+      },
+      "viewingNote": {
+        "zh": "该像肩部与胸腹关系清晰，双手托宝瓶的姿态稳定，局部鎏金保存较佳，光泽温润，不流于炫目。其尺度适中，更能在近距离观看中呈现手部、冠饰与莲座的细部起伏。",
+        "en": "The relation between shoulders and torso is clearly built, the gesture of holding the vase is steady, and the surviving gilding is warm rather than flashy. Its moderate scale rewards close viewing of the hands, crown, and lotus base."
+      },
+      "comparisonNote": {
+        "zh": "相较同时期体量更大的西藏西部造像，此件的分量来自比例与完成度，而非尺寸本身。对私人收藏和预约制陈列环境而言，它具有更友好的观看尺度。",
+        "en": "Compared with larger western Tibetan bronzes of the same period, its presence derives from proportion and finish rather than scale itself. It is particularly well suited to private collections and appointment-based display settings."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "欧洲旧藏",
+            "en": "European private collection"
+          },
+          "note": {
+            "zh": "二十世纪九十年代入藏。",
+            "en": "Acquired into a collection in the 1990s."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "寂照：喜马拉雅造像与图像的观看",
+            "en": "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2025"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《竹瑾居图录一：铜造像》",
+            "en": "Zhu Jin Ju Catalogue I: Bronze Sculpture"
+          },
+          "year": "2025",
+          "pages": {
+            "zh": "图录页 54-57",
+            "en": "Catalogue pp. 54-57"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "how-to-look-at-a-bronze"
+      ],
+      "relatedExhibitionSlugs": [
+        "silent-radiance"
+      ],
+      "image": "/api/placeholder/amitayus-western-tibet?kind=portrait"
+    },
+    {
+      "slug": "newar-shakyamuni",
+      "title": {
+        "zh": "释迦牟尼坐像",
+        "en": "Seated Shakyamuni"
+      },
+      "subtitle": {
+        "zh": "尼泊尔早期金铜造像",
+        "en": "Early Nepalese Gilt Bronze Sculpture"
+      },
+      "period": {
+        "zh": "十三至十四世纪",
+        "en": "13th-14th century"
+      },
+      "region": {
+        "zh": "尼泊尔谷地",
+        "en": "Kathmandu Valley"
+      },
+      "origin": {
+        "zh": "尼泊尔",
+        "en": "Nepal"
+      },
+      "material": {
+        "zh": "鎏金铜",
+        "en": "Gilt copper alloy"
+      },
+      "category": {
+        "zh": "尼泊尔造像",
+        "en": "Nepalese Sculpture"
+      },
+      "dimensions": {
+        "zh": "高 22 cm",
+        "en": "Height 22 cm"
+      },
+      "status": "reserved",
+      "excerpt": {
+        "zh": "尺寸精巧，面相与台座兼具早期风格信息，适合纳入跨区域风格比较。",
+        "en": "Compact in scale yet rich in early stylistic information, the work is highly useful in cross-regional comparison."
+      },
+      "viewingNote": {
+        "zh": "本件释迦牟尼坐像规模虽小，但台座比例与衣纹布局均具备早期尼泊尔金铜造像的重要特征，面部处理偏向平静而不追求夸饰，形成一种收敛的庄严感。",
+        "en": "Though modest in size, the sculpture preserves important early Nepalese features in the lotus base proportions and drapery arrangement. Its facial treatment tends toward calm reserve rather than elaboration, creating restrained solemnity."
+      },
+      "comparisonNote": {
+        "zh": "作为喜马拉雅艺术观看路径中的关键样本，这类作品常具有超过尺寸的研究价值。与晚期尼瓦尔工艺相比，其重点在早期结构信息而非表面华丽程度。",
+        "en": "As a key type within Himalayan art, works of this class often carry research value disproportionate to their scale. Compared with later Newar workmanship, its importance lies in early structural information rather than surface richness."
+      },
+      "provenance": [
+        {
+          "label": {
+            "zh": "香港私人收藏",
+            "en": "Hong Kong private collection"
+          },
+          "note": {
+            "zh": "附旧拍卖来源信息。",
+            "en": "With previous auction provenance."
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "金铜之间：十三至十八世纪藏传佛教艺术",
+            "en": "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"
+          },
+          "venue": {
+            "zh": "竹瑾居 · 上海预约制空间",
+            "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+          },
+          "year": "2024"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "《金铜之间》展览图录",
+            "en": "Between Gilding and Pigment, Exhibition Catalogue"
+          },
+          "year": "2024",
+          "pages": {
+            "zh": "图录页 22-25",
+            "en": "Catalogue pp. 22-25"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available"
+        }
+      ],
+      "relatedArticleSlugs": [
+        "how-to-look-at-a-bronze"
+      ],
+      "relatedExhibitionSlugs": [
+        "between-gilding-and-pigment"
+      ],
+      "image": "/api/placeholder/newar-shakyamuni?kind=portrait"
+    }
+  ],
+  "exhibitions": [
+    {
+      "slug": "silent-radiance",
+      "title": {
+        "zh": "寂照：喜马拉雅造像与图像的观看",
+        "en": "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"
+      },
+      "subtitle": {
+        "zh": "专题展览",
+        "en": "Special Exhibition"
+      },
+      "period": {
+        "zh": "2025.10.18 - 2025.12.28",
+        "en": "18 Oct 2025 - 28 Dec 2025"
+      },
+      "venue": {
+        "zh": "竹瑾居 · 上海预约制空间",
+        "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+      },
+      "intro": {
+        "zh": "以造像与绘画并置的方式重新建立观看路径，讨论图像秩序、材质语汇与近距离观察的重要性。",
+        "en": "By placing sculpture and painting in dialogue, the exhibition reconsiders how image order, material language, and close looking shape understanding."
+      },
+      "description": [
+        {
+          "zh": "展览以“观看方式”而非年代排序为结构核心，将铜造像、唐卡与工艺器物置于同一叙事中，强调作品之间的呼应与尺度转换。",
+          "en": "The exhibition is structured around modes of looking rather than chronology, bringing bronzes, thangkas, and ritual objects into a single visual narrative."
+        },
+        {
+          "zh": "重点作品围绕观音、释迦牟尼与护法图像展开，既讨论图像学，也关注物质与工艺的细部判断，使展览成为一种公开的研究方法。",
+          "en": "Key works revolve around Avalokiteshvara, Shakyamuni, and protector imagery, balancing iconographic reading with close material and technical observation."
+        },
+        {
+          "zh": "配套图录整理了作品基础信息、对照图版与研究摘要，使现场观看得以转化为可引用、可检索的图像文献。",
+          "en": "The accompanying catalogue gathers object data, comparative plates, and research summaries, allowing the exhibition experience to become citable visual documentation."
+        }
+      ],
+      "highlightArtworkSlugs": [
+        "ekadasamukha-avalokiteshvara",
+        "shakyamuni-bhumisparsha",
+        "vajrapani-thangka"
+      ],
+      "highlightCount": 18,
+      "catalogueTitle": {
+        "zh": "《寂照》展览图录",
+        "en": "Catalogue for Silent Radiance"
+      },
+      "catalogueIntro": {
+        "zh": "收录 18 件重点作品，附策展前言、作品页与图像索引。",
+        "en": "Including 18 key works with a curatorial preface, object entries, and image index."
+      },
+      "cataloguePages": 96,
+      "curatorialLead": {
+        "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
+        "en": "The exhibition avoids category accumulation and instead lets works form a comparable field of looking."
+      },
+      "relatedArticleSlugs": [
+        "how-to-look-at-a-bronze",
+        "why-exhibitions-matter"
+      ],
+      "cover": "/api/placeholder/silent-radiance?kind=landscape"
+    },
+    {
+      "slug": "between-gilding-and-pigment",
+      "title": {
+        "zh": "金铜之间：十三至十八世纪藏传佛教艺术",
+        "en": "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"
+      },
+      "subtitle": {
+        "zh": "研究型展览",
+        "en": "Research Exhibition"
+      },
+      "period": {
+        "zh": "2024.05.12 - 2024.07.30",
+        "en": "12 May 2024 - 30 Jul 2024"
+      },
+      "venue": {
+        "zh": "竹瑾居 · 上海预约制空间",
+        "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+      },
+      "intro": {
+        "zh": "从金铜造像到设色唐卡，讨论材质与图像如何共同塑造宗教艺术的观看经验。",
+        "en": "From gilt bronzes to painted thangkas, the exhibition considers how material and image together shape the experience of sacred art."
+      },
+      "description": [
+        {
+          "zh": "展览以材质为切入点，将造像、绘画与器物纳入同一条研究线索，尝试打破常见的门类分割。",
+          "en": "Beginning with materiality, the exhibition places sculpture, painting, and objects within a shared research line rather than conventional categories."
+        },
+        {
+          "zh": "策展重点不在数量，而在作品之间的风格差异与工艺共性，使观者可以通过局部与整体的对照建立更清晰的比较能力。",
+          "en": "Its curatorial emphasis lies not in quantity but in stylistic difference and technical affinity, allowing sharper comparison between works."
+        },
+        {
+          "zh": "同期发布的图录以简洁结构呈现核心信息，并通过页码索引与图版顺序建立便于引用的基础资料。",
+          "en": "The accompanying catalogue presents core information in a compact structure, using pagination and image order to create a stable basis for citation."
+        }
+      ],
+      "highlightArtworkSlugs": [
+        "green-tara-malla",
+        "manjushri-thangka",
+        "ritual-conch-set"
+      ],
+      "highlightCount": 16,
+      "catalogueTitle": {
+        "zh": "《金铜之间》展览图录",
+        "en": "Catalogue for Between Gilding and Pigment"
+      },
+      "catalogueIntro": {
+        "zh": "围绕材料、区域与图像关系展开，收录 16 件重点作品与一篇研究前言。",
+        "en": "Focused on material, region, and image, with 16 key works and a research preface."
+      },
+      "cataloguePages": 88,
+      "curatorialLead": {
+        "zh": "材质并非附属信息，而是理解图像与时代判断的第一入口。",
+        "en": "Material is not secondary information but one of the first entries into image and period judgement."
+      },
+      "relatedArticleSlugs": [
+        "thangka-as-structure",
+        "why-exhibitions-matter"
+      ],
+      "cover": "/api/placeholder/between-gilding-and-pigment?kind=landscape"
+    }
+  ],
+  "articles": [
+    {
+      "slug": "how-to-look-at-a-bronze",
+      "title": {
+        "zh": "一件铜造像为何值得反复观看",
+        "en": "Why a Bronze Deserves Repeated Looking"
+      },
+      "category": {
+        "zh": "研究短文",
+        "en": "Research Note"
+      },
+      "column": {
+        "zh": "观看方法",
+        "en": "Ways of Looking"
+      },
+      "author": {
+        "zh": "竹瑾居研究部",
+        "en": "Zhu Jin Ju Research Desk"
+      },
+      "date": "2025.11.06",
+      "excerpt": {
+        "zh": "真正重要的观看，不是迅速确认题材，而是在比例、体量与工艺节奏里建立判断。",
+        "en": "The most important act of looking is not quick identification, but judgement built through proportion, mass, and the rhythm of workmanship."
+      },
+      "body": [
+        {
+          "zh": "观看金铜造像时，最先进入视线的往往是题材与姿态，但真正构成作品层次的，是比例、结构与细部处理之间的内在关系。",
+          "en": "When looking at gilt bronze sculpture, subject and pose are often the first things seen, yet what truly gives a work depth is the internal relation between proportion, structure, and detail."
+        },
+        {
+          "zh": "例如肩部如何展开、胸腹如何起伏、手指与莲座是否保持稳定节奏，这些因素共同决定了一件作品的时代气息与完成度。",
+          "en": "How the shoulders open, how the torso rises and settles, and whether the fingers and lotus base maintain a steady rhythm all contribute to a work's period character and level of completion."
+        },
+        {
+          "zh": "因此，竹瑾居在呈现造像时更重视近距离观看与并置比较，而不是以单一标签替代完整判断。",
+          "en": "For this reason, Zhu Jin Ju favors close viewing and comparative display rather than allowing a single label to stand in for complete judgement."
+        }
+      ],
+      "keywords": [
+        {
+          "zh": "铜造像",
+          "en": "Bronze Sculpture"
+        },
+        {
+          "zh": "观看方法",
+          "en": "Close Looking"
+        },
+        {
+          "zh": "比例判断",
+          "en": "Proportion"
+        }
+      ],
+      "relatedArtworkSlugs": [
+        "ekadasamukha-avalokiteshvara",
+        "green-tara-malla",
+        "shakyamuni-bhumisparsha"
+      ],
+      "relatedExhibitionSlugs": [
+        "silent-radiance"
+      ],
+      "cover": "/api/placeholder/how-to-look-at-a-bronze?kind=landscape"
+    },
+    {
+      "slug": "thangka-as-structure",
+      "title": {
+        "zh": "唐卡的价值，不只在设色",
+        "en": "The Value of a Thangka Is Not Only Color"
+      },
+      "category": {
+        "zh": "市场观察",
+        "en": "Market Observation"
+      },
+      "column": {
+        "zh": "作品判断",
+        "en": "Object Judgement"
+      },
+      "author": {
+        "zh": "竹瑾居",
+        "en": "Zhu Jin Ju"
+      },
+      "date": "2025.08.14",
+      "excerpt": {
+        "zh": "设色只是表层入口，图像秩序、尺幅关系与保存状态同样决定作品能否成立。",
+        "en": "Color is only the surface entry point; iconographic order, scale, and condition are equally decisive."
+      },
+      "body": [
+        {
+          "zh": "在市场讨论中，唐卡常被简化为颜色是否鲜明、金线是否充足，但真正构成作品品质的，是图像系统是否完整、笔法是否稳定，以及画面各部分是否保持必要的秩序。",
+          "en": "In the market, thangkas are often reduced to brightness of color or abundance of gold line, yet true quality rests on a complete iconographic system, stable brushwork, and overall pictorial order."
+        },
+        {
+          "zh": "尤其在高等级作品中，设色并不追求炫目，而是服务于图像结构与观看节奏。",
+          "en": "In higher-level works, color rarely aims for spectacle; it serves structure and the pacing of vision."
+        },
+        {
+          "zh": "这也是我们在展览与图录中强调局部细节与整体布局并重的原因。",
+          "en": "This is why our exhibitions and catalogues give equal weight to details and the total composition."
+        }
+      ],
+      "keywords": [
+        {
+          "zh": "唐卡",
+          "en": "Thangka"
+        },
+        {
+          "zh": "设色",
+          "en": "Pigment"
+        },
+        {
+          "zh": "保存状态",
+          "en": "Condition"
+        }
+      ],
+      "relatedArtworkSlugs": [
+        "manjushri-thangka",
+        "vajrapani-thangka"
+      ],
+      "relatedExhibitionSlugs": [
+        "between-gilding-and-pigment"
+      ],
+      "cover": "/api/placeholder/thangka-as-structure?kind=landscape"
+    },
+    {
+      "slug": "why-exhibitions-matter",
+      "title": {
+        "zh": "为什么我们持续做展览与图录",
+        "en": "Why We Continue to Make Exhibitions and Catalogues"
+      },
+      "category": {
+        "zh": "展览札记",
+        "en": "Exhibition Note"
+      },
+      "column": {
+        "zh": "策展工作",
+        "en": "Curatorial Practice"
+      },
+      "author": {
+        "zh": "竹瑾居",
+        "en": "Zhu Jin Ju"
+      },
+      "date": "2025.03.21",
+      "excerpt": {
+        "zh": "展览不是销售陈列的延伸，而是把判断公开、把研究组织成可被观看的方式。",
+        "en": "An exhibition is not an extension of display for sale, but a way of making judgement public and research visible."
+      },
+      "body": [
+        {
+          "zh": "对古代艺术而言，展览的意义不只是集中呈现作品，更在于建立清晰的观看结构，让作品之间形成可比较、可讨论的关系。",
+          "en": "For historical art, the value of an exhibition lies not only in gathering works, but in creating a clear structure of viewing through which works can be compared and discussed."
+        },
+        {
+          "zh": "图录则承担另一层功能，它把现场经验沉淀为可检索、可引用的文字与图像档案。",
+          "en": "The catalogue serves another purpose, condensing the exhibition experience into searchable, citable texts and images."
+        },
+        {
+          "zh": "竹瑾居把展览与图录视为品牌工作的核心，因为它们直接决定专业判断是否能够被长期保存与传递。",
+          "en": "Zhu Jin Ju treats exhibitions and catalogues as central to its practice because they directly determine whether professional judgement can be preserved and transmitted over time."
+        }
+      ],
+      "keywords": [
+        {
+          "zh": "展览",
+          "en": "Exhibition"
+        },
+        {
+          "zh": "图录",
+          "en": "Catalogue"
+        },
+        {
+          "zh": "研究输出",
+          "en": "Research Output"
+        }
+      ],
+      "relatedArtworkSlugs": [
+        "ekadasamukha-avalokiteshvara",
+        "manjushri-thangka",
+        "ritual-conch-set"
+      ],
+      "relatedExhibitionSlugs": [
+        "silent-radiance",
+        "between-gilding-and-pigment"
+      ],
+      "cover": "/api/placeholder/why-exhibitions-matter?kind=landscape"
+    }
+  ]
+}

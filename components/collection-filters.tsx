@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { bt, formatInlineText } from "@/lib/bilingual";
-import { filterOptions } from "@/lib/site-data";
+import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
 import { ActionLabel } from "./action-label";
 import { BilingualText } from "./bilingual-text";
@@ -13,16 +13,23 @@ type CollectionFiltersProps = {
     period?: string;
     material?: string;
   };
+  options: {
+    all: BilingualValue;
+    categories: BilingualValue[];
+    regions: BilingualValue[];
+    periods: BilingualValue[];
+    materials: BilingualValue[];
+  };
 };
 
-const filterFields = [
-  { name: "category", label: bt("品类", "Category"), options: filterOptions.categories },
-  { name: "region", label: bt("地区", "Region"), options: filterOptions.regions },
-  { name: "period", label: bt("年代", "Period"), options: filterOptions.periods },
-  { name: "material", label: bt("材质", "Material"), options: filterOptions.materials },
-] as const;
+export function CollectionFilters({ current, options }: CollectionFiltersProps) {
+  const filterFields = [
+    { name: "category", label: bt("品类", "Category"), options: options.categories },
+    { name: "region", label: bt("地区", "Region"), options: options.regions },
+    { name: "period", label: bt("年代", "Period"), options: options.periods },
+    { name: "material", label: bt("材质", "Material"), options: options.materials },
+  ] as const;
 
-export function CollectionFilters({ current }: CollectionFiltersProps) {
   return (
     <form
       action="/collection"
@@ -43,7 +50,7 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
             defaultValue={current[field.name]}
             className="h-11 rounded-none border border-[var(--line)] bg-[var(--surface)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           >
-            <option value={filterOptions.all.zh}>{formatInlineText(filterOptions.all)}</option>
+            <option value={options.all.zh}>{formatInlineText(options.all)}</option>
             {field.options.map((option) => (
               <option key={option.zh} value={option.zh}>
                 {formatInlineText(option)}

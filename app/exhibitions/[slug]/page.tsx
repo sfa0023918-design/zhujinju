@@ -9,10 +9,10 @@ import { ArtworkCard } from "@/components/artwork-card";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import {
-  exhibitions,
   getArticlesBySlugs,
   getExhibitionBySlug,
   getHighlightedArtworks,
+  loadSiteContent,
 } from "@/lib/site-data";
 
 type ExhibitionDetailPageProps = {
@@ -22,7 +22,9 @@ type ExhibitionDetailPageProps = {
 };
 
 export async function generateStaticParams() {
-  return exhibitions.map((exhibition) => ({
+  const content = await loadSiteContent();
+
+  return content.exhibitions.map((exhibition) => ({
     slug: exhibition.slug,
   }));
 }
@@ -31,13 +33,15 @@ export async function generateMetadata({
   params,
 }: ExhibitionDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const exhibition = getExhibitionBySlug(slug);
+  const content = await loadSiteContent();
+  const exhibition = getExhibitionBySlug(content, slug);
 
   if (!exhibition) {
     return buildMetadata({
       title: bt("展览未找到", "Exhibition Not Found"),
       description: bt("当前展览不存在或尚未公开。", "This exhibition is unavailable or not yet published."),
       path: "/exhibitions",
+      site: content.siteConfig,
     });
   }
 
@@ -45,6 +49,7 @@ export async function generateMetadata({
     title: exhibition.title,
     description: exhibition.intro,
     path: `/exhibitions/${exhibition.slug}`,
+    site: content.siteConfig,
   });
 }
 
@@ -52,14 +57,15 @@ export default async function ExhibitionDetailPage({
   params,
 }: ExhibitionDetailPageProps) {
   const { slug } = await params;
-  const exhibition = getExhibitionBySlug(slug);
+  const content = await loadSiteContent();
+  const exhibition = getExhibitionBySlug(content, slug);
 
   if (!exhibition) {
     notFound();
   }
 
-  const highlightArtworks = getHighlightedArtworks(exhibition.highlightArtworkSlugs);
-  const relatedArticles = getArticlesBySlugs(exhibition.relatedArticleSlugs);
+  const highlightArtworks = getHighlightedArtworks(content, exhibition.highlightArtworkSlugs);
+  const relatedArticles = getArticlesBySlugs(content, exhibition.relatedArticleSlugs);
 
   return (
     <>

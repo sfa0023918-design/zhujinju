@@ -6,15 +6,22 @@ import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { articles } from "@/lib/site-data";
+import { loadSiteContent } from "@/lib/site-data";
 
-export const metadata = buildMetadata({
-  title: bt("文章", "Journal"),
-  description: bt("阅读竹瑾居发布的展览资讯、研究文章、市场观察与学术短文。", "Read exhibition notes, research writing, market observations, and short scholarly texts from Zhu Jin Ju."),
-  path: "/journal",
-});
+export async function generateMetadata() {
+  const { siteConfig } = await loadSiteContent();
 
-export default function JournalPage() {
+  return buildMetadata({
+    title: bt("文章", "Journal"),
+    description: bt("阅读竹瑾居发布的展览资讯、研究文章、市场观察与学术短文。", "Read exhibition notes, research writing, market observations, and short scholarly texts from Zhu Jin Ju."),
+    path: "/journal",
+    site: siteConfig,
+  });
+}
+
+export default async function JournalPage() {
+  const { articles } = await loadSiteContent();
+
   return (
     <>
       <PageHero
