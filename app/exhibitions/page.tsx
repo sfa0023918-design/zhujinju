@@ -30,10 +30,10 @@ export default function ExhibitionsPage() {
         )}
       />
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-10 md:pb-20">
-        <div className="grid gap-12">
+      <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
+        <div className="grid gap-10">
           {exhibitions.map((exhibition) => (
-            <article key={exhibition.slug} className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-[minmax(0,0.72fr)_minmax(320px,0.48fr)]">
+            <article key={exhibition.slug} className="grid gap-6 border-t border-[var(--line)] pt-7 md:grid-cols-[minmax(0,0.68fr)_minmax(320px,0.52fr)]">
               <Link href={`/exhibitions/${exhibition.slug}`} className="relative overflow-hidden bg-[var(--surface-strong)]">
                 <Image
                   src={exhibition.cover}
@@ -41,11 +41,11 @@ export default function ExhibitionsPage() {
                   width={1600}
                   height={1000}
                   unoptimized
-                  className="aspect-[1.5/1] h-full w-full object-cover"
+                  className="aspect-[1.45/1] h-full w-full object-cover"
                 />
               </Link>
               <div className="flex flex-col justify-between gap-5">
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <BilingualText
                     as="p"
                     text={exhibition.subtitle}
@@ -93,8 +93,10 @@ export default function ExhibitionsPage() {
                   <p className="border-l border-[var(--line)] pl-4 text-sm leading-7 text-[var(--muted)]">
                     {exhibition.curatorialLead.zh}
                   </p>
-                  <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
-                  <p>{exhibition.catalogueIntro.zh}</p>
+                  <div className="space-y-2">
+                    <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
+                    <p>{exhibition.catalogueIntro.zh}</p>
+                  </div>
                   <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex text-[var(--ink)]">
                     <ActionLabel text={bt("查看展览详情", "View Exhibition")} align="start" />
                   </Link>

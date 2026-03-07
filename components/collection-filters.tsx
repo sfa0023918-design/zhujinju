@@ -26,7 +26,7 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
   return (
     <form
       action="/collection"
-      className="grid gap-4 border-y border-[var(--line)] py-5 md:grid-cols-[repeat(4,minmax(0,1fr))_auto_auto]"
+      className="grid gap-4 border-y border-[var(--line)] py-5 md:grid-cols-[repeat(4,minmax(0,1fr))_minmax(280px,0.9fr)]"
     >
       {filterFields.map((field) => (
         <label key={field.name} className="grid gap-2 text-sm text-[var(--muted)]">
@@ -52,18 +52,30 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
           </select>
         </label>
       ))}
-      <button
-        type="submit"
-        className="inline-flex h-11 items-center justify-center self-end border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
-      >
-        <ActionLabel text={bt("筛选结果", "Apply Filters")} />
-      </button>
-      <Link
-        href="/collection"
-        className="inline-flex h-11 items-center justify-center self-end border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
-      >
-        <ActionLabel text={bt("重置筛选", "Reset Filters")} />
-      </Link>
+      <div className="grid gap-2 text-sm text-[var(--muted)]">
+        <BilingualText
+          as="span"
+          text={bt("操作", "Actions")}
+          mode="inline"
+          className="text-[var(--accent)]"
+          zhClassName="text-[0.72rem] tracking-[0.18em]"
+          enClassName="text-[0.5rem] uppercase tracking-[0.16em]"
+        />
+        <div className="grid gap-3 md:grid-cols-2">
+          <button
+            type="submit"
+            className="inline-flex h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
+          >
+            <ActionLabel text={bt("筛选结果", "Apply Filters")} />
+          </button>
+          <Link
+            href="/collection"
+            className="inline-flex h-11 items-center justify-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+          >
+            <ActionLabel text={bt("重置筛选", "Reset Filters")} />
+          </Link>
+        </div>
+      </div>
     </form>
   );
 }

@@ -91,7 +91,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               className="aspect-[4/5] h-full w-full object-cover"
             />
           </div>
-          <aside className="space-y-8 md:sticky md:top-8 md:self-start">
+          <aside className="space-y-7 md:sticky md:top-8 md:self-start">
             <div className="space-y-5 border-t border-[var(--line)] pt-5">
               <div className="flex items-center justify-between gap-4">
                 <BilingualText
@@ -124,9 +124,9 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               <p className="text-sm leading-8 text-[var(--muted)]">{artwork.excerpt.zh}</p>
             </div>
 
-            <dl className="grid gap-4 border-t border-[var(--line)] pt-5 text-sm">
+            <dl className="divide-y divide-[var(--line)] border-t border-[var(--line)] pt-1 text-sm">
               {fieldRows.map((field) => (
-                <div key={field.key} className="grid grid-cols-[118px_1fr] gap-4">
+                <div key={field.key} className="grid grid-cols-[112px_1fr] gap-4 py-4">
                   <BilingualText
                     as="dt"
                     text={field.label}
@@ -151,16 +151,16 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               ))}
             </dl>
 
-            <div className="grid gap-3 border-t border-[var(--line)] pt-5">
+            <div className="grid gap-4 border-t border-[var(--line)] pt-5">
               <Link
                 href={`/contact?artwork=${encodeURIComponent(formatInlineText(artwork.title))}`}
                 className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
                 <ActionLabel text={bt("询洽此件作品", "Inquire")} />
               </Link>
-              <ul className="grid gap-2 text-[0.84rem] leading-6 text-[var(--muted)]">
+              <ul className="grid gap-px border border-[var(--line)] bg-[var(--line)] text-[0.82rem] leading-6 text-[var(--muted)]">
                 {artwork.inquirySupport.map((item) => (
-                  <li key={item.zh} className="border-l border-[var(--line)] pl-3">
+                  <li key={item.zh} className="bg-[var(--surface)] px-4 py-3">
                     {item.zh}
                   </li>
                 ))}
@@ -176,7 +176,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.95fr)_minmax(0,0.75fr)] md:px-10 md:py-20">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,0.95fr)_minmax(0,0.75fr)] md:px-10 md:py-24">
         <div>
           <BilingualText
             as="p"
@@ -215,7 +215,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             </div>
           </div>
         </div>
-        <div className="grid gap-8">
+        <div className="grid gap-7">
           <div className="border-t border-[var(--line)] pt-5">
             <BilingualText
               as="h2"
@@ -329,8 +329,8 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
       </section>
 
       {related.length > 0 ? (
-        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
-          <div className="mb-10 flex items-end justify-between gap-4">
+        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
+          <div className="mb-8 flex items-end justify-between gap-4">
             <div>
               <BilingualText
                 as="p"
@@ -349,7 +349,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
               />
             </div>
           </div>
-          <div className="grid gap-8">
+          <div className="grid gap-7">
             {related.map((item) => (
               <ArtworkCard key={item.slug} artwork={item} />
             ))}

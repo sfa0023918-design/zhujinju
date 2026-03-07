@@ -85,7 +85,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-20">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-24">
         <SectionIntro
           eyebrow={focusEyebrow}
           title={currentExhibition.title}
@@ -109,7 +109,7 @@ export default function HomePage() {
               className="aspect-[1.45/1] h-full w-full object-cover"
             />
           </div>
-          <div className="grid gap-6 border-t border-[var(--line)] pt-6 md:grid-cols-[0.68fr_0.32fr]">
+          <div className="grid gap-7 border-t border-[var(--line)] pt-7 md:grid-cols-[0.68fr_0.32fr]">
             <BilingualText
               as="p"
               text={currentExhibition.curatorialLead}
@@ -148,7 +148,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 py-14 md:px-10 md:py-20">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro
           eyebrow={bt("精选作品", "Selected Works")}
           title={bt("以作品为核心组织观看顺序", "A Viewing Order Built Around the Object")}
@@ -157,14 +157,14 @@ export default function HomePage() {
             "Works of stylistic weight, comparative value, and visual tension are foregrounded, with the layout kept in service of the object."
           )}
         />
-        <div className="mt-11 grid gap-9">
+        <div className="mt-10 grid gap-8">
           {featuredArtworks.slice(0, 4).map((artwork, index) => (
             <ArtworkCard key={artwork.slug} artwork={artwork} priority={index < 2} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro
           eyebrow={bt("收藏方向", "Collecting Directions")}
           title={bt("围绕明确而长期的研究线索展开", "Structured by Clear and Long-Term Research Lines")}
@@ -175,7 +175,7 @@ export default function HomePage() {
         />
         <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
           {collectingDirections.map((direction) => (
-            <div key={direction.name.zh} className="bg-[var(--surface-strong)] p-6">
+            <div key={direction.name.zh} className="bg-[var(--surface-strong)] p-7">
               <BilingualText
                 as="h3"
                 text={direction.name}
@@ -195,7 +195,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
         <SectionIntro
           eyebrow={bt("专业信任", "Professional Trust")}
           title={bt("由展览、图录与研究累积出的公开方法", "A Public Method Built Through Exhibitions, Catalogues, and Research")}
@@ -233,7 +233,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-[1480px] gap-8 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,1fr)_340px] md:px-10 md:py-18">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-8 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,1fr)_340px] md:px-10 md:py-20">
         <div className="space-y-4">
           <BilingualText
             as="p"
@@ -262,7 +262,7 @@ export default function HomePage() {
             enClassName="text-[0.76rem] leading-7 text-[var(--accent)]/75"
           />
         </div>
-        <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm text-[var(--muted)] md:pt-0">
+        <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm text-[var(--muted)] md:border-t-0 md:border-l md:pl-8 md:pt-0">
           <Link href="/contact" className="inline-flex text-[var(--ink)]">
             <ActionLabel text={bt("前往联系页面", "Contact Page")} align="start" />
           </Link>
