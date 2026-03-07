@@ -41,6 +41,41 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-4">
+        <Link
+          href="/admin/content/pageCopy"
+          className="border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--line-strong)]"
+        >
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">快速开始</p>
+          <p className="mt-3 text-[1.05rem] text-[var(--ink)]">修改页面文案</p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted)]">按网站页面顺序修改最常用的固定文字。</p>
+        </Link>
+        <Link
+          href="/admin/content/artworks?new=1"
+          className="border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--line-strong)]"
+        >
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">快速新增</p>
+          <p className="mt-3 text-[1.05rem] text-[var(--ink)]">新增一件藏品</p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted)]">直接打开新藏品表单，从主图和标题开始填。</p>
+        </Link>
+        <Link
+          href="/admin/content/exhibitions?new=1"
+          className="border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--line-strong)]"
+        >
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">快速新增</p>
+          <p className="mt-3 text-[1.05rem] text-[var(--ink)]">新增一个展览</p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted)]">直接打开新展览表单，从封面和时间地点开始填。</p>
+        </Link>
+        <Link
+          href="/admin/content/articles?new=1"
+          className="border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--line-strong)]"
+        >
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">快速新增</p>
+          <p className="mt-3 text-[1.05rem] text-[var(--ink)]">新增一篇文章</p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted)]">直接打开新文章表单，从封面和标题开始填。</p>
+        </Link>
+      </div>
+
       <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-4">
         {overview.map((item) => (
           <div key={item.label} className="bg-[var(--surface)] p-6">

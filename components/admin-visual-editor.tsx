@@ -28,6 +28,7 @@ type AdminVisualEditorProps = {
   description: string;
   initialValue: SiteContent[EditableSectionKey];
   content: SiteContent;
+  autoCreate?: boolean;
 };
 
 function emptyBilingual(): BilingualText {
@@ -482,6 +483,37 @@ function EditorSection({
   );
 }
 
+function WorkflowSteps({
+  title,
+  steps,
+}: {
+  title: string;
+  steps: Array<{ label: string; description: string }>;
+}) {
+  return (
+    <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-5">
+      <Label>{title}</Label>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {steps.map((step, index) => (
+          <div key={step.label} className="border border-[var(--line)] bg-white/40 p-4">
+            <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]">{`步骤 ${index + 1}`}</p>
+            <p className="mt-3 text-sm leading-7 text-[var(--ink)]">{step.label}</p>
+            <p className="mt-2 text-sm leading-7 text-[var(--muted)]">{step.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HelperNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-[var(--line)] bg-white/40 px-4 py-3 text-sm leading-7 text-[var(--muted)]">
+      {children}
+    </div>
+  );
+}
+
 function MediaGalleryEditor({
   label,
   folder,
@@ -544,6 +576,7 @@ export function AdminVisualEditor({
   description,
   initialValue,
   content,
+  autoCreate = false,
 }: AdminVisualEditorProps) {
   const [state, formAction, pending] = useActionState(action, initialState);
   const [draft, setDraft] = useState<SiteContent[EditableSectionKey]>(() => cloneValue(initialValue));
@@ -553,6 +586,41 @@ export function AdminVisualEditor({
     setDraft(cloneValue(initialValue));
     setSelectedIndex(0);
   }, [initialValue, section]);
+
+  useEffect(() => {
+    if (!autoCreate) {
+      return;
+    }
+
+    if (section === "artworks") {
+      setDraft((current) => {
+        const items = cloneValue(current as Artwork[]);
+        items.push(createArtwork());
+        return items as SiteContent[EditableSectionKey];
+      });
+      setSelectedIndex((initialValue as Artwork[]).length);
+      return;
+    }
+
+    if (section === "exhibitions") {
+      setDraft((current) => {
+        const items = cloneValue(current as Exhibition[]);
+        items.push(createExhibition());
+        return items as SiteContent[EditableSectionKey];
+      });
+      setSelectedIndex((initialValue as Exhibition[]).length);
+      return;
+    }
+
+    if (section === "articles") {
+      setDraft((current) => {
+        const items = cloneValue(current as Article[]);
+        items.push(createArticle());
+        return items as SiteContent[EditableSectionKey];
+      });
+      setSelectedIndex((initialValue as Article[]).length);
+    }
+  }, [autoCreate, initialValue, section]);
 
   function updateDraft(recipe: (value: SiteContent[EditableSectionKey]) => void) {
     setDraft((current) => {
@@ -2162,24 +2230,35 @@ export function AdminVisualEditor({
 
       return (
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-          <ListManager
-            label="藏品列表"
-            items={items}
-            selectedIndex={selectedIndex}
-            onSelect={setSelectedIndex}
-            onAdd={() => {
-              updateDraft((item) => (item as Artwork[]).push(createArtwork()));
-              setSelectedIndex(items.length);
-            }}
-            onRemove={(index) => {
-              updateDraft((item) => {
-                const next = removeArrayItem(item as Artwork[], index);
-                (item as Artwork[]).splice(0, (item as Artwork[]).length, ...next);
-              });
-              setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
-            }}
-            renderLabel={(index) => items[index]?.title.zh || items[index]?.slug || `藏品 ${index + 1}`}
-          />
+          <div className="space-y-4">
+            <WorkflowSteps
+              title="藏品编辑建议顺序"
+              steps={[
+                { label: "先新增或选中一件作品", description: "左侧选中已有作品，或点“新增”自动打开新条目。" },
+                { label: "先填主图和基础信息", description: "先填标题、年代、地区、材质，前台列表就能成形。" },
+                { label: "再补学术说明和来源记录", description: "观看描述、比较判断、来源、展览、出版建议后补。" },
+                { label: "最后勾选关联文章和展览", description: "这样前台详情页会自动出现互链。" },
+              ]}
+            />
+            <ListManager
+              label="藏品列表"
+              items={items}
+              selectedIndex={selectedIndex}
+              onSelect={setSelectedIndex}
+              onAdd={() => {
+                updateDraft((item) => (item as Artwork[]).push(createArtwork()));
+                setSelectedIndex(items.length);
+              }}
+              onRemove={(index) => {
+                updateDraft((item) => {
+                  const next = removeArrayItem(item as Artwork[], index);
+                  (item as Artwork[]).splice(0, (item as Artwork[]).length, ...next);
+                });
+                setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
+              }}
+              renderLabel={(index) => items[index]?.title.zh || items[index]?.slug || `藏品 ${index + 1}`}
+            />
+          </div>
 
           {current ? (
             <div className="grid gap-6">
@@ -2198,6 +2277,7 @@ export function AdminVisualEditor({
                 description="先整理主图、细节图、标题和作品基础信息。"
               >
                 <div className="grid gap-4">
+                  <HelperNote>最少先填 5 项：主图、作品标题、年代、地区、材质。这样前台列表和详情页就已经能正常显示。</HelperNote>
                   <AdminMediaField
                     label="藏品主图"
                     folder="artworks"
@@ -2337,6 +2417,7 @@ export function AdminVisualEditor({
                 description="这部分对应前台藏品详情页的摘要、观看描述和比较判断。"
               >
                 <div className="grid gap-4">
+                  <HelperNote>如果时间有限，先写“简述”。观看描述和比较判断可以后补。</HelperNote>
                   <BilingualTextarea
                     label="简述"
                     rows={4}
@@ -2376,6 +2457,7 @@ export function AdminVisualEditor({
                 description="管理 provenance、展览记录和出版信息。"
               >
                 <div className="grid gap-6">
+              <HelperNote>来源、展览、出版都支持一条一条新增。暂时没有的信息可以先留空，不会影响保存。</HelperNote>
               <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
                 <div className="flex items-center justify-between gap-4">
                   <Label>来源 / Provenance</Label>
@@ -2595,6 +2677,7 @@ export function AdminVisualEditor({
                 description="控制询洽补充说明，以及作品和展览、文章之间的互链。"
               >
                 <div className="grid gap-6">
+              <HelperNote>这一步不是必填，但建议至少关联一篇文章或一个展览，前台会更完整。</HelperNote>
               <div className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-4">
                 <div className="flex items-center justify-between gap-4">
                   <Label>询洽补充信息</Label>
@@ -2693,24 +2776,35 @@ export function AdminVisualEditor({
 
       return (
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-          <ListManager
-            label="展览列表"
-            items={items}
-            selectedIndex={selectedIndex}
-            onSelect={setSelectedIndex}
-            onAdd={() => {
-              updateDraft((item) => (item as Exhibition[]).push(createExhibition()));
-              setSelectedIndex(items.length);
-            }}
-            onRemove={(index) => {
-              updateDraft((item) => {
-                const next = removeArrayItem(item as Exhibition[], index);
-                (item as Exhibition[]).splice(0, (item as Exhibition[]).length, ...next);
-              });
-              setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
-            }}
-            renderLabel={(index) => items[index]?.title.zh || items[index]?.slug || `展览 ${index + 1}`}
-          />
+          <div className="space-y-4">
+            <WorkflowSteps
+              title="展览编辑建议顺序"
+              steps={[
+                { label: "先新增或选中一个展览", description: "左侧新增后会自动打开新展览。" },
+                { label: "先填封面、标题、时间地点", description: "这些信息会先出现在前台列表页。" },
+                { label: "再补导语、图录和正文", description: "图录标题、页数、策展前言和正文可分步完善。" },
+                { label: "最后勾选重点作品和相关文章", description: "这样展览页会自动形成互链。" },
+              ]}
+            />
+            <ListManager
+              label="展览列表"
+              items={items}
+              selectedIndex={selectedIndex}
+              onSelect={setSelectedIndex}
+              onAdd={() => {
+                updateDraft((item) => (item as Exhibition[]).push(createExhibition()));
+                setSelectedIndex(items.length);
+              }}
+              onRemove={(index) => {
+                updateDraft((item) => {
+                  const next = removeArrayItem(item as Exhibition[], index);
+                  (item as Exhibition[]).splice(0, (item as Exhibition[]).length, ...next);
+                });
+                setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
+              }}
+              renderLabel={(index) => items[index]?.title.zh || items[index]?.slug || `展览 ${index + 1}`}
+            />
+          </div>
 
           {current ? (
             <div className="grid gap-6">
@@ -2727,6 +2821,7 @@ export function AdminVisualEditor({
                 description="封面、标题、首页状态、时间地点和图录页数。"
               >
                 <div className="grid gap-4">
+                  <HelperNote>如果这个展览要显示在首页专题，把“设为首页当前专题 / 近期展览”打开即可。</HelperNote>
                   <AdminMediaField
                     label="展览封面"
                     folder="exhibitions"
@@ -2815,6 +2910,7 @@ export function AdminVisualEditor({
                 description="维护导语、策展前言、图录说明和正文段落。"
               >
                 <div className="grid gap-4">
+                  <HelperNote>正文段落可以只有中文，英文可以以后再补。</HelperNote>
                   <BilingualTextarea
                     label="导语"
                     rows={4}
@@ -2921,6 +3017,7 @@ export function AdminVisualEditor({
                 description="控制重点作品与相关文章。"
               >
                 <div className="grid gap-6">
+                  <HelperNote>重点作品数量会根据你勾选的作品自动计算，不需要手动填写。</HelperNote>
                   <RelationChecklist
                     label="重点作品"
                     options={artworkOptions}
@@ -2962,24 +3059,35 @@ export function AdminVisualEditor({
 
     return (
       <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-        <ListManager
-          label="文章列表"
-          items={articleItems}
-          selectedIndex={selectedIndex}
-          onSelect={setSelectedIndex}
-          onAdd={() => {
-            updateDraft((item) => (item as Article[]).push(createArticle()));
-            setSelectedIndex(articleItems.length);
-          }}
-          onRemove={(index) => {
-            updateDraft((item) => {
-              const next = removeArrayItem(item as Article[], index);
-              (item as Article[]).splice(0, (item as Article[]).length, ...next);
-            });
-            setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
-          }}
-          renderLabel={(index) => articleItems[index]?.title.zh || articleItems[index]?.slug || `文章 ${index + 1}`}
-        />
+        <div className="space-y-4">
+          <WorkflowSteps
+            title="文章编辑建议顺序"
+            steps={[
+              { label: "先新增或选中文章", description: "左侧新增后会自动打开新文章。" },
+              { label: "先填封面、标题、作者和日期", description: "文章列表页会先显示这些基本信息。" },
+              { label: "再写摘要、正文和关键词", description: "摘要先写好，前台列表就会更完整。" },
+              { label: "最后关联展览和藏品", description: "这样文章详情页能自动出现相关内容。" },
+            ]}
+          />
+          <ListManager
+            label="文章列表"
+            items={articleItems}
+            selectedIndex={selectedIndex}
+            onSelect={setSelectedIndex}
+            onAdd={() => {
+              updateDraft((item) => (item as Article[]).push(createArticle()));
+              setSelectedIndex(articleItems.length);
+            }}
+            onRemove={(index) => {
+              updateDraft((item) => {
+                const next = removeArrayItem(item as Article[], index);
+                (item as Article[]).splice(0, (item as Article[]).length, ...next);
+              });
+              setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
+            }}
+            renderLabel={(index) => articleItems[index]?.title.zh || articleItems[index]?.slug || `文章 ${index + 1}`}
+          />
+        </div>
 
         {currentArticle ? (
           <div className="grid gap-6">
@@ -2996,6 +3104,7 @@ export function AdminVisualEditor({
               description="封面、标题、作者、栏目、分类与发布时间。"
             >
               <div className="grid gap-4">
+                <HelperNote>最少先填 6 项：封面、标题、日期、作者、栏目、摘要。这样前台文章列表就会正常显示。</HelperNote>
                 <AdminMediaField
                   label="文章封面"
                   folder="articles"
@@ -3083,6 +3192,7 @@ export function AdminVisualEditor({
               description="维护文章段落和前台展示关键词。"
             >
               <div className="grid gap-6">
+                <HelperNote>正文可以只写中文，关键词建议至少填 2 到 3 个，便于后续整理内容方向。</HelperNote>
                 <div className="space-y-4 border border-[var(--line)] bg-white/40 p-4">
                   <div className="flex items-center justify-between gap-4">
                     <Label>正文段落</Label>
@@ -3207,6 +3317,7 @@ export function AdminVisualEditor({
               description="维护文章与藏品、展览之间的关联关系。"
             >
               <div className="grid gap-6">
+                <HelperNote>如果文章和某件作品或某个展览有关，建议在这里勾选，前台会自动生成互链。</HelperNote>
                 <RelationChecklist
                   label="关联藏品"
                   options={artworkOptions}

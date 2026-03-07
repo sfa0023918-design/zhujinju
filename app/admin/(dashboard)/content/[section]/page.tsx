@@ -9,10 +9,14 @@ type AdminSectionPageProps = {
   params: Promise<{
     section: string;
   }>;
+  searchParams?: Promise<{
+    new?: string;
+  }>;
 };
 
-export default async function AdminSectionPage({ params }: AdminSectionPageProps) {
+export default async function AdminSectionPage({ params, searchParams }: AdminSectionPageProps) {
   const { section } = await params;
+  const query = (await searchParams) ?? {};
   const sectionMeta = editableSections.find((item) => item.key === section);
 
   if (!sectionMeta) {
@@ -31,6 +35,7 @@ export default async function AdminSectionPage({ params }: AdminSectionPageProps
         description={sectionMeta.description.zh}
         initialValue={value}
         content={content}
+        autoCreate={query.new === "1"}
       />
     </AdminShell>
   );
