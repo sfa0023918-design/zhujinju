@@ -19,6 +19,7 @@ type AdminMediaFieldProps = {
   value: string;
   onChange: (value: string) => void;
   autoSaveAfterUpload?: boolean;
+  onRequestAutoSave?: () => void;
   previewRatio?: PreviewRatio;
   targetSize?: TargetSize;
   recommendedSize?: string;
@@ -56,6 +57,7 @@ export function AdminMediaField({
   value,
   onChange,
   autoSaveAfterUpload = true,
+  onRequestAutoSave,
   previewRatio = "portrait",
   targetSize,
   recommendedSize,
@@ -290,9 +292,7 @@ export function AdminMediaField({
       );
 
       if (autoSaveAfterUpload) {
-        window.setTimeout(() => {
-          event.currentTarget.form?.requestSubmit();
-        }, 120);
+        onRequestAutoSave?.();
       }
     } catch (uploadError) {
       replaceLocalPreview(null);

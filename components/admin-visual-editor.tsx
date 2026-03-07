@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AdminActionState } from "@/app/admin/actions";
 import type {
@@ -161,12 +161,14 @@ function TextField({
   label,
   value,
   onChange,
+  onBlur,
   placeholder,
   type = "text",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   type?: "text" | "date" | "email" | "url" | "number";
 }) {
@@ -177,6 +179,7 @@ function TextField({
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         className="min-h-11 w-full border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
       />
@@ -188,12 +191,14 @@ function TextAreaField({
   label,
   value,
   onChange,
+  onBlur,
   rows = 4,
   placeholder,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   rows?: number;
   placeholder?: string;
 }) {
@@ -204,6 +209,7 @@ function TextAreaField({
         value={value}
         rows={rows}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         className="w-full border border-[var(--line)] bg-white/60 px-3 py-3 text-sm leading-7 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
       />
@@ -224,14 +230,67 @@ function BilingualInput({
   zhPlaceholder?: string;
   enPlaceholder?: string;
 }) {
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState<string | null>(null);
+
+  async function requestTranslation(force = false) {
+    const zh = value.zh.trim();
+    const en = value.en.trim();
+
+    if (!zh || (!force && en)) {
+      return;
+    }
+
+    setTranslating(true);
+    setTranslateError(null);
+
+    try {
+      const response = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: zh,
+          label,
+        }),
+      });
+      const payload = (await response.json()) as { translation?: string; error?: string };
+
+      if (!response.ok || !payload.translation) {
+        throw new Error(payload.error ?? "英文翻译失败。");
+      }
+
+      onChange({
+        zh: value.zh,
+        en: payload.translation,
+      });
+    } catch (translationError) {
+      setTranslateError(translationError instanceof Error ? translationError.message : "英文翻译失败。");
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   return (
     <div className="grid gap-3 border border-[var(--line)] bg-[var(--surface)] p-4">
-      <Label>{label}</Label>
+      <div className="flex items-center justify-between gap-4">
+        <Label>{label}</Label>
+        <button
+          type="button"
+          onClick={() => requestTranslation(true)}
+          disabled={translating || !value.zh.trim()}
+          className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          {translating ? "翻译中..." : "根据中文生成英文"}
+        </button>
+      </div>
       <div className="grid gap-3 md:grid-cols-2">
         <TextField
           label="中文"
           value={value.zh}
           onChange={(zh) => onChange({ ...value, zh })}
+          onBlur={() => void requestTranslation(false)}
           placeholder={zhPlaceholder}
         />
         <TextField
@@ -241,6 +300,7 @@ function BilingualInput({
           placeholder={enPlaceholder}
         />
       </div>
+      {translateError ? <p className="text-sm leading-7 text-[#8e4e3b]">{translateError}</p> : null}
     </div>
   );
 }
@@ -256,15 +316,68 @@ function BilingualTextarea({
   onChange: (value: BilingualText) => void;
   rows?: number;
 }) {
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState<string | null>(null);
+
+  async function requestTranslation(force = false) {
+    const zh = value.zh.trim();
+    const en = value.en.trim();
+
+    if (!zh || (!force && en)) {
+      return;
+    }
+
+    setTranslating(true);
+    setTranslateError(null);
+
+    try {
+      const response = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: zh,
+          label,
+        }),
+      });
+      const payload = (await response.json()) as { translation?: string; error?: string };
+
+      if (!response.ok || !payload.translation) {
+        throw new Error(payload.error ?? "英文翻译失败。");
+      }
+
+      onChange({
+        zh: value.zh,
+        en: payload.translation,
+      });
+    } catch (translationError) {
+      setTranslateError(translationError instanceof Error ? translationError.message : "英文翻译失败。");
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   return (
     <div className="grid gap-3 border border-[var(--line)] bg-[var(--surface)] p-4">
-      <Label>{label}</Label>
+      <div className="flex items-center justify-between gap-4">
+        <Label>{label}</Label>
+        <button
+          type="button"
+          onClick={() => requestTranslation(true)}
+          disabled={translating || !value.zh.trim()}
+          className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          {translating ? "翻译中..." : "根据中文生成英文"}
+        </button>
+      </div>
       <div className="grid gap-3 md:grid-cols-2">
         <TextAreaField
           label="中文"
           rows={rows}
           value={value.zh}
           onChange={(zh) => onChange({ ...value, zh })}
+          onBlur={() => void requestTranslation(false)}
         />
         <TextAreaField
           label="英文"
@@ -273,6 +386,7 @@ function BilingualTextarea({
           onChange={(en) => onChange({ ...value, en })}
         />
       </div>
+      {translateError ? <p className="text-sm leading-7 text-[#8e4e3b]">{translateError}</p> : null}
     </div>
   );
 }
@@ -572,11 +686,13 @@ function MediaGalleryEditor({
   folder,
   images,
   onChange,
+  onRequestAutoSave,
 }: {
   label: string;
   folder: string;
   images: string[];
   onChange: (images: string[]) => void;
+  onRequestAutoSave?: () => void;
 }) {
   const safeImages = images.length ? images : [""];
 
@@ -610,6 +726,7 @@ function MediaGalleryEditor({
               folder={folder}
               value={image}
               targetSize={{ width: 1200, height: 1500 }}
+              onRequestAutoSave={onRequestAutoSave}
               onChange={(next) => {
                 const nextImages = [...safeImages];
                 nextImages[index] = next;
@@ -637,6 +754,9 @@ export function AdminVisualEditor({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [hydrated, setHydrated] = useState(false);
   const [autosaveState, setAutosaveState] = useState<"idle" | "restored" | "saved">("idle");
+  const [queuedUploadSave, setQueuedUploadSave] = useState(0);
+  const [submittedUploadSave, setSubmittedUploadSave] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     setDraft(cloneValue(initialValue));
@@ -738,6 +858,19 @@ export function AdminVisualEditor({
     setAutosaveState("idle");
   }, [section, state.success]);
 
+  const serialized = useMemo(() => JSON.stringify(draft), [draft]);
+
+  useEffect(() => {
+    if (!hydrated || pending || !queuedUploadSave || queuedUploadSave === submittedUploadSave) {
+      return;
+    }
+
+    setSubmittedUploadSave(queuedUploadSave);
+    window.setTimeout(() => {
+      formRef.current?.requestSubmit();
+    }, 0);
+  }, [hydrated, pending, queuedUploadSave, serialized, submittedUploadSave]);
+
   function updateDraft(recipe: (value: SiteContent[EditableSectionKey]) => void) {
     setDraft((current) => {
       const next = cloneValue(current);
@@ -745,8 +878,6 @@ export function AdminVisualEditor({
       return next;
     });
   }
-
-  const serialized = useMemo(() => JSON.stringify(draft), [draft]);
   const articleOptions = content.articles.map((article) => ({
     value: article.slug,
     title: article.title.zh || article.slug,
@@ -769,6 +900,10 @@ export function AdminVisualEditor({
     setDraft(cloneValue(initialValue));
     setSelectedIndex(0);
     setAutosaveState("idle");
+  }
+
+  function queueAutoSaveAfterUpload() {
+    setQueuedUploadSave(Date.now());
   }
 
   function getPreviewHref() {
@@ -847,6 +982,7 @@ export function AdminVisualEditor({
             folder="site"
             value={value.ogImagePath}
             onChange={(next) => updateDraft((item) => ((item as SiteConfigContent).ogImagePath = next))}
+            onRequestAutoSave={queueAutoSaveAfterUpload}
             note="可上传用于 Open Graph / 社交分享的图片，也可以保留现有生成图。"
             previewRatio="landscape"
             targetSize={{ width: 1200, height: 630 }}
@@ -1217,38 +1353,22 @@ export function AdminVisualEditor({
                             删除
                           </button>
                         </div>
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <TextField
-                            label="中文"
-                            value={option.zh}
-                            onChange={(next) =>
-                              updateDraft((item) => {
-                                (item as PageCopyContent).siteChrome.contactForm.roleOptions = updateArrayItem(
-                                  (item as PageCopyContent).siteChrome.contactForm.roleOptions,
-                                  index,
-                                  (target) => {
-                                    target.zh = next;
-                                  },
-                                );
-                              })
-                            }
-                          />
-                          <TextField
-                            label="英文"
-                            value={option.en}
-                            onChange={(next) =>
-                              updateDraft((item) => {
-                                (item as PageCopyContent).siteChrome.contactForm.roleOptions = updateArrayItem(
-                                  (item as PageCopyContent).siteChrome.contactForm.roleOptions,
-                                  index,
-                                  (target) => {
-                                    target.en = next;
-                                  },
-                                );
-                              })
-                            }
-                          />
-                        </div>
+                        <BilingualInput
+                          label={`身份 ${index + 1}`}
+                          value={option}
+                          onChange={(next) =>
+                            updateDraft((item) => {
+                              (item as PageCopyContent).siteChrome.contactForm.roleOptions = updateArrayItem(
+                                (item as PageCopyContent).siteChrome.contactForm.roleOptions,
+                                index,
+                                (target) => {
+                                  target.zh = next.zh;
+                                  target.en = next.en;
+                                },
+                              );
+                            })
+                          }
+                        />
                       </div>
                     ))}
                   </div>
@@ -2163,6 +2283,7 @@ export function AdminVisualEditor({
             folder="site"
             value={value.heroImage ?? ""}
             onChange={(next) => updateDraft((item) => ((item as BrandIntroContent).heroImage = next))}
+            onRequestAutoSave={queueAutoSaveAfterUpload}
             note="用于首页首屏主图。上传后保存即可更新。"
             previewRatio="landscape"
             targetSize={{ width: 1600, height: 1400 }}
@@ -2221,40 +2342,23 @@ export function AdminVisualEditor({
                       删除
                     </button>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <TextAreaField
-                      label="中文"
-                      rows={3}
-                      value={entry.zh}
-                      onChange={(next) =>
-                        updateDraft((item) => {
-                          (item as BrandIntroContent).methodology = updateArrayItem(
-                            (item as BrandIntroContent).methodology,
-                            index,
-                            (target) => {
-                              target.zh = next;
-                            },
-                          );
-                        })
-                      }
-                    />
-                    <TextAreaField
-                      label="英文"
-                      rows={3}
-                      value={entry.en}
-                      onChange={(next) =>
-                        updateDraft((item) => {
-                          (item as BrandIntroContent).methodology = updateArrayItem(
-                            (item as BrandIntroContent).methodology,
-                            index,
-                            (target) => {
-                              target.en = next;
-                            },
-                          );
-                        })
-                      }
-                    />
-                  </div>
+                  <BilingualTextarea
+                    label={`方法论 ${index + 1}`}
+                    rows={3}
+                    value={entry}
+                    onChange={(next) =>
+                      updateDraft((item) => {
+                        (item as BrandIntroContent).methodology = updateArrayItem(
+                          (item as BrandIntroContent).methodology,
+                          index,
+                          (target) => {
+                            target.zh = next.zh;
+                            target.en = next.en;
+                          },
+                        );
+                      })
+                    }
+                  />
                 </div>
               ))}
             </div>
@@ -2460,6 +2564,7 @@ export function AdminVisualEditor({
                     value={current.image}
                     previewRatio="portrait"
                     targetSize={{ width: 1200, height: 1500 }}
+                    onRequestAutoSave={queueAutoSaveAfterUpload}
                     recommendedUse="藏品列表与藏品详情主图"
                     recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>
@@ -2472,6 +2577,7 @@ export function AdminVisualEditor({
                     label="细节图画廊"
                     folder="artworks"
                     images={current.gallery ?? []}
+                    onRequestAutoSave={queueAutoSaveAfterUpload}
                     onChange={(next) =>
                       updateDraft((item) => {
                         (item as Artwork[])[selectedIndex].gallery = next;
@@ -2910,26 +3016,15 @@ export function AdminVisualEditor({
                         删除
                       </button>
                     </div>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <TextField
-                        label="中文"
-                        value={entry.zh}
-                        onChange={(next) =>
-                          updateDraft((item) => {
-                            (item as Artwork[])[selectedIndex].inquirySupport[index].zh = next;
-                          })
-                        }
-                      />
-                      <TextField
-                        label="英文"
-                        value={entry.en}
-                        onChange={(next) =>
-                          updateDraft((item) => {
-                            (item as Artwork[])[selectedIndex].inquirySupport[index].en = next;
-                          })
-                        }
-                      />
-                    </div>
+                    <BilingualInput
+                      label={`提示 ${index + 1}`}
+                      value={entry}
+                      onChange={(next) =>
+                        updateDraft((item) => {
+                          (item as Artwork[])[selectedIndex].inquirySupport[index] = next;
+                        })
+                      }
+                    />
                   </div>
                 ))}
               </div>
@@ -3038,6 +3133,7 @@ export function AdminVisualEditor({
                     value={current.cover}
                     previewRatio="landscape"
                     targetSize={{ width: 1600, height: 1000 }}
+                    onRequestAutoSave={queueAutoSaveAfterUpload}
                     recommendedUse="首页专题与展览列表封面"
                     recommendedSize="1600 x 1000 像素以上，横图约 1.45:1"
                     onChange={(next) =>
@@ -3206,28 +3302,16 @@ export function AdminVisualEditor({
                             删除
                           </button>
                         </div>
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <TextAreaField
-                            label="中文"
-                            rows={4}
-                            value={entry.zh}
-                            onChange={(next) =>
-                              updateDraft((item) => {
-                                (item as Exhibition[])[selectedIndex].description[index].zh = next;
-                              })
-                            }
-                          />
-                          <TextAreaField
-                            label="英文"
-                            rows={4}
-                            value={entry.en}
-                            onChange={(next) =>
-                              updateDraft((item) => {
-                                (item as Exhibition[])[selectedIndex].description[index].en = next;
-                              })
-                            }
-                          />
-                        </div>
+                        <BilingualTextarea
+                          label={`段落 ${index + 1}`}
+                          rows={4}
+                          value={entry}
+                          onChange={(next) =>
+                            updateDraft((item) => {
+                              (item as Exhibition[])[selectedIndex].description[index] = next;
+                            })
+                          }
+                        />
                       </div>
                     ))}
                   </div>
@@ -3345,6 +3429,7 @@ export function AdminVisualEditor({
                   value={currentArticle.cover}
                   previewRatio="landscape"
                   targetSize={{ width: 1400, height: 900 }}
+                  onRequestAutoSave={queueAutoSaveAfterUpload}
                   recommendedUse="文章列表与文章详情头图"
                   recommendedSize="1400 x 900 像素以上，横图约 1.55:1"
                   onChange={(next) =>
@@ -3473,28 +3558,16 @@ export function AdminVisualEditor({
                           删除
                         </button>
                       </div>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <TextAreaField
-                          label="中文"
-                          rows={5}
-                          value={entry.zh}
-                          onChange={(next) =>
-                            updateDraft((item) => {
-                              (item as Article[])[selectedIndex].body[index].zh = next;
-                            })
-                          }
-                        />
-                        <TextAreaField
-                          label="英文"
-                          rows={5}
-                          value={entry.en}
-                          onChange={(next) =>
-                            updateDraft((item) => {
-                              (item as Article[])[selectedIndex].body[index].en = next;
-                            })
-                          }
-                        />
-                      </div>
+                      <BilingualTextarea
+                        label={`段落 ${index + 1}`}
+                        rows={5}
+                        value={entry}
+                        onChange={(next) =>
+                          updateDraft((item) => {
+                            (item as Article[])[selectedIndex].body[index] = next;
+                          })
+                        }
+                      />
                     </div>
                   ))}
                 </div>
@@ -3532,26 +3605,15 @@ export function AdminVisualEditor({
                           删除
                         </button>
                       </div>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <TextField
-                          label="中文"
-                          value={entry.zh}
-                          onChange={(next) =>
-                            updateDraft((item) => {
-                              (item as Article[])[selectedIndex].keywords[index].zh = next;
-                            })
-                          }
-                        />
-                        <TextField
-                          label="英文"
-                          value={entry.en}
-                          onChange={(next) =>
-                            updateDraft((item) => {
-                              (item as Article[])[selectedIndex].keywords[index].en = next;
-                            })
-                          }
-                        />
-                      </div>
+                      <BilingualInput
+                        label={`关键词 ${index + 1}`}
+                        value={entry}
+                        onChange={(next) =>
+                          updateDraft((item) => {
+                            (item as Article[])[selectedIndex].keywords[index] = next;
+                          })
+                        }
+                      />
                     </div>
                   ))}
                 </div>
@@ -3599,7 +3661,7 @@ export function AdminVisualEditor({
   };
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form ref={formRef} action={formAction} className="space-y-6">
       <input type="hidden" name="section" value={section} />
       <input type="hidden" name="content" value={serialized} />
       <div className="space-y-2 border-b border-[var(--line)] pb-6">
