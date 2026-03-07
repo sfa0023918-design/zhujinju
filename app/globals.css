@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Source Han Sans SC", sans-serif;
+  --font-serif:
+    "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", "Source Han Serif SC",
+    serif;
+}
+
+:root {
+  --bg: #f4f0e8;
+  --surface: #f7f3ec;
+  --surface-strong: #fbf8f2;
+  --ink: #171512;
+  --muted: #5b554d;
+  --accent: #85715a;
+  --line: rgba(23, 21, 18, 0.12);
+  --line-strong: rgba(23, 21, 18, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.58)),
+    var(--bg);
+  color: var(--ink);
+  font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+}
+
+::selection {
+  background: rgba(133, 113, 90, 0.2);
+}
+
+.site-fade-in {
+  animation: siteFadeIn 720ms ease both;
+}
+
+.rich-text p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 2;
+}
+
+.rich-text p + p {
+  margin-top: 1.1rem;
+}
+
+.rich-text ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.rich-text li + li {
+  margin-top: 0.5rem;
+}
+
+@keyframes siteFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .site-fade-in {
+    animation: none;
+  }
+
+  * {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}

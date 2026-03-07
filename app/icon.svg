@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" fill="#f4f0e8" />
+  <rect x="12" y="12" width="104" height="104" fill="none" stroke="#85715a" stroke-opacity="0.35" />
+  <path d="M44 90V36h10c14 0 22 7 22 18 0 7-3 12-9 15 10 2 16 9 16 18 0 12-9 21-27 21H44Zm12-33h7c8 0 12-3 12-10 0-6-4-9-12-9h-7v19Zm0 23h10c10 0 15-4 15-12 0-8-6-11-16-11H56v23Z" fill="#171512" />
+  <text x="64" y="108" text-anchor="middle" font-size="10" letter-spacing="4" fill="#85715a">ZJJ</text>
+</svg>
