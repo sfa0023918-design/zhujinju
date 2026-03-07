@@ -277,12 +277,13 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
     artworks: content.artworks.map((artwork) => ({
       ...artwork,
       publicationStatus: artwork.publicationStatus ?? "published",
-      gallery:
-        artwork.gallery && artwork.gallery.length > 0
-          ? artwork.gallery
-          : artwork.image
-            ? [artwork.image]
-            : [],
+      gallery: Array.from(
+        new Set(
+          (artwork.gallery ?? [])
+            .map((image) => image.trim())
+            .filter((image) => image.length > 0 && image !== artwork.image),
+        ),
+      ),
     })),
     exhibitions: content.exhibitions.map((exhibition) => ({
       ...exhibition,

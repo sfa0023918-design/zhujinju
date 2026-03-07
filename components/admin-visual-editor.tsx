@@ -681,6 +681,32 @@ function PublicationStatusField({
   );
 }
 
+const DEFAULT_GALLERY_SLOTS = 3;
+const MAX_GALLERY_SLOTS = 8;
+
+function normalizeGalleryImages(images: string[]) {
+  const normalized = images.map((image) => image.trim());
+  let lastFilledIndex = -1;
+
+  normalized.forEach((image, index) => {
+    if (image) {
+      lastFilledIndex = index;
+    }
+  });
+
+  if (lastFilledIndex < 0) {
+    return [];
+  }
+
+  return normalized.slice(0, lastFilledIndex + 1);
+}
+
+function getGallerySlots(images: string[]) {
+  const normalized = normalizeGalleryImages(images);
+  const slotCount = Math.min(MAX_GALLERY_SLOTS, Math.max(DEFAULT_GALLERY_SLOTS, normalized.length));
+  return Array.from({ length: slotCount }, (_, index) => normalized[index] ?? "");
+}
+
 function MediaGalleryEditor({
   label,
   folder,
@@ -694,32 +720,55 @@ function MediaGalleryEditor({
   onChange: (images: string[]) => void;
   onRequestAutoSave?: () => void;
 }) {
-  const safeImages = images.length ? images : [""];
+  const [visibleSlots, setVisibleSlots] = useState(() => getGallerySlots(images).length);
+
+  useEffect(() => {
+    setVisibleSlots((current) => Math.min(MAX_GALLERY_SLOTS, Math.max(current, getGallerySlots(images).length)));
+  }, [images]);
+
+  const slots = Array.from({ length: visibleSlots }, (_, index) => getGallerySlots(images)[index] ?? "");
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
-        <Label>{label}</Label>
-        <button
-          type="button"
-          onClick={() => onChange([...images, ""])}
-          className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-        >
-          新增图片
-        </button>
+        <div className="space-y-1">
+          <Label>{label}</Label>
+          <p className="text-sm leading-7 text-[var(--muted)]">
+            细节图按前台展示顺序填写。每一项都和主图一样，可以直接粘贴图片路径，或上传电脑里的图片。
+          </p>
+        </div>
+        {slots.length < MAX_GALLERY_SLOTS ? (
+          <button
+            type="button"
+            onClick={() => setVisibleSlots((current) => Math.min(MAX_GALLERY_SLOTS, current + 1))}
+            className="inline-flex min-h-10 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+          >
+            新增细节图位
+          </button>
+        ) : null}
       </div>
       <div className="grid gap-4">
-        {safeImages.map((image, index) => (
+        {slots.map((image, index) => (
           <div key={`gallery-image-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
             <div className="flex items-center justify-between gap-4">
-              <Label>{`图片 ${index + 1}`}</Label>
-              <button
-                type="button"
-                onClick={() => onChange(removeArrayItem(safeImages, index))}
-                className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
-              >
-                删除
-              </button>
+              <div className="space-y-1">
+                <Label>{`细节图 ${index + 1}`}</Label>
+                <p className="text-xs leading-6 text-[var(--muted)]">
+                  {index === 0 ? "建议先上传最重要的一张局部图。" : "如果这一项暂时不用，可以留空。"}
+                </p>
+              </div>
+              {index >= DEFAULT_GALLERY_SLOTS ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVisibleSlots((current) => Math.max(DEFAULT_GALLERY_SLOTS, current - 1));
+                    onChange(normalizeGalleryImages(removeArrayItem(slots, index)));
+                  }}
+                  className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
+                >
+                  删除这个图位
+                </button>
+              ) : null}
             </div>
             <AdminMediaField
               label={`细节图 ${index + 1}`}
@@ -728,9 +777,9 @@ function MediaGalleryEditor({
               targetSize={{ width: 1200, height: 1500 }}
               onRequestAutoSave={onRequestAutoSave}
               onChange={(next) => {
-                const nextImages = [...safeImages];
+                const nextImages = [...slots];
                 nextImages[index] = next;
-                onChange(nextImages);
+                onChange(normalizeGalleryImages(nextImages));
               }}
             />
           </div>
