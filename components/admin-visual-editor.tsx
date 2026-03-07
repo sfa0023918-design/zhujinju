@@ -609,6 +609,7 @@ function MediaGalleryEditor({
               label={`细节图 ${index + 1}`}
               folder={folder}
               value={image}
+              targetSize={{ width: 1200, height: 1500 }}
               onChange={(next) => {
                 const nextImages = [...safeImages];
                 nextImages[index] = next;
@@ -848,6 +849,7 @@ export function AdminVisualEditor({
             onChange={(next) => updateDraft((item) => ((item as SiteConfigContent).ogImagePath = next))}
             note="可上传用于 Open Graph / 社交分享的图片，也可以保留现有生成图。"
             previewRatio="landscape"
+            targetSize={{ width: 1200, height: 630 }}
             recommendedUse="分享链接时的预览图"
             recommendedSize="1200 x 630 像素，横图"
           />
@@ -2163,6 +2165,7 @@ export function AdminVisualEditor({
             onChange={(next) => updateDraft((item) => ((item as BrandIntroContent).heroImage = next))}
             note="用于首页首屏主图。上传后保存即可更新。"
             previewRatio="landscape"
+            targetSize={{ width: 1600, height: 1400 }}
             recommendedUse="首页首屏主视觉"
             recommendedSize="1600 x 1400 像素以上，接近 1.15:1"
           />
@@ -2456,6 +2459,7 @@ export function AdminVisualEditor({
                     folder="artworks"
                     value={current.image}
                     previewRatio="portrait"
+                    targetSize={{ width: 1200, height: 1500 }}
                     recommendedUse="藏品列表与藏品详情主图"
                     recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>
@@ -3033,6 +3037,7 @@ export function AdminVisualEditor({
                     folder="exhibitions"
                     value={current.cover}
                     previewRatio="landscape"
+                    targetSize={{ width: 1600, height: 1000 }}
                     recommendedUse="首页专题与展览列表封面"
                     recommendedSize="1600 x 1000 像素以上，横图约 1.45:1"
                     onChange={(next) =>
@@ -3339,6 +3344,7 @@ export function AdminVisualEditor({
                   folder="articles"
                   value={currentArticle.cover}
                   previewRatio="landscape"
+                  targetSize={{ width: 1400, height: 900 }}
                   recommendedUse="文章列表与文章详情头图"
                   recommendedSize="1400 x 900 像素以上，横图约 1.55:1"
                   onChange={(next) =>

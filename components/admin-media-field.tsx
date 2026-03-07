@@ -1,11 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 const SAFE_UPLOAD_BYTES = Math.floor(3.5 * 1024 * 1024);
-const MAX_IMAGE_DIMENSION = 2400;
 const DISPLAY_UPLOAD_LIMIT = "4MB";
+
+type PreviewRatio = "portrait" | "landscape" | "square";
+type TargetSize = {
+  width: number;
+  height: number;
+};
 
 type AdminMediaFieldProps = {
   label: string;
@@ -14,10 +19,35 @@ type AdminMediaFieldProps = {
   value: string;
   onChange: (value: string) => void;
   autoSaveAfterUpload?: boolean;
-  previewRatio?: "portrait" | "landscape" | "square";
+  previewRatio?: PreviewRatio;
+  targetSize?: TargetSize;
   recommendedSize?: string;
   recommendedUse?: string;
 };
+
+function getDefaultTargetSize(previewRatio: PreviewRatio): TargetSize {
+  if (previewRatio === "landscape") {
+    return { width: 1600, height: 1000 };
+  }
+
+  if (previewRatio === "square") {
+    return { width: 1400, height: 1400 };
+  }
+
+  return { width: 1200, height: 1500 };
+}
+
+function getTargetOutputType(file: File) {
+  if (file.type === "image/png" || file.type === "image/webp") {
+    return "image/webp";
+  }
+
+  return "image/jpeg";
+}
+
+function createObjectUrl(fileOrBlob: Blob) {
+  return URL.createObjectURL(fileOrBlob);
+}
 
 export function AdminMediaField({
   label,
@@ -27,6 +57,7 @@ export function AdminMediaField({
   onChange,
   autoSaveAfterUpload = true,
   previewRatio = "portrait",
+  targetSize,
   recommendedSize,
   recommendedUse,
 }: AdminMediaFieldProps) {
@@ -35,6 +66,19 @@ export function AdminMediaField({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
+
+  const outputSize = useMemo(() => targetSize ?? getDefaultTargetSize(previewRatio), [previewRatio, targetSize]);
+  const previewAspectRatio = useMemo(() => `${outputSize.width} / ${outputSize.height}`, [outputSize.height, outputSize.width]);
+
+  function replaceLocalPreview(nextPreview: string | null) {
+    setLocalPreview((current) => {
+      if (current?.startsWith("blob:")) {
+        URL.revokeObjectURL(current);
+      }
+
+      return nextPreview;
+    });
+  }
 
   async function readUploadResponse(response: Response) {
     const raw = await response.text();
@@ -52,9 +96,9 @@ export function AdminMediaField({
     }
   }
 
-  async function loadImageForCompression(file: File) {
+  async function loadImage(file: File) {
     return await new Promise<HTMLImageElement>((resolve, reject) => {
-      const objectUrl = URL.createObjectURL(file);
+      const objectUrl = createObjectUrl(file);
       const nextImage = new window.Image();
 
       nextImage.onload = () => {
@@ -71,43 +115,75 @@ export function AdminMediaField({
     });
   }
 
-  async function compressImageIfNeeded(file: File) {
-    if (file.size <= SAFE_UPLOAD_BYTES) {
-      return { file, compressed: false };
-    }
-
+  async function transformImage(file: File) {
     if (!file.type.startsWith("image/")) {
       throw new Error("仅支持上传图片文件。");
     }
 
-    if (file.type === "image/svg+xml" || file.type === "image/gif") {
-      throw new Error(`当前图片文件过大。请改用 ${DISPLAY_UPLOAD_LIMIT} 以内的 JPG、PNG 或 WebP 图片后再上传。`);
+    const image = await loadImage(file);
+    const targetRatio = outputSize.width / outputSize.height;
+    const sourceRatio = image.width / image.height;
+    const needsCropping = Math.abs(sourceRatio - targetRatio) > 0.015;
+    const needsResizing = image.width > outputSize.width || image.height > outputSize.height;
+    const needsCompression = file.size > SAFE_UPLOAD_BYTES;
+    const canKeepOriginal =
+      !needsCropping &&
+      !needsResizing &&
+      !needsCompression &&
+      file.type !== "image/gif" &&
+      file.type !== "image/svg+xml";
+
+    if (canKeepOriginal) {
+      return {
+        file,
+        previewUrl: createObjectUrl(file),
+        transformed: false,
+        details: {
+          cropped: false,
+          resized: false,
+          compressed: false,
+        },
+      };
     }
 
-    const image = await loadImageForCompression(file);
-    let scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(image.width, image.height));
-    let width = Math.max(1, Math.round(image.width * scale));
-    let height = Math.max(1, Math.round(image.height * scale));
+    const cropWidth = needsCropping
+      ? sourceRatio > targetRatio
+        ? image.height * targetRatio
+        : image.width
+      : image.width;
+    const cropHeight = needsCropping
+      ? sourceRatio > targetRatio
+        ? image.height
+        : image.width / targetRatio
+      : image.height;
+    const cropX = Math.max(0, (image.width - cropWidth) / 2);
+    const cropY = Math.max(0, (image.height - cropHeight) / 2);
+    const scale = Math.min(1, outputSize.width / cropWidth, outputSize.height / cropHeight);
+    let exportWidth = Math.max(1, Math.round(cropWidth * scale));
+    let exportHeight = Math.max(1, Math.round(cropHeight * scale));
+    const outputType = getTargetOutputType(file);
+    const outputExtension = outputType === "image/webp" ? "webp" : "jpg";
+    const normalizedName = file.name.replace(/\.[^.]+$/, "") || "upload";
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
 
     if (!context) {
-      throw new Error("当前浏览器无法处理图片压缩，请换一张更小的图片后再试。");
+      throw new Error("当前浏览器无法处理图片，请更换一张图片后再试。");
     }
 
-    const targetType = file.type === "image/png" ? "image/webp" : file.type === "image/webp" ? "image/webp" : "image/jpeg";
-    const qualitySteps = [0.9, 0.84, 0.78, 0.72, 0.66];
+    const qualitySteps = [0.92, 0.86, 0.8, 0.74, 0.68];
     let bestBlob: Blob | null = null;
+    let bestPreviewUrl: string | null = null;
 
-    for (let resizeRound = 0; resizeRound < 3; resizeRound += 1) {
-      canvas.width = width;
-      canvas.height = height;
-      context.clearRect(0, 0, width, height);
-      context.drawImage(image, 0, 0, width, height);
+    for (let resizeRound = 0; resizeRound < 4; resizeRound += 1) {
+      canvas.width = exportWidth;
+      canvas.height = exportHeight;
+      context.clearRect(0, 0, exportWidth, exportHeight);
+      context.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, exportWidth, exportHeight);
 
       for (const quality of qualitySteps) {
         const blob = await new Promise<Blob | null>((resolve) => {
-          canvas.toBlob(resolve, targetType, quality);
+          canvas.toBlob(resolve, outputType, quality);
         });
 
         if (!blob) {
@@ -117,27 +193,55 @@ export function AdminMediaField({
         bestBlob = blob;
 
         if (blob.size <= SAFE_UPLOAD_BYTES) {
-          const extension = targetType === "image/webp" ? "webp" : "jpg";
-          const normalizedName = file.name.replace(/\.[^.]+$/, "") || "upload";
+          if (bestPreviewUrl?.startsWith("blob:")) {
+            URL.revokeObjectURL(bestPreviewUrl);
+          }
+
           return {
-            file: new File([blob], `${normalizedName}.${extension}`, {
+            file: new File([blob], `${normalizedName}.${outputExtension}`, {
               type: blob.type,
               lastModified: Date.now(),
             }),
-            compressed: true,
+            previewUrl: createObjectUrl(blob),
+            transformed: true,
+            details: {
+              cropped: needsCropping,
+              resized: needsResizing || resizeRound > 0,
+              compressed: needsCompression || quality < 0.92,
+            },
           };
         }
       }
 
-      width = Math.max(1, Math.round(width * 0.82));
-      height = Math.max(1, Math.round(height * 0.82));
+      if (bestPreviewUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(bestPreviewUrl);
+      }
+
+      if (bestBlob) {
+        bestPreviewUrl = createObjectUrl(bestBlob);
+      }
+
+      exportWidth = Math.max(960, Math.round(exportWidth * 0.88));
+      exportHeight = Math.max(Math.round(960 / targetRatio), Math.round(exportHeight * 0.88));
     }
 
-    if (bestBlob) {
-      throw new Error(`图片仍然过大。建议先裁切或压缩到 ${DISPLAY_UPLOAD_LIMIT} 以内再上传。`);
+    if (bestBlob && bestBlob.size <= SAFE_UPLOAD_BYTES) {
+      return {
+        file: new File([bestBlob], `${normalizedName}.${outputExtension}`, {
+          type: bestBlob.type,
+          lastModified: Date.now(),
+        }),
+        previewUrl: bestPreviewUrl ?? createObjectUrl(bestBlob),
+        transformed: true,
+        details: {
+          cropped: true,
+          resized: true,
+          compressed: true,
+        },
+      };
     }
 
-    throw new Error("图片压缩失败，请更换一张图片后再试。");
+    throw new Error(`系统已经自动裁切和压缩，但图片仍然过大。请换一张更清晰但尺寸更适中的图片，或先裁掉多余背景后再上传。`);
   }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -150,10 +254,11 @@ export function AdminMediaField({
     setUploading(true);
     setError(null);
     setMessage(null);
-    setLocalPreview(URL.createObjectURL(file));
 
     try {
-      const prepared = await compressImageIfNeeded(file);
+      const prepared = await transformImage(file);
+      replaceLocalPreview(prepared.previewUrl);
+
       const formData = new FormData();
       formData.append("file", prepared.file);
       formData.append("folder", folder);
@@ -167,7 +272,7 @@ export function AdminMediaField({
 
       if (!response.ok || !payload.url) {
         if (response.status === 413 || /request entity too large/i.test(raw)) {
-          throw new Error(`图片过大，上传请求被服务器拒绝。系统建议使用 ${DISPLAY_UPLOAD_LIMIT} 以内的 JPG、PNG 或 WebP 图片。`);
+          throw new Error(`图片过大，上传请求被服务器拒绝。系统会自动压缩，但单张图片仍需控制在 ${DISPLAY_UPLOAD_LIMIT} 内。`);
         }
 
         throw new Error(payload.error ?? (raw.trim() || "图片上传失败。"));
@@ -176,31 +281,27 @@ export function AdminMediaField({
       onChange(payload.url);
       setMessage(
         autoSaveAfterUpload
-          ? "图片已上传，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
-          : prepared.compressed
-            ? "图片已自动压缩并上传。保存当前内容后，网站会在下一次部署完成后显示新图片。"
+          ? prepared.transformed
+            ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
+            : "图片已上传，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
+          : prepared.transformed
+            ? "图片已自动裁切并压缩为网站适用尺寸。保存当前内容后，网站会在下一次部署完成后显示新图片。"
             : payload.message ?? "图片上传成功。",
       );
 
       if (autoSaveAfterUpload) {
         window.setTimeout(() => {
           event.currentTarget.form?.requestSubmit();
-        }, 80);
+        }, 120);
       }
     } catch (uploadError) {
+      replaceLocalPreview(null);
       setError(uploadError instanceof Error ? uploadError.message : "图片上传失败。");
     } finally {
       setUploading(false);
       event.target.value = "";
     }
   }
-
-  const previewClassName =
-    previewRatio === "landscape"
-      ? "aspect-[1.45/1]"
-      : previewRatio === "square"
-        ? "aspect-square"
-        : "aspect-[4/5]";
 
   return (
     <div className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
@@ -215,21 +316,24 @@ export function AdminMediaField({
             {recommendedSize ? <p>{`建议尺寸：${recommendedSize}`}</p> : null}
           </div>
         ) : null}
+        <p className="text-xs leading-6 text-[var(--muted)]">
+          系统会自动按当前页面所需比例裁切，并在尽量保持清晰度的情况下压缩到可上传尺寸。
+        </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <div className="overflow-hidden bg-[var(--surface-strong)]">
+        <div className="overflow-hidden bg-[var(--surface-strong)]" style={{ aspectRatio: previewAspectRatio }}>
           {localPreview || value ? (
             <Image
               src={localPreview ?? value}
               alt={label}
-              width={800}
-              height={1000}
+              width={outputSize.width}
+              height={outputSize.height}
               unoptimized
-              className={`${previewClassName} h-full w-full object-cover`}
+              className="h-full w-full object-cover"
             />
           ) : (
-            <div className={`flex ${previewClassName} items-center justify-center text-xs tracking-[0.16em] text-[var(--accent)]`}>
+            <div className="flex h-full w-full items-center justify-center text-xs tracking-[0.16em] text-[var(--accent)]">
               暂无图片
             </div>
           )}
@@ -249,7 +353,7 @@ export function AdminMediaField({
                 uploading ? "cursor-wait opacity-72" : "cursor-pointer hover:bg-[var(--surface-strong)]"
               }`}
             >
-              {uploading ? "上传中..." : "上传本地图片"}
+              {uploading ? "处理中..." : "上传本地图片"}
             </label>
             <input
               id={inputId}
@@ -261,7 +365,7 @@ export function AdminMediaField({
             <button
               type="button"
               onClick={() => {
-                setLocalPreview(null);
+                replaceLocalPreview(null);
                 setMessage(null);
                 setError(null);
                 onChange("");
