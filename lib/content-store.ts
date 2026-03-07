@@ -98,6 +98,10 @@ export async function writeLocalContentFile(content: SiteContent) {
   await fs.writeFile(CONTENT_FILE_PATH, `${JSON.stringify(content, null, 2)}\n`, "utf8");
 }
 
+function canWriteLocalContentFile() {
+  return process.env.NODE_ENV !== "production";
+}
+
 type GitHubConfig = {
   token: string;
   owner: string;
@@ -179,7 +183,10 @@ export async function saveSiteSection(
     [section]: nextValue,
   } as SiteContent;
 
-  await writeLocalContentFile(nextContent);
+  if (canWriteLocalContentFile()) {
+    await writeLocalContentFile(nextContent);
+  }
+
   await pushContentToGitHub(nextContent, `Update ${section} from admin by ${actor}`);
 
   return nextContent;
