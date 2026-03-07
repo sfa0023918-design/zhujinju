@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BilingualText } from "@/components/bilingual-text";
+import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { articles, getArticleBySlug } from "@/lib/site-data";
 
@@ -26,8 +28,8 @@ export async function generateMetadata({
 
   if (!article) {
     return buildMetadata({
-      title: "文章未找到",
-      description: "当前文章不存在或尚未公开。",
+      title: bt("文章未找到", "Article Not Found"),
+      description: bt("当前文章不存在或尚未公开。", "This article is unavailable or not yet published."),
       path: "/journal",
     });
   }
@@ -52,25 +54,33 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
     <>
       <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-10 md:py-12">
         <Link href="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-          返回文章
+          返回文章 / Back to Journal
         </Link>
       </section>
 
       <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-10 md:pb-28">
         <header className="space-y-5 border-t border-[var(--line)] pt-6">
-          <p className="text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-            {article.category}
-          </p>
-          <h1 className="max-w-4xl font-serif text-[2.8rem] leading-[0.94] tracking-[-0.05em] text-[var(--ink)] md:text-[5rem]">
-            {article.title}
-          </h1>
+          <BilingualText
+            as="p"
+            text={article.category}
+            className="flex flex-col gap-1 text-[var(--accent)]"
+            zhClassName="text-[0.72rem] tracking-[0.22em]"
+            enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+          />
+          <BilingualText
+            as="h1"
+            text={article.title}
+            className="max-w-4xl font-serif text-[var(--ink)]"
+            zhClassName="block text-[2.8rem] leading-[0.94] tracking-[-0.05em] md:text-[5rem]"
+            enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+          />
           <p className="text-sm text-[var(--muted)]">{article.date}</p>
         </header>
 
-        <div className="mt-8 relative overflow-hidden bg-[var(--surface-strong)]">
+        <div className="relative mt-8 overflow-hidden bg-[var(--surface-strong)]">
           <Image
             src={article.cover}
-            alt={article.title}
+            alt={`${article.title.zh} ${article.title.en}`}
             width={1600}
             height={1000}
             priority
@@ -79,9 +89,16 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
           />
         </div>
 
-        <div className="rich-text mt-10 max-w-3xl text-[1rem] md:text-[1.05rem]">
+        <div className="mt-10 space-y-6">
           {article.body.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
+            <BilingualText
+              key={paragraph.zh}
+              as="p"
+              text={paragraph}
+              className="max-w-3xl flex flex-col gap-3 text-[var(--muted)]"
+              zhClassName="text-[1rem] leading-8 md:text-[1.05rem]"
+              enClassName="text-[0.84rem] leading-7 text-[var(--accent)]/80"
+            />
           ))}
         </div>
       </article>

@@ -1,46 +1,51 @@
-export type ArtworkStatus = "可洽询" | "已售" | "暂留";
+export type BilingualText = {
+  zh: string;
+  en: string;
+};
+
+export type ArtworkStatus = "inquiry" | "sold" | "reserved";
 
 export type Artwork = {
   slug: string;
-  title: string;
-  subtitle: string;
-  period: string;
-  region: string;
-  origin: string;
-  material: string;
-  category: string;
-  dimensions: string;
+  title: BilingualText;
+  subtitle: BilingualText;
+  period: BilingualText;
+  region: BilingualText;
+  origin: BilingualText;
+  material: BilingualText;
+  category: BilingualText;
+  dimensions: BilingualText;
   status: ArtworkStatus;
-  excerpt: string;
-  statement: string[];
-  provenance: string[];
-  exhibitions: string[];
-  publications: string[];
+  excerpt: BilingualText;
+  statement: BilingualText[];
+  provenance: BilingualText[];
+  exhibitions: BilingualText[];
+  publications: BilingualText[];
   image: string;
   featured?: boolean;
 };
 
 export type Exhibition = {
   slug: string;
-  title: string;
-  subtitle: string;
-  period: string;
-  venue: string;
-  intro: string;
-  description: string[];
+  title: BilingualText;
+  subtitle: BilingualText;
+  period: BilingualText;
+  venue: BilingualText;
+  intro: BilingualText;
+  description: BilingualText[];
   highlightArtworkSlugs: string[];
-  catalogueTitle: string;
-  catalogueIntro: string;
+  catalogueTitle: BilingualText;
+  catalogueIntro: BilingualText;
   cover: string;
   current?: boolean;
 };
 
 export type Article = {
   slug: string;
-  title: string;
-  category: string;
+  title: BilingualText;
+  category: BilingualText;
   date: string;
-  excerpt: string;
-  body: string[];
+  excerpt: BilingualText;
+  body: BilingualText[];
   cover: string;
 };

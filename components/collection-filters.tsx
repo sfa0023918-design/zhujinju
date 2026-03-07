@@ -1,6 +1,9 @@
 import Link from "next/link";
 
+import { bt, formatInlineText } from "@/lib/bilingual";
 import { filterOptions } from "@/lib/site-data";
+
+import { BilingualText } from "./bilingual-text";
 
 type CollectionFiltersProps = {
   current: {
@@ -12,10 +15,10 @@ type CollectionFiltersProps = {
 };
 
 const filterFields = [
-  { name: "category", label: "品类", options: filterOptions.categories },
-  { name: "region", label: "地区", options: filterOptions.regions },
-  { name: "period", label: "年代", options: filterOptions.periods },
-  { name: "material", label: "材质", options: filterOptions.materials },
+  { name: "category", label: bt("品类", "Category"), options: filterOptions.categories },
+  { name: "region", label: bt("地区", "Region"), options: filterOptions.regions },
+  { name: "period", label: bt("年代", "Period"), options: filterOptions.periods },
+  { name: "material", label: bt("材质", "Material"), options: filterOptions.materials },
 ] as const;
 
 export function CollectionFilters({ current }: CollectionFiltersProps) {
@@ -26,17 +29,22 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
     >
       {filterFields.map((field) => (
         <label key={field.name} className="grid gap-2 text-sm text-[var(--muted)]">
-          <span className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)] uppercase">
-            {field.label}
-          </span>
+          <BilingualText
+            as="span"
+            text={field.label}
+            className="flex flex-col gap-1 text-[var(--accent)]"
+            zhClassName="text-[0.72rem] tracking-[0.18em]"
+            enClassName="text-[0.54rem] uppercase tracking-[0.2em]"
+          />
           <select
             name={field.name}
             defaultValue={current[field.name]}
             className="h-11 rounded-none border border-[var(--line)] bg-[var(--surface)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           >
+            <option value={filterOptions.all.zh}>{formatInlineText(filterOptions.all)}</option>
             {field.options.map((option) => (
-              <option key={option} value={option}>
-                {option}
+              <option key={option.zh} value={option.zh}>
+                {formatInlineText(option)}
               </option>
             ))}
           </select>
@@ -46,13 +54,13 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
         type="submit"
         className="h-11 self-end border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
       >
-        筛选
+        筛选 / Filter
       </button>
       <Link
         href="/collection"
         className="flex h-11 items-center justify-center self-end border border-[var(--line)] px-5 text-sm text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
       >
-        重置
+        重置 / Reset
       </Link>
     </form>
   );

@@ -8,9 +8,13 @@ export const metadata = {
   ...buildMetadata(),
   keywords: [
     "竹瑾居",
+    "Zhu Jin Ju",
     "喜马拉雅艺术",
+    "Himalayan Art",
     "藏传佛教艺术",
+    "Tibetan Buddhist Art",
     "亚洲古代艺术",
+    "Asian Antiquities",
     "铜造像",
     "唐卡",
     "古董艺廊",

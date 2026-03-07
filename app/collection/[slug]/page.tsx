@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { StatusPill } from "@/components/status-pill";
+import { bt, formatInlineText } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { artworks, getArtworkBySlug, getRelatedArtworks } from "@/lib/site-data";
 
@@ -28,8 +30,8 @@ export async function generateMetadata({
 
   if (!artwork) {
     return buildMetadata({
-      title: "作品未找到",
-      description: "当前作品不存在或尚未公开。",
+      title: bt("作品未找到", "Artwork Not Found"),
+      description: bt("当前作品不存在或尚未公开。", "This work is unavailable or not yet published."),
       path: "/collection",
     });
   }
@@ -42,10 +44,10 @@ export async function generateMetadata({
 }
 
 const fieldRows = [
-  { label: "年代", key: "period" },
-  { label: "地区 / 产地", key: "region" },
-  { label: "材质", key: "material" },
-  { label: "尺寸", key: "dimensions" },
+  { label: bt("年代", "Period"), key: "period" },
+  { label: bt("地区 / 产地", "Region / Origin"), key: "region" },
+  { label: bt("材质", "Material"), key: "material" },
+  { label: bt("尺寸", "Dimensions"), key: "dimensions" },
 ] as const;
 
 export default async function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
@@ -56,23 +58,23 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
     notFound();
   }
 
-  const related = getRelatedArtworks(artwork.slug, artwork.category);
+  const related = getRelatedArtworks(artwork.slug, artwork.category.zh);
 
   return (
     <>
       <section className="mx-auto w-full max-w-[1480px] px-5 py-8 md:px-10 md:py-12">
         <div className="mb-8 text-sm text-[var(--muted)]">
           <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
-            藏品
+            藏品 / Collection
           </Link>
           <span className="px-2">/</span>
-          <span>{artwork.title}</span>
+          <span>{formatInlineText(artwork.title)}</span>
         </div>
         <div className="grid gap-10 md:grid-cols-[minmax(0,1.02fr)_minmax(280px,0.5fr)] md:gap-12">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
             <Image
               src={artwork.image}
-              alt={artwork.title}
+              alt={formatInlineText(artwork.title)}
               width={1200}
               height={1500}
               priority
@@ -83,45 +85,73 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
           <aside className="space-y-8 md:sticky md:top-8 md:self-start">
             <div className="space-y-5 border-t border-[var(--line)] pt-5">
               <div className="flex items-center justify-between gap-4">
-                <p className="text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-                  {artwork.category}
-                </p>
+                <BilingualText
+                  as="p"
+                  text={artwork.category}
+                  className="flex flex-col gap-1 text-[var(--accent)]"
+                  zhClassName="text-[0.74rem] tracking-[0.16em]"
+                  enClassName="text-[0.54rem] uppercase tracking-[0.22em]"
+                />
                 <StatusPill status={artwork.status} />
               </div>
               <div>
-                <h1 className="font-serif text-[2.5rem] leading-[0.96] tracking-[-0.05em] text-[var(--ink)] md:text-[4.35rem]">
-                  {artwork.title}
-                </h1>
-                <p className="mt-3 text-sm leading-7 text-[var(--muted)] md:text-[0.98rem]">
-                  {artwork.subtitle}
-                </p>
+                <BilingualText
+                  as="h1"
+                  text={artwork.title}
+                  className="font-serif text-[var(--ink)]"
+                  zhClassName="block text-[2.5rem] leading-[0.96] tracking-[-0.05em] md:text-[4.35rem]"
+                  enClassName="mt-3 block font-sans text-[0.78rem] uppercase tracking-[0.22em] text-[var(--accent)] md:text-[0.9rem]"
+                />
+                <BilingualText
+                  as="p"
+                  text={artwork.subtitle}
+                  className="mt-3 flex flex-col gap-2 text-[var(--muted)]"
+                  zhClassName="text-sm leading-7 md:text-[0.98rem]"
+                  enClassName="text-[0.78rem] leading-6 text-[var(--accent)]/80"
+                />
               </div>
-              <p className="text-sm leading-8 text-[var(--muted)]">{artwork.excerpt}</p>
+              <BilingualText
+                as="p"
+                text={artwork.excerpt}
+                className="flex flex-col gap-3 text-[var(--muted)]"
+                zhClassName="text-sm leading-8"
+                enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+              />
             </div>
 
             <dl className="grid gap-4 border-t border-[var(--line)] pt-5 text-sm">
               {fieldRows.map((field) => (
                 <div key={field.key} className="grid grid-cols-[112px_1fr] gap-4">
-                  <dt className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)] uppercase">
-                    {field.label}
-                  </dt>
-                  <dd className="text-[var(--muted)]">{artwork[field.key]}</dd>
+                  <BilingualText
+                    as="dt"
+                    text={field.label}
+                    className="flex flex-col gap-1 text-[var(--accent)]"
+                    zhClassName="text-[0.72rem] tracking-[0.18em]"
+                    enClassName="text-[0.52rem] uppercase tracking-[0.2em]"
+                  />
+                  <BilingualText
+                    as="dd"
+                    text={artwork[field.key]}
+                    className="flex flex-col gap-1 text-[var(--muted)]"
+                    zhClassName="block"
+                    enClassName="block text-[0.72rem] leading-6 text-[var(--accent)]/80"
+                  />
                 </div>
               ))}
             </dl>
 
             <div className="grid gap-3 border-t border-[var(--line)] pt-5">
               <Link
-                href={`/contact?artwork=${encodeURIComponent(artwork.title)}`}
+                href={`/contact?artwork=${encodeURIComponent(formatInlineText(artwork.title))}`}
                 className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
-                询洽此件作品
+                询洽此件作品 / Inquire
               </Link>
               <Link
                 href="/collection"
                 className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-sm text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
-                返回藏品浏览
+                返回藏品浏览 / Back to Collection
               </Link>
             </div>
           </aside>
@@ -130,43 +160,90 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
 
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.95fr)_minmax(0,0.75fr)] md:px-10 md:py-20">
         <div>
-          <p className="mb-4 text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-            学术说明
-          </p>
-          <div className="rich-text space-y-5 text-[0.98rem]">
+          <BilingualText
+            as="p"
+            text={bt("学术说明", "Scholarly Note")}
+            className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+            zhClassName="text-[0.72rem] tracking-[0.22em]"
+            enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+          />
+          <div className="space-y-6">
             {artwork.statement.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+              <BilingualText
+                key={paragraph.zh}
+                as="p"
+                text={paragraph}
+                className="rich-text flex flex-col gap-3 text-[var(--muted)]"
+                zhClassName="text-[0.98rem] leading-8"
+                enClassName="text-[0.82rem] leading-7 text-[var(--accent)]/80"
+              />
             ))}
           </div>
         </div>
         <div className="grid gap-8">
           <div className="border-t border-[var(--line)] pt-5">
-            <p className="mb-4 text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-              来源
-            </p>
-            <ul className="rich-text">
+            <BilingualText
+              as="p"
+              text={bt("来源", "Provenance")}
+              className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+              zhClassName="text-[0.72rem] tracking-[0.22em]"
+              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+            />
+            <ul className="space-y-3">
               {artwork.provenance.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item.zh}>
+                  <BilingualText
+                    as="p"
+                    text={item}
+                    className="flex flex-col gap-2 text-[var(--muted)]"
+                    zhClassName="text-sm leading-7"
+                    enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
+                  />
+                </li>
               ))}
             </ul>
           </div>
           <div className="border-t border-[var(--line)] pt-5">
-            <p className="mb-4 text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-              展览
-            </p>
-            <ul className="rich-text">
+            <BilingualText
+              as="p"
+              text={bt("展览", "Exhibitions")}
+              className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+              zhClassName="text-[0.72rem] tracking-[0.22em]"
+              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+            />
+            <ul className="space-y-3">
               {artwork.exhibitions.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item.zh}>
+                  <BilingualText
+                    as="p"
+                    text={item}
+                    className="flex flex-col gap-2 text-[var(--muted)]"
+                    zhClassName="text-sm leading-7"
+                    enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
+                  />
+                </li>
               ))}
             </ul>
           </div>
           <div className="border-t border-[var(--line)] pt-5">
-            <p className="mb-4 text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-              出版
-            </p>
-            <ul className="rich-text">
+            <BilingualText
+              as="p"
+              text={bt("出版", "Publications")}
+              className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
+              zhClassName="text-[0.72rem] tracking-[0.22em]"
+              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+            />
+            <ul className="space-y-3">
               {artwork.publications.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item.zh}>
+                  <BilingualText
+                    as="p"
+                    text={item}
+                    className="flex flex-col gap-2 text-[var(--muted)]"
+                    zhClassName="text-sm leading-7"
+                    enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
+                  />
+                </li>
               ))}
             </ul>
           </div>
@@ -177,12 +254,20 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
         <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
           <div className="mb-10 flex items-end justify-between gap-4">
             <div>
-              <p className="mb-3 text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-                相关推荐
-              </p>
-              <h2 className="font-serif text-[2rem] leading-none tracking-[-0.04em] text-[var(--ink)] md:text-[3.5rem]">
-                同类方向中的其他作品
-              </h2>
+              <BilingualText
+                as="p"
+                text={bt("相关推荐", "Related Works")}
+                className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.22em]"
+                enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              />
+              <BilingualText
+                as="h2"
+                text={bt("同类方向中的其他作品", "Other Works in the Same Direction")}
+                className="font-serif text-[var(--ink)]"
+                zhClassName="block text-[2rem] leading-none tracking-[-0.04em] md:text-[3.5rem]"
+                enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+              />
             </div>
           </div>
           <div className="grid gap-8">

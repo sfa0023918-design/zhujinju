@@ -1,13 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
+import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { articles } from "@/lib/site-data";
 
 export const metadata = buildMetadata({
-  title: "文章",
-  description: "阅读竹瑾居发布的展览资讯、研究文章、市场观察与学术短文。",
+  title: bt("文章", "Journal"),
+  description: bt("阅读竹瑾居发布的展览资讯、研究文章、市场观察与学术短文。", "Read exhibition notes, research writing, market observations, and short scholarly texts from Zhu Jin Ju."),
   path: "/journal",
 });
 
@@ -15,10 +17,16 @@ export default function JournalPage() {
   return (
     <>
       <PageHero
-        eyebrow="Journal"
-        title="文章"
-        description="用于发布研究短文、展览札记与市场观察。整体样式更接近艺廊 journal，而非资讯门户。"
-        aside="文章页采用低干扰阅读布局，便于后续接入更完整的编辑内容与目录结构。"
+        eyebrow={bt("文章", "Journal")}
+        title={bt("文章", "Journal")}
+        description={bt(
+          "用于发布研究短文、展览札记与市场观察。整体样式更接近艺廊 journal，而非资讯门户。",
+          "A space for short research writing, exhibition notes, and market observations, conceived more as a gallery journal than a news portal."
+        )}
+        aside={bt(
+          "文章页采用低干扰阅读布局，便于后续接入更完整的编辑内容与目录结构。",
+          "The reading layout is intentionally quiet and can later expand into fuller editorial structure and navigation."
+        )}
       />
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
@@ -28,7 +36,7 @@ export default function JournalPage() {
               <Link href={`/journal/${article.slug}`} className="relative overflow-hidden bg-[var(--surface-strong)]">
                 <Image
                   src={article.cover}
-                  alt={article.title}
+                  alt={`${article.title.zh} ${article.title.en}`}
                   width={1400}
                   height={900}
                   unoptimized
@@ -36,20 +44,32 @@ export default function JournalPage() {
                 />
               </Link>
               <div className="space-y-4">
-                <p className="text-[0.72rem] tracking-[0.22em] text-[var(--accent)] uppercase">
-                  {article.category}
-                </p>
+                <BilingualText
+                  as="p"
+                  text={article.category}
+                  className="flex flex-col gap-1 text-[var(--accent)]"
+                  zhClassName="text-[0.72rem] tracking-[0.22em]"
+                  enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+                />
                 <div>
-                  <h2 className="font-serif text-[2rem] leading-tight tracking-[-0.04em] text-[var(--ink)] md:text-[3rem]">
-                    {article.title}
-                  </h2>
+                  <BilingualText
+                    as="h2"
+                    text={article.title}
+                    className="font-serif text-[var(--ink)]"
+                    zhClassName="block text-[2rem] leading-tight tracking-[-0.04em] md:text-[3rem]"
+                    enClassName="mt-3 block font-sans text-[0.76rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+                  />
                   <p className="mt-3 text-sm text-[var(--muted)]">{article.date}</p>
                 </div>
-                <p className="max-w-2xl text-sm leading-8 text-[var(--muted)] md:text-[0.98rem]">
-                  {article.excerpt}
-                </p>
+                <BilingualText
+                  as="p"
+                  text={article.excerpt}
+                  className="max-w-2xl flex flex-col gap-3 text-[var(--muted)] md:text-[0.98rem]"
+                  zhClassName="text-sm leading-8"
+                  enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
+                />
                 <Link href={`/journal/${article.slug}`} className="inline-flex text-sm text-[var(--ink)]">
-                  阅读全文
+                  阅读全文 / Read Article
                 </Link>
               </div>
             </article>
