@@ -28,7 +28,7 @@ export function SiteHeader() {
           />
         </Link>
         <nav
-          aria-label="主导航 / Main Navigation"
+          aria-label="主导航"
           className="flex flex-1 justify-end gap-4 overflow-x-auto text-sm text-[var(--muted)] md:gap-7"
         >
           {navigation.map((item) => (

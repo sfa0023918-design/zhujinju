@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { bt } from "@/lib/bilingual";
@@ -59,7 +60,7 @@ export default async function ExhibitionDetailPage({
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-8 md:grid-cols-[minmax(0,1fr)_320px] md:px-10 md:py-12">
         <div className="space-y-6">
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-            返回展览与图录 / Back to Exhibitions
+            <ActionLabel text={bt("返回展览与图录", "Back to Exhibitions")} align="start" />
           </Link>
           <div className="space-y-4">
             <BilingualText

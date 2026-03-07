@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
@@ -54,7 +55,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailPagePro
     <>
       <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-10 md:py-12">
         <Link href="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-          返回文章 / Back to Journal
+          <ActionLabel text={bt("返回文章", "Back to Journal")} align="start" />
         </Link>
       </section>
 

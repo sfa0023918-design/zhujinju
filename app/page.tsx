@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { SectionIntro } from "@/components/section-intro";
@@ -65,15 +66,15 @@ export default function HomePage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/collection"
-                className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+                className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
-                浏览藏品 / Browse Collection
+                <ActionLabel text={bt("浏览藏品", "Browse Collection")} />
               </Link>
               <Link
                 href="/exhibitions"
-                className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-sm text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+                className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
-                查看展览与图录 / View Exhibitions
+                <ActionLabel text={bt("查看展览与图录", "View Exhibitions")} />
               </Link>
             </div>
           </div>
@@ -124,9 +125,9 @@ export default function HomePage() {
               />
               <Link
                 href={`/exhibitions/${currentExhibition.slug}`}
-                className="inline-flex pt-3 text-[0.92rem] text-[var(--ink)]"
+                className="inline-flex pt-3 text-[var(--ink)]"
               >
-                进入专题详情 / View Exhibition
+                <ActionLabel text={bt("进入专题详情", "View Exhibition")} align="start" />
               </Link>
             </div>
           </div>
@@ -242,10 +243,10 @@ export default function HomePage() {
         </div>
         <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm text-[var(--muted)] md:pt-0">
           <Link href="/contact" className="inline-flex text-[var(--ink)]">
-            前往联系页面 / Contact Page
+            <ActionLabel text={bt("前往联系页面", "Contact Page")} align="start" />
           </Link>
           <Link href="/journal" className="block">
-            查看文章与研究 / Read Journal
+            <ActionLabel text={bt("查看文章与研究", "Read Journal")} align="start" />
           </Link>
         </div>
       </section>

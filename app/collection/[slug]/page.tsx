@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { StatusPill } from "@/components/status-pill";
@@ -65,7 +66,7 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
       <section className="mx-auto w-full max-w-[1480px] px-5 py-8 md:px-10 md:py-12">
         <div className="mb-8 text-sm text-[var(--muted)]">
           <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
-            藏品 / Collection
+            藏品·Collection
           </Link>
           <span className="px-2">/</span>
           <span>{formatInlineText(artwork.title)}</span>
@@ -141,15 +142,15 @@ export default async function ArtworkDetailPage({ params }: ArtworkDetailPagePro
             <div className="grid gap-3 border-t border-[var(--line)] pt-5">
               <Link
                 href={`/contact?artwork=${encodeURIComponent(formatInlineText(artwork.title))}`}
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-sm tracking-[0.01em] text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
-                询洽此件作品 / Inquire
+                <ActionLabel text={bt("询洽此件作品", "Inquire")} />
               </Link>
               <Link
                 href="/collection"
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-sm tracking-[0.01em] text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+                className="inline-flex min-h-11 items-center justify-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
-                返回藏品浏览 / Back to Collection
+                <ActionLabel text={bt("返回藏品浏览", "Back to Collection")} />
               </Link>
             </div>
           </aside>

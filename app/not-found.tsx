@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { bt } from "@/lib/bilingual";
 
@@ -31,13 +32,13 @@ export default function NotFound() {
           href="/"
           className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)]"
         >
-          返回首页 / Home
+          <ActionLabel text={bt("返回首页", "Home")} />
         </Link>
         <Link
           href="/collection"
           className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-sm text-[var(--muted)]"
         >
-          浏览藏品 / Collection
+          <ActionLabel text={bt("浏览藏品", "Collection")} />
         </Link>
       </div>
     </section>

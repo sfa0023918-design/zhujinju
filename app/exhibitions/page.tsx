@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
@@ -78,7 +79,7 @@ export default function ExhibitionsPage() {
                   <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
                   <p>{exhibition.catalogueIntro.zh}</p>
                   <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex text-[var(--ink)]">
-                    查看展览详情 / View Exhibition
+                    <ActionLabel text={bt("查看展览详情", "View Exhibition")} align="start" />
                   </Link>
                 </div>
               </div>

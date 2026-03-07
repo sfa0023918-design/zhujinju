@@ -55,13 +55,13 @@ export function CollectionFilters({ current }: CollectionFiltersProps) {
         type="submit"
         className="h-11 self-end border border-[var(--line-strong)] px-5 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
       >
-        筛选 / Filter
+        筛选·Filter
       </button>
       <Link
         href="/collection"
         className="flex h-11 items-center justify-center self-end border border-[var(--line)] px-5 text-sm text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
       >
-        重置 / Reset
+        重置·Reset
       </Link>
     </form>
   );

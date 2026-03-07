@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+import { bt } from "@/lib/bilingual";
+
+import { ActionLabel } from "./action-label";
 import { BilingualText } from "./bilingual-text";
 
 type ContactFormProps = {
@@ -103,7 +106,7 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
             as="span"
-            text={{ zh: "机构 / 公司", en: "Institution / Company" }}
+            text={{ zh: "机构与公司", en: "Institution / Company" }}
             mode="inline"
             className="block"
             zhClassName="text-sm"
@@ -125,14 +128,14 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
           />
           <select
             name="identity"
-            defaultValue="藏家 / Collector"
+            defaultValue="藏家 · Collector"
             className="h-11 border border-[var(--line)] bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           >
-            <option>藏家 / Collector</option>
-            <option>机构 / Institution</option>
-            <option>策展人 / Curator</option>
-            <option>研究者 / Researcher</option>
-            <option>媒体 / Press</option>
+            <option>藏家 · Collector</option>
+            <option>机构 · Institution</option>
+            <option>策展人 · Curator</option>
+            <option>研究者 · Researcher</option>
+            <option>媒体 · Press</option>
           </select>
         </label>
       </div>
@@ -171,9 +174,13 @@ export function ContactForm({ initialArtwork }: ContactFormProps) {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-6 text-sm text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-6 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === "submitting" ? "提交中 / Sending" : "发送联系信息 / Send Inquiry"}
+          {status === "submitting" ? (
+            <ActionLabel text={bt("提交中", "Sending")} />
+          ) : (
+            <ActionLabel text={bt("发送联系信息", "Send Inquiry")} />
+          )}
         </button>
         <BilingualText
           as="p"

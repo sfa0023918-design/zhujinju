@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { PageHero } from "@/components/page-hero";
 import { bt } from "@/lib/bilingual";
@@ -66,7 +67,7 @@ export default function JournalPage() {
                   {article.excerpt.zh}
                 </p>
                 <Link href={`/journal/${article.slug}`} className="inline-flex text-sm text-[var(--ink)]">
-                  阅读全文 / Read Article
+                  <ActionLabel text={bt("阅读全文", "Read Article")} align="start" />
                 </Link>
               </div>
             </article>

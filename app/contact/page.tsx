@@ -63,9 +63,10 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <BilingualText
               as="p"
               text={bt("电话 / WhatsApp", "Phone / WhatsApp")}
-              className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
+              mode="inline"
+              className="mb-3 text-[var(--accent)]"
               zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
             />
             <p className="text-[var(--muted)]">{siteConfig.contact.phone}</p>
             <p className="text-[var(--muted)]">{siteConfig.contact.whatsapp}</p>
