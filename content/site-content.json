@@ -768,7 +768,7 @@
   ],
   "artworks": [
     {
-      "slug": "ekadasamukha-avalokiteshvara",
+      "slug": "摩利支天",
       "title": {
         "zh": "十一面观音坐像",
         "en": "Seated Ekadasamukha Avalokiteshvara"
@@ -888,7 +888,7 @@
         "silent-radiance"
       ],
       "image": "/uploads/artworks/1772951079184-b00013243fr1772286470.jpg",
-      "featured": true,
+      "featured": false,
       "gallery": [
         "/uploads/artworks/1772951087461-b00013133fr1771928731.jpg"
       ],
