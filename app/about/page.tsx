@@ -7,33 +7,32 @@ import { loadSiteContent } from "@/lib/site-data";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
-  const { siteConfig, pageCopy } = await loadSiteContent();
+  const { siteConfig } = await loadSiteContent();
 
   return buildMetadata({
     title: bt("关于", "About"),
-    description: pageCopy.about.hero.description,
+    description: siteConfig.about.body[0],
     path: "/about",
     site: siteConfig,
   });
 }
 
 export default async function AboutPage() {
-  const { brandIntro, operationalFacts, pageCopy } = await loadSiteContent();
+  const { operationalFacts, siteConfig } = await loadSiteContent();
 
   return (
     <>
       <PageHero
-        eyebrow={pageCopy.about.hero.eyebrow}
-        title={pageCopy.about.hero.title}
-        description={pageCopy.about.hero.description}
-        aside={pageCopy.about.hero.aside}
+        eyebrow={siteConfig.about.eyebrow}
+        title={siteConfig.about.title}
+        description={siteConfig.about.subtitle}
       />
 
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:px-10 md:py-20">
         <div>
           <BilingualText
             as="p"
-            text={pageCopy.about.position.eyebrow}
+            text={siteConfig.about.eyebrow}
             mode="inline"
             className="mb-4 text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
@@ -41,38 +40,17 @@ export default async function AboutPage() {
           />
           <BilingualText
             as="h2"
-            text={pageCopy.about.position.title}
+            text={siteConfig.about.subtitle}
             className="font-serif text-[var(--ink)]"
             zhClassName="block text-[2.2rem] leading-none tracking-[-0.04em] md:text-[3.8rem]"
             enClassName="mt-3 block font-sans text-[0.86rem] uppercase tracking-[0.22em] text-[var(--accent)]"
           />
         </div>
         <div className="space-y-6">
-          <p className="text-[0.98rem] leading-8 text-[var(--muted)]">{brandIntro.about.zh}</p>
-          <p className="text-[0.98rem] leading-8 text-[var(--muted)]">{pageCopy.about.position.paragraphTwo.zh}</p>
-          <p className="text-[0.98rem] leading-8 text-[var(--muted)]">{pageCopy.about.position.paragraphThree.zh}</p>
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
-        <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-3">
-          {brandIntro.methodology.map((item, index) => (
-            <div key={item.zh} className="bg-[var(--surface)] p-7">
-              <BilingualText
-                as="p"
-                text={bt(`方法 ${index + 1}`, `Method ${index + 1}`)}
-                className="mb-5 flex flex-col gap-1 text-[var(--accent)]"
-                zhClassName="text-[0.72rem] tracking-[0.22em]"
-                enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
-              />
-              <BilingualText
-                as="p"
-                text={item}
-                className="font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.55rem] leading-snug tracking-[-0.03em]"
-                enClassName="hidden"
-              />
-            </div>
+          {siteConfig.about.body.map((paragraph) => (
+            <p key={paragraph.zh} className="text-[0.98rem] leading-8 text-[var(--muted)]">
+              {paragraph.zh}
+            </p>
           ))}
         </div>
       </section>

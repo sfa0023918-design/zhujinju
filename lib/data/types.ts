@@ -97,6 +97,7 @@ export type ContactDetails = {
   address: BilingualText;
   replyWindow: BilingualText;
   collaborationNote: BilingualText;
+  appointmentNote: BilingualText;
 };
 
 export type SiteConfigContent = {
@@ -107,7 +108,65 @@ export type SiteConfigContent = {
   protocol: "http" | "https";
   locale: string;
   ogImagePath: string;
+  homeIntro: BilingualText;
+  about: {
+    eyebrow: BilingualText;
+    title: BilingualText;
+    subtitle: BilingualText;
+    body: BilingualText[];
+  };
+  contactPage: {
+    eyebrow: BilingualText;
+    title: BilingualText;
+    description: BilingualText;
+    aside: BilingualText;
+    infoLabels: {
+      email: BilingualText;
+      wechat: BilingualText;
+      phoneWhatsapp: BilingualText;
+    };
+  };
+  footer: {
+    intro: BilingualText;
+    appointment: BilingualText;
+    copyrightLabel: BilingualText;
+    contactHeading: BilingualText;
+    informationHeading: BilingualText;
+    collectionLink: BilingualText;
+    exhibitionsLink: BilingualText;
+    journalLink: BilingualText;
+    pdfRequestLabel: BilingualText;
+    instagramLabel: BilingualText;
+    wechatLabel: BilingualText;
+  };
   contact: ContactDetails;
+};
+
+export type HomeContent = {
+  heroEyebrow: BilingualText;
+  heroTitle: BilingualText;
+  heroSubtitle: BilingualText;
+  heroPrimaryAction: BilingualText;
+  heroSecondaryAction: BilingualText;
+  focusCurrent: {
+    eyebrow: BilingualText;
+    description: BilingualText;
+  };
+  focusRecent: {
+    eyebrow: BilingualText;
+    description: BilingualText;
+  };
+  focusSummaryLine: {
+    highlightUnit: BilingualText;
+    catalogueUnit: BilingualText;
+  };
+  focusAction: BilingualText;
+  selectedWorks: PageIntroCopy;
+  collectingDirections: PageIntroCopy;
+  operationalFacts: PageIntroCopy;
+  contact: PageIntroCopy;
+  contactPrimaryAction: BilingualText;
+  contactSecondaryAction: BilingualText;
 };
 
 export type BrandIntroContent = {
@@ -290,6 +349,7 @@ export type PageCopyContent = {
 
 export type SiteContent = {
   siteConfig: SiteConfigContent;
+  homeContent: HomeContent;
   pageCopy: PageCopyContent;
   brandIntro: BrandIntroContent;
   collectingDirections: CollectingDirection[];
@@ -301,10 +361,23 @@ export type SiteContent = {
 
 export type EditableSectionKey =
   | "siteConfig"
-  | "pageCopy"
-  | "brandIntro"
-  | "collectingDirections"
-  | "operationalFacts"
+  | "homeContent"
   | "artworks"
   | "exhibitions"
   | "articles";
+
+export type HomeContentEditorValue = {
+  intro: BilingualText;
+  homeContent: HomeContent;
+  collectingDirections: CollectingDirection[];
+  operationalFacts: OperationalFact[];
+  featuredArtworkIds: string[];
+};
+
+export type EditableSectionValueMap = {
+  siteConfig: SiteConfigContent;
+  homeContent: HomeContentEditorValue;
+  artworks: Artwork[];
+  exhibitions: Exhibition[];
+  articles: Article[];
+};

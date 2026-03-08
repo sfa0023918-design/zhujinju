@@ -12,7 +12,7 @@ type TargetSize = {
   height: number;
 };
 
-type UploadSaveTarget = {
+export type UploadSaveTarget = {
   section: "artworks";
   id: string;
   field: "image" | "gallery";
@@ -35,6 +35,8 @@ type AdminMediaFieldProps = {
   saveTarget?: UploadSaveTarget;
   disabled?: boolean;
   disabledHint?: string;
+  onPersisted?: (value: string) => void;
+  onPersistError?: (message: string) => void;
 };
 
 function getDefaultTargetSize(previewRatio: PreviewRatio): TargetSize {
@@ -61,6 +63,170 @@ function createObjectUrl(fileOrBlob: Blob) {
   return URL.createObjectURL(fileOrBlob);
 }
 
+export async function readAdminUploadResponse(response: Response) {
+  const raw = await response.text();
+
+  try {
+    return {
+      payload: JSON.parse(raw) as { url?: string; message?: string; error?: string; saved?: boolean },
+      raw,
+    };
+  } catch {
+    return {
+      payload: {} as { url?: string; message?: string; error?: string; saved?: boolean },
+      raw,
+    };
+  }
+}
+
+async function loadImage(file: File) {
+  return await new Promise<HTMLImageElement>((resolve, reject) => {
+    const objectUrl = createObjectUrl(file);
+    const nextImage = new window.Image();
+
+    nextImage.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(nextImage);
+    };
+
+    nextImage.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("浏览器未能读取这张图片，请换一张图片后再试。"));
+    };
+
+    nextImage.src = objectUrl;
+  });
+}
+
+export async function prepareAdminImageUpload(file: File, outputSize: TargetSize) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("仅支持上传图片文件。");
+  }
+
+  const image = await loadImage(file);
+  const targetRatio = outputSize.width / outputSize.height;
+  const sourceRatio = image.width / image.height;
+  const needsCropping = Math.abs(sourceRatio - targetRatio) > 0.015;
+  const needsResizing = image.width > outputSize.width || image.height > outputSize.height;
+  const needsCompression = file.size > SAFE_UPLOAD_BYTES;
+  const canKeepOriginal =
+    !needsCropping &&
+    !needsResizing &&
+    !needsCompression &&
+    file.type !== "image/gif" &&
+    file.type !== "image/svg+xml";
+
+  if (canKeepOriginal) {
+    return {
+      file,
+      previewUrl: createObjectUrl(file),
+      transformed: false,
+      details: {
+        cropped: false,
+        resized: false,
+        compressed: false,
+      },
+    };
+  }
+
+  const cropWidth = needsCropping
+    ? sourceRatio > targetRatio
+      ? image.height * targetRatio
+      : image.width
+    : image.width;
+  const cropHeight = needsCropping
+    ? sourceRatio > targetRatio
+      ? image.height
+      : image.width / targetRatio
+    : image.height;
+  const cropX = Math.max(0, (image.width - cropWidth) / 2);
+  const cropY = Math.max(0, (image.height - cropHeight) / 2);
+  const scale = Math.min(1, outputSize.width / cropWidth, outputSize.height / cropHeight);
+  let exportWidth = Math.max(1, Math.round(cropWidth * scale));
+  let exportHeight = Math.max(1, Math.round(cropHeight * scale));
+  const outputType = getTargetOutputType(file);
+  const outputExtension = outputType === "image/webp" ? "webp" : "jpg";
+  const normalizedName = file.name.replace(/\.[^.]+$/, "") || "upload";
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("当前浏览器无法处理图片，请更换一张图片后再试。");
+  }
+
+  const qualitySteps = [0.92, 0.86, 0.8, 0.74, 0.68];
+  let bestBlob: Blob | null = null;
+  let bestPreviewUrl: string | null = null;
+
+  for (let resizeRound = 0; resizeRound < 4; resizeRound += 1) {
+    canvas.width = exportWidth;
+    canvas.height = exportHeight;
+    context.clearRect(0, 0, exportWidth, exportHeight);
+    context.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, exportWidth, exportHeight);
+
+    for (const quality of qualitySteps) {
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, outputType, quality);
+      });
+
+      if (!blob) {
+        continue;
+      }
+
+      bestBlob = blob;
+
+      if (blob.size <= SAFE_UPLOAD_BYTES) {
+        if (bestPreviewUrl?.startsWith("blob:")) {
+          URL.revokeObjectURL(bestPreviewUrl);
+        }
+
+        return {
+          file: new File([blob], `${normalizedName}.${outputExtension}`, {
+            type: blob.type,
+            lastModified: Date.now(),
+          }),
+          previewUrl: createObjectUrl(blob),
+          transformed: true,
+          details: {
+            cropped: needsCropping,
+            resized: needsResizing || resizeRound > 0,
+            compressed: needsCompression || quality < 0.92,
+          },
+        };
+      }
+    }
+
+    if (bestPreviewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(bestPreviewUrl);
+    }
+
+    if (bestBlob) {
+      bestPreviewUrl = createObjectUrl(bestBlob);
+    }
+
+    exportWidth = Math.max(960, Math.round(exportWidth * 0.88));
+    exportHeight = Math.max(Math.round(960 / targetRatio), Math.round(exportHeight * 0.88));
+  }
+
+  if (bestBlob && bestBlob.size <= SAFE_UPLOAD_BYTES) {
+    return {
+      file: new File([bestBlob], `${normalizedName}.${outputExtension}`, {
+        type: bestBlob.type,
+        lastModified: Date.now(),
+      }),
+      previewUrl: bestPreviewUrl ?? createObjectUrl(bestBlob),
+      transformed: true,
+      details: {
+        cropped: true,
+        resized: true,
+        compressed: true,
+      },
+    };
+  }
+
+  throw new Error("系统已经自动裁切和压缩，但图片仍然过大。请换一张更清晰但尺寸更适中的图片，或先裁掉多余背景后再上传。");
+}
+
 export function AdminMediaField({
   fieldKey,
   label,
@@ -77,6 +243,8 @@ export function AdminMediaField({
   saveTarget,
   disabled = false,
   disabledHint,
+  onPersisted,
+  onPersistError,
 }: AdminMediaFieldProps) {
   const inputId = useId();
   const [uploading, setUploading] = useState(false);
@@ -115,170 +283,6 @@ export function AdminMediaField({
     });
   }
 
-  async function readUploadResponse(response: Response) {
-    const raw = await response.text();
-
-    try {
-      return {
-        payload: JSON.parse(raw) as { url?: string; message?: string; error?: string; saved?: boolean },
-        raw,
-      };
-    } catch {
-      return {
-        payload: {} as { url?: string; message?: string; error?: string; saved?: boolean },
-        raw,
-      };
-    }
-  }
-
-  async function loadImage(file: File) {
-    return await new Promise<HTMLImageElement>((resolve, reject) => {
-      const objectUrl = createObjectUrl(file);
-      const nextImage = new window.Image();
-
-      nextImage.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        resolve(nextImage);
-      };
-
-      nextImage.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error("浏览器未能读取这张图片，请换一张图片后再试。"));
-      };
-
-      nextImage.src = objectUrl;
-    });
-  }
-
-  async function transformImage(file: File) {
-    if (!file.type.startsWith("image/")) {
-      throw new Error("仅支持上传图片文件。");
-    }
-
-    const image = await loadImage(file);
-    const targetRatio = outputSize.width / outputSize.height;
-    const sourceRatio = image.width / image.height;
-    const needsCropping = Math.abs(sourceRatio - targetRatio) > 0.015;
-    const needsResizing = image.width > outputSize.width || image.height > outputSize.height;
-    const needsCompression = file.size > SAFE_UPLOAD_BYTES;
-    const canKeepOriginal =
-      !needsCropping &&
-      !needsResizing &&
-      !needsCompression &&
-      file.type !== "image/gif" &&
-      file.type !== "image/svg+xml";
-
-    if (canKeepOriginal) {
-      return {
-        file,
-        previewUrl: createObjectUrl(file),
-        transformed: false,
-        details: {
-          cropped: false,
-          resized: false,
-          compressed: false,
-        },
-      };
-    }
-
-    const cropWidth = needsCropping
-      ? sourceRatio > targetRatio
-        ? image.height * targetRatio
-        : image.width
-      : image.width;
-    const cropHeight = needsCropping
-      ? sourceRatio > targetRatio
-        ? image.height
-        : image.width / targetRatio
-      : image.height;
-    const cropX = Math.max(0, (image.width - cropWidth) / 2);
-    const cropY = Math.max(0, (image.height - cropHeight) / 2);
-    const scale = Math.min(1, outputSize.width / cropWidth, outputSize.height / cropHeight);
-    let exportWidth = Math.max(1, Math.round(cropWidth * scale));
-    let exportHeight = Math.max(1, Math.round(cropHeight * scale));
-    const outputType = getTargetOutputType(file);
-    const outputExtension = outputType === "image/webp" ? "webp" : "jpg";
-    const normalizedName = file.name.replace(/\.[^.]+$/, "") || "upload";
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-
-    if (!context) {
-      throw new Error("当前浏览器无法处理图片，请更换一张图片后再试。");
-    }
-
-    const qualitySteps = [0.92, 0.86, 0.8, 0.74, 0.68];
-    let bestBlob: Blob | null = null;
-    let bestPreviewUrl: string | null = null;
-
-    for (let resizeRound = 0; resizeRound < 4; resizeRound += 1) {
-      canvas.width = exportWidth;
-      canvas.height = exportHeight;
-      context.clearRect(0, 0, exportWidth, exportHeight);
-      context.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, exportWidth, exportHeight);
-
-      for (const quality of qualitySteps) {
-        const blob = await new Promise<Blob | null>((resolve) => {
-          canvas.toBlob(resolve, outputType, quality);
-        });
-
-        if (!blob) {
-          continue;
-        }
-
-        bestBlob = blob;
-
-        if (blob.size <= SAFE_UPLOAD_BYTES) {
-          if (bestPreviewUrl?.startsWith("blob:")) {
-            URL.revokeObjectURL(bestPreviewUrl);
-          }
-
-          return {
-            file: new File([blob], `${normalizedName}.${outputExtension}`, {
-              type: blob.type,
-              lastModified: Date.now(),
-            }),
-            previewUrl: createObjectUrl(blob),
-            transformed: true,
-            details: {
-              cropped: needsCropping,
-              resized: needsResizing || resizeRound > 0,
-              compressed: needsCompression || quality < 0.92,
-            },
-          };
-        }
-      }
-
-      if (bestPreviewUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(bestPreviewUrl);
-      }
-
-      if (bestBlob) {
-        bestPreviewUrl = createObjectUrl(bestBlob);
-      }
-
-      exportWidth = Math.max(960, Math.round(exportWidth * 0.88));
-      exportHeight = Math.max(Math.round(960 / targetRatio), Math.round(exportHeight * 0.88));
-    }
-
-    if (bestBlob && bestBlob.size <= SAFE_UPLOAD_BYTES) {
-      return {
-        file: new File([bestBlob], `${normalizedName}.${outputExtension}`, {
-          type: bestBlob.type,
-          lastModified: Date.now(),
-        }),
-        previewUrl: bestPreviewUrl ?? createObjectUrl(bestBlob),
-        transformed: true,
-        details: {
-          cropped: true,
-          resized: true,
-          compressed: true,
-        },
-      };
-    }
-
-    throw new Error(`系统已经自动裁切和压缩，但图片仍然过大。请换一张更清晰但尺寸更适中的图片，或先裁掉多余背景后再上传。`);
-  }
-
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (disabled) {
       event.target.value = "";
@@ -296,7 +300,11 @@ export function AdminMediaField({
     setMessage(null);
 
     try {
-      const prepared = await transformImage(file);
+      if (saveTarget && !saveTarget.id.trim()) {
+        throw new Error("当前内容还没有真实记录，暂时不能上传图片。");
+      }
+
+      const prepared = await prepareAdminImageUpload(file, outputSize);
       replaceLocalPreview(prepared.previewUrl);
 
       const formData = new FormData();
@@ -316,7 +324,7 @@ export function AdminMediaField({
         body: formData,
       });
 
-      const { payload, raw } = await readUploadResponse(response);
+      const { payload, raw } = await readAdminUploadResponse(response);
 
       if (!response.ok || !payload.url) {
         if (response.status === 413 || /request entity too large/i.test(raw)) {
@@ -328,15 +336,16 @@ export function AdminMediaField({
 
       onChange(payload.url);
       setLastPersistedValue(payload.url);
+      onPersisted?.(payload.url);
       setMessage(
         payload.saved
-          ? payload.message ?? "图片已上传并写入当前内容。部署完成后，前台会显示新图片。"
+          ? payload.message ?? "图片已上传并同步当前内容。"
           : autoSaveAfterUpload
           ? prepared.transformed
-            ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
-            : "图片已上传，系统正在自动保存当前内容。部署完成后，前台将显示新图片。"
+            ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存。"
+            : "图片已上传，系统正在自动保存。"
           : prepared.transformed
-            ? "图片已自动裁切并压缩为网站适用尺寸。保存当前内容后，网站会在下一次部署完成后显示新图片。"
+            ? "图片已自动裁切并压缩为网站适用尺寸。"
             : payload.message ?? "图片上传成功。",
       );
 
@@ -345,7 +354,9 @@ export function AdminMediaField({
       }
     } catch (uploadError) {
       replaceLocalPreview(null);
-      setError(uploadError instanceof Error ? uploadError.message : "图片上传失败。");
+      const message = uploadError instanceof Error ? uploadError.message : "图片上传失败。";
+      setError(message);
+      onPersistError?.(message);
     } finally {
       setUploading(false);
       event.target.value = "";
@@ -354,6 +365,11 @@ export function AdminMediaField({
 
   async function persistMediaValue(nextValue: string) {
     if (!saveTarget || disabled) {
+      return;
+    }
+
+    if (!saveTarget.id.trim()) {
+      setError("当前内容还没有真实记录，暂时不能保存图片。");
       return;
     }
 
@@ -381,9 +397,12 @@ export function AdminMediaField({
       }
 
       setLastPersistedValue(nextValue);
+      onPersisted?.(nextValue);
       setMessage(payload.message ?? "图片字段已更新。");
     } catch (persistError) {
-      setError(persistError instanceof Error ? persistError.message : "图片字段保存失败。");
+      const message = persistError instanceof Error ? persistError.message : "图片字段保存失败。";
+      setError(message);
+      onPersistError?.(message);
     } finally {
       setSaving(false);
     }
@@ -461,7 +480,7 @@ export function AdminMediaField({
                   : "cursor-pointer hover:bg-[var(--surface-strong)]"
               }`}
             >
-              {disabled ? "请先保存当前藏品" : uploading ? "处理中..." : saving ? "同步中..." : "上传本地图片"}
+              {disabled ? "暂不可上传" : uploading ? "处理中..." : saving ? "同步中..." : "上传本地图片"}
             </label>
             <input
               id={inputId}

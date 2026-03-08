@@ -1,0 +1,548 @@
+"use client";
+
+import Link from "next/link";
+
+import type {
+  Article,
+  Artwork,
+  Exhibition,
+  PageCopyContent,
+  SiteConfigContent,
+} from "@/lib/site-data";
+
+import { ActionLabel } from "./action-label";
+import { ArtworkCard } from "./artwork-card";
+import { ArtworkGallery } from "./artwork-gallery";
+import { BilingualText } from "./bilingual-text";
+import { StatusPill } from "./status-pill";
+
+type ArtworkDetailCopy = PageCopyContent["artworkDetail"];
+
+type ArtworkDetailTemplateProps = {
+  artwork: Artwork;
+  detailCopy: ArtworkDetailCopy;
+  siteConfig: SiteConfigContent;
+  relatedWorks: Artwork[];
+  relatedArticles: Article[];
+  relatedExhibitions: Exhibition[];
+};
+
+type ArtworkFactsProps = {
+  items: Array<{
+    label: { zh: string; en: string };
+    value: { zh: string; en: string };
+  }>;
+};
+
+type ArtworkInquiryProps = {
+  artwork: Artwork;
+  detailCopy: ArtworkDetailCopy;
+  siteConfig: SiteConfigContent;
+};
+
+type ArtworkHeroProps = {
+  artwork: Artwork;
+  detailCopy: ArtworkDetailCopy;
+  siteConfig: SiteConfigContent;
+};
+
+type ArtworkScholarlyNoteProps = {
+  artwork: Artwork;
+  detailCopy: ArtworkDetailCopy;
+};
+
+type ArtworkReferencesProps = {
+  artwork: Artwork;
+  detailCopy: ArtworkDetailCopy;
+  relatedArticles: Article[];
+  relatedExhibitions: Exhibition[];
+};
+
+type RelatedWorksProps = {
+  items: Artwork[];
+  detailCopy: ArtworkDetailCopy;
+};
+
+function hasText(value?: { zh?: string; en?: string } | null) {
+  if (!value) {
+    return false;
+  }
+
+  return Boolean(value.zh?.trim() || value.en?.trim());
+}
+
+function joinBilingual(primary: { zh: string; en: string }, secondary?: { zh: string; en: string }) {
+  if (!secondary || (!secondary.zh.trim() && !secondary.en.trim())) {
+    return primary;
+  }
+
+  return {
+    zh: `${primary.zh} · ${secondary.zh}`,
+    en: `${primary.en} · ${secondary.en}`,
+  };
+}
+
+function DetailIndexSection({
+  label,
+  tone = "primary",
+  children,
+}: {
+  label: { zh: string; en: string };
+  tone?: "primary" | "secondary";
+  children: React.ReactNode;
+}) {
+  const titleClasses =
+    tone === "secondary"
+      ? {
+          zh: "text-[0.56rem] tracking-[0.14em]",
+          en: "text-[0.4rem] uppercase tracking-[0.14em] text-[var(--accent)]/34",
+        }
+      : {
+          zh: "text-[0.6rem] tracking-[0.15em]",
+          en: "text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/42",
+        };
+
+  return (
+    <section className="border-t border-[var(--line)]/34 pt-4.5 first:border-t-0 first:pt-0">
+      <BilingualText
+        as="p"
+        text={label}
+        mode="inline"
+        className="text-[var(--accent)]"
+        zhClassName={titleClasses.zh}
+        enClassName={titleClasses.en}
+      />
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
+export function ArtworkFacts({ items }: ArtworkFactsProps) {
+  const visibleItems = items.filter((item) => hasText(item.value));
+
+  if (!visibleItems.length) {
+    return null;
+  }
+
+  return (
+    <dl className="space-y-0.5 border-t border-[var(--line)]/34 pt-1">
+      {visibleItems.map((item) => (
+        <div
+          key={item.label.zh}
+          className="grid gap-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[92px_minmax(0,1fr)] md:gap-3.5"
+        >
+          <dt className="text-[var(--accent)]">
+            <p className="text-[0.52rem] tracking-[0.13em] text-[var(--accent)]/76">{item.label.zh}</p>
+            <p className="mt-0.5 text-[0.4rem] uppercase tracking-[0.14em] text-[var(--accent)]/34">
+              {item.label.en}
+            </p>
+          </dt>
+          <dd className="min-w-0">
+            <p className="text-[0.9rem] leading-7 text-[var(--ink)]">{item.value.zh}</p>
+            {item.value.en.trim() ? (
+              <p className="mt-0.5 text-[0.48rem] uppercase tracking-[0.14em] text-[var(--accent)]/36">
+                {item.value.en}
+              </p>
+            ) : null}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function ArtworkInquiry({
+  artwork,
+  detailCopy,
+  siteConfig,
+}: ArtworkInquiryProps) {
+  const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
+  const supportItems = artwork.inquirySupport.filter(hasText);
+  const contactRows = [
+    { label: "Email", value: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` },
+    { label: "WeChat", value: siteConfig.contact.wechat },
+    { label: "Phone", value: siteConfig.contact.phone },
+    {
+      label: "Instagram",
+      value: siteConfig.contact.instagram,
+      href: siteConfig.contact.instagram.startsWith("http")
+        ? siteConfig.contact.instagram
+        : `https://instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}`,
+    },
+  ].filter((item) => item.value.trim());
+
+  return (
+    <div className="space-y-3.5 border-t border-[var(--line)]/34 pt-5">
+      <Link
+        href={inquiryHref}
+        className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line-strong)]/62 px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+      >
+        <ActionLabel text={detailCopy.inquireAction} />
+      </Link>
+
+      {supportItems.length ? (
+        <div className="flex flex-wrap gap-2">
+          {supportItems.map((item) => (
+            <Link
+              key={item.zh}
+              href={`${inquiryHref}&request=${encodeURIComponent(item.zh || item.en)}`}
+              className="inline-flex min-h-8 cursor-pointer select-none items-center rounded-full border border-[var(--line)]/26 px-3 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/38 hover:text-[var(--ink)]"
+            >
+              <BilingualText
+                as="span"
+                text={item}
+                mode="inline"
+                className="leading-none"
+                zhClassName="text-[0.64rem]"
+                enClassName="text-[0.38rem] uppercase tracking-[0.14em] text-[var(--accent)]/36"
+              />
+            </Link>
+          ))}
+        </div>
+      ) : null}
+
+      {(contactRows.length || hasText(siteConfig.contact.appointmentNote) || detailCopy.backAction.zh) ? (
+        <div className="space-y-2.5 border-t border-[var(--line)]/20 pt-3">
+          {contactRows.length ? (
+            <dl className="grid gap-y-2 sm:grid-cols-2 sm:gap-x-6">
+              {contactRows.map((item) => (
+                <div key={`${artwork.slug}-${item.label}`} className="min-w-0">
+                  <dt className="text-[0.42rem] uppercase tracking-[0.16em] text-[var(--accent)]/40">
+                    {item.label}
+                  </dt>
+                  <dd className="mt-1 text-[0.76rem] leading-6 text-[var(--ink)]">
+                    {item.href ? (
+                      <a href={item.href} className="transition-colors hover:text-[var(--accent)]">
+                        {item.value}
+                      </a>
+                    ) : (
+                      item.value
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {hasText(siteConfig.contact.appointmentNote) ? (
+            <p className="max-w-[26rem] text-[0.76rem] leading-7 text-[var(--muted)]">
+              {siteConfig.contact.appointmentNote.zh}
+            </p>
+          ) : null}
+
+          <Link
+            href="/collection"
+            className="inline-flex items-center text-[0.72rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+          >
+            <ActionLabel text={detailCopy.backAction} />
+          </Link>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function ArtworkHero({
+  artwork,
+  detailCopy,
+  siteConfig,
+}: ArtworkHeroProps) {
+  const facts = [
+    { label: detailCopy.fieldLabels.period, value: artwork.period },
+    { label: detailCopy.fieldLabels.regionOrigin, value: joinBilingual(artwork.region, artwork.origin) },
+    { label: detailCopy.fieldLabels.material, value: artwork.material },
+    { label: detailCopy.fieldLabels.dimensions, value: artwork.dimensions },
+  ];
+  const hasLead = hasText(artwork.excerpt);
+
+  return (
+    <section className="mx-auto w-full max-w-[1480px] px-5 py-7 md:px-10 md:py-10">
+      <div className="mb-5 text-[0.82rem] leading-6 text-[var(--muted)]">
+        <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
+          {detailCopy.breadcrumb.zh}
+        </Link>
+        <span className="px-2 text-[var(--accent)]/34">/</span>
+        <span className="text-[var(--ink)]">{artwork.title.zh}</span>
+      </div>
+
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.82fr)] lg:gap-16">
+        <ArtworkGallery
+          title={`${artwork.title.zh} ${artwork.title.en}`.trim()}
+          primaryImage={artwork.image}
+          gallery={artwork.gallery}
+        />
+
+        <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
+          <div className="space-y-4 border-t border-[var(--line)]/56 pt-5">
+            <div className="flex items-center justify-between gap-4">
+              <BilingualText
+                as="p"
+                text={artwork.category}
+                mode="inline"
+                className="text-[var(--accent)]"
+                zhClassName="text-[0.68rem] tracking-[0.16em]"
+                enClassName="text-[0.46rem] uppercase tracking-[0.15em] text-[var(--accent)]/48"
+              />
+              <StatusPill status={artwork.status} />
+            </div>
+            <div className="space-y-2">
+              <h1 className="font-serif text-[clamp(2.5rem,3.8vw,3.4rem)] leading-[0.98] tracking-[-0.045em] text-[var(--ink)]">
+                {artwork.title.zh}
+              </h1>
+              <p className="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]/44">
+                {artwork.title.en}
+              </p>
+            </div>
+            {hasText(artwork.subtitle) ? (
+              <p className="max-w-[28rem] text-[0.9rem] leading-7 text-[var(--muted)]">{artwork.subtitle.zh}</p>
+            ) : null}
+            {hasLead ? (
+              <p className="max-w-[30rem] text-[0.82rem] leading-7 text-[var(--muted)]">{artwork.excerpt.zh}</p>
+            ) : null}
+          </div>
+
+          <ArtworkFacts items={facts} />
+          <ArtworkInquiry artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} />
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+export function ArtworkScholarlyNote({
+  artwork,
+  detailCopy,
+}: ArtworkScholarlyNoteProps) {
+  const hasExcerpt = hasText(artwork.excerpt);
+  const hasViewing = hasText(artwork.viewingNote);
+  const hasComparison = hasText(artwork.comparisonNote);
+  const showExcerptAsLead = hasExcerpt && !hasViewing && !hasComparison;
+
+  if (!hasExcerpt && !hasViewing && !hasComparison) {
+    return null;
+  }
+
+  return (
+    <section className="max-w-[42rem] space-y-7">
+      <div className="space-y-2">
+        <BilingualText
+          as="p"
+          text={detailCopy.scholarlyNote}
+          mode="inline"
+          className="text-[var(--accent)]"
+          zhClassName="text-[0.66rem] tracking-[0.16em]"
+          enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
+        />
+        {showExcerptAsLead ? (
+          <p className="text-[1rem] leading-8 text-[var(--ink)] md:text-[1.04rem]">
+            {artwork.excerpt.zh}
+          </p>
+        ) : null}
+      </div>
+
+      {hasViewing ? (
+        <div className="space-y-2.5">
+          <BilingualText
+            as="p"
+            text={detailCopy.viewingNote}
+            mode="inline"
+            className="text-[var(--accent)]"
+            zhClassName="text-[0.58rem] tracking-[0.15em]"
+            enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
+          />
+          <p className="text-[0.96rem] leading-8 text-[var(--muted)]">{artwork.viewingNote.zh}</p>
+        </div>
+      ) : null}
+
+      {hasComparison ? (
+        <div className="space-y-2.5">
+          <BilingualText
+            as="p"
+            text={detailCopy.comparisonNote}
+            mode="inline"
+            className="text-[var(--accent)]"
+            zhClassName="text-[0.58rem] tracking-[0.15em]"
+            enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
+          />
+          <p className="text-[0.96rem] leading-8 text-[var(--muted)]">{artwork.comparisonNote.zh}</p>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+export function ArtworkReferences({
+  artwork,
+  detailCopy,
+  relatedArticles,
+  relatedExhibitions,
+}: ArtworkReferencesProps) {
+  const hasProvenance = artwork.provenance.length > 0;
+  const hasExhibitions = artwork.exhibitions.length > 0;
+  const hasPublications = artwork.publications.length > 0;
+  const hasRelatedArticles = relatedArticles.length > 0;
+  const hasRelatedExhibitions = relatedExhibitions.length > 0;
+
+  if (!hasProvenance && !hasExhibitions && !hasPublications && !hasRelatedArticles && !hasRelatedExhibitions) {
+    return null;
+  }
+
+  return (
+    <aside className="space-y-4.5 lg:pl-6">
+      {hasProvenance ? (
+        <DetailIndexSection label={detailCopy.provenance}>
+          <ul className="space-y-3">
+            {artwork.provenance.map((item) => (
+              <li key={item.label.zh} className="space-y-0.5">
+                <p className="text-[0.86rem] leading-7 text-[var(--ink)]">{item.label.zh}</p>
+                {item.note && hasText(item.note) ? (
+                  <p className="text-[0.76rem] leading-6 text-[var(--muted)]">{item.note.zh}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </DetailIndexSection>
+      ) : null}
+
+      {hasExhibitions ? (
+        <DetailIndexSection label={detailCopy.exhibitions}>
+          <ul className="space-y-3">
+            {artwork.exhibitions.map((item) => (
+              <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
+                <p className="text-[0.86rem] leading-7 text-[var(--ink)]">{item.title.zh}</p>
+                <p className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                  {item.venue.zh}，{item.year}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </DetailIndexSection>
+      ) : null}
+
+      {hasPublications ? (
+        <DetailIndexSection label={detailCopy.publications}>
+          <ul className="space-y-3">
+            {artwork.publications.map((item) => (
+              <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
+                <p className="text-[0.86rem] leading-7 text-[var(--ink)]">{item.title.zh}</p>
+                <p className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                  {item.year}，{item.pages.zh}
+                </p>
+                {item.note && hasText(item.note) ? (
+                  <p className="text-[0.76rem] leading-6 text-[var(--muted)]">{item.note.zh}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </DetailIndexSection>
+      ) : null}
+
+      {hasRelatedExhibitions ? (
+        <DetailIndexSection label={detailCopy.relatedExhibitions} tone="secondary">
+          <div className="space-y-2">
+            {relatedExhibitions.map((item) => (
+              <Link
+                key={item.slug}
+                href={`/exhibitions/${item.slug}`}
+                className="block text-[0.8rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+              >
+                {item.title.zh}
+              </Link>
+            ))}
+          </div>
+        </DetailIndexSection>
+      ) : null}
+
+      {hasRelatedArticles ? (
+        <DetailIndexSection label={detailCopy.relatedArticles} tone="secondary">
+          <div className="space-y-2">
+            {relatedArticles.map((item) => (
+              <Link
+                key={item.slug}
+                href={`/journal/${item.slug}`}
+                className="block text-[0.8rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+              >
+                {item.title.zh}
+              </Link>
+            ))}
+          </div>
+        </DetailIndexSection>
+      ) : null}
+    </aside>
+  );
+}
+
+export function RelatedWorks({ items, detailCopy }: RelatedWorksProps) {
+  const visibleItems = items.slice(0, 3);
+
+  if (!visibleItems.length) {
+    return null;
+  }
+
+  const gridClassName =
+    visibleItems.length === 1
+      ? "max-w-[24rem]"
+      : visibleItems.length === 2
+        ? "grid gap-x-7 gap-y-9 md:grid-cols-2"
+        : "grid gap-x-7 gap-y-9 md:grid-cols-2 xl:grid-cols-3";
+  const innerClassName = visibleItems.length === 1 ? "max-w-[24rem]" : "";
+  const headingClassName = visibleItems.length === 1 ? "max-w-[20rem] space-y-1.5" : "max-w-[34rem] space-y-2";
+  const titleClassName =
+    visibleItems.length === 1
+      ? "font-serif text-[clamp(1.58rem,2.2vw,2.1rem)] leading-[1.06] tracking-[-0.035em] text-[var(--ink)] text-balance"
+      : "font-serif text-[clamp(1.9rem,3vw,2.65rem)] leading-[1.02] tracking-[-0.04em] text-[var(--ink)]";
+
+  return (
+    <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-10 md:py-18">
+      <div className={innerClassName}>
+        <div className={headingClassName}>
+          <BilingualText
+            as="p"
+            text={detailCopy.relatedWorks}
+            mode="inline"
+            className="text-[var(--accent)]"
+            zhClassName="text-[0.66rem] tracking-[0.16em]"
+            enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
+          />
+          <h2 className={titleClassName}>
+            {detailCopy.relatedWorksTitle.zh}
+          </h2>
+        </div>
+        <div className={`mt-7 ${gridClassName}`}>
+          {visibleItems.map((item, index) => (
+            <ArtworkCard key={item.slug} artwork={item} priority={index === 0} variant="compact" />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function ArtworkDetailTemplate({
+  artwork,
+  detailCopy,
+  siteConfig,
+  relatedWorks,
+  relatedArticles,
+  relatedExhibitions,
+}: ArtworkDetailTemplateProps) {
+  return (
+    <>
+      <ArtworkHero artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} />
+
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-10 md:py-18">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,0.88fr)_minmax(260px,0.62fr)] lg:gap-16">
+          <ArtworkScholarlyNote artwork={artwork} detailCopy={detailCopy} />
+          <ArtworkReferences
+            artwork={artwork}
+            detailCopy={detailCopy}
+            relatedArticles={relatedArticles}
+            relatedExhibitions={relatedExhibitions}
+          />
+        </div>
+      </section>
+
+      <RelatedWorks items={relatedWorks} detailCopy={detailCopy} />
+    </>
+  );
+}

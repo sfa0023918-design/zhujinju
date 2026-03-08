@@ -37,8 +37,8 @@ export async function POST(request: Request) {
       saved: true,
       message:
         body.value && String(body.value).trim()
-          ? "图片路径已写入当前藏品。部署完成后，前台会显示最新图片。"
-          : "图片已从当前藏品中移除。部署完成后，前台会同步更新。",
+          ? "图片路径已写入当前藏品。"
+          : "图片已从当前藏品中移除。",
     });
   } catch (error) {
     return NextResponse.json(

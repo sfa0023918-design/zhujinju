@@ -24,6 +24,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "未检测到上传文件。" }, { status: 400 });
     }
 
+    if (targetSection === "artworks" && !targetId) {
+      return NextResponse.json({ error: "当前藏品还没有真实记录，不能上传图片。" }, { status: 400 });
+    }
+
     const result = await uploadAdminImage(file, folder, session.email);
 
     if (targetSection === "artworks" && targetId && (targetField === "image" || targetField === "gallery")) {
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         ...result,
         saved: true,
-        message: "图片已上传并写入当前藏品。部署完成后，前台会按你的细节图顺序显示。",
+        message: "图片已上传并写入当前藏品。",
       });
     }
 

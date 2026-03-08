@@ -5,6 +5,7 @@ import { BilingualText } from "./bilingual-text";
 
 type StatusPillProps = {
   status: ArtworkStatus;
+  variant?: "default" | "fine";
 };
 
 const statusClassMap: Record<ArtworkStatus, string> = {
@@ -13,15 +14,25 @@ const statusClassMap: Record<ArtworkStatus, string> = {
   reserved: "border-[var(--line)] text-[var(--muted)]",
 };
 
-export function StatusPill({ status }: StatusPillProps) {
+export function StatusPill({ status, variant = "default" }: StatusPillProps) {
+  const baseClassName =
+    variant === "fine"
+      ? "inline-flex items-center rounded-full border px-[0.34rem] py-[0.06rem]"
+      : "inline-flex items-center rounded-full border px-2.5 py-[0.22rem]";
+  const zhClassName = variant === "fine" ? "text-[0.48rem] tracking-[0.14em]" : "text-[0.64rem] tracking-[0.16em]";
+  const enClassName =
+    variant === "fine"
+      ? "text-[0.28rem] uppercase tracking-[0.1em] opacity-38"
+      : "text-[0.4rem] uppercase tracking-[0.1em] opacity-60";
+
   return (
     <BilingualText
       as="span"
       text={getArtworkStatusText(status)}
       mode="inline"
-      className={`inline-flex items-center rounded-full border px-3 py-[0.28rem] ${statusClassMap[status]}`}
-      zhClassName="text-[0.72rem] tracking-[0.18em]"
-      enClassName="text-[0.44rem] uppercase tracking-[0.12em] opacity-70"
+      className={`${baseClassName} ${statusClassMap[status]}`}
+      zhClassName={zhClassName}
+      enClassName={enClassName}
     />
   );
 }

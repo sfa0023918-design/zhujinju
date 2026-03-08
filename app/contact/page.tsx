@@ -14,11 +14,11 @@ type ContactPageProps = {
 };
 
 export async function generateMetadata() {
-  const { siteConfig, pageCopy } = await loadSiteContent();
+  const { siteConfig } = await loadSiteContent();
 
   return buildMetadata({
     title: bt("联系", "Contact"),
-    description: pageCopy.contact.hero.description,
+    description: siteConfig.contactPage.description,
     path: "/contact",
     site: siteConfig,
   });
@@ -27,15 +27,15 @@ export async function generateMetadata() {
 export default async function ContactPage({ searchParams }: ContactPageProps) {
   const params = (await searchParams) ?? {};
   const { siteConfig, pageCopy } = await loadSiteContent();
-  const labels = pageCopy.contact.infoLabels;
+  const labels = siteConfig.contactPage.infoLabels;
 
   return (
     <>
       <PageHero
-        eyebrow={pageCopy.contact.hero.eyebrow}
-        title={pageCopy.contact.hero.title}
-        description={pageCopy.contact.hero.description}
-        aside={pageCopy.contact.hero.aside}
+        eyebrow={siteConfig.contactPage.eyebrow}
+        title={siteConfig.contactPage.title}
+        description={siteConfig.contactPage.description}
+        aside={siteConfig.contactPage.aside}
       />
 
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 pb-16 md:grid-cols-[minmax(0,0.72fr)_minmax(0,1.08fr)] md:px-10 md:pb-24">
@@ -76,12 +76,11 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           </div>
           <div className="border-t border-[var(--line)] pt-5">
             <p className="text-sm leading-8 text-[var(--muted)]">{siteConfig.contact.address.zh}</p>
-            <p className="mt-3 text-sm leading-8 text-[var(--muted)]">{pageCopy.contact.appointmentLine.zh}</p>
+            <p className="mt-3 text-sm leading-8 text-[var(--muted)]">{siteConfig.contact.appointmentNote.zh}</p>
           </div>
           <div className="border-t border-[var(--line)] pt-5">
             <p className="text-sm leading-8 text-[var(--muted)]">{siteConfig.contact.replyWindow.zh}</p>
             <p className="mt-2 text-sm leading-8 text-[var(--muted)]">{siteConfig.contact.collaborationNote.zh}</p>
-            <p className="mt-2 text-sm leading-8 text-[var(--muted)]">{pageCopy.contact.cooperationLine.zh}</p>
           </div>
         </div>
         <ContactForm
