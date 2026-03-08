@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const file = formData.get("file");
     const folder = String(formData.get("folder") ?? "misc");
     const targetSection = String(formData.get("targetSection") ?? "");
-    const targetSlug = String(formData.get("targetSlug") ?? "");
+    const targetId = String(formData.get("targetId") ?? "");
     const targetField = String(formData.get("targetField") ?? "");
     const targetIndexRaw = String(formData.get("targetIndex") ?? "");
 
@@ -26,8 +26,8 @@ export async function POST(request: Request) {
 
     const result = await uploadAdminImage(file, folder, session.email);
 
-    if (targetSection === "artworks" && targetSlug && (targetField === "image" || targetField === "gallery")) {
-      await saveArtworkMediaField(targetSlug, targetField, result.url, session.email, {
+    if (targetSection === "artworks" && targetId && (targetField === "image" || targetField === "gallery")) {
+      await saveArtworkMediaField(targetId, targetField, result.url, session.email, {
         galleryIndex: targetField === "gallery" && targetIndexRaw ? Number(targetIndexRaw) : undefined,
       });
 

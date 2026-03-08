@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AdminActionState } from "@/app/admin/actions";
 import type {
@@ -32,44 +32,19 @@ type AdminVisualEditorProps = {
   autoCreate?: boolean;
 };
 
+type ArtworkSavePhase = "idle" | "creating" | "saving" | "saved" | "error";
+
+type ArtworkSaveState = {
+  phase: ArtworkSavePhase;
+  message?: string;
+};
+
 function emptyBilingual(): BilingualText {
   return { zh: "", en: "" };
 }
 
 function createSlug(prefix: string) {
   return `${prefix}-${Date.now()}`;
-}
-
-function createArtwork(): Artwork {
-  return {
-    slug: createSlug("artwork"),
-    publicationStatus: "draft",
-    title: emptyBilingual(),
-    subtitle: emptyBilingual(),
-    period: emptyBilingual(),
-    region: emptyBilingual(),
-    origin: emptyBilingual(),
-    material: emptyBilingual(),
-    category: emptyBilingual(),
-    dimensions: emptyBilingual(),
-    status: "inquiry",
-    excerpt: emptyBilingual(),
-    viewingNote: emptyBilingual(),
-    comparisonNote: emptyBilingual(),
-    provenance: [],
-    exhibitions: [],
-    publications: [],
-    inquirySupport: [
-      { zh: "可索取高清图", en: "High-resolution images available on request" },
-      { zh: "可索取品相信息", en: "Condition report available on request" },
-      { zh: "可索取图录页", en: "Catalogue pages available on request" },
-    ],
-    relatedArticleSlugs: [],
-    relatedExhibitionSlugs: [],
-    image: "",
-    gallery: [],
-    featured: false,
-  };
 }
 
 function createExhibition(): Exhibition {
@@ -151,6 +126,15 @@ function moveArrayItem<T>(items: T[], from: number, to: number) {
 
 function toggleString(items: string[], value: string) {
   return items.includes(value) ? items.filter((item) => item !== value) : [...items, value];
+}
+
+function getArtworkId(artwork: Artwork) {
+  return artwork.id ?? artwork.slug;
+}
+
+function replaceArtworkById(items: Artwork[], nextArtwork: Artwork) {
+  const nextId = getArtworkId(nextArtwork);
+  return items.map((artwork) => (getArtworkId(artwork) === nextId ? nextArtwork : artwork));
 }
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -710,7 +694,7 @@ function getGallerySlots(images: string[]) {
 function MediaGalleryEditor({
   label,
   folder,
-  artworkSlug,
+  artworkId,
   canPersistMedia,
   images,
   onChange,
@@ -718,7 +702,7 @@ function MediaGalleryEditor({
 }: {
   label: string;
   folder: string;
-  artworkSlug: string;
+  artworkId?: string;
   canPersistMedia: boolean;
   images: string[];
   onChange: (images: string[]) => void;
@@ -775,7 +759,7 @@ function MediaGalleryEditor({
               ) : null}
             </div>
             <AdminMediaField
-              fieldKey={`${artworkSlug}:gallery:${index}`}
+              fieldKey={`${artworkId ?? "pending"}:gallery:${index}`}
               label={`细节图 ${index + 1}`}
               folder={folder}
               value={image}
@@ -785,7 +769,7 @@ function MediaGalleryEditor({
                 canPersistMedia
                   ? {
                       section: "artworks",
-                      slug: artworkSlug,
+                      id: artworkId!,
                       field: "gallery",
                       index,
                     }
@@ -823,8 +807,11 @@ export function AdminVisualEditor({
   const [autosaveState, setAutosaveState] = useState<"idle" | "restored" | "saved">("idle");
   const [queuedUploadSave, setQueuedUploadSave] = useState(0);
   const [submittedUploadSave, setSubmittedUploadSave] = useState(0);
+  const [artworkSaveState, setArtworkSaveState] = useState<ArtworkSaveState>({ phase: "idle" });
   const formRef = useRef<HTMLFormElement>(null);
   const lastSuccessRef = useRef<string | null>(null);
+  const artworkSaveTimerRef = useRef<number | null>(null);
+  const artworkRequestRef = useRef(0);
 
   useEffect(() => {
     setDraft(cloneValue(initialValue));
@@ -832,7 +819,12 @@ export function AdminVisualEditor({
     setSelectedIndex(0);
     setHydrated(false);
     setAutosaveState("idle");
+    setArtworkSaveState({ phase: "idle" });
     lastSuccessRef.current = null;
+    if (artworkSaveTimerRef.current) {
+      window.clearTimeout(artworkSaveTimerRef.current);
+      artworkSaveTimerRef.current = null;
+    }
   }, [initialValue, section]);
 
   useEffect(() => {
@@ -863,14 +855,51 @@ export function AdminVisualEditor({
     }
 
     if (section === "artworks") {
-      setDraft((current) => {
-        const items = cloneValue(current as Artwork[]);
-        items.push(createArtwork());
-        return items as SiteContent[EditableSectionKey];
-      });
-      setSelectedIndex((initialValue as Artwork[]).length);
-      setHydrated(true);
-      return;
+      let cancelled = false;
+
+      void (async () => {
+        setArtworkSaveState({ phase: "creating", message: "正在创建新藏品草稿..." });
+
+        try {
+          const response = await fetch("/api/admin/artworks", {
+            method: "POST",
+          });
+          const payload = (await response.json()) as {
+            artwork?: Artwork;
+            artworks?: Artwork[];
+            message?: string;
+            error?: string;
+          };
+
+          if (!response.ok || !payload.artwork || !payload.artworks) {
+            throw new Error(payload.error ?? "新建藏品失败。");
+          }
+
+          if (cancelled) {
+            return;
+          }
+
+          setDraft(payload.artworks as SiteContent[EditableSectionKey]);
+          setPersistedValue(payload.artworks as SiteContent[EditableSectionKey]);
+          setSelectedIndex(payload.artworks.findIndex((artwork) => getArtworkId(artwork) === getArtworkId(payload.artwork!)));
+          setArtworkSaveState({ phase: "saved", message: payload.message ?? "新藏品草稿已创建。" });
+          setHydrated(true);
+        } catch (error) {
+          if (cancelled) {
+            return;
+          }
+
+          setArtworkSaveState({
+            phase: "error",
+            message: error instanceof Error ? error.message : "新建藏品失败。",
+          });
+          setHydrated(true);
+        }
+      })();
+
+      return () => {
+        cancelled = true;
+      };
     }
 
     if (section === "exhibitions") {
@@ -969,14 +998,188 @@ export function AdminVisualEditor({
   function resetBrowserDraft() {
     const storageKey = `zhujinju-admin-draft-${section}`;
     window.localStorage.removeItem(storageKey);
-    setDraft(cloneValue(initialValue));
+    setDraft(cloneValue(persistedValue));
     setSelectedIndex(0);
     setAutosaveState("idle");
+    setArtworkSaveState({ phase: "idle" });
   }
 
   function queueAutoSaveAfterUpload() {
+    if (section === "artworks") {
+      return;
+    }
+
     setQueuedUploadSave(Date.now());
   }
+
+  const applyArtworkServerState = useCallback((nextArtworks: Artwork[], targetArtworkId?: string) => {
+    setPersistedValue(nextArtworks as SiteContent[EditableSectionKey]);
+    setDraft((current) => {
+      if (section !== "artworks") {
+        return current;
+      }
+
+      return nextArtworks as SiteContent[EditableSectionKey];
+    });
+
+    if (targetArtworkId) {
+      const nextIndex = nextArtworks.findIndex((artwork) => getArtworkId(artwork) === targetArtworkId);
+      setSelectedIndex(nextIndex >= 0 ? nextIndex : 0);
+    }
+  }, [section]);
+
+  const createArtworkRecord = useCallback(async () => {
+    setArtworkSaveState({ phase: "creating", message: "正在创建新藏品草稿..." });
+
+    try {
+      const response = await fetch("/api/admin/artworks", {
+        method: "POST",
+      });
+      const payload = (await response.json()) as {
+        artwork?: Artwork;
+        artworks?: Artwork[];
+        message?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.artwork || !payload.artworks) {
+        throw new Error(payload.error ?? "新建藏品失败。");
+      }
+
+      applyArtworkServerState(payload.artworks, getArtworkId(payload.artwork));
+      setArtworkSaveState({ phase: "saved", message: payload.message ?? "新藏品草稿已创建。" });
+    } catch (error) {
+      setArtworkSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "新建藏品失败。",
+      });
+    }
+  }, [applyArtworkServerState]);
+
+  const saveArtworkToServer = useCallback(async (artwork: Artwork, reason: "autosave" | "manual" = "autosave") => {
+    const artworkId = getArtworkId(artwork);
+    const snapshot = JSON.stringify(artwork);
+    const requestId = artworkRequestRef.current + 1;
+
+    artworkRequestRef.current = requestId;
+    setArtworkSaveState({
+      phase: "saving",
+      message: reason === "manual" ? "正在保存当前藏品..." : "正在自动保存当前藏品...",
+    });
+
+    try {
+      const response = await fetch(`/api/admin/artworks/${artworkId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          artwork,
+        }),
+      });
+      const payload = (await response.json()) as {
+        artwork?: Artwork;
+        artworks?: Artwork[];
+        message?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.artwork || !payload.artworks) {
+        throw new Error(payload.error ?? "藏品保存失败。");
+      }
+
+      if (artworkRequestRef.current !== requestId) {
+        return;
+      }
+
+      const nextArtworks = payload.artworks;
+      setPersistedValue(nextArtworks as SiteContent[EditableSectionKey]);
+      setDraft((currentDraft) => {
+        if (section !== "artworks") {
+          return currentDraft;
+        }
+
+        const currentItems = currentDraft as Artwork[];
+        const currentArtwork = currentItems.find((item) => getArtworkId(item) === artworkId);
+
+        if (!currentArtwork || JSON.stringify(currentArtwork) === snapshot) {
+          return nextArtworks as SiteContent[EditableSectionKey];
+        }
+
+        return replaceArtworkById(nextArtworks, currentArtwork) as SiteContent[EditableSectionKey];
+      });
+      setArtworkSaveState({ phase: "saved", message: payload.message ?? "藏品内容已保存。" });
+    } catch (error) {
+      if (artworkRequestRef.current !== requestId) {
+        return;
+      }
+
+      setArtworkSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "藏品保存失败。",
+      });
+    }
+  }, [section]);
+
+  const removeArtworkRecord = useCallback(async (artworkId: string) => {
+    setArtworkSaveState({ phase: "saving", message: "正在删除当前藏品..." });
+
+    try {
+      const response = await fetch(`/api/admin/artworks/${artworkId}`, {
+        method: "DELETE",
+      });
+      const payload = (await response.json()) as {
+        artworks?: Artwork[];
+        message?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.artworks) {
+        throw new Error(payload.error ?? "删除藏品失败。");
+      }
+
+      applyArtworkServerState(payload.artworks);
+      setArtworkSaveState({ phase: "saved", message: payload.message ?? "藏品已删除。" });
+    } catch (error) {
+      setArtworkSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "删除藏品失败。",
+      });
+    }
+  }, [applyArtworkServerState]);
+
+  const reorderArtworkRecordsOnServer = useCallback(async (artworkIds: string[], targetArtworkId: string) => {
+    setArtworkSaveState({ phase: "saving", message: "正在更新藏品顺序..." });
+
+    try {
+      const response = await fetch("/api/admin/artworks/reorder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          artworkIds,
+        }),
+      });
+      const payload = (await response.json()) as {
+        artworks?: Artwork[];
+        message?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.artworks) {
+        throw new Error(payload.error ?? "更新藏品顺序失败。");
+      }
+
+      applyArtworkServerState(payload.artworks, targetArtworkId);
+      setArtworkSaveState({ phase: "saved", message: payload.message ?? "藏品顺序已更新。" });
+    } catch (error) {
+      setArtworkSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "更新藏品顺序失败。",
+      });
+    }
+  }, [applyArtworkServerState]);
 
   function getPreviewHref() {
     if (section === "artworks") {
@@ -1007,6 +1210,49 @@ export function AdminVisualEditor({
   }
 
   const previewHref = getPreviewHref();
+
+  useEffect(() => {
+    if (section !== "artworks" || !hydrated) {
+      return;
+    }
+
+    const artworks = draft as Artwork[];
+    const currentArtwork = artworks[selectedIndex];
+
+    if (!currentArtwork?.id) {
+      return;
+    }
+
+    const persistedArtwork = (persistedValue as Artwork[]).find(
+      (artwork) => getArtworkId(artwork) === getArtworkId(currentArtwork),
+    );
+
+    if (!persistedArtwork) {
+      return;
+    }
+
+    const currentSerialized = JSON.stringify(currentArtwork);
+    const persistedSerialized = JSON.stringify(persistedArtwork);
+
+    if (currentSerialized === persistedSerialized) {
+      return;
+    }
+
+    if (artworkSaveTimerRef.current) {
+      window.clearTimeout(artworkSaveTimerRef.current);
+    }
+
+    artworkSaveTimerRef.current = window.setTimeout(() => {
+      void saveArtworkToServer(currentArtwork);
+    }, 700);
+
+    return () => {
+      if (artworkSaveTimerRef.current) {
+        window.clearTimeout(artworkSaveTimerRef.current);
+        artworkSaveTimerRef.current = null;
+      }
+    };
+  }, [draft, hydrated, persistedValue, saveArtworkToServer, section, selectedIndex]);
 
   const renderSection = () => {
     if (section === "siteConfig") {
@@ -2585,23 +2831,30 @@ export function AdminVisualEditor({
               selectedIndex={selectedIndex}
               onSelect={setSelectedIndex}
               onAdd={() => {
-                updateDraft((item) => (item as Artwork[]).push(createArtwork()));
-                setSelectedIndex(items.length);
+                void createArtworkRecord();
               }}
               onRemove={(index) => {
-                updateDraft((item) => {
-                  const next = removeArrayItem(item as Artwork[], index);
-                  (item as Artwork[]).splice(0, (item as Artwork[]).length, ...next);
-                });
-                setSelectedIndex((currentIndex) => Math.max(0, currentIndex - (currentIndex >= index ? 1 : 0)));
+                const artwork = items[index];
+
+                if (!artwork?.id) {
+                  return;
+                }
+
+                void removeArtworkRecord(getArtworkId(artwork));
               }}
               onMove={(from, to) => {
                 if (from === to) return;
-                updateDraft((item) => {
-                  const next = moveArrayItem(item as Artwork[], from, to);
-                  (item as Artwork[]).splice(0, (item as Artwork[]).length, ...next);
-                });
-                setSelectedIndex(to);
+                const next = moveArrayItem(items, from, to);
+                const targetArtwork = next[to];
+
+                if (!targetArtwork?.id) {
+                  return;
+                }
+
+                void reorderArtworkRecordsOnServer(
+                  next.map((artwork) => getArtworkId(artwork)),
+                  getArtworkId(targetArtwork),
+                );
               }}
               renderLabel={(index) =>
                 `${items[index]?.publicationStatus === "draft" ? "草稿" : "已发布"} · ${
@@ -2614,11 +2867,27 @@ export function AdminVisualEditor({
           {current ? (
             <div className="grid gap-6">
               {(() => {
-                const persistedArtworkSlugs = new Set((persistedValue as Artwork[]).map((artwork) => artwork.slug));
-                const canPersistArtworkMedia = persistedArtworkSlugs.has(current.slug);
+                const currentArtworkId = getArtworkId(current);
 
                 return (
                   <>
+              <div className="flex flex-wrap items-center gap-3 border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--muted)]">
+                <span className="inline-flex items-center border border-[var(--line)] px-3 py-1 text-[0.72rem] tracking-[0.16em] text-[var(--accent)]">
+                  {current.publicationStatus === "draft" ? "草稿" : "已发布"}
+                </span>
+                <span>
+                  {artworkSaveState.phase === "creating"
+                    ? "正在创建"
+                    : artworkSaveState.phase === "saving"
+                      ? "保存中"
+                      : artworkSaveState.phase === "error"
+                        ? "保存失败"
+                        : artworkSaveState.phase === "saved"
+                          ? "已保存"
+                          : "等待编辑"}
+                </span>
+                {artworkSaveState.message ? <span className="text-[var(--accent)]/82">{artworkSaveState.message}</span> : null}
+              </div>
               <SectionMenu
                 items={[
                   { id: "artwork-media", label: "第 1 步 上传主图" },
@@ -2637,7 +2906,7 @@ export function AdminVisualEditor({
                 <div className="grid gap-4">
                   <HelperNote>这是前台页面最先出现的位置。先上传主图，前台列表页和详情页就会先有视觉内容。</HelperNote>
                   <AdminMediaField
-                    fieldKey={`${current.slug}:image`}
+                    fieldKey={`${current.id ?? "pending"}:image`}
                     label="藏品主图"
                     folder="artworks"
                     value={current.image}
@@ -2645,16 +2914,16 @@ export function AdminVisualEditor({
                     targetSize={{ width: 1200, height: 1500 }}
                     onRequestAutoSave={queueAutoSaveAfterUpload}
                     saveTarget={
-                      canPersistArtworkMedia
+                      current.id
                         ? {
                             section: "artworks",
-                            slug: current.slug,
+                            id: currentArtworkId,
                             field: "image",
                           }
                         : undefined
                     }
-                    disabled={!canPersistArtworkMedia}
-                    disabledHint="这是一件刚新增、还未正式保存到网站的藏品。请先点击下方“保存当前分区”，再上传主图。"
+                    disabled={!current.id}
+                    disabledHint="系统尚未拿到这件藏品的真实记录，请稍后重试。"
                     recommendedUse="藏品列表与藏品详情主图"
                     recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>
@@ -2666,8 +2935,8 @@ export function AdminVisualEditor({
                   <MediaGalleryEditor
                     label="细节图画廊"
                     folder="artworks"
-                    artworkSlug={current.slug}
-                    canPersistMedia={canPersistArtworkMedia}
+                    artworkId={current.id}
+                    canPersistMedia={Boolean(current.id)}
                     images={current.gallery ?? []}
                     onRequestAutoSave={queueAutoSaveAfterUpload}
                     onChange={(next) =>
@@ -2676,9 +2945,9 @@ export function AdminVisualEditor({
                       })
                     }
                   />
-                  {!canPersistArtworkMedia ? (
+                  {!current.id ? (
                     <HelperNote>
-                      这是一件刚新增、还未正式保存到网站的藏品。请先点击下方“保存当前分区”建立这件藏品，再继续上传主图和细节图。
+                      这件藏品尚未拿到真实记录。系统会在后端创建成功后自动开放主图和细节图上传。
                     </HelperNote>
                   ) : null}
                 </div>
@@ -3775,8 +4044,16 @@ export function AdminVisualEditor({
 
       <div className="flex flex-col gap-4 border-t border-[var(--line)] pt-5 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1 text-sm text-[var(--muted)]">
-          <p>内容通过可视化表单保存到 `content/site-content.json`。</p>
-          <p>图片会上传到仓库资源目录，并在下一次 Vercel 部署完成后对外可见。</p>
+          <p>
+            {section === "artworks"
+              ? "藏品会直接保存到真实草稿记录。主图、细节图与文字字段都绑定到同一条记录。"
+              : "内容通过可视化表单保存到 `content/site-content.json`。"}
+          </p>
+          <p>
+            {section === "artworks"
+              ? "图片上传成功后会立刻写入后端；文字字段会自动保存，正式前台只读取已发布藏品。"
+              : "图片会上传到仓库资源目录，并在下一次 Vercel 部署完成后对外可见。"}
+          </p>
           <p>
             {autosaveState === "restored"
               ? "已恢复你上次未保存的浏览器草稿。"
@@ -3803,17 +4080,37 @@ export function AdminVisualEditor({
           >
             清除浏览器草稿
           </button>
-          <button
-            type="submit"
-            disabled={pending}
-            className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-6 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {pending ? "保存中" : "保存当前分区"}
-          </button>
+          {section === "artworks" ? (
+            <button
+              type="button"
+              onClick={() => {
+                const currentArtwork = (draft as Artwork[])[selectedIndex];
+
+                if (currentArtwork?.id) {
+                  void saveArtworkToServer(currentArtwork, "manual");
+                }
+              }}
+              disabled={artworkSaveState.phase === "creating" || artworkSaveState.phase === "saving"}
+              className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-6 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {artworkSaveState.phase === "saving" ? "保存中" : "立即保存当前藏品"}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={pending}
+              className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-6 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {pending ? "保存中" : "保存当前分区"}
+            </button>
+          )}
         </div>
       </div>
       {state.error ? <p className="text-sm leading-7 text-[#8e4e3b]">{state.error}</p> : null}
       {state.success ? <p className="text-sm leading-7 text-[var(--muted)]">{state.success}</p> : null}
+      {section === "artworks" && artworkSaveState.phase === "error" ? (
+        <p className="text-sm leading-7 text-[#8e4e3b]">{artworkSaveState.message}</p>
+      ) : null}
     </form>
   );
 }

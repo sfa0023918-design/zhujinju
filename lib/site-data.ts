@@ -18,6 +18,8 @@ export type {
 } from "./data/types";
 
 export {
+  createArtworkDraft,
+  deleteArtworkRecord,
   editableSections,
   getArticleBySlug,
   getArticlesBySlugs,
@@ -35,7 +37,10 @@ export {
   getPublicExhibitions,
   getRelatedArtworks,
   loadSiteContent,
+  reorderArtworkRecords,
   readSiteContentFresh,
+  saveArtworkMediaField,
+  saveArtworkRecord,
   saveSiteSection,
 } from "./content-store";
 

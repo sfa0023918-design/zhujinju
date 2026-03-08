@@ -14,7 +14,7 @@ type TargetSize = {
 
 type UploadSaveTarget = {
   section: "artworks";
-  slug: string;
+  id: string;
   field: "image" | "gallery";
   index?: number;
 };
@@ -90,7 +90,7 @@ export function AdminMediaField({
   const previewAspectRatio = useMemo(() => `${outputSize.width} / ${outputSize.height}`, [outputSize.height, outputSize.width]);
   const targetKey =
     fieldKey ??
-    `${saveTarget?.section ?? "none"}:${saveTarget?.slug ?? "none"}:${saveTarget?.field ?? "none"}:${saveTarget?.index ?? "na"}`;
+    `${saveTarget?.section ?? "none"}:${saveTarget?.id ?? "none"}:${saveTarget?.field ?? "none"}:${saveTarget?.index ?? "na"}`;
   const targetKeyRef = useRef(targetKey);
 
   useEffect(() => {
@@ -304,7 +304,7 @@ export function AdminMediaField({
       formData.append("folder", folder);
       if (saveTarget) {
         formData.append("targetSection", saveTarget.section);
-        formData.append("targetSlug", saveTarget.slug);
+        formData.append("targetId", saveTarget.id);
         formData.append("targetField", saveTarget.field);
         if (typeof saveTarget.index === "number") {
           formData.append("targetIndex", String(saveTarget.index));
@@ -368,7 +368,7 @@ export function AdminMediaField({
         },
         body: JSON.stringify({
           targetSection: saveTarget.section,
-          targetSlug: saveTarget.slug,
+          targetId: saveTarget.id,
           targetField: saveTarget.field,
           targetIndex: saveTarget.index,
           value: nextValue,

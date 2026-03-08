@@ -25,6 +25,7 @@ export type PublicationReference = {
 };
 
 export type Artwork = {
+  id?: string;
   slug: string;
   publicationStatus?: PublicationStatus;
   title: BilingualText;

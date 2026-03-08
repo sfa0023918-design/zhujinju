@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -140,6 +141,63 @@ async function pushContentToGitHub(content: SiteContent, message: string) {
   );
 }
 
+async function persistSiteContent(content: SiteContent, message: string) {
+  if (canWriteLocalContentFile()) {
+    await writeLocalContentFile(content);
+  }
+
+  await pushContentToGitHub(content, message);
+}
+
+function makeArtworkId() {
+  return `artwork_${randomUUID()}`;
+}
+
+function makeArtworkSlug() {
+  return `artwork-${Date.now()}`;
+}
+
+function createArtworkDraftRecord(): Artwork {
+  return {
+    id: makeArtworkId(),
+    slug: makeArtworkSlug(),
+    publicationStatus: "draft",
+    title: bt("未命名藏品", "Untitled Artwork"),
+    subtitle: bt("", ""),
+    period: bt("", ""),
+    region: bt("", ""),
+    origin: bt("", ""),
+    material: bt("", ""),
+    category: bt("", ""),
+    dimensions: bt("", ""),
+    status: "inquiry",
+    excerpt: bt("", ""),
+    viewingNote: bt("", ""),
+    comparisonNote: bt("", ""),
+    provenance: [],
+    exhibitions: [],
+    publications: [],
+    inquirySupport: [
+      bt("可索取高清图", "High-resolution images available on request"),
+      bt("可索取品相信息", "Condition report available on request"),
+      bt("可索取图录页", "Catalogue pages available on request"),
+    ],
+    relatedArticleSlugs: [],
+    relatedExhibitionSlugs: [],
+    image: "",
+    gallery: [],
+    featured: false,
+  };
+}
+
+function getArtworkId(artwork: Artwork) {
+  return artwork.id?.trim() || artwork.slug;
+}
+
+function findArtworkIndexById(artworks: Artwork[], artworkId: string) {
+  return artworks.findIndex((artwork) => getArtworkId(artwork) === artworkId);
+}
+
 export async function saveSiteSection(
   section: EditableSectionKey,
   nextValue: unknown,
@@ -155,20 +213,16 @@ export async function saveSiteSection(
     [section]: mergedValue,
   } as SiteContent);
 
-  if (canWriteLocalContentFile()) {
-    await writeLocalContentFile(nextContent);
-  }
-
-  await pushContentToGitHub(nextContent, `Update ${section} from admin by ${actor}`);
+  await persistSiteContent(nextContent, `Update ${section} from admin by ${actor}`);
 
   return nextContent;
 }
 
 function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[]) {
-  const currentBySlug = new Map(currentArtworks.map((artwork) => [artwork.slug, artwork]));
+  const currentById = new Map(currentArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
 
   return nextArtworks.map((artwork) => {
-    const current = currentBySlug.get(artwork.slug);
+    const current = currentById.get(getArtworkId(artwork));
 
     if (!current) {
       return artwork;
@@ -184,15 +238,96 @@ function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[]
   });
 }
 
+export async function createArtworkDraft(actor: string) {
+  const current = await readSiteContentFresh();
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const artwork = createArtworkDraftRecord();
+
+  nextContent.artworks.push(artwork);
+  await persistSiteContent(nextContent, `Create artwork draft from admin by ${actor}`);
+
+  return {
+    artwork: nextContent.artworks[nextContent.artworks.length - 1],
+    artworks: nextContent.artworks,
+  };
+}
+
+export async function saveArtworkRecord(
+  artworkId: string,
+  nextArtwork: Artwork,
+  actor: string,
+) {
+  const current = await readSiteContentFresh();
+  const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
+
+  if (artworkIndex < 0) {
+    throw new Error("未找到要保存的藏品记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const currentArtwork = nextContent.artworks[artworkIndex];
+  const mergedArtwork: Artwork = {
+    ...currentArtwork,
+    ...nextArtwork,
+    id: currentArtwork.id,
+  };
+
+  nextContent.artworks[artworkIndex] = mergedArtwork;
+  const normalized = normalizeSiteContent(nextContent);
+
+  await persistSiteContent(normalized, `Update artwork record from admin by ${actor}`);
+
+  return {
+    artwork: normalized.artworks[artworkIndex],
+    artworks: normalized.artworks,
+  };
+}
+
+export async function deleteArtworkRecord(artworkId: string, actor: string) {
+  const current = await readSiteContentFresh();
+  const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
+
+  if (artworkIndex < 0) {
+    throw new Error("未找到要删除的藏品记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  nextContent.artworks.splice(artworkIndex, 1);
+  await persistSiteContent(nextContent, `Delete artwork record from admin by ${actor}`);
+
+  return {
+    artworks: nextContent.artworks,
+  };
+}
+
+export async function reorderArtworkRecords(orderedIds: string[], actor: string) {
+  const current = await readSiteContentFresh();
+  const currentById = new Map(current.artworks.map((artwork) => [getArtworkId(artwork), artwork]));
+  const ordered = orderedIds
+    .map((id) => currentById.get(id))
+    .filter((artwork): artwork is Artwork => Boolean(artwork));
+  const remaining = current.artworks.filter((artwork) => !orderedIds.includes(getArtworkId(artwork)));
+  const nextContent = normalizeSiteContent({
+    ...current,
+    artworks: [...ordered, ...remaining],
+  });
+
+  await persistSiteContent(nextContent, `Reorder artworks from admin by ${actor}`);
+
+  return {
+    artworks: nextContent.artworks,
+  };
+}
+
 export async function saveArtworkMediaField(
-  slug: string,
+  artworkId: string,
   field: "image" | "gallery",
   value: string,
   actor: string,
   options?: { galleryIndex?: number },
 ) {
   const current = await readSiteContentFresh();
-  const artworkIndex = current.artworks.findIndex((artwork) => artwork.slug === slug);
+  const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
 
   if (artworkIndex < 0) {
     throw new Error("未找到要更新图片的藏品。");
@@ -212,13 +347,12 @@ export async function saveArtworkMediaField(
 
   const normalized = normalizeSiteContent(nextContent);
 
-  if (canWriteLocalContentFile()) {
-    await writeLocalContentFile(normalized);
-  }
+  await persistSiteContent(normalized, `Update artwork media from admin by ${actor}`);
 
-  await pushContentToGitHub(normalized, `Update artwork media from admin by ${actor}`);
-
-  return normalized.artworks[artworkIndex];
+  return {
+    artwork: normalized.artworks[artworkIndex],
+    artworks: normalized.artworks,
+  };
 }
 
 function normalizeSiteContent(content: SiteContent): SiteContent {
@@ -358,6 +492,7 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
     },
     artworks: content.artworks.map((artwork) => ({
       ...artwork,
+      id: getArtworkId(artwork),
       publicationStatus: artwork.publicationStatus ?? "published",
       gallery: normalizeArtworkGallery(artwork.gallery, artwork.image),
     })),

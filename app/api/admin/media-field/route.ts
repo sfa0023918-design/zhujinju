@@ -13,18 +13,18 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
       targetSection?: string;
-      targetSlug?: string;
+      targetId?: string;
       targetField?: string;
       targetIndex?: number;
       value?: string;
     };
 
-    if (body.targetSection !== "artworks" || !body.targetSlug || (body.targetField !== "image" && body.targetField !== "gallery")) {
+    if (body.targetSection !== "artworks" || !body.targetId || (body.targetField !== "image" && body.targetField !== "gallery")) {
       return NextResponse.json({ error: "无效的图片字段请求。" }, { status: 400 });
     }
 
     await saveArtworkMediaField(
-      body.targetSlug,
+      body.targetId,
       body.targetField,
       String(body.value ?? ""),
       session.email,
