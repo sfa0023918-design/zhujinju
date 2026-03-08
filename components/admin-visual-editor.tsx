@@ -817,18 +817,22 @@ export function AdminVisualEditor({
 }: AdminVisualEditorProps) {
   const [state, formAction, pending] = useActionState(action, initialState);
   const [draft, setDraft] = useState<SiteContent[EditableSectionKey]>(() => cloneValue(initialValue));
+  const [persistedValue, setPersistedValue] = useState<SiteContent[EditableSectionKey]>(() => cloneValue(initialValue));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [hydrated, setHydrated] = useState(false);
   const [autosaveState, setAutosaveState] = useState<"idle" | "restored" | "saved">("idle");
   const [queuedUploadSave, setQueuedUploadSave] = useState(0);
   const [submittedUploadSave, setSubmittedUploadSave] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
+  const lastSuccessRef = useRef<string | null>(null);
 
   useEffect(() => {
     setDraft(cloneValue(initialValue));
+    setPersistedValue(cloneValue(initialValue));
     setSelectedIndex(0);
     setHydrated(false);
     setAutosaveState("idle");
+    lastSuccessRef.current = null;
   }, [initialValue, section]);
 
   useEffect(() => {
@@ -915,14 +919,16 @@ export function AdminVisualEditor({
   }, [draft, hydrated, pending, section, selectedIndex]);
 
   useEffect(() => {
-    if (!state.success) {
+    if (!state.success || lastSuccessRef.current === state.success) {
       return;
     }
 
+    lastSuccessRef.current = state.success;
     const storageKey = `zhujinju-admin-draft-${section}`;
     window.localStorage.removeItem(storageKey);
+    setPersistedValue(cloneValue(draft));
     setAutosaveState("idle");
-  }, [section, state.success]);
+  }, [draft, section, state.success]);
 
   const serialized = useMemo(() => JSON.stringify(draft), [draft]);
 
@@ -2608,7 +2614,7 @@ export function AdminVisualEditor({
           {current ? (
             <div className="grid gap-6">
               {(() => {
-                const persistedArtworkSlugs = new Set(content.artworks.map((artwork) => artwork.slug));
+                const persistedArtworkSlugs = new Set((persistedValue as Artwork[]).map((artwork) => artwork.slug));
                 const canPersistArtworkMedia = persistedArtworkSlugs.has(current.slug);
 
                 return (
