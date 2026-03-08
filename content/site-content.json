@@ -889,7 +889,9 @@
       ],
       "image": "/uploads/artworks/1772951079184-b00013243fr1772286470.jpg",
       "featured": true,
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1772951087461-b00013133fr1771928731.jpg"
+      ],
       "publicationStatus": "published"
     },
     {
