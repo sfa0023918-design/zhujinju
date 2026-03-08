@@ -1239,7 +1239,9 @@
       ],
       "image": "/uploads/artworks/1772950081724-b00008033fr1770106532.jpg",
       "featured": true,
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1772950102804-b00008443fr1770280590-denoised-p.jpg"
+      ],
       "publicationStatus": "published"
     },
     {
