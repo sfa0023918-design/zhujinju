@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 const SAFE_UPLOAD_BYTES = Math.floor(3.5 * 1024 * 1024);
 const DISPLAY_UPLOAD_LIMIT = "4MB";
@@ -74,12 +74,28 @@ export function AdminMediaField({
 }: AdminMediaFieldProps) {
   const inputId = useId();
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [lastPersistedValue, setLastPersistedValue] = useState(value);
 
   const outputSize = useMemo(() => targetSize ?? getDefaultTargetSize(previewRatio), [previewRatio, targetSize]);
   const previewAspectRatio = useMemo(() => `${outputSize.width} / ${outputSize.height}`, [outputSize.height, outputSize.width]);
+  const targetKey = `${saveTarget?.section ?? "none"}:${saveTarget?.slug ?? "none"}:${saveTarget?.field ?? "none"}:${saveTarget?.index ?? "na"}`;
+  const targetKeyRef = useRef(targetKey);
+
+  useEffect(() => {
+    if (targetKeyRef.current === targetKey) {
+      return;
+    }
+
+    targetKeyRef.current = targetKey;
+    setLastPersistedValue(value);
+    setMessage(null);
+    setError(null);
+    replaceLocalPreview(null);
+  }, [targetKey, value]);
 
   function replaceLocalPreview(nextPreview: string | null) {
     setLocalPreview((current) => {
@@ -298,6 +314,7 @@ export function AdminMediaField({
       }
 
       onChange(payload.url);
+      setLastPersistedValue(payload.url);
       setMessage(
         payload.saved
           ? payload.message ?? "图片已上传并写入当前内容。部署完成后，前台会显示新图片。"
@@ -320,6 +337,57 @@ export function AdminMediaField({
       setUploading(false);
       event.target.value = "";
     }
+  }
+
+  async function persistMediaValue(nextValue: string) {
+    if (!saveTarget) {
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/admin/media-field", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          targetSection: saveTarget.section,
+          targetSlug: saveTarget.slug,
+          targetField: saveTarget.field,
+          targetIndex: saveTarget.index,
+          value: nextValue,
+        }),
+      });
+      const payload = (await response.json()) as { saved?: boolean; message?: string; error?: string };
+
+      if (!response.ok || !payload.saved) {
+        throw new Error(payload.error ?? "图片字段保存失败。");
+      }
+
+      setLastPersistedValue(nextValue);
+      setMessage(payload.message ?? "图片字段已更新。");
+    } catch (persistError) {
+      setError(persistError instanceof Error ? persistError.message : "图片字段保存失败。");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handlePathBlur() {
+    if (!saveTarget) {
+      return;
+    }
+
+    const normalized = value.trim();
+    if (normalized === lastPersistedValue.trim()) {
+      return;
+    }
+
+    onChange(normalized);
+    await persistMediaValue(normalized);
   }
 
   return (
@@ -362,6 +430,7 @@ export function AdminMediaField({
           <input
             value={value}
             onChange={(event) => onChange(event.target.value)}
+            onBlur={() => void handlePathBlur()}
             placeholder="可粘贴现有图片地址，或下方上传本地图片"
             className="min-h-11 w-full border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           />
@@ -369,10 +438,10 @@ export function AdminMediaField({
             <label
               htmlFor={inputId}
               className={`inline-flex min-h-11 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors ${
-                uploading ? "cursor-wait opacity-72" : "cursor-pointer hover:bg-[var(--surface-strong)]"
+                uploading || saving ? "cursor-wait opacity-72" : "cursor-pointer hover:bg-[var(--surface-strong)]"
               }`}
             >
-              {uploading ? "处理中..." : "上传本地图片"}
+              {uploading ? "处理中..." : saving ? "同步中..." : "上传本地图片"}
             </label>
             <input
               id={inputId}
@@ -380,6 +449,7 @@ export function AdminMediaField({
               accept="image/*"
               onChange={handleFileChange}
               className="sr-only"
+              disabled={saving}
             />
             <button
               type="button"
@@ -388,7 +458,11 @@ export function AdminMediaField({
                 setMessage(null);
                 setError(null);
                 onChange("");
+                if (saveTarget) {
+                  void persistMediaValue("");
+                }
               }}
+              disabled={uploading || saving}
               className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
             >
               清空图片

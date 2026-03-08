@@ -146,9 +146,13 @@ export async function saveSiteSection(
   actor: string,
 ) {
   const current = await readSiteContentFresh();
+  const mergedValue =
+    section === "artworks"
+      ? mergeArtworkSection(current.artworks, nextValue as Artwork[])
+      : nextValue;
   const nextContent = normalizeSiteContent({
     ...current,
-    [section]: nextValue,
+    [section]: mergedValue,
   } as SiteContent);
 
   if (canWriteLocalContentFile()) {
@@ -158,6 +162,26 @@ export async function saveSiteSection(
   await pushContentToGitHub(nextContent, `Update ${section} from admin by ${actor}`);
 
   return nextContent;
+}
+
+function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[]) {
+  const currentBySlug = new Map(currentArtworks.map((artwork) => [artwork.slug, artwork]));
+
+  return nextArtworks.map((artwork) => {
+    const current = currentBySlug.get(artwork.slug);
+
+    if (!current) {
+      return artwork;
+    }
+
+    // Media fields are persisted through dedicated endpoints so a full-form save
+    // cannot accidentally roll them back to stale client state.
+    return {
+      ...artwork,
+      image: current.image,
+      gallery: current.gallery,
+    };
+  });
 }
 
 export async function saveArtworkMediaField(

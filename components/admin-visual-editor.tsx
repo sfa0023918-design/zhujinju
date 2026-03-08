@@ -711,6 +711,7 @@ function MediaGalleryEditor({
   label,
   folder,
   artworkSlug,
+  canPersistMedia,
   images,
   onChange,
   onRequestAutoSave,
@@ -718,6 +719,7 @@ function MediaGalleryEditor({
   label: string;
   folder: string;
   artworkSlug: string;
+  canPersistMedia: boolean;
   images: string[];
   onChange: (images: string[]) => void;
   onRequestAutoSave?: () => void;
@@ -778,12 +780,16 @@ function MediaGalleryEditor({
               value={image}
               targetSize={{ width: 1200, height: 1500 }}
               onRequestAutoSave={onRequestAutoSave}
-              saveTarget={{
-                section: "artworks",
-                slug: artworkSlug,
-                field: "gallery",
-                index,
-              }}
+              saveTarget={
+                canPersistMedia
+                  ? {
+                      section: "artworks",
+                      slug: artworkSlug,
+                      field: "gallery",
+                      index,
+                    }
+                  : undefined
+              }
               onChange={(next) => {
                 const nextImages = [...slots];
                 nextImages[index] = next;
@@ -2598,6 +2604,12 @@ export function AdminVisualEditor({
 
           {current ? (
             <div className="grid gap-6">
+              {(() => {
+                const persistedArtworkSlugs = new Set(content.artworks.map((artwork) => artwork.slug));
+                const canPersistArtworkMedia = persistedArtworkSlugs.has(current.slug);
+
+                return (
+                  <>
               <SectionMenu
                 items={[
                   { id: "artwork-media", label: "第 1 步 上传主图" },
@@ -2622,11 +2634,15 @@ export function AdminVisualEditor({
                     previewRatio="portrait"
                     targetSize={{ width: 1200, height: 1500 }}
                     onRequestAutoSave={queueAutoSaveAfterUpload}
-                    saveTarget={{
-                      section: "artworks",
-                      slug: current.slug,
-                      field: "image",
-                    }}
+                    saveTarget={
+                      canPersistArtworkMedia
+                        ? {
+                            section: "artworks",
+                            slug: current.slug,
+                            field: "image",
+                          }
+                        : undefined
+                    }
                     recommendedUse="藏品列表与藏品详情主图"
                     recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>
@@ -2639,6 +2655,7 @@ export function AdminVisualEditor({
                     label="细节图画廊"
                     folder="artworks"
                     artworkSlug={current.slug}
+                    canPersistMedia={canPersistArtworkMedia}
                     images={current.gallery ?? []}
                     onRequestAutoSave={queueAutoSaveAfterUpload}
                     onChange={(next) =>
@@ -2647,6 +2664,11 @@ export function AdminVisualEditor({
                       })
                     }
                   />
+                  {!canPersistArtworkMedia ? (
+                    <HelperNote>
+                      这是一件刚新增、还未正式保存到网站的藏品。请先点击下方“保存当前分区”建立这件藏品，再继续上传主图和细节图。
+                    </HelperNote>
+                  ) : null}
                 </div>
               </EditorSection>
 
@@ -3120,6 +3142,9 @@ export function AdminVisualEditor({
               />
                 </div>
               </EditorSection>
+                  </>
+                );
+              })()}
             </div>
           ) : null}
         </div>

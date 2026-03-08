@@ -9,7 +9,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit:artworks": "node scripts/audit-artwork-sync.mjs"
   },
   "dependencies": {
     "next": "^15.3.0",
