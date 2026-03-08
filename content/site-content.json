@@ -1124,7 +1124,9 @@
       ],
       "image": "/uploads/artworks/1772948608165-bf14d1c5d93d059af96255d212e50056.jpg",
       "featured": true,
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1772948642024-img-4417.webp"
+      ],
       "publicationStatus": "published"
     },
     {
