@@ -11,9 +11,10 @@ import {
   getArticleBySlug,
   getExhibitionsBySlugs,
   getHighlightedArtworks,
-  getPublicArticles,
   loadSiteContent,
 } from "@/lib/site-data";
+
+export const dynamic = "force-dynamic";
 
 type ArticleDetailPageProps = {
   params: Promise<{
@@ -23,14 +24,6 @@ type ArticleDetailPageProps = {
     preview?: string;
   }>;
 };
-
-export async function generateStaticParams() {
-  const content = await loadSiteContent();
-
-  return getPublicArticles(content).map((article) => ({
-    slug: article.slug,
-  }));
-}
 
 export async function generateMetadata({
   params,

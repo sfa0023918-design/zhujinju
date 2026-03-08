@@ -12,9 +12,10 @@ import {
   getArticlesBySlugs,
   getExhibitionBySlug,
   getHighlightedArtworks,
-  getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
+
+export const dynamic = "force-dynamic";
 
 type ExhibitionDetailPageProps = {
   params: Promise<{
@@ -24,14 +25,6 @@ type ExhibitionDetailPageProps = {
     preview?: string;
   }>;
 };
-
-export async function generateStaticParams() {
-  const content = await loadSiteContent();
-
-  return getPublicExhibitions(content).map((exhibition) => ({
-    slug: exhibition.slug,
-  }));
-}
 
 export async function generateMetadata({
   params,

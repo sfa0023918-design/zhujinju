@@ -14,11 +14,12 @@ import { buildMetadata } from "@/lib/metadata";
 import {
   getArticlesBySlugs,
   getArtworkBySlug,
-  getPublicArtworks,
   getExhibitionsBySlugs,
   getRelatedArtworks,
   loadSiteContent,
 } from "@/lib/site-data";
+
+export const dynamic = "force-dynamic";
 
 type ArtworkDetailPageProps = {
   params: Promise<{
@@ -28,14 +29,6 @@ type ArtworkDetailPageProps = {
     preview?: string;
   }>;
 };
-
-export async function generateStaticParams() {
-  const content = await loadSiteContent();
-
-  return getPublicArtworks(content).map((artwork) => ({
-    slug: artwork.slug,
-  }));
-}
 
 export async function generateMetadata({
   params,

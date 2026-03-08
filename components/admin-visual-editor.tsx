@@ -775,6 +775,7 @@ function MediaGalleryEditor({
               ) : null}
             </div>
             <AdminMediaField
+              fieldKey={`${artworkSlug}:gallery:${index}`}
               label={`细节图 ${index + 1}`}
               folder={folder}
               value={image}
@@ -790,6 +791,8 @@ function MediaGalleryEditor({
                     }
                   : undefined
               }
+              disabled={!canPersistMedia}
+              disabledHint="这是一件刚新增、还未正式保存到网站的藏品。请先点击下方“保存当前分区”，再上传这一张细节图。"
               onChange={(next) => {
                 const nextImages = [...slots];
                 nextImages[index] = next;
@@ -2628,6 +2631,7 @@ export function AdminVisualEditor({
                 <div className="grid gap-4">
                   <HelperNote>这是前台页面最先出现的位置。先上传主图，前台列表页和详情页就会先有视觉内容。</HelperNote>
                   <AdminMediaField
+                    fieldKey={`${current.slug}:image`}
                     label="藏品主图"
                     folder="artworks"
                     value={current.image}
@@ -2643,6 +2647,8 @@ export function AdminVisualEditor({
                           }
                         : undefined
                     }
+                    disabled={!canPersistArtworkMedia}
+                    disabledHint="这是一件刚新增、还未正式保存到网站的藏品。请先点击下方“保存当前分区”，再上传主图。"
                     recommendedUse="藏品列表与藏品详情主图"
                     recommendedSize="1200 x 1500 像素以上，竖图 4:5"
                     onChange={(next) =>

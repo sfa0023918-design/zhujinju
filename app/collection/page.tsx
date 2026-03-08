@@ -6,6 +6,8 @@ import { bt } from "@/lib/bilingual";
 import { getFilterOptions, getFilteredArtworks, loadSiteContent } from "@/lib/site-data";
 import { BilingualText } from "@/components/bilingual-text";
 
+export const dynamic = "force-dynamic";
+
 type CollectionPageProps = {
   searchParams?: Promise<{
     category?: string;

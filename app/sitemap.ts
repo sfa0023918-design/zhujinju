@@ -3,6 +3,8 @@ import type { MetadataRoute } from "next";
 import { getPublicArticles, getPublicArtworks, getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
 import { resolveSiteBaseUrl } from "@/lib/site-config";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const content = await loadSiteContent();
   const baseUrl = resolveSiteBaseUrl(content.siteConfig);

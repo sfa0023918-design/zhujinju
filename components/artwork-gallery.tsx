@@ -36,6 +36,14 @@ export function ArtworkGallery({
     setActiveImage(primaryImage);
   }, [primaryImage]);
 
+  useEffect(() => {
+    if (activeImage === primaryImage || detailImages.includes(activeImage)) {
+      return;
+    }
+
+    setActiveImage(primaryImage);
+  }, [activeImage, detailImages, primaryImage]);
+
   const activeImageSrc = withImageVersion(activeImage);
 
   return (

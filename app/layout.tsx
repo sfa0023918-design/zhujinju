@@ -5,6 +5,8 @@ import { loadSiteContent } from "@/lib/site-data";
 
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata() {
   const { siteConfig } = await loadSiteContent();
 

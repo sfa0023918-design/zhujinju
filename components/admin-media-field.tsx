@@ -20,6 +20,7 @@ type UploadSaveTarget = {
 };
 
 type AdminMediaFieldProps = {
+  fieldKey?: string;
   label: string;
   note?: string;
   folder: string;
@@ -32,6 +33,8 @@ type AdminMediaFieldProps = {
   recommendedSize?: string;
   recommendedUse?: string;
   saveTarget?: UploadSaveTarget;
+  disabled?: boolean;
+  disabledHint?: string;
 };
 
 function getDefaultTargetSize(previewRatio: PreviewRatio): TargetSize {
@@ -59,6 +62,7 @@ function createObjectUrl(fileOrBlob: Blob) {
 }
 
 export function AdminMediaField({
+  fieldKey,
   label,
   note,
   folder,
@@ -71,6 +75,8 @@ export function AdminMediaField({
   recommendedSize,
   recommendedUse,
   saveTarget,
+  disabled = false,
+  disabledHint,
 }: AdminMediaFieldProps) {
   const inputId = useId();
   const [uploading, setUploading] = useState(false);
@@ -82,7 +88,9 @@ export function AdminMediaField({
 
   const outputSize = useMemo(() => targetSize ?? getDefaultTargetSize(previewRatio), [previewRatio, targetSize]);
   const previewAspectRatio = useMemo(() => `${outputSize.width} / ${outputSize.height}`, [outputSize.height, outputSize.width]);
-  const targetKey = `${saveTarget?.section ?? "none"}:${saveTarget?.slug ?? "none"}:${saveTarget?.field ?? "none"}:${saveTarget?.index ?? "na"}`;
+  const targetKey =
+    fieldKey ??
+    `${saveTarget?.section ?? "none"}:${saveTarget?.slug ?? "none"}:${saveTarget?.field ?? "none"}:${saveTarget?.index ?? "na"}`;
   const targetKeyRef = useRef(targetKey);
 
   useEffect(() => {
@@ -272,6 +280,11 @@ export function AdminMediaField({
   }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (disabled) {
+      event.target.value = "";
+      return;
+    }
+
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -340,7 +353,7 @@ export function AdminMediaField({
   }
 
   async function persistMediaValue(nextValue: string) {
-    if (!saveTarget) {
+    if (!saveTarget || disabled) {
       return;
     }
 
@@ -377,6 +390,10 @@ export function AdminMediaField({
   }
 
   async function handlePathBlur() {
+    if (disabled) {
+      return;
+    }
+
     if (!saveTarget) {
       return;
     }
@@ -432,16 +449,19 @@ export function AdminMediaField({
             onChange={(event) => onChange(event.target.value)}
             onBlur={() => void handlePathBlur()}
             placeholder="可粘贴现有图片地址，或下方上传本地图片"
+            disabled={disabled || uploading || saving}
             className="min-h-11 w-full border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           />
           <div className="flex flex-wrap gap-3">
             <label
               htmlFor={inputId}
               className={`inline-flex min-h-11 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors ${
-                uploading || saving ? "cursor-wait opacity-72" : "cursor-pointer hover:bg-[var(--surface-strong)]"
+                disabled || uploading || saving
+                  ? "cursor-not-allowed opacity-55"
+                  : "cursor-pointer hover:bg-[var(--surface-strong)]"
               }`}
             >
-              {uploading ? "处理中..." : saving ? "同步中..." : "上传本地图片"}
+              {disabled ? "请先保存当前藏品" : uploading ? "处理中..." : saving ? "同步中..." : "上传本地图片"}
             </label>
             <input
               id={inputId}
@@ -449,11 +469,14 @@ export function AdminMediaField({
               accept="image/*"
               onChange={handleFileChange}
               className="sr-only"
-              disabled={saving}
+              disabled={disabled || uploading || saving}
             />
             <button
               type="button"
               onClick={() => {
+                if (disabled) {
+                  return;
+                }
                 replaceLocalPreview(null);
                 setMessage(null);
                 setError(null);
@@ -462,12 +485,13 @@ export function AdminMediaField({
                   void persistMediaValue("");
                 }
               }}
-              disabled={uploading || saving}
+              disabled={disabled || uploading || saving}
               className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
             >
               清空图片
             </button>
           </div>
+          {disabled && disabledHint ? <p className="text-sm leading-7 text-[var(--muted)]">{disabledHint}</p> : null}
           {message ? <p className="text-sm leading-7 text-[var(--muted)]">{message}</p> : null}
           {error ? <p className="text-sm leading-7 text-[#8e4e3b]">{error}</p> : null}
         </div>
