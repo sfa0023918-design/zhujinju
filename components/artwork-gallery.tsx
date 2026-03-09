@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { withImageVersion } from "@/lib/image-url";
 
+import { MediaPlaceholder } from "./media-placeholder";
+
 type ArtworkGalleryProps = {
   title: string;
   primaryImage: string;
@@ -94,17 +96,11 @@ export function ArtworkGallery({
           })}
         </div>
       ) : null}
-      <div className="order-1 grid gap-4">
+      <div className="order-1 grid gap-3.5">
         <div className="relative overflow-hidden bg-[var(--surface-strong)]">
           {isActivePlaceholder ? (
-            <div className="relative flex aspect-[4/5] h-full w-full items-end bg-[linear-gradient(180deg,rgba(239,235,229,0.82)_0%,rgba(233,228,221,0.98)_100%)] p-6 md:p-8">
-              <div className="absolute inset-6 border border-[var(--line)]/28 md:inset-8" />
-              <div className="relative w-full border-t border-[var(--line)]/42 pt-3 text-[var(--muted)]">
-                <p className="text-[0.72rem] tracking-[0.08em] text-[var(--muted)]/88">图像整理中</p>
-                <p className="mt-0.5 text-[0.42rem] uppercase tracking-[0.18em] text-[var(--accent)]/34">
-                  Image forthcoming
-                </p>
-              </div>
+            <div className="aspect-[4/5]">
+              <MediaPlaceholder eyebrow="Artwork Image" title={title} />
             </div>
           ) : (
             <Image
@@ -119,7 +115,7 @@ export function ArtworkGallery({
           )}
         </div>
         {thumbnailImages.length > 1 && activeImage !== primaryImage && !primaryImage.startsWith("/api/placeholder/") ? (
-          <div className="flex justify-end border-t border-[var(--line)]/42 pt-3.5 text-[var(--muted)]">
+          <div className="flex justify-end border-t border-[var(--line)]/34 pt-3 text-[var(--muted)]">
             <button
               type="button"
               onClick={() => setActiveImage(primaryImage)}

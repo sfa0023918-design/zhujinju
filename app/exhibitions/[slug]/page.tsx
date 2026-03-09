@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
+import { MediaPlaceholder } from "@/components/media-placeholder";
 import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 import {
@@ -73,7 +74,7 @@ export default async function ExhibitionDetailPage({
 
   return (
     <>
-      <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-8 md:grid-cols-[minmax(0,1fr)_320px] md:px-10 md:py-12">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-8 px-5 py-8 md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-10 lg:py-12">
         <div className="space-y-6">
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
             <ActionLabel text={detailCopy.backAction} align="start" />
@@ -114,21 +115,27 @@ export default async function ExhibitionDetailPage({
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-10 md:pb-20">
+      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-8 md:pb-18 lg:px-10 lg:pb-20">
         <div className="relative overflow-hidden bg-[var(--surface-strong)]">
-          <Image
-            src={exhibition.cover}
-            alt={`${exhibition.title.zh} ${exhibition.title.en}`}
-            width={1800}
-            height={1100}
-            priority
-            unoptimized
-            className="aspect-[1.65/1] h-full w-full object-cover"
-          />
+          {exhibition.cover.startsWith("/api/placeholder/") ? (
+            <div className="aspect-[1.65/1]">
+              <MediaPlaceholder eyebrow="Exhibition Image" title={exhibition.title.zh} />
+            </div>
+          ) : (
+            <Image
+              src={exhibition.cover}
+              alt={`${exhibition.title.zh} ${exhibition.title.en}`}
+              width={1800}
+              height={1100}
+              priority
+              unoptimized
+              className="aspect-[1.65/1] h-full w-full object-cover"
+            />
+          )}
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:grid-cols-[minmax(0,0.92fr)_minmax(0,0.8fr)] md:px-10 md:py-20">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,0.8fr)] lg:px-10 lg:py-20">
         <div className="space-y-6">
           {exhibition.description.map((paragraph) => (
             <p key={paragraph.zh} className="text-[0.98rem] leading-8 text-[var(--muted)]">
@@ -180,7 +187,7 @@ export default async function ExhibitionDetailPage({
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-20">
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
             <BilingualText

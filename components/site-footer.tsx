@@ -18,7 +18,7 @@ export async function SiteFooter() {
 
   return (
     <footer className="border-t border-[var(--line)]/75">
-      <div className="mx-auto grid w-full max-w-[1480px] gap-6 px-5 py-5 text-sm text-[var(--muted)] md:grid-cols-[0.96fr_0.74fr_0.82fr] md:px-10 md:py-7">
+      <div className="mx-auto grid w-full max-w-[1480px] gap-6 px-5 py-5 text-sm text-[var(--muted)] md:grid-cols-2 md:px-8 md:py-6 lg:grid-cols-[0.96fr_0.74fr_0.82fr] lg:px-10 lg:py-7">
         <div className="max-w-[24rem] space-y-2.5">
           <BilingualText
             as="p"
@@ -55,7 +55,7 @@ export async function SiteFooter() {
           {showWhatsApp ? <p className="text-[0.84rem] leading-[1.6]">{siteConfig.contact.whatsapp}</p> : null}
           <p className="text-[0.84rem] leading-[1.6]">WeChat: {siteConfig.contact.wechat}</p>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2 lg:col-span-1">
           <BilingualText
             as="p"
             text={siteConfig.footer.informationHeading}

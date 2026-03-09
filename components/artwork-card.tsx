@@ -5,6 +5,7 @@ import { withImageVersion } from "@/lib/image-url";
 import type { Artwork } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
+import { MediaPlaceholder } from "./media-placeholder";
 import { StatusPill } from "./status-pill";
 
 type ArtworkCardProps = {
@@ -33,14 +34,8 @@ export function ArtworkCard({
         <Link href={`/collection/${artwork.slug}`} className="block space-y-2.5">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
             {isPlaceholderImage ? (
-              <div className="relative flex aspect-[4/5] h-full w-full items-end bg-[linear-gradient(180deg,rgba(239,235,229,0.8)_0%,rgba(233,228,221,0.97)_100%)] p-4 md:p-5">
-                <div className="absolute inset-4 border border-[var(--line)]/34 md:inset-5" />
-                <div className="relative w-full border-t border-[var(--line)]/44 pt-2 text-[var(--muted)]">
-                  <p className="text-[0.64rem] tracking-[0.08em] text-[var(--muted)]/88">图像整理中</p>
-                  <p className="mt-0.5 text-[0.4rem] uppercase tracking-[0.18em] text-[var(--accent)]/34">
-                    Image forthcoming
-                  </p>
-                </div>
+              <div className="aspect-[4/5]">
+                <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
               </div>
             ) : (
               <Image
@@ -85,15 +80,21 @@ export function ArtworkCard({
       <article className="group">
         <Link href={`/collection/${artwork.slug}`} className="block space-y-3.5">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
-            <Image
-              src={withImageVersion(artwork.image)}
-              alt={`${artwork.title.zh} ${artwork.title.en}`}
-              width={900}
-              height={1200}
-              priority={priority}
-              unoptimized
-              className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.012]"
-            />
+            {isPlaceholderImage ? (
+              <div className="aspect-[4/5]">
+                <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
+              </div>
+            ) : (
+              <Image
+                src={withImageVersion(artwork.image)}
+                alt={`${artwork.title.zh} ${artwork.title.en}`}
+                width={900}
+                height={1200}
+                priority={priority}
+                unoptimized
+                className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.012]"
+              />
+            )}
           </div>
           <div className="space-y-2.5">
             <div className="flex items-center justify-between gap-4">
@@ -125,15 +126,21 @@ export function ArtworkCard({
     <article className="group border-t border-[var(--line)] pt-6 md:pt-7">
       <Link href={`/collection/${artwork.slug}`} className="grid gap-6 md:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.52fr)] md:gap-10">
         <div className="relative overflow-hidden bg-[var(--surface-strong)]">
-          <Image
-            src={withImageVersion(artwork.image)}
-            alt={`${artwork.title.zh} ${artwork.title.en}`}
-            width={900}
-            height={1200}
-            priority={priority}
-            unoptimized
-            className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.008]"
-          />
+          {isPlaceholderImage ? (
+            <div className="aspect-[4/5]">
+              <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} />
+            </div>
+          ) : (
+            <Image
+              src={withImageVersion(artwork.image)}
+              alt={`${artwork.title.zh} ${artwork.title.en}`}
+              width={900}
+              height={1200}
+              priority={priority}
+              unoptimized
+              className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.008]"
+            />
+          )}
         </div>
         <div className="flex flex-col justify-between gap-7 py-1">
           <div className="space-y-4">

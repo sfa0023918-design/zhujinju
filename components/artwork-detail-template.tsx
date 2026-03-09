@@ -256,7 +256,7 @@ export function ArtworkHero({
   const hasLead = hasText(artwork.excerpt);
 
   return (
-    <section className="mx-auto w-full max-w-[1480px] px-5 py-7 md:px-10 md:py-10">
+    <section className="mx-auto w-full max-w-[1480px] px-5 py-7 md:px-8 md:py-9 lg:px-10 lg:py-10">
       <div className="mb-5 text-[0.82rem] leading-6 text-[var(--muted)]">
         <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
           {detailCopy.breadcrumb.zh}
@@ -493,7 +493,7 @@ export function RelatedWorks({ items, detailCopy }: RelatedWorksProps) {
       : "font-serif text-[clamp(1.9rem,3vw,2.65rem)] leading-[1.02] tracking-[-0.04em] text-[var(--ink)]";
 
   return (
-    <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-10 md:py-18">
+    <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
       <div className={innerClassName}>
         <div className={headingClassName}>
           <BilingualText
@@ -530,8 +530,8 @@ export function ArtworkDetailTemplate({
     <>
       <ArtworkHero artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} />
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-10 md:py-18">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,0.88fr)_minmax(260px,0.62fr)] lg:gap-16">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(260px,0.62fr)] lg:gap-14">
           <ArtworkScholarlyNote artwork={artwork} detailCopy={detailCopy} />
           <ArtworkReferences
             artwork={artwork}

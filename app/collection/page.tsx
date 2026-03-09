@@ -51,7 +51,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
 
   return (
     <>
-      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-10 md:py-8">
+      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
         <div className="grid gap-3 md:grid-cols-[168px_minmax(0,480px)] md:items-start md:gap-6">
           <p className="text-[0.7rem] tracking-[0.17em] text-[var(--accent)]/84">
             藏品浏览
@@ -71,7 +71,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-10 md:pb-20">
+      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-8 md:pb-18 lg:px-10 lg:pb-20">
         <CollectionFilters
           current={filters}
           options={filterOptions}

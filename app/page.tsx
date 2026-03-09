@@ -28,8 +28,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-10 md:py-8">
-        <div className="grid gap-7 md:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] md:items-end md:gap-10">
+      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] lg:items-end lg:gap-10">
           <div className="relative overflow-hidden bg-[var(--surface-strong)]">
             <Image
               src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
@@ -41,7 +41,7 @@ export default async function HomePage() {
               className="aspect-[1.22/1] h-full w-full object-cover"
             />
           </div>
-          <div className="flex flex-col justify-end gap-6 md:pb-1">
+          <div className="flex flex-col justify-end gap-6 lg:pb-1">
             <div className="space-y-4">
               <BilingualText
                 as="p"
@@ -81,8 +81,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-8 md:px-10 md:py-10">
-        <div className="grid gap-4 md:grid-cols-[180px_minmax(0,520px)] md:gap-7">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-8 md:px-8 md:py-9 lg:px-10 lg:py-10">
+        <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,520px)] lg:gap-7">
           <p className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">
             品牌简介
             <span className="mx-[0.45em] opacity-40">·</span>
@@ -102,8 +102,8 @@ export default async function HomePage() {
       </section>
 
       {currentExhibition ? (
-        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-18">
-          <div className="grid gap-7 md:grid-cols-[minmax(0,1.04fr)_minmax(320px,0.76fr)] md:items-start md:gap-10">
+        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+          <div className="grid gap-7 lg:grid-cols-[minmax(0,1.04fr)_minmax(320px,0.76fr)] lg:items-start lg:gap-10">
             <div className="relative overflow-hidden bg-[var(--surface-strong)]">
               <Image
                 src={currentExhibition.cover}
@@ -149,8 +149,8 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-18">
-        <div className="grid gap-4 md:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.58fr)] md:items-end md:gap-8">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.58fr)] lg:items-end lg:gap-8">
           <div className="space-y-3">
             <BilingualText
               as="p"
@@ -180,8 +180,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-10 md:py-16">
-        <div className="grid gap-7 md:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] md:items-start">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-8 md:py-14 lg:px-10 lg:py-16">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] lg:items-start">
           <div className="space-y-3">
             <BilingualText
               as="p"
@@ -211,8 +211,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-10 md:py-16">
-        <div className="grid gap-7 md:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] md:items-start">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-8 md:py-14 lg:px-10 lg:py-16">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] lg:items-start">
           <div className="space-y-3">
             <BilingualText
               as="p"
@@ -253,8 +253,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-18">
-        <div className="grid gap-7 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-8">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-8">
           <div className="space-y-3.5">
             <BilingualText
               as="p"
