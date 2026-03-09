@@ -4,6 +4,7 @@ import { bt } from "@/lib/bilingual";
 import { loadSiteContent } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
+import { SiteHeaderNav } from "./site-header-nav";
 
 const navigation = [
   { href: "/", label: bt("首页", "Home") },
@@ -19,7 +20,7 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b border-[var(--line)]">
-      <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-8 px-5 py-5 md:px-10 md:py-6">
+      <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-5 px-5 py-4 md:px-10 md:py-5">
         <Link href="/" className="min-w-fit">
           <BilingualText
             as="span"
@@ -29,27 +30,7 @@ export async function SiteHeader() {
             enClassName="text-[0.56rem] uppercase tracking-[0.28em] text-[var(--accent)]"
           />
         </Link>
-        <nav
-          aria-label="主导航"
-          className="flex flex-1 justify-end gap-3 overflow-x-auto text-sm text-[var(--muted)] md:gap-7"
-        >
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="min-w-fit whitespace-nowrap transition-colors duration-300 hover:text-[var(--ink)]"
-            >
-              <BilingualText
-                as="span"
-                text={item.label}
-                mode="inline"
-                className="text-[0.88rem] md:text-[0.92rem]"
-                zhClassName="text-[0.88rem] md:text-[0.92rem]"
-                enClassName="text-[0.42rem] uppercase tracking-[0.12em] text-[var(--accent)]/72 md:text-[0.46rem] md:tracking-[0.14em]"
-              />
-            </Link>
-          ))}
-        </nav>
+        <SiteHeaderNav items={navigation} />
       </div>
     </header>
   );

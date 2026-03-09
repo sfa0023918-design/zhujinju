@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/admin-auth";
 import type { Artwork } from "@/lib/site-data";
-import { deleteArtworkRecord, saveArtworkRecord } from "@/lib/site-data";
+import { ContentValidationError, deleteArtworkRecord, saveArtworkRecord } from "@/lib/site-data";
 
 type ArtworkRouteProps = {
   params: Promise<{
@@ -38,7 +38,7 @@ export async function PATCH(request: Request, { params }: ArtworkRouteProps) {
       {
         error: error instanceof Error ? error.message : "藏品保存失败。",
       },
-      { status: 500 },
+      { status: error instanceof ContentValidationError ? 400 : 500 },
     );
   }
 }

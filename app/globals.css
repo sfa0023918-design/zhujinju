@@ -45,8 +45,30 @@ a {
   text-decoration: none;
 }
 
+button,
+[role="button"],
+summary {
+  cursor: pointer;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
 img {
   display: block;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(133, 113, 90, 0.34);
+  outline-offset: 2px;
 }
 
 ::selection {

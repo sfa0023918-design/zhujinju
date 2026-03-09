@@ -1,10 +1,9 @@
 import { ArtworkCard } from "@/components/artwork-card";
 import { CollectionFilters } from "@/components/collection-filters";
-import { PageHero } from "@/components/page-hero";
+import { getArtworkStatusText } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { bt } from "@/lib/bilingual";
-import { getFilterOptions, getFilteredArtworks, loadSiteContent } from "@/lib/site-data";
-import { BilingualText } from "@/components/bilingual-text";
+import { getFilterOptions, getFilteredArtworks, getPublicArtworks, loadSiteContent } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +13,7 @@ type CollectionPageProps = {
     region?: string;
     period?: string;
     material?: string;
+    status?: string;
   }>;
 };
 
@@ -31,60 +31,71 @@ export async function generateMetadata() {
 export default async function CollectionPage({ searchParams }: CollectionPageProps) {
   const filters = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const artworks = getFilteredArtworks(content, filters);
-  const filterOptions = getFilterOptions(content);
-  const { collectingDirections, pageCopy } = content;
+  const baseArtworks = getFilteredArtworks(content, filters);
+  const publicArtworks = getPublicArtworks(content);
+  const artworks = !filters.status
+    ? baseArtworks
+    : baseArtworks.filter((artwork) => artwork.status === filters.status);
+  const filterOptions = {
+    ...getFilterOptions(content),
+    statuses: Array.from(new Set(publicArtworks.map((artwork) => artwork.status))).map((status) => ({
+      value: status,
+      label: getArtworkStatusText(status),
+    })),
+  };
+  const { pageCopy } = content;
+  const filterLabels = {
+    ...pageCopy.collection.filters,
+    status: bt("状态", "Status"),
+  };
 
   return (
     <>
-      <PageHero
-        eyebrow={pageCopy.collection.hero.eyebrow}
-        title={pageCopy.collection.hero.title}
-        description={pageCopy.collection.hero.description}
-        aside={pageCopy.collection.hero.aside}
-      />
-
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
-        <CollectionFilters
-          current={filters}
-          options={filterOptions}
-          labels={pageCopy.collection.filters}
-        />
-        <div className="mt-10 grid gap-8">
-          {artworks.length > 0 ? (
-            artworks.map((artwork) => <ArtworkCard key={artwork.slug} artwork={artwork} />)
-          ) : (
-            <BilingualText
-              as="div"
-              text={pageCopy.collection.emptyState}
-              className="border-t border-[var(--line)] py-10 flex flex-col gap-3 text-[var(--muted)]"
-              zhClassName="text-sm leading-8"
-              enClassName="text-[0.8rem] leading-7 text-[var(--accent)]/80"
-            />
-          )}
+      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
+        <div className="grid gap-3 md:grid-cols-[168px_minmax(0,480px)] md:items-start md:gap-6">
+          <p className="text-[0.7rem] tracking-[0.17em] text-[var(--accent)]/84">
+            藏品浏览
+            <span className="mx-[0.45em] opacity-40">·</span>
+            <span className="text-[0.44rem] uppercase tracking-[0.15em] text-[var(--accent)]/54">
+              Collection
+            </span>
+          </p>
+          <div className="space-y-2">
+            <h1 className="font-serif text-[clamp(2.28rem,3.45vw,3rem)] leading-[1.02] tracking-[-0.04em] text-[var(--ink)]">
+              藏品浏览
+            </h1>
+            <p className="max-w-[21rem] text-[0.78rem] leading-[1.9] text-[var(--muted)]/88">
+              {pageCopy.collection.hero.description.zh}
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-10 md:py-20">
-        <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
-          {collectingDirections.map((direction) => (
-            <div key={direction.name.zh} className="bg-[var(--surface-strong)] p-5">
-              <BilingualText
-                as="p"
-                text={direction.name}
-                className="font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.35rem] tracking-[-0.03em]"
-                enClassName="mt-2 block font-sans text-[0.62rem] uppercase tracking-[0.2em] text-[var(--accent)]"
+      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-8 md:pb-18 lg:px-10 lg:pb-20">
+        <CollectionFilters
+          current={filters}
+          options={filterOptions}
+          labels={filterLabels}
+          resultCount={artworks.length}
+        />
+        <div className="mt-6 grid gap-x-8 gap-y-11 md:grid-cols-2 xl:grid-cols-3">
+          {artworks.length > 0 ? (
+            artworks.map((artwork, index) => (
+              <ArtworkCard
+                key={artwork.slug}
+                artwork={artwork}
+                priority={index < 3}
+                variant="catalogue"
               />
-              <BilingualText
-                as="p"
-                text={direction.description}
-                className="mt-3 flex flex-col gap-3 text-[var(--muted)]"
-                zhClassName="text-sm leading-7"
-                enClassName="text-[0.76rem] leading-6 text-[var(--accent)]/80"
-              />
+            ))
+          ) : (
+            <div className="border-t border-[var(--line)] py-10 text-[var(--muted)]">
+              <p className="text-sm leading-8">{pageCopy.collection.emptyState.zh}</p>
+              <p className="mt-2 text-[0.66rem] uppercase tracking-[0.18em] text-[var(--accent)]/72">
+                {pageCopy.collection.emptyState.en}
+              </p>
             </div>
-          ))}
+          )}
         </div>
       </section>
     </>

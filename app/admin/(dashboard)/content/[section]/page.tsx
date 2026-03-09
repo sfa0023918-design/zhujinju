@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 
-import { saveAdminSection } from "@/app/admin/actions";
 import { AdminShell } from "@/components/admin-shell";
-import { AdminVisualEditor } from "@/components/admin-visual-editor";
-import { editableSections, readSiteContentFresh } from "@/lib/site-data";
+import { AdminCmsEditor } from "@/components/admin-cms-editor";
+import { editableSections, getEditableSectionValue, readSiteContentFresh } from "@/lib/site-data";
 
 type AdminSectionPageProps = {
   params: Promise<{
@@ -24,12 +23,11 @@ export default async function AdminSectionPage({ params, searchParams }: AdminSe
   }
 
   const content = await readSiteContentFresh();
-  const value = content[sectionMeta.key];
+  const value = getEditableSectionValue(content, sectionMeta.key);
 
   return (
     <AdminShell activeSection={sectionMeta.key}>
-      <AdminVisualEditor
-        action={saveAdminSection}
+      <AdminCmsEditor
         section={sectionMeta.key}
         title={sectionMeta.title.zh}
         description={sectionMeta.description.zh}

@@ -1,9 +1,10 @@
-import Link from "next/link";
+"use client";
 
-import { formatInlineText } from "@/lib/bilingual";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
-import { ActionLabel } from "./action-label";
 import { BilingualText } from "./bilingual-text";
 
 type CollectionFiltersProps = {
@@ -12,6 +13,7 @@ type CollectionFiltersProps = {
     region?: string;
     period?: string;
     material?: string;
+    status?: string;
   };
   options: {
     all: BilingualValue;
@@ -19,79 +21,342 @@ type CollectionFiltersProps = {
     regions: BilingualValue[];
     periods: BilingualValue[];
     materials: BilingualValue[];
+    statuses: Array<{ value: string; label: BilingualValue }>;
   };
   labels: {
     category: BilingualValue;
     region: BilingualValue;
     period: BilingualValue;
     material: BilingualValue;
+    status: BilingualValue;
     actions: BilingualValue;
     apply: BilingualValue;
     reset: BilingualValue;
   };
+  resultCount: number;
 };
 
-export function CollectionFilters({ current, options, labels }: CollectionFiltersProps) {
-  const filterFields = [
-    { name: "category", label: labels.category, options: options.categories },
-    { name: "region", label: labels.region, options: options.regions },
-    { name: "period", label: labels.period, options: options.periods },
-    { name: "material", label: labels.material, options: options.materials },
-  ] as const;
+const filterKeys = ["category", "region", "period", "material", "status"] as const;
+type FilterKey = (typeof filterKeys)[number];
+type FilterOption = {
+  value?: string;
+  label: BilingualValue;
+};
+
+function buildFilterHref(
+  current: CollectionFiltersProps["current"],
+  fieldName: FilterKey,
+  nextValue?: string,
+) {
+  const params = new URLSearchParams();
+
+  filterKeys.forEach((key) => {
+    const value = key === fieldName ? nextValue : current[key];
+
+    if (value && value !== "全部") {
+      params.set(key, value);
+    }
+  });
+
+  const query = params.toString();
+  return query ? `/collection?${query}` : "/collection";
+}
+
+export function CollectionFilters({
+  current,
+  options,
+  labels,
+  resultCount,
+}: CollectionFiltersProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<number | null>(null);
+  const [openKey, setOpenKey] = useState<FilterKey | null>(null);
+
+  const cancelClose = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimerRef.current = window.setTimeout(() => {
+      setOpenKey(null);
+      closeTimerRef.current = null;
+    }, 170);
+  };
+
+  const filterFields = useMemo(
+    () =>
+      [
+        {
+          name: "category" as const,
+          label: labels.category,
+          options: options.categories.map((item) => ({ value: item.zh, label: item })),
+        },
+        {
+          name: "region" as const,
+          label: labels.region,
+          options: options.regions.map((item) => ({ value: item.zh, label: item })),
+        },
+        {
+          name: "period" as const,
+          label: labels.period,
+          options: options.periods.map((item) => ({ value: item.zh, label: item })),
+        },
+        {
+          name: "material" as const,
+          label: labels.material,
+          options: options.materials.map((item) => ({ value: item.zh, label: item })),
+        },
+        {
+          name: "status" as const,
+          label: labels.status,
+          options: options.statuses.map((item) => ({ value: item.value, label: item.label })),
+        },
+      ] satisfies Array<{ name: FilterKey; label: BilingualValue; options: FilterOption[] }>,
+    [labels, options],
+  );
+  const activeField = filterFields.find((field) => field.name === openKey);
+
+  useEffect(() => {
+    setOpenKey(null);
+  }, [current.category, current.region, current.period, current.material, current.status]);
+
+  useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        cancelClose();
+        setOpenKey(null);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        cancelClose();
+        setOpenKey(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      cancelClose();
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   return (
-    <form
-      action="/collection"
-      className="grid gap-4 border-y border-[var(--line)] py-5 md:grid-cols-[repeat(4,minmax(0,1fr))_minmax(280px,0.9fr)]"
-    >
-      {filterFields.map((field) => (
-        <label key={field.name} className="grid gap-2 text-sm text-[var(--muted)]">
-          <BilingualText
-            as="span"
-            text={field.label}
-            mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.72rem] tracking-[0.18em]"
-            enClassName="text-[0.5rem] uppercase tracking-[0.16em]"
-          />
-          <select
-            name={field.name}
-            defaultValue={current[field.name]}
-            className="h-11 rounded-none border border-[var(--line)] bg-[var(--surface)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-          >
-            <option value={options.all.zh}>{formatInlineText(options.all)}</option>
-            {field.options.map((option) => (
-              <option key={option.zh} value={option.zh}>
-                {formatInlineText(option)}
-              </option>
-            ))}
-          </select>
-        </label>
-      ))}
-      <div className="grid gap-2 text-sm text-[var(--muted)]">
-        <BilingualText
-          as="span"
-          text={labels.actions}
-          mode="inline"
-          className="text-[var(--accent)]"
-          zhClassName="text-[0.72rem] tracking-[0.18em]"
-          enClassName="text-[0.5rem] uppercase tracking-[0.16em]"
-        />
-        <div className="grid gap-3 md:grid-cols-2">
-          <button
-            type="submit"
-            className="inline-flex h-11 items-center justify-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
-          >
-            <ActionLabel text={labels.apply} />
-          </button>
-          <Link
-            href="/collection"
-            className="inline-flex h-11 items-center justify-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
-          >
-            <ActionLabel text={labels.reset} />
-          </Link>
+    <div ref={rootRef} className="border-y border-[var(--line)]/50 py-3 md:py-3">
+      <div className="hidden items-center gap-2 md:flex md:flex-wrap md:gap-2.5">
+        {filterFields.map((field) => {
+          const currentLabel =
+            field.options.find((option) => option.value === current[field.name])?.label ?? options.all;
+          const isOpen = openKey === field.name;
+          const isActive = Boolean(current[field.name]);
+
+          return (
+            <div
+              key={field.name}
+              className="relative min-w-0"
+              onMouseEnter={cancelClose}
+              onMouseLeave={() => {
+                if (isOpen) {
+                  scheduleClose();
+                }
+              }}
+            >
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => {
+                  cancelClose();
+                  setOpenKey((previous) => (previous === field.name ? null : field.name));
+                }}
+                className={`inline-flex min-h-[2rem] w-full cursor-pointer select-none items-center gap-2 rounded-full border px-3 py-[0.32rem] text-left transition-colors duration-150 md:min-w-[138px] ${
+                  isOpen || isActive
+                    ? "border-[var(--line-strong)]/50 text-[var(--ink)]"
+                    : "border-[var(--line)]/52 text-[var(--muted)] hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)]"
+                }`}
+              >
+                <div className="min-w-0 flex-1">
+                  <BilingualText
+                    as="span"
+                    text={field.label}
+                    mode="inline"
+                    className="block text-[var(--accent)]"
+                    zhClassName="text-[0.5rem] tracking-[0.12em]"
+                    enClassName="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/34"
+                  />
+                  <BilingualText
+                    as="span"
+                    text={currentLabel}
+                    mode="inline"
+                    className="mt-[0.18rem] block truncate text-[var(--ink)]"
+                    zhClassName="text-[0.72rem]"
+                    enClassName="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/34"
+                  />
+                </div>
+                <span
+                  aria-hidden="true"
+                  className={`text-[0.42rem] text-[var(--accent)]/28 transition-transform duration-150 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
+                >
+                  ▾
+                </span>
+              </button>
+
+              {isOpen ? (
+                <div className="absolute left-0 top-[calc(100%+0.35rem)] z-20 min-w-[204px] border border-[var(--line)]/52 bg-[var(--surface)] p-[3px] shadow-[0_12px_26px_rgba(26,22,18,0.05)]">
+                  <div className="grid gap-px bg-[var(--line)]/10">
+                    <Link
+                      href={buildFilterHref(current, field.name, undefined)}
+                      onClick={() => {
+                        cancelClose();
+                        setOpenKey(null);
+                      }}
+                      className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.46rem] text-[var(--muted)] transition-colors duration-150 hover:bg-[var(--surface-strong)] hover:text-[var(--ink)] ${
+                        !current[field.name] ? "bg-[var(--surface-strong)] text-[var(--ink)]" : ""
+                      }`}
+                    >
+                      <span className="text-[0.74rem]">{options.all.zh}</span>
+                      <span className="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/36">
+                        {options.all.en}
+                      </span>
+                    </Link>
+                    {field.options.map((option) => (
+                      <Link
+                        key={`${field.name}-${option.value ?? "all"}`}
+                        href={buildFilterHref(current, field.name, option.value)}
+                        onClick={() => {
+                          cancelClose();
+                          setOpenKey(null);
+                        }}
+                        className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.46rem] text-[var(--muted)] transition-colors duration-150 hover:bg-[var(--surface-strong)] hover:text-[var(--ink)] ${
+                          current[field.name] === option.value ? "bg-[var(--surface-strong)] text-[var(--ink)]" : ""
+                        }`}
+                      >
+                        <span className="text-[0.74rem] leading-6">{option.label.zh}</span>
+                        <span className="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/36">
+                          {option.label.en}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+
+        <Link
+          href="/collection"
+          className="inline-flex min-h-[2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/52 px-2.75 py-[0.32rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)]"
+        >
+          <span className="text-[0.66rem]">{labels.reset.zh}</span>
+          <span className="ml-1 text-[0.38rem] uppercase tracking-[0.14em] text-[var(--accent)]/40">
+            {labels.reset.en}
+          </span>
+        </Link>
+
+        <div className="md:ml-auto flex items-center">
+          <span className="select-none text-[0.72rem] tracking-[0.06em] text-[var(--muted)]/82">{`${resultCount} 件作品`}</span>
         </div>
       </div>
-    </form>
+
+      <div className="grid gap-2 md:hidden">
+        <div className="flex flex-wrap gap-2">
+          {filterFields.map((field) => {
+            const currentLabel =
+              field.options.find((option) => option.value === current[field.name])?.label ?? options.all;
+            const isActive = Boolean(current[field.name]);
+
+            return (
+              <button
+                key={field.name}
+                type="button"
+                onClick={() => {
+                  cancelClose();
+                  setOpenKey(field.name);
+                }}
+                className={`inline-flex min-h-[2.15rem] cursor-pointer select-none items-center gap-2 rounded-full border px-3 py-[0.35rem] ${
+                  isActive
+                    ? "border-[var(--line-strong)]/50 text-[var(--ink)]"
+                    : "border-[var(--line)]/52 text-[var(--muted)]"
+                }`}
+              >
+                <span className="text-[0.72rem]">{field.label.zh}</span>
+                <span className="text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">{currentLabel.zh}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <Link
+            href="/collection"
+            className="inline-flex min-h-[2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/52 px-2.75 py-[0.32rem] text-[var(--muted)]"
+          >
+            <span className="text-[0.66rem]">{labels.reset.zh}</span>
+          </Link>
+          <span className="select-none text-[0.72rem] tracking-[0.06em] text-[var(--muted)]/82">{`${resultCount} 件作品`}</span>
+        </div>
+      </div>
+
+      {openKey && activeField ? (
+        <div className="fixed inset-0 z-50 bg-[rgba(23,21,18,0.16)] md:hidden" onClick={() => setOpenKey(null)}>
+          <div
+            className="absolute inset-x-0 bottom-0 rounded-t-[22px] border-t border-[var(--line)] bg-[var(--surface)] px-5 pb-6 pt-5 shadow-[0_-16px_40px_rgba(17,14,12,0.08)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <BilingualText
+                as="p"
+                text={activeField.label}
+                mode="inline"
+                className="text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.2em]"
+                enClassName="text-[0.5rem] uppercase tracking-[0.16em] text-[var(--accent)]/62"
+              />
+              <button
+                type="button"
+                onClick={() => setOpenKey(null)}
+                className="cursor-pointer select-none text-[0.72rem] text-[var(--muted)]"
+              >
+                关闭
+              </button>
+            </div>
+            <div className="grid gap-px border-y border-[var(--line)]/60 py-1">
+              <Link
+                href={buildFilterHref(current, activeField.name, undefined)}
+                onClick={() => setOpenKey(null)}
+                className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 px-1 py-3 ${
+                  !current[activeField.name] ? "text-[var(--ink)]" : "text-[var(--muted)]"
+                }`}
+              >
+                <span className="text-[0.92rem]">{options.all.zh}</span>
+                <span className="text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">{options.all.en}</span>
+              </Link>
+              {activeField.options.map((option) => (
+                <Link
+                  key={`${activeField.name}-${option.value ?? "all-mobile"}`}
+                  href={buildFilterHref(current, activeField.name, option.value)}
+                  onClick={() => setOpenKey(null)}
+                  className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 px-1 py-3 ${
+                    current[activeField.name] === option.value ? "text-[var(--ink)]" : "text-[var(--muted)]"
+                  }`}
+                >
+                  <span className="text-[0.92rem]">{option.label.zh}</span>
+                  <span className="text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">{option.label.en}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }

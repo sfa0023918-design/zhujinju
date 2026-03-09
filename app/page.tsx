@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
-import { SectionIntro } from "@/components/section-intro";
 import {
   getCurrentExhibition,
   getFeaturedArtworks,
@@ -15,84 +14,96 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const content = await loadSiteContent();
-  const { brandIntro, collectingDirections, operationalFacts, pageCopy } = content;
+  const { brandIntro, collectingDirections, operationalFacts, homeContent, siteConfig } = content;
   const currentExhibition = getCurrentExhibition(content);
   const featuredArtworks = getFeaturedArtworks(content);
-  const focusCopy = currentExhibition?.current ? pageCopy.home.focusCurrent : pageCopy.home.focusRecent;
+  const focusCopy = currentExhibition?.current ? homeContent.focusCurrent : homeContent.focusRecent;
+  const contactItems = [
+    { label: "Email", value: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` },
+    { label: "WeChat", value: siteConfig.contact.wechat },
+    { label: "Phone", value: siteConfig.contact.phone },
+    { label: "Instagram", value: siteConfig.contact.instagram },
+  ];
+  const contactRows = [contactItems.slice(0, 2), contactItems.slice(2, 4)].filter((row) => row.length > 0);
 
   return (
     <>
-      <section className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-10 md:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] md:px-10 md:py-14">
-        <div className="relative overflow-hidden bg-[var(--surface-strong)]">
-          <Image
-            src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
-            alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
-            width={1600}
-            height={1080}
-            priority
-            unoptimized
-            className="aspect-[1.15/1] h-full w-full object-cover"
-          />
-        </div>
-        <div className="flex flex-col justify-between gap-8 border-t border-[var(--line)] pt-6 md:pt-0">
-          <div className="space-y-5">
-            <BilingualText
-              as="p"
-              text={pageCopy.home.heroEyebrow}
-              mode="inline"
-              className="text-[var(--accent)]"
-              zhClassName="text-[0.76rem] tracking-[0.18em]"
-              enClassName="text-[0.56rem] uppercase tracking-[0.2em] text-[var(--accent)]/80"
+      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] lg:items-end lg:gap-10">
+          <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+            <Image
+              src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
+              alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
+              width={1600}
+              height={1080}
+              priority
+              unoptimized
+              className="aspect-[1.22/1] h-full w-full object-cover"
             />
-            <BilingualText
-              as="h1"
-              text={pageCopy.home.heroTitle}
-              className="font-serif text-[var(--ink)]"
-              zhClassName="block max-w-[11ch] text-balance text-[2.9rem] leading-[0.94] tracking-[-0.05em] md:text-[5.9rem]"
-              enClassName="mt-4 block font-sans text-[0.68rem] uppercase tracking-[0.22em] text-[var(--accent)]/78 md:text-[0.76rem]"
-            />
-            <div className="max-w-xl">
-              <p className="text-[1rem] leading-8 text-[var(--muted)] md:text-[1.08rem]">
-                {brandIntro.statement.zh}
-              </p>
-              <p className="mt-3 text-[0.74rem] leading-7 text-[var(--accent)]/72 md:text-[0.78rem]">
-                {brandIntro.statement.en}
-              </p>
-            </div>
           </div>
-          <div className="grid gap-5 border-t border-[var(--line)] pt-6">
-            <div className="max-w-lg">
-              <p className="text-sm leading-8 text-[var(--muted)]">{brandIntro.about.zh}</p>
-              <p className="mt-3 text-[0.72rem] leading-7 text-[var(--accent)]/72">
-                {brandIntro.about.en}
+          <div className="flex flex-col justify-end gap-6 lg:pb-1">
+            <div className="space-y-4">
+              <BilingualText
+                as="p"
+                text={homeContent.heroEyebrow}
+                mode="inline"
+                className="text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.18em]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.2em] text-[var(--accent)]/66"
+              />
+              <div className="space-y-3">
+                <h1 className="max-w-[9ch] font-serif text-[clamp(3.625rem,6vw,4.875rem)] leading-[0.98] tracking-[-0.05em] text-[var(--ink)]">
+                  {homeContent.heroTitle.zh}
+                </h1>
+                <p className="max-w-[32rem] text-[0.88rem] uppercase tracking-[0.18em] text-[var(--accent)]/58 md:text-[clamp(1rem,1.4vw,1.125rem)]">
+                  {homeContent.heroSubtitle.en}
+                </p>
+              </div>
+              <p className="max-w-[26ch] text-[1.05rem] leading-[1.95] text-[var(--muted)] md:text-[clamp(1.125rem,1.45vw,1.25rem)]">
+                {homeContent.heroSubtitle.zh}
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 border-t border-[var(--line)] pt-5">
               <Link
                 href="/collection"
-                className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+                className="inline-flex min-h-12 items-center border border-[var(--line-strong)] px-4.5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
               >
-                <ActionLabel text={pageCopy.home.heroPrimaryAction} />
+                <ActionLabel text={homeContent.heroPrimaryAction} />
               </Link>
               <Link
                 href="/exhibitions"
-                className="inline-flex min-h-11 items-center border border-[var(--line)] px-5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+                className="inline-flex min-h-12 items-center border border-[var(--line)] px-4.5 text-[var(--muted)] transition-colors duration-300 hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
               >
-                <ActionLabel text={pageCopy.home.heroSecondaryAction} />
+                <ActionLabel text={homeContent.heroSecondaryAction} />
               </Link>
             </div>
           </div>
         </div>
       </section>
 
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-8 md:px-8 md:py-9 lg:px-10 lg:py-10">
+        <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,520px)] lg:gap-7">
+          <p className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">
+            品牌简介
+            <span className="mx-[0.45em] opacity-40">·</span>
+            <span className="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72">
+              Introduction
+            </span>
+          </p>
+          <div className="space-y-3">
+            <p className="max-w-[25ch] text-[0.98rem] leading-[2.02] text-[var(--muted)] md:text-[1.02rem]">
+              {siteConfig.homeIntro.zh}
+            </p>
+            <p className="max-w-[28rem] text-[0.66rem] leading-6 text-[var(--accent)]/62 md:text-[0.7rem]">
+              {siteConfig.homeIntro.en}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {currentExhibition ? (
-        <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:px-10 md:py-24">
-          <SectionIntro
-            eyebrow={focusCopy.eyebrow}
-            title={currentExhibition.title}
-            description={focusCopy.description}
-          />
-          <div className="grid gap-6">
+        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+          <div className="grid gap-7 lg:grid-cols-[minmax(0,1.04fr)_minmax(320px,0.76fr)] lg:items-start lg:gap-10">
             <div className="relative overflow-hidden bg-[var(--surface-strong)]">
               <Image
                 src={currentExhibition.cover}
@@ -100,159 +111,207 @@ export default async function HomePage() {
                 width={1600}
                 height={1000}
                 unoptimized
-                className="aspect-[1.45/1] h-full w-full object-cover"
+                className="aspect-[1.42/1] h-full w-full object-cover"
               />
             </div>
-            <div className="grid gap-7 border-t border-[var(--line)] pt-7 md:grid-cols-[0.68fr_0.32fr]">
+            <div className="space-y-5 md:pt-3">
               <BilingualText
                 as="p"
-                text={currentExhibition.curatorialLead}
-                className="text-[var(--muted)] md:text-[0.98rem]"
-                zhClassName="text-sm leading-8"
-                enClassName="hidden"
+                text={focusCopy.eyebrow}
+                mode="inline"
+                className="text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.18em]"
+                enClassName="text-[0.48rem] uppercase tracking-[0.18em] text-[var(--accent)]/64"
               />
-              <div className="space-y-3 text-sm leading-7 text-[var(--muted)]">
-                <BilingualText
-                  as="p"
-                  text={currentExhibition.period}
-                  mode="inline"
-                  className="block"
-                  zhClassName="block"
-                  enClassName="text-[0.66rem] text-[var(--accent)]/75"
-                />
-                <BilingualText
-                  as="p"
-                  text={currentExhibition.venue}
-                  mode="inline"
-                  className="block"
-                  zhClassName="block"
-                  enClassName="text-[0.66rem] text-[var(--accent)]/75"
-                />
-                <p className="text-[0.92rem] text-[var(--muted)]">
-                  {currentExhibition.highlightCount} {pageCopy.home.focusSummaryLine.highlightUnit.zh} · {currentExhibition.cataloguePages}{" "}
-                  {pageCopy.home.focusSummaryLine.catalogueUnit.zh}
+              <div className="space-y-2.5">
+                <p className="font-serif text-[clamp(2.56rem,4.45vw,3.56rem)] leading-[0.98] tracking-[-0.04em] text-[var(--ink)]">
+                  {currentExhibition.title.zh}
                 </p>
-                <Link
-                  href={`/exhibitions/${currentExhibition.slug}`}
-                  className="inline-flex pt-3 text-[var(--ink)]"
-                >
-                  <ActionLabel text={pageCopy.home.focusAction} align="start" />
-                </Link>
+                <p className="text-[0.58rem] uppercase tracking-[0.18em] text-[var(--accent)]/58 md:text-[0.64rem]">
+                  {currentExhibition.title.en}
+                </p>
               </div>
+              <div className="grid gap-2 border-y border-[var(--line)] py-3.5 text-[0.92rem] leading-7 text-[var(--muted)]">
+                <p>{currentExhibition.period.zh}</p>
+                <p>{currentExhibition.venue.zh}</p>
+                <p className="text-[0.86rem] text-[var(--accent)]/88">
+                  {currentExhibition.highlightCount} 件重点作品 · {currentExhibition.cataloguePages} 页图录
+                </p>
+              </div>
+              <p className="max-w-[26rem] text-[0.92rem] leading-7 text-[var(--muted)]">
+                {currentExhibition.curatorialLead.zh}
+              </p>
+              <Link href={`/exhibitions/${currentExhibition.slug}`} className="inline-flex text-[var(--ink)]">
+                <ActionLabel text={homeContent.focusAction} align="start" />
+              </Link>
             </div>
           </div>
         </section>
       ) : null}
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
-        <SectionIntro
-          eyebrow={pageCopy.home.selectedWorks.eyebrow}
-          title={pageCopy.home.selectedWorks.title}
-          description={pageCopy.home.selectedWorks.description}
-        />
-        <div className="mt-10 grid gap-8">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.58fr)] lg:items-end lg:gap-8">
+          <div className="space-y-3">
+            <BilingualText
+              as="p"
+              text={homeContent.selectedWorks.eyebrow}
+              mode="inline"
+              className="text-[var(--accent)]"
+              zhClassName="text-[0.76rem] tracking-[0.18em]"
+              enClassName="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72"
+            />
+            <h2 className="max-w-[11ch] font-serif text-[clamp(2.625rem,4.2vw,3.5rem)] leading-[1] tracking-[-0.04em] text-[var(--ink)]">
+              {homeContent.selectedWorks.title.zh}
+            </h2>
+          </div>
+          <p className="max-w-[20rem] text-[0.88rem] leading-7 text-[var(--muted)]">
+            {homeContent.selectedWorks.description.zh}
+          </p>
+        </div>
+        <div className="mt-9 grid gap-7 sm:grid-cols-2 xl:grid-cols-4">
           {featuredArtworks.slice(0, 4).map((artwork, index) => (
-            <ArtworkCard key={artwork.slug} artwork={artwork} priority={index < 2} />
+            <ArtworkCard
+              key={artwork.slug}
+              artwork={artwork}
+              priority={index < 2}
+              variant="compact"
+            />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
-        <SectionIntro
-          eyebrow={pageCopy.home.collectingDirections.eyebrow}
-          title={pageCopy.home.collectingDirections.title}
-          description={pageCopy.home.collectingDirections.description}
-        />
-        <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
-          {collectingDirections.map((direction) => (
-            <div key={direction.name.zh} className="bg-[var(--surface-strong)] p-7">
-              <BilingualText
-                as="h3"
-                text={direction.name}
-                className="font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.5rem] tracking-[-0.03em]"
-                enClassName="mt-2 block font-sans text-[0.66rem] uppercase tracking-[0.22em] text-[var(--accent)]"
-              />
-              <BilingualText
-                as="p"
-                text={direction.description}
-                className="mt-4 text-[var(--muted)]"
-                zhClassName="text-sm leading-7"
-                enClassName="hidden"
-              />
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-8 md:py-14 lg:px-10 lg:py-16">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] lg:items-start">
+          <div className="space-y-3">
+            <BilingualText
+              as="p"
+              text={homeContent.collectingDirections.eyebrow}
+              mode="inline"
+              className="text-[var(--accent)]"
+              zhClassName="text-[0.76rem] tracking-[0.18em]"
+              enClassName="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72"
+            />
+            <h2 className="font-serif text-[clamp(24px,2.4vw,32px)] leading-[1.08] tracking-[-0.034em] text-[var(--ink)]">
+              {homeContent.collectingDirections.title.zh}
+            </h2>
+          </div>
+          <div className="grid gap-x-5 gap-y-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {collectingDirections.map((direction) => (
+              <div
+                key={direction.name.zh}
+                className="flex min-h-[62px] flex-col justify-center gap-1 border-b border-[var(--line)] px-1 pb-2 pt-1.5"
+              >
+                <p className="text-[15px] font-[450] leading-[1.45] text-[var(--ink)]">{direction.name.zh}</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/38">
+                  {direction.name.en}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-8 md:py-14 lg:px-10 lg:py-16">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] lg:items-start">
+          <div className="space-y-3">
+            <BilingualText
+              as="p"
+              text={homeContent.operationalFacts.eyebrow}
+              mode="inline"
+              className="text-[var(--accent)]"
+              zhClassName="text-[0.76rem] tracking-[0.18em]"
+              enClassName="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72"
+            />
+            <h2 className="font-serif text-[clamp(24px,2.4vw,32px)] leading-[1.08] tracking-[-0.034em] text-[var(--ink)]">
+              {homeContent.operationalFacts.title.zh}
+            </h2>
+          </div>
+          <div className="border-y border-[var(--line)] md:grid md:grid-cols-5 md:divide-x md:divide-[var(--line)]">
+            {operationalFacts.map((pillar) => {
+              const hasDenseValue =
+                pillar.title.zh === "服务对象" || pillar.title.zh === "上海预约制空间";
+
+              return (
+                <div key={pillar.title.zh} className="border-t border-[var(--line)] px-3 py-4 first:border-t-0 md:border-t-0 md:px-4">
+                  <p className="text-[0.66rem] tracking-[0.14em] text-[var(--accent)]/78">{pillar.title.zh}</p>
+                  <p
+                    className={
+                      hasDenseValue
+                        ? "mt-2.5 text-[15px] font-[450] leading-[1.72] text-[var(--muted)]"
+                        : "mt-2.5 font-serif text-[1.34rem] leading-[1.06] tracking-[-0.028em] text-[var(--ink)]"
+                    }
+                  >
+                    {pillar.value.zh}
+                  </p>
+                  <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/38">
+                    {pillar.title.en}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-8">
+          <div className="space-y-3.5">
+            <BilingualText
+              as="p"
+              text={homeContent.contact.eyebrow}
+              mode="inline"
+              className="text-[var(--accent)]"
+              zhClassName="text-[0.76rem] tracking-[0.18em]"
+              enClassName="text-[0.52rem] uppercase tracking-[0.18em] text-[var(--accent)]/72"
+            />
+            <h2 className="max-w-[8.2ch] font-serif text-[clamp(24px,2.4vw,32px)] leading-[1.08] tracking-[-0.034em] text-[var(--ink)]">
+              {homeContent.contact.title.zh}
+            </h2>
+            <p className="max-w-[27rem] text-[15px] leading-[1.82] text-[var(--muted)]/88">
+              {homeContent.contact.description.zh}
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link href="/contact" className="inline-flex text-[var(--ink)]">
+                <ActionLabel text={homeContent.contactPrimaryAction} align="start" />
+              </Link>
+              <Link href="/journal" className="inline-flex text-[var(--muted)] hover:text-[var(--ink)]">
+                <ActionLabel text={homeContent.contactSecondaryAction} align="start" />
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-16 md:px-10 md:py-24">
-        <SectionIntro
-          eyebrow={pageCopy.home.operationalFacts.eyebrow}
-          title={pageCopy.home.operationalFacts.title}
-          description={pageCopy.home.operationalFacts.description}
-        />
-        <div className="mt-10 grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-5">
-          {operationalFacts.map((pillar) => (
-            <div key={pillar.title.zh} className="bg-[var(--surface)] p-6 md:p-7">
-              <BilingualText
-                as="h3"
-                text={pillar.title}
-                className="font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.2rem] tracking-[-0.03em]"
-                enClassName="mt-2 block font-sans text-[0.64rem] uppercase tracking-[0.22em] text-[var(--accent)]"
-              />
-              <BilingualText
-                as="p"
-                text={pillar.value}
-                className="mt-4 font-serif text-[var(--ink)]"
-                zhClassName="block text-[1.75rem] leading-none tracking-[-0.04em]"
-                enClassName="mt-2 block font-sans text-[0.7rem] uppercase tracking-[0.18em] text-[var(--accent)]/76"
-              />
-              <BilingualText
-                as="p"
-                text={pillar.description}
-                className="mt-4 text-[var(--muted)]"
-                zhClassName="text-sm leading-7"
-                enClassName="hidden"
-              />
+          </div>
+          <div className="border-t border-[var(--line)]/75">
+            {contactRows.map((row, rowIndex) => (
+              <div
+                key={`row-${rowIndex}`}
+                className={`grid sm:grid-cols-2 ${rowIndex > 0 ? "border-t border-[var(--line)]/70" : ""}`}
+              >
+                {row.map((item, itemIndex) => (
+                  <div
+                    key={item.label}
+                    className={`px-1 py-3.5 sm:px-4 ${itemIndex > 0 ? "sm:border-l sm:border-[var(--line)]/70" : ""}`}
+                  >
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]/32">{item.label}</p>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="mt-2 block text-[0.9rem] leading-7 text-[var(--ink)] transition-colors hover:text-[var(--accent)]"
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      <p className="mt-2 text-[0.9rem] leading-7 text-[var(--ink)]">{item.value}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div className="border-t border-[var(--line)]/70 px-1 py-3.5 sm:px-4">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]/32">Appointment</p>
+              <p className="mt-2 text-[0.88rem] leading-6.5 text-[var(--ink)]">{siteConfig.contact.address.zh}</p>
+              <p className="mt-1.5 text-[15px] leading-[1.8] text-[var(--muted)]/86">{siteConfig.contact.replyWindow.zh}</p>
+              <p className="mt-1 text-[15px] leading-[1.8] text-[var(--muted)]/86">{siteConfig.contact.collaborationNote.zh}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto grid w-full max-w-[1480px] gap-8 border-t border-[var(--line)] px-5 py-16 md:grid-cols-[minmax(0,1fr)_340px] md:px-10 md:py-20">
-        <div className="space-y-4">
-          <BilingualText
-            as="p"
-            text={pageCopy.home.contact.eyebrow}
-            mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.76rem] tracking-[0.18em]"
-            enClassName="text-[0.56rem] uppercase tracking-[0.18em] text-[var(--accent)]/80"
-          />
-          <BilingualText
-            as="h2"
-            text={pageCopy.home.contact.title}
-            className="font-serif leading-none tracking-[-0.04em]"
-            zhClassName="block text-[2.2rem] md:text-[3.8rem]"
-            enClassName="mt-3 block font-sans text-[0.86rem] uppercase tracking-[0.24em] text-[var(--accent)]"
-          />
-          <BilingualText
-            as="p"
-            text={pageCopy.home.contact.description}
-            mode="inline"
-            className="max-w-2xl text-[var(--muted)] md:text-[0.98rem]"
-            zhClassName="text-sm leading-8"
-            enClassName="text-[0.76rem] leading-7 text-[var(--accent)]/75"
-          />
-        </div>
-        <div className="space-y-3 border-t border-[var(--line)] pt-5 text-sm text-[var(--muted)] md:border-t-0 md:border-l md:pl-8 md:pt-0">
-          <Link href="/contact" className="inline-flex text-[var(--ink)]">
-            <ActionLabel text={pageCopy.home.contactPrimaryAction} align="start" />
-          </Link>
-          <Link href="/journal" className="block">
-            <ActionLabel text={pageCopy.home.contactSecondaryAction} align="start" />
-          </Link>
+          </div>
         </div>
       </section>
     </>

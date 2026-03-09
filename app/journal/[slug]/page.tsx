@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { MediaPlaceholder } from "@/components/media-placeholder";
 import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 import {
@@ -70,13 +71,13 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
 
   return (
     <>
-      <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-10 md:py-12">
+      <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
         <Link href="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
           <ActionLabel text={detailCopy.backAction} align="start" />
         </Link>
       </section>
 
-      <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-10 md:pb-28">
+      <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-8 md:pb-24 lg:px-10 lg:pb-28">
         <header className="space-y-5 border-t border-[var(--line)] pt-6">
           <BilingualText
             as="p"
@@ -108,15 +109,21 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
         </header>
 
         <div className="relative mt-8 overflow-hidden bg-[var(--surface-strong)]">
-          <Image
-            src={article.cover}
-            alt={`${article.title.zh} ${article.title.en}`}
-            width={1600}
-            height={1000}
-            priority
-            unoptimized
-            className="aspect-[1.55/1] h-full w-full object-cover"
-          />
+          {article.cover.startsWith("/api/placeholder/") ? (
+            <div className="aspect-[1.55/1]">
+              <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />
+            </div>
+          ) : (
+            <Image
+              src={article.cover}
+              alt={`${article.title.zh} ${article.title.en}`}
+              width={1600}
+              height={1000}
+              priority
+              unoptimized
+              className="aspect-[1.55/1] h-full w-full object-cover"
+            />
+          )}
         </div>
 
         <div className="mt-10 space-y-6">
