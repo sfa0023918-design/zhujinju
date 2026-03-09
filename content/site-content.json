@@ -884,7 +884,7 @@
     {
       "id": "artwork_a7be079d-98c1-4bb7-9d41-2e91ab302328",
       "slug": "artwork-1773059260653",
-      "publicationStatus": "draft",
+      "publicationStatus": "published",
       "title": {
         "zh": "帝释天",
         "en": "Indre"
@@ -894,19 +894,19 @@
         "en": ""
       },
       "period": {
-        "zh": "13",
+        "zh": "13-14世纪",
         "en": ""
       },
       "region": {
-        "zh": "",
+        "zh": "尼泊尔",
         "en": ""
       },
       "origin": {
-        "zh": "",
+        "zh": "加德满都",
         "en": ""
       },
       "material": {
-        "zh": "",
+        "zh": "铜鎏金",
         "en": ""
       },
       "category": {
@@ -914,7 +914,7 @@
         "en": ""
       },
       "dimensions": {
-        "zh": "",
+        "zh": "24.5cm",
         "en": ""
       },
       "status": "inquiry",
