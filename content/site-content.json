@@ -16,6 +16,116 @@
     "protocol": "https",
     "locale": "zh_CN",
     "ogImagePath": "/opengraph-image",
+    "homeIntro": {
+      "zh": "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
+      "en": "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their broader dialogues with Asian antiquities, with work structured around collecting, research, exhibitions, and catalogues."
+    },
+    "about": {
+      "eyebrow": {
+        "zh": "关于",
+        "en": "About"
+      },
+      "title": {
+        "zh": "关于竹瑾居",
+        "en": "About Zhu Jin Ju"
+      },
+      "subtitle": {
+        "zh": "工作围绕收藏、研究、展览与图录展开。",
+        "en": "The Work Is Structured Around Collecting, Research, Exhibitions, and Catalogues."
+      },
+      "body": [
+        {
+          "zh": "我们以作品本体为起点，在图像学、风格学、材质工艺与流传脉络之间建立判断，并通过展览、图录与研究文字持续公开这些判断。",
+          "en": "We begin with the object itself, building judgement through iconography, style, material, craftsmanship, and provenance, and making that judgement public through exhibitions, catalogues, and research writing."
+        },
+        {
+          "zh": "我们不以“海量上新”定义专业，也不将古代艺术处理为泛化的装饰品类。每一次展示、每一件作品与每一段文字，都应指向更准确的观看。",
+          "en": "We do not define professionalism by constant new arrivals, nor reduce historical art to generalized decoration. Each display, object, and paragraph should lead to a more precise way of looking."
+        },
+        {
+          "zh": "对竹瑾居而言，品牌并不独立于学术判断之外；网站、展览与图录，本身就是专业工作持续公开的一部分。",
+          "en": "For Zhu Jin Ju, the brand is not separate from scholarly judgement; the website, exhibitions, and catalogues are themselves part of making that work public."
+        }
+      ]
+    },
+    "contactPage": {
+      "eyebrow": {
+        "zh": "联系",
+        "en": "Contact"
+      },
+      "title": {
+        "zh": "联系",
+        "en": "Contact"
+      },
+      "description": {
+        "zh": "欢迎藏家、机构、策展人与研究者联系。竹瑾居以作品咨询、借展洽谈、研究合作与图录交换为主要联络方向。",
+        "en": "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange."
+      },
+      "aside": {
+        "zh": "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。上海会面采用预约制，可安排看件与研究交流。",
+        "en": "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Shanghai are by appointment."
+      },
+      "infoLabels": {
+        "email": {
+          "zh": "邮箱",
+          "en": "Email"
+        },
+        "wechat": {
+          "zh": "微信",
+          "en": "WeChat"
+        },
+        "phoneWhatsapp": {
+          "zh": "电话 / WhatsApp",
+          "en": "Phone / WhatsApp"
+        }
+      }
+    },
+    "footer": {
+      "intro": {
+        "zh": "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
+        "en": "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
+      },
+      "appointment": {
+        "zh": "By Appointment in Shanghai",
+        "en": "By Appointment in Shanghai"
+      },
+      "copyrightLabel": {
+        "zh": "版权所有",
+        "en": "Copyright"
+      },
+      "contactHeading": {
+        "zh": "联络",
+        "en": "Contact"
+      },
+      "informationHeading": {
+        "zh": "信息与请求",
+        "en": "Information"
+      },
+      "collectionLink": {
+        "zh": "藏品浏览",
+        "en": "Browse Collection"
+      },
+      "exhibitionsLink": {
+        "zh": "展览与图录",
+        "en": "Exhibitions & Catalogues"
+      },
+      "journalLink": {
+        "zh": "文章与研究",
+        "en": "Journal & Research"
+      },
+      "pdfRequestLabel": {
+        "zh": "PDF 索取",
+        "en": "PDF Request"
+      },
+      "instagramLabel": {
+        "zh": "Instagram",
+        "en": "Instagram"
+      },
+      "wechatLabel": {
+        "zh": "微信",
+        "en": "WeChat"
+      }
+    },
     "contact": {
       "email": "sfa0023918@gmail.com",
       "phone": "+86 188 0738 1234",
@@ -34,6 +144,10 @@
       "collaborationNote": {
         "zh": "可联系借展、研究合作、图录交换与机构预约看件。",
         "en": "Loans, research collaboration, catalogue exchange, and institutional viewings may be arranged."
+      },
+      "appointmentNote": {
+        "zh": "By appointment in Chengdu.",
+        "en": "By appointment in Shanghai."
       }
     }
   },
@@ -890,7 +1004,8 @@
       "image": "/uploads/artworks/1772951219156-img-0002.jpg",
       "featured": false,
       "gallery": [],
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "id": "摩利支天"
     },
     {
       "slug": "green-tara-malla",
@@ -1010,7 +1125,8 @@
       "image": "/uploads/artworks/1772905959218-b00008503fr1770280981-denoised-p.jpg",
       "featured": true,
       "gallery": [],
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "id": "green-tara-malla"
     },
     {
       "slug": "shakyamuni-bhumisparsha",
@@ -1123,7 +1239,8 @@
       "gallery": [
         "/uploads/artworks/1772948642024-img-4417.webp"
       ],
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "id": "shakyamuni-bhumisparsha"
     },
     {
       "slug": "manjushri-thangka",
@@ -1240,7 +1357,8 @@
       "gallery": [
         "/uploads/artworks/1772950102804-b00008443fr1770280590-denoised-p.jpg"
       ],
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "id": "manjushri-thangka"
     },
     {
       "slug": "vajrapani-thangka",
@@ -1350,7 +1468,8 @@
       ],
       "image": "/api/placeholder/vajrapani-thangka?kind=portrait",
       "gallery": [],
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "id": "vajrapani-thangka"
     },
     {
       "slug": "ritual-conch-set",
@@ -1459,7 +1578,8 @@
       ],
       "image": "/api/placeholder/ritual-conch-set?kind=portrait",
       "gallery": [],
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "id": "ritual-conch-set"
     },
     {
       "slug": "artwork-1772951019289",
@@ -1530,7 +1650,8 @@
       "relatedExhibitionSlugs": [],
       "image": "",
       "gallery": [],
-      "featured": false
+      "featured": false,
+      "id": "artwork-1772951019289"
     }
   ],
   "exhibitions": [
@@ -1846,5 +1967,125 @@
       "cover": "/api/placeholder/why-exhibitions-matter?kind=landscape",
       "publicationStatus": "published"
     }
-  ]
+  ],
+  "homeContent": {
+    "heroEyebrow": {
+      "zh": "喜马拉雅艺术与亚洲古代艺术",
+      "en": "Himalayan Art and Asian Antiquities"
+    },
+    "heroTitle": {
+      "zh": "让作品先说话。",
+      "en": "Let the Work Speak First."
+    },
+    "heroSubtitle": {
+      "zh": "以作品、展览、图录与研究建立长期判断。",
+      "en": "A long view built through objects, exhibitions, catalogues, and research."
+    },
+    "heroPrimaryAction": {
+      "zh": "浏览藏品",
+      "en": "Browse Collection"
+    },
+    "heroSecondaryAction": {
+      "zh": "查看展览与图录",
+      "en": "View Exhibitions"
+    },
+    "focusCurrent": {
+      "eyebrow": {
+        "zh": "当前专题",
+        "en": "Current Focus"
+      },
+      "description": {
+        "zh": "围绕当前正在进行的专题展览，继续呈现重点作品、图录整理与观看方法。",
+        "en": "A current exhibition continuing Zhu Jin Ju's object-centered approach through selected works, catalogues, and ways of looking."
+      }
+    },
+    "focusRecent": {
+      "eyebrow": {
+        "zh": "近期展览",
+        "en": "Recent Exhibition"
+      },
+      "description": {
+        "zh": "近期展览延续了竹瑾居以作品为核心的研究路径，相关图录与文章仍可继续索取与查阅。",
+        "en": "A recent exhibition continuing Zhu Jin Ju's object-centered approach, with related catalogues and texts still available on request."
+      }
+    },
+    "focusSummaryLine": {
+      "highlightUnit": {
+        "zh": "件重点作品",
+        "en": "highlighted works"
+      },
+      "catalogueUnit": {
+        "zh": "页图录",
+        "en": "catalogue pages"
+      }
+    },
+    "focusAction": {
+      "zh": "进入专题详情",
+      "en": "View Exhibition"
+    },
+    "selectedWorks": {
+      "eyebrow": {
+        "zh": "精选作品",
+        "en": "Selected Works"
+      },
+      "title": {
+        "zh": "以作品为核心组织观看顺序",
+        "en": "A Viewing Order Built Around the Object"
+      },
+      "description": {
+        "zh": "优先呈现具有风格代表性、可比较性与观看张力的作品，版式始终服务于图像与器物本体。",
+        "en": "Works of stylistic weight, comparative value, and visual tension are foregrounded, with the layout kept in service of the object."
+      }
+    },
+    "collectingDirections": {
+      "eyebrow": {
+        "zh": "收藏方向",
+        "en": "Collecting Directions"
+      },
+      "title": {
+        "zh": "围绕明确而长期的研究线索展开",
+        "en": "Structured by Clear and Long-Term Research Lines"
+      },
+      "description": {
+        "zh": "竹瑾居不追求门类堆叠，而是在少数真正重要的方向上持续积累判断、图像档案与展览经验。",
+        "en": "Zhu Jin Ju does not pursue breadth for its own sake, but builds judgement, image archives, and exhibition experience within a few important fields."
+      }
+    },
+    "operationalFacts": {
+      "eyebrow": {
+        "zh": "专业信任",
+        "en": "Professional Trust"
+      },
+      "title": {
+        "zh": "由展览、图录与研究累积出的公开方法",
+        "en": "A Public Method Built Through Exhibitions, Catalogues, and Research"
+      },
+      "description": {
+        "zh": "对藏家、机构与研究者而言，可信赖并不来自夸张表达，而来自判断的一致性、公开资料的清晰度与持续积累。",
+        "en": "For collectors, institutions, and researchers, trust comes not from spectacle but from consistent judgement, clear public documentation, and sustained work."
+      }
+    },
+    "contact": {
+      "eyebrow": {
+        "zh": "联系",
+        "en": "Contact"
+      },
+      "title": {
+        "zh": "欢迎藏家、机构、策展人与研究者联系。",
+        "en": "Collectors, Institutions, Curators, and Researchers Are Welcome."
+      },
+      "description": {
+        "zh": "如需咨询具体作品、专题合作、机构借展、图录交换或研究交流，可通过联系页面提交信息。",
+        "en": "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page."
+      }
+    },
+    "contactPrimaryAction": {
+      "zh": "前往联系页面",
+      "en": "Contact Page"
+    },
+    "contactSecondaryAction": {
+      "zh": "查看文章与研究",
+      "en": "Read Journal"
+    }
+  }
 }
