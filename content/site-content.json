@@ -950,7 +950,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773059376623-50帝释天-侧.jpg"
+      ],
       "featured": false
     }
   ],
