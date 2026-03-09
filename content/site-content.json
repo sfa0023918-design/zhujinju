@@ -1649,7 +1649,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773046559736-b00013133fr1771928731.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773046573770-b00013133fr1771928731.jpg"
+      ],
       "featured": false,
       "id": "artwork-1772951019289"
     }
