@@ -1,7 +1,7 @@
-import Link from "next/link";
-
+import { AdminNavLink } from "@/components/admin-nav-link";
 import { AdminShell } from "@/components/admin-shell";
-import { editableSections, getPublicArticles, getPublicArtworks, getPublicExhibitions, readSiteContentFresh } from "@/lib/site-data";
+import { editableSections, getEditableSectionValue, getPublicArticles, getPublicArtworks, getPublicExhibitions, readSiteContentFresh } from "@/lib/site-data";
+import { getHomeContentReminders, getSiteConfigReminders } from "@/lib/admin-reminders";
 
 const UNTITLED_ARTWORK_TITLES = new Set(["", "未命名藏品", "Untitled Artwork"]);
 
@@ -46,6 +46,14 @@ export default async function AdminDashboardPage() {
     !content.siteConfig.contact.wechat.trim() ? "微信" : null,
     !content.siteConfig.contact.instagram.trim() ? "Instagram" : null,
   ].filter((item): item is string => Boolean(item));
+  const siteConfigReminders = getSiteConfigReminders(content.siteConfig);
+  const homeContentReminders = getHomeContentReminders(getEditableSectionValue(content, "homeContent"));
+  const firstMissingContactField =
+    (!content.siteConfig.contact.email.trim() && "contact.email") ||
+    (!content.siteConfig.contact.phone.trim() && !content.siteConfig.contact.whatsapp.trim() && "contact.phone") ||
+    (!content.siteConfig.contact.wechat.trim() && "contact.wechat") ||
+    (!content.siteConfig.contact.instagram.trim() && "contact.instagram") ||
+    siteConfigReminders[0]?.field;
 
   const overview = [
     { label: "藏品", value: `${publishedArtworks} / ${content.artworks.length}` },
@@ -58,21 +66,37 @@ export default async function AdminDashboardPage() {
       label: "缺主图藏品",
       value: String(missingArtworkImageCount),
       note: "含草稿与已发布藏品",
+      href: "/admin/content/artworks",
     },
     {
       label: "空标题草稿",
       value: String(untitledDraftArtworkCount),
       note: "包含“未命名藏品”占位标题",
+      href: "/admin/content/artworks?status=draft&search=%E6%9C%AA%E5%91%BD%E5%90%8D",
     },
     {
       label: "已过期专题",
       value: String(expiredCurrentExhibitionCount),
       note: "当前专题已过结束日期",
+      href: "/admin/content/homeContent?focus=homeContent.focusCurrent.description.zh",
     },
     {
       label: "联系方式缺项",
       value: String(missingContactItems.length),
       note: missingContactItems.length ? missingContactItems.join("、") : "当前完整",
+      href: `/admin/content/siteConfig${firstMissingContactField ? `?focus=${encodeURIComponent(firstMissingContactField)}` : ""}`,
+    },
+    {
+      label: "站点设置缺项",
+      value: String(siteConfigReminders.length),
+      note: siteConfigReminders.length ? siteConfigReminders.slice(0, 2).map((item) => item.message).join("、") : "当前完整",
+      href: `/admin/content/siteConfig${siteConfigReminders[0] ? `?focus=${encodeURIComponent(siteConfigReminders[0].field)}` : ""}`,
+    },
+    {
+      label: "首页内容缺项",
+      value: String(homeContentReminders.length),
+      note: homeContentReminders.length ? homeContentReminders.slice(0, 2).map((item) => item.message).join("、") : "当前完整",
+      href: `/admin/content/homeContent${homeContentReminders[0] ? `?focus=${encodeURIComponent(homeContentReminders[0].field)}` : ""}`,
     },
   ];
 
@@ -112,7 +136,7 @@ export default async function AdminDashboardPage() {
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {shortcuts.map((item) => (
-            <Link
+            <AdminNavLink
               key={item.href}
               href={item.href}
               className="border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[var(--line-strong)]"
@@ -120,7 +144,7 @@ export default async function AdminDashboardPage() {
               <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">后台入口</p>
               <p className="mt-3 text-[1.05rem] text-[var(--ink)]">{item.title}</p>
               <p className="mt-2 text-sm leading-7 text-[var(--muted)]">{item.description}</p>
-            </Link>
+            </AdminNavLink>
           ))}
         </div>
 
@@ -143,15 +167,19 @@ export default async function AdminDashboardPage() {
             <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">健康检查</p>
             <p className="text-sm leading-7 text-[var(--muted)]">用来快速发现发布前最容易遗漏的内容问题。</p>
           </div>
-          <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] md:grid-cols-2 xl:grid-cols-3">
             {healthChecks.map((item) => (
-              <div key={item.label} className="bg-[var(--surface)] p-6">
+              <AdminNavLink
+                key={item.label}
+                href={item.href}
+                className="bg-[var(--surface)] p-6 transition-colors hover:bg-[var(--surface-strong)]"
+              >
                 <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">{item.label}</p>
                 <p className="mt-4 font-serif text-[2rem] leading-none tracking-[-0.04em] text-[var(--ink)]">
                   {item.value}
                 </p>
                 <p className="mt-3 text-xs leading-6 text-[var(--muted)]">{item.note}</p>
-              </div>
+              </AdminNavLink>
             ))}
           </div>
         </div>

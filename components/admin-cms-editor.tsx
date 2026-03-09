@@ -21,6 +21,9 @@ import type {
   SiteConfigContent,
   SiteContent,
 } from "@/lib/site-data";
+import type { ValidationIssue } from "@/lib/publication-validation";
+import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "@/lib/publication-validation";
+import { getHomeContentReminders, getSiteConfigReminders, type EditorReminder } from "@/lib/admin-reminders";
 
 import { AdminMediaField, prepareAdminImageUpload, readAdminUploadResponse } from "./admin-media-field";
 
@@ -31,6 +34,9 @@ type AdminCmsEditorProps = {
   initialValue: EditableSectionValueMap[EditableSectionKey];
   content: SiteContent;
   autoCreate?: boolean;
+  initialSearch?: string;
+  initialStatusFilter?: string;
+  initialFocus?: string;
 };
 
 type SavePhase = "idle" | "saving" | "saved" | "error" | "creating";
@@ -39,6 +45,16 @@ type SaveState = {
   phase: SavePhase;
   message?: string;
 };
+
+class AdminValidationError extends Error {
+  issues: ValidationIssue[];
+
+  constructor(message: string, issues: ValidationIssue[]) {
+    super(message);
+    this.name = "AdminValidationError";
+    this.issues = issues;
+  }
+}
 
 type SyncPhase = "waiting" | "publishing" | "live" | "error";
 
@@ -62,71 +78,49 @@ type AutosaveOptions<T> = {
   validate?: (value: T) => string | null;
 };
 
-const UNTITLED_ARTWORK_TITLES = new Set(["未命名藏品", "Untitled Artwork"]);
-
 function cloneValue<T>(value: T): T {
   return structuredClone(value);
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+let translationQueue: Promise<void> = Promise.resolve();
+let lastQueuedTranslationAt = 0;
+
+async function runQueuedTranslation<T>(task: () => Promise<T>) {
+  const previous = translationQueue;
+  let release!: () => void;
+  translationQueue = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+
+  await previous.catch(() => {});
+
+  const minGapMs = 900;
+  const elapsed = Date.now() - lastQueuedTranslationAt;
+  if (elapsed < minGapMs) {
+    await sleep(minGapMs - elapsed);
+  }
+
+  lastQueuedTranslationAt = Date.now();
+
+  try {
+    return await task();
+  } finally {
+    release();
+  }
 }
 
 function emptyBilingual(): BilingualText {
   return { zh: "", en: "" };
 }
 
-function createSlug(prefix: string) {
-  return `${prefix}-${Date.now()}`;
-}
-
 function getArtworkId(artwork: Artwork) {
   return artwork.id ?? artwork.slug;
-}
-
-function getPrimaryText(text: BilingualText | undefined) {
-  return text?.zh.trim() || text?.en.trim() || "";
-}
-
-function hasMeaningfulArtworkTitle(text: BilingualText | undefined) {
-  const primary = getPrimaryText(text);
-  return Boolean(primary) && !UNTITLED_ARTWORK_TITLES.has(primary);
-}
-
-function getArtworkPublishError(artwork: Artwork) {
-  if (!hasMeaningfulArtworkTitle(artwork.title)) {
-    return "发布藏品前请填写作品标题。";
-  }
-
-  if (!artwork.slug.trim()) {
-    return "发布藏品前请填写 slug。";
-  }
-
-  if (!artwork.image.trim()) {
-    return "发布藏品前请先上传主图。";
-  }
-
-  return null;
-}
-
-function getExhibitionPublishError(exhibition: Exhibition) {
-  if (!getPrimaryText(exhibition.title)) {
-    return "发布展览前请填写标题。";
-  }
-
-  if (!exhibition.slug.trim()) {
-    return "发布展览前请填写 slug。";
-  }
-
-  return null;
-}
-
-function getArticlePublishError(article: Article) {
-  if (!getPrimaryText(article.title)) {
-    return "发布文章前请填写标题。";
-  }
-
-  if (!article.slug.trim()) {
-    return "发布文章前请填写 slug。";
-  }
-
-  return null;
 }
 
 function updateArrayItem<T>(items: T[], index: number, updater: (item: T) => void) {
@@ -151,14 +145,34 @@ function removeArrayItem<T>(items: T[], index: number) {
   return items.filter((_, currentIndex) => currentIndex !== index);
 }
 
+function isImeCompositionActive() {
+  if (typeof document === "undefined") {
+    return false;
+  }
+
+  const activeElement = document.activeElement;
+  return activeElement instanceof HTMLElement && activeElement.dataset.imeActive === "true";
+}
+
+function summarizeIssueBadges(issues: ValidationIssue[], limit = 2) {
+  return issues
+    .filter((issue) => issue.level === "error")
+    .slice(0, limit)
+    .map((issue) => issue.message.replace(/^请/, "").replace(/。$/, ""));
+}
+
 async function requestJson<T>(url: string, init: RequestInit) {
   const response = await fetch(url, init);
   const raw = await response.text();
 
   try {
-    const payload = JSON.parse(raw) as T & { error?: string };
+    const payload = JSON.parse(raw) as T & { error?: string; issues?: ValidationIssue[] };
 
     if (!response.ok) {
+      if (Array.isArray(payload.issues) && payload.issues.length) {
+        throw new AdminValidationError(payload.error ?? "当前内容尚不能发布。", payload.issues);
+      }
+
       throw new Error(payload.error ?? "请求失败。");
     }
 
@@ -179,6 +193,10 @@ function useLeavePageProtection(shouldWarn: boolean) {
     }
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (window.__zhujinjuAdminNavBypass) {
+        return;
+      }
+
       event.preventDefault();
       event.returnValue = "";
     };
@@ -186,6 +204,92 @@ function useLeavePageProtection(shouldWarn: boolean) {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [shouldWarn]);
+}
+
+function findFieldTarget(fieldKey: string) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return document.querySelector<HTMLElement>(`[data-field-key="${CSS.escape(fieldKey)}"]`);
+}
+
+function highlightFieldTarget(target: HTMLElement) {
+  target.classList.remove("admin-field-highlight");
+  void target.offsetWidth;
+  target.classList.add("admin-field-highlight");
+  window.setTimeout(() => {
+    target.classList.remove("admin-field-highlight");
+  }, 1800);
+}
+
+function locateFieldTarget(fieldKey: string, section?: string) {
+  const directTarget = findFieldTarget(fieldKey);
+
+  if (directTarget) {
+    directTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+    const focusable =
+      directTarget.matches("input, textarea, select, button, [tabindex]:not([tabindex='-1'])")
+        ? directTarget
+        : directTarget.querySelector<HTMLElement>("input, textarea, select, button, [tabindex]:not([tabindex='-1'])");
+
+    focusable?.focus({ preventScroll: true });
+    highlightFieldTarget(directTarget);
+    return;
+  }
+
+  const arrayMatch = fieldKey.match(/^([a-zA-Z0-9_-]+)\.(\d+)(?:\.[a-zA-Z0-9_-]+)?$/);
+
+  if (arrayMatch) {
+    const baseKey = arrayMatch[1];
+    const addTarget = findFieldTarget(`${baseKey}.add`);
+
+    if (addTarget) {
+      addTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+      const focusable =
+        addTarget.matches("input, textarea, select, button, [tabindex]:not([tabindex='-1'])")
+          ? addTarget
+          : addTarget.querySelector<HTMLElement>("input, textarea, select, button, [tabindex]:not([tabindex='-1'])");
+
+      focusable?.focus({ preventScroll: true });
+      highlightFieldTarget(addTarget);
+      return;
+    }
+
+    const baseTarget = findFieldTarget(baseKey);
+
+    if (baseTarget) {
+      baseTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightFieldTarget(baseTarget);
+      return;
+    }
+  }
+
+  if (!section) {
+    return;
+  }
+
+  const sectionTarget = document.getElementById(`section-${section}`);
+  if (!sectionTarget) {
+    return;
+  }
+
+  sectionTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+  highlightFieldTarget(sectionTarget);
+}
+
+function useInitialFieldFocus(initialFocus?: string, section?: string) {
+  useEffect(() => {
+    if (!initialFocus) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      locateFieldTarget(initialFocus, section);
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [initialFocus, section]);
 }
 
 function formatStatusTime(timestamp?: number) {
@@ -362,19 +466,111 @@ function SectionBlock({
   title,
   description,
   children,
+  id,
+  issues,
+  reminders,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
+  id?: string;
+  issues?: ValidationIssue[];
+  reminders?: string[];
 }) {
   return (
-    <section className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-5 md:p-6">
+    <section id={id} className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-5 md:p-6 scroll-mt-28">
       <div className="space-y-2 border-b border-[var(--line)] pb-4">
         <Label>{title}</Label>
         {description ? <p className="text-sm leading-7 text-[var(--muted)]">{description}</p> : null}
+        {reminders?.length ? (
+          <p className="text-sm leading-7 text-[var(--accent)]/88">{reminders.join("、")}</p>
+        ) : null}
+        {issues?.length ? (
+          <p className="text-sm leading-7 text-[#8e4e3b]">
+            {issues
+              .filter((issue) => issue.level === "error")
+              .map((issue) => issue.message)
+              .join("、")}
+          </p>
+        ) : null}
       </div>
       {children}
     </section>
+  );
+}
+
+function ValidationSummary({
+  issues,
+  sectionLabels,
+}: {
+  issues: Array<ValidationIssue | EditorReminder>;
+  sectionLabels: Record<string, string>;
+}) {
+  const blocking = issues.filter((issue) => ("level" in issue ? issue.level === "error" : true));
+
+  if (!blocking.length) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-3 border border-[#d8c1b5] bg-[#fbf5f1] p-4">
+      <p className="text-sm leading-7 text-[#8e4e3b]">
+        当前内容尚不能发布，请先完成以下字段：
+        {blocking.map((issue) => issue.message.replace(/^请/, "").replace(/。$/, "")).join("、")}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {blocking.map((issue, index) => {
+          return (
+            <button
+              key={`${issue.field}-${index}`}
+              type="button"
+              onClick={() => {
+                locateFieldTarget(issue.field, issue.section);
+              }}
+              className="border border-[#d8c1b5] px-3 py-1.5 text-xs leading-5 text-[#8e4e3b] transition-colors hover:bg-[#f7ede7]"
+            >
+              {`${sectionLabels[issue.section] ?? issue.section} · ${issue.message.replace(/^请/, "").replace(/。$/, "")}`}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ReminderSummary({
+  title,
+  reminders,
+  sectionLabels,
+}: {
+  title: string;
+  reminders: EditorReminder[];
+  sectionLabels: Record<string, string>;
+}) {
+  if (!reminders.length) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-3 border border-[var(--line)] bg-white/30 p-4">
+      <p className="text-sm leading-7 text-[var(--muted)]">
+        {`${title}：当前还有 ${reminders.length} 项建议补充内容。`}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {reminders.map((reminder) => (
+          <button
+            key={`${reminder.section}-${reminder.field}`}
+            type="button"
+            onClick={() => {
+              locateFieldTarget(reminder.field, reminder.section);
+            }}
+            className="border border-[var(--line)] px-3 py-1.5 text-xs leading-5 text-[var(--accent)] transition-colors hover:bg-[var(--surface-strong)]"
+          >
+            {`${sectionLabels[reminder.section] ?? reminder.section} · ${reminder.message}`}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -450,20 +646,30 @@ function TextField({
   onChange,
   type = "text",
   placeholder,
+  fieldKey,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type?: "text" | "email" | "url" | "date" | "number";
   placeholder?: string;
+  fieldKey?: string;
 }) {
   return (
     <label className="grid gap-2">
       <Label>{label}</Label>
       <input
+        data-field-key={fieldKey}
+        data-ime-active="false"
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onCompositionStart={(event) => {
+          event.currentTarget.dataset.imeActive = "true";
+        }}
+        onCompositionEnd={(event) => {
+          event.currentTarget.dataset.imeActive = "false";
+        }}
         placeholder={placeholder}
         className="min-h-11 border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
       />
@@ -476,19 +682,29 @@ function TextAreaField({
   value,
   onChange,
   rows = 4,
+  fieldKey,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   rows?: number;
+  fieldKey?: string;
 }) {
   return (
     <label className="grid gap-2">
       <Label>{label}</Label>
       <textarea
+        data-field-key={fieldKey}
+        data-ime-active="false"
         rows={rows}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onCompositionStart={(event) => {
+          event.currentTarget.dataset.imeActive = "true";
+        }}
+        onCompositionEnd={(event) => {
+          event.currentTarget.dataset.imeActive = "false";
+        }}
         className="w-full border border-[var(--line)] bg-white/60 px-3 py-3 text-sm leading-7 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
       />
     </label>
@@ -499,13 +715,19 @@ function BilingualInput({
   label,
   value,
   onChange,
+  fieldKeys,
 }: {
   label: string;
   value: BilingualText;
   onChange: (value: BilingualText) => void;
+  fieldKeys?: {
+    zh?: string;
+    en?: string;
+  };
 }) {
-  const [translating, setTranslating] = useState(false);
+  const [translationPhase, setTranslationPhase] = useState<"idle" | "queued" | "running">("idle");
   const [translateError, setTranslateError] = useState<string | null>(null);
+  const translating = translationPhase !== "idle";
 
   async function translate(force = false) {
     const zh = value.zh.trim();
@@ -514,19 +736,22 @@ function BilingualInput({
       return;
     }
 
-    setTranslating(true);
+    setTranslationPhase("queued");
     setTranslateError(null);
 
     try {
-      const payload = await requestJson<{ translation?: string; error?: string }>("/api/admin/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: zh,
-          label,
-        }),
+      const payload = await runQueuedTranslation(async () => {
+        setTranslationPhase("running");
+        return requestJson<{ translation?: string; error?: string }>("/api/admin/translate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: zh,
+            label,
+          }),
+        });
       });
 
       if (!payload.translation) {
@@ -540,7 +765,7 @@ function BilingualInput({
     } catch (error) {
       setTranslateError(error instanceof Error ? error.message : "英文翻译失败。");
     } finally {
-      setTranslating(false);
+      setTranslationPhase("idle");
     }
   }
 
@@ -554,7 +779,7 @@ function BilingualInput({
           disabled={translating || !value.zh.trim()}
           className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45"
         >
-          {translating ? "翻译中..." : "根据中文生成英文"}
+          {translationPhase === "queued" ? "排队中..." : translationPhase === "running" ? "翻译中..." : "根据中文生成英文"}
         </button>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
@@ -562,11 +787,13 @@ function BilingualInput({
           label="中文"
           value={value.zh}
           onChange={(zh) => onChange({ ...value, zh })}
+          fieldKey={fieldKeys?.zh}
         />
         <TextField
           label="英文"
           value={value.en}
           onChange={(en) => onChange({ ...value, en })}
+          fieldKey={fieldKeys?.en}
         />
       </div>
       {translateError ? <p className="text-sm leading-7 text-[#8e4e3b]">{translateError}</p> : null}
@@ -579,14 +806,20 @@ function BilingualTextarea({
   value,
   onChange,
   rows = 4,
+  fieldKeys,
 }: {
   label: string;
   value: BilingualText;
   onChange: (value: BilingualText) => void;
   rows?: number;
+  fieldKeys?: {
+    zh?: string;
+    en?: string;
+  };
 }) {
-  const [translating, setTranslating] = useState(false);
+  const [translationPhase, setTranslationPhase] = useState<"idle" | "queued" | "running">("idle");
   const [translateError, setTranslateError] = useState<string | null>(null);
+  const translating = translationPhase !== "idle";
 
   async function translate(force = false) {
     const zh = value.zh.trim();
@@ -595,19 +828,22 @@ function BilingualTextarea({
       return;
     }
 
-    setTranslating(true);
+    setTranslationPhase("queued");
     setTranslateError(null);
 
     try {
-      const payload = await requestJson<{ translation?: string; error?: string }>("/api/admin/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: zh,
-          label,
-        }),
+      const payload = await runQueuedTranslation(async () => {
+        setTranslationPhase("running");
+        return requestJson<{ translation?: string; error?: string }>("/api/admin/translate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: zh,
+            label,
+          }),
+        });
       });
 
       if (!payload.translation) {
@@ -621,7 +857,7 @@ function BilingualTextarea({
     } catch (error) {
       setTranslateError(error instanceof Error ? error.message : "英文翻译失败。");
     } finally {
-      setTranslating(false);
+      setTranslationPhase("idle");
     }
   }
 
@@ -635,7 +871,7 @@ function BilingualTextarea({
           disabled={translating || !value.zh.trim()}
           className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45"
         >
-          {translating ? "翻译中..." : "根据中文生成英文"}
+          {translationPhase === "queued" ? "排队中..." : translationPhase === "running" ? "翻译中..." : "根据中文生成英文"}
         </button>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
@@ -644,12 +880,14 @@ function BilingualTextarea({
           rows={rows}
           value={value.zh}
           onChange={(zh) => onChange({ ...value, zh })}
+          fieldKey={fieldKeys?.zh}
         />
         <TextAreaField
           label="英文"
           rows={rows}
           value={value.en}
           onChange={(en) => onChange({ ...value, en })}
+          fieldKey={fieldKeys?.en}
         />
       </div>
       {translateError ? <p className="text-sm leading-7 text-[#8e4e3b]">{translateError}</p> : null}
@@ -662,22 +900,25 @@ function RelationChecklist({
   options,
   selected,
   onToggle,
+  fieldKey,
 }: {
   label: string;
   options: Array<{ value: string; title: string; note?: string }>;
   selected: string[];
   onToggle: (value: string) => void;
+  fieldKey?: string;
 }) {
   return (
-    <div className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+    <div data-field-key={fieldKey} className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
       <Label>{label}</Label>
       <div className="grid gap-3 md:grid-cols-2">
-        {options.map((option) => {
+        {options.map((option, index) => {
           const checked = selected.includes(option.value);
 
           return (
             <label
               key={option.value}
+              data-field-key={fieldKey ? `${fieldKey}.${index}` : undefined}
               className={`grid gap-1 border px-4 py-3 ${
                 checked
                   ? "border-[var(--line-strong)] bg-[var(--surface-strong)]"
@@ -710,6 +951,7 @@ function ListSidebar<T>({
   onSelect,
   renderTitle,
   renderMeta,
+  renderWarnings,
   onAdd,
   search,
   onSearchChange,
@@ -721,6 +963,7 @@ function ListSidebar<T>({
   onSelect: (index: number) => void;
   renderTitle: (item: T, index: number) => string;
   renderMeta?: (item: T, index: number) => string;
+  renderWarnings?: (item: T, index: number) => string[];
   onAdd: () => void;
   search?: string;
   onSearchChange?: (value: string) => void;
@@ -728,7 +971,7 @@ function ListSidebar<T>({
   onStatusFilterChange?: (value: string) => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div data-field-key="gallery" className="space-y-4">
       <div className="grid gap-3 border border-[var(--line)] bg-[var(--surface)] p-4">
         {onSearchChange ? (
           <input
@@ -772,6 +1015,15 @@ function ListSidebar<T>({
             >
               <p className="text-sm leading-6 text-[var(--ink)]">{renderTitle(item, index)}</p>
               {renderMeta ? <p className="text-xs leading-5 text-[var(--muted)]">{renderMeta(item, index)}</p> : null}
+              {renderWarnings ? (
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {renderWarnings(item, index).map((warning) => (
+                    <span key={warning} className="border border-[#d8c1b5] px-2 py-0.5 text-[11px] leading-5 text-[#8e4e3b]">
+                      {warning}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </button>
           ))
         ) : (
@@ -779,6 +1031,30 @@ function ListSidebar<T>({
         )}
       </div>
     </div>
+  );
+}
+
+function ToolbarButton({
+  children,
+  onClick,
+  tone = "default",
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  tone?: "default" | "danger";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex min-h-11 items-center border px-4 text-sm transition-colors ${
+        tone === "danger"
+          ? "border-[var(--line)] text-[#8e4e3b] hover:border-[#8e4e3b]"
+          : "border-[var(--line)] text-[var(--muted)] hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -830,13 +1106,16 @@ function useAutosaveSection<T>(
   }, [initialValue, section]);
 
   const saveValue = useCallback(
-    async (nextValue: T, reason: "autosave" | "manual" = "autosave") => {
+    async (nextValue: T, reason: "autosave" | "manual" = "autosave", throwOnError = false) => {
       const requestId = requestRef.current + 1;
       const snapshot = JSON.stringify(nextValue);
       const validationError = options?.validate?.(nextValue) ?? null;
 
       if (validationError) {
         setSaveState({ phase: "error", message: validationError });
+        if (throwOnError) {
+          throw new Error(validationError);
+        }
         return;
       }
 
@@ -862,7 +1141,6 @@ function useAutosaveSection<T>(
         }
 
         setPersisted(payload.value);
-        setDraft((currentDraft) => (JSON.stringify(currentDraft) === snapshot ? payload.value : currentDraft));
         setSaveState({ phase: "saved", message: payload.message ?? "刚刚已保存。" });
       } catch (error) {
         if (requestRef.current !== requestId) {
@@ -873,6 +1151,10 @@ function useAutosaveSection<T>(
           phase: "error",
           message: error instanceof Error ? error.message : "保存失败。",
         });
+
+        if (throwOnError) {
+          throw error;
+        }
       }
     },
     [options, section],
@@ -885,7 +1167,7 @@ function useAutosaveSection<T>(
   useLeavePageProtection(isDirty || saveState.phase === "saving" || saveState.phase === "creating");
 
   useEffect(() => {
-    if (!isDirty) {
+    if (!isDirty || isImeCompositionActive()) {
       return;
     }
 
@@ -906,8 +1188,10 @@ function useAutosaveSection<T>(
     draft,
     persisted,
     setDraft,
+    setPersisted,
     isDirty,
     saveState,
+    setSaveState,
     saveNow: saveValue,
   };
 }
@@ -916,17 +1200,36 @@ function SiteSettingsEditor({
   title,
   description,
   initialValue,
+  initialFocus,
 }: {
   title: string;
   description: string;
   initialValue: SiteConfigContent;
+  initialFocus?: string;
 }) {
   const { draft, persisted, setDraft, saveState, isDirty } = useAutosaveSection("siteConfig", initialValue);
+  const reminders = useMemo(() => getSiteConfigReminders(draft), [draft]);
+  const sectionLabels = {
+    branding: "品牌与 SEO",
+    about: "关于页面",
+    contact: "联系方式",
+    contactPage: "联系页文案",
+    footer: "页脚",
+  } satisfies Record<string, string>;
+  const sectionReminders = {
+    branding: reminders.filter((item) => item.section === "branding").map((item) => item.message),
+    about: reminders.filter((item) => item.section === "about").map((item) => item.message),
+    contact: reminders.filter((item) => item.section === "contact").map((item) => item.message),
+    contactPage: reminders.filter((item) => item.section === "contactPage").map((item) => item.message),
+    footer: reminders.filter((item) => item.section === "footer").map((item) => item.message),
+  };
   const syncState = useWebsiteSyncStatus({
     target: { section: "siteConfig" },
     changeToken: JSON.stringify(persisted),
     hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
   });
+
+  useInitialFieldFocus(initialFocus);
 
   function update(recipe: (value: SiteConfigContent) => void) {
     setDraft((current) => {
@@ -942,15 +1245,16 @@ function SiteSettingsEditor({
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
+      <ReminderSummary title="当前还有一些建议补充项" reminders={reminders} sectionLabels={sectionLabels} />
       <div className="grid gap-6">
-        <SectionBlock title="品牌与 SEO" description="网站名称、首页短介绍与搜索展示信息共用这一组内容。">
+        <SectionBlock id="section-branding" title="品牌与 SEO" description="网站名称、首页短介绍与搜索展示信息共用这一组内容。" reminders={sectionReminders.branding}>
           <div className="grid gap-4">
-            <BilingualInput label="品牌名称" value={draft.siteName} onChange={(next) => update((value) => { value.siteName = next; })} />
-            <BilingualTextarea label="首页短介绍" value={draft.homeIntro} onChange={(next) => update((value) => { value.homeIntro = next; })} rows={4} />
-            <BilingualInput label="浏览器标题" value={draft.title} onChange={(next) => update((value) => { value.title = next; })} />
-            <BilingualTextarea label="站点描述" value={draft.description} onChange={(next) => update((value) => { value.description = next; })} rows={4} />
+            <BilingualInput label="品牌名称" value={draft.siteName} onChange={(next) => update((value) => { value.siteName = next; })} fieldKeys={{ zh: "siteName.zh", en: "siteName.en" }} />
+            <BilingualTextarea label="首页短介绍" value={draft.homeIntro} onChange={(next) => update((value) => { value.homeIntro = next; })} rows={4} fieldKeys={{ zh: "homeIntro.zh", en: "homeIntro.en" }} />
+            <BilingualInput label="浏览器标题" value={draft.title} onChange={(next) => update((value) => { value.title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
+            <BilingualTextarea label="站点描述" value={draft.description} onChange={(next) => update((value) => { value.description = next; })} rows={4} fieldKeys={{ zh: "description.zh", en: "description.en" }} />
             <div className="grid gap-4 md:grid-cols-2">
-              <TextField label="主域名" value={draft.defaultDomain} onChange={(next) => update((value) => { value.defaultDomain = next; })} />
+              <TextField label="主域名" value={draft.defaultDomain} onChange={(next) => update((value) => { value.defaultDomain = next; })} fieldKey="defaultDomain" />
               <TextField label="Open Graph 图片路径" value={draft.ogImagePath} onChange={(next) => update((value) => { value.ogImagePath = next; })} />
               <TextField label="协议" value={draft.protocol} onChange={(next) => update((value) => { value.protocol = next as SiteConfigContent["protocol"]; })} />
               <TextField label="语言地区" value={draft.locale} onChange={(next) => update((value) => { value.locale = next; })} />
@@ -958,12 +1262,12 @@ function SiteSettingsEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="关于页面" description="关于页主标题、副标题和正文统一在这里维护。">
+        <SectionBlock id="section-about" title="关于页面" description="关于页主标题、副标题和正文统一在这里维护。" reminders={sectionReminders.about}>
           <div className="grid gap-4">
             <BilingualInput label="页眉标签" value={draft.about.eyebrow} onChange={(next) => update((value) => { value.about.eyebrow = next; })} />
-            <BilingualInput label="About 标题" value={draft.about.title} onChange={(next) => update((value) => { value.about.title = next; })} />
-            <BilingualTextarea label="About 副标题" value={draft.about.subtitle} onChange={(next) => update((value) => { value.about.subtitle = next; })} rows={3} />
-            <div className="grid gap-4">
+            <BilingualInput label="About 标题" value={draft.about.title} onChange={(next) => update((value) => { value.about.title = next; })} fieldKeys={{ zh: "about.title.zh", en: "about.title.en" }} />
+            <BilingualTextarea label="About 副标题" value={draft.about.subtitle} onChange={(next) => update((value) => { value.about.subtitle = next; })} rows={3} fieldKeys={{ zh: "about.subtitle.zh", en: "about.subtitle.en" }} />
+            <div data-field-key="collectingDirections" className="grid gap-4">
               {draft.about.body.map((paragraph, index) => (
                 <div key={`about-body-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
                   <div className="flex items-center justify-between gap-3">
@@ -983,6 +1287,7 @@ function SiteSettingsEditor({
                     value={paragraph}
                     onChange={(next) => update((value) => { value.about.body = updateArrayItem(value.about.body, index, (item) => { item.zh = next.zh; item.en = next.en; }); })}
                     rows={5}
+                    fieldKeys={{ zh: `about.body.${index}.zh`, en: `about.body.${index}.en` }}
                   />
                 </div>
               ))}
@@ -997,12 +1302,12 @@ function SiteSettingsEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="联系方式" description="联系页、页脚和网站联系入口共用这里的联系方式。">
+        <SectionBlock id="section-contact" title="联系方式" description="联系页、页脚和网站联系入口共用这里的联系方式。" reminders={sectionReminders.contact}>
           <div className="grid gap-4 md:grid-cols-2">
-            <TextField label="邮箱" type="email" value={draft.contact.email} onChange={(next) => update((value) => { value.contact.email = next; })} />
-            <TextField label="电话" value={draft.contact.phone} onChange={(next) => update((value) => { value.contact.phone = next; })} />
-            <TextField label="WhatsApp" value={draft.contact.whatsapp} onChange={(next) => update((value) => { value.contact.whatsapp = next; })} />
-            <TextField label="微信" value={draft.contact.wechat} onChange={(next) => update((value) => { value.contact.wechat = next; })} />
+            <TextField label="邮箱" type="email" value={draft.contact.email} onChange={(next) => update((value) => { value.contact.email = next; })} fieldKey="contact.email" />
+            <TextField label="电话" value={draft.contact.phone} onChange={(next) => update((value) => { value.contact.phone = next; })} fieldKey="contact.phone" />
+            <TextField label="WhatsApp" value={draft.contact.whatsapp} onChange={(next) => update((value) => { value.contact.whatsapp = next; })} fieldKey="contact.whatsapp" />
+            <TextField label="微信" value={draft.contact.wechat} onChange={(next) => update((value) => { value.contact.wechat = next; })} fieldKey="contact.wechat" />
             <TextField label="Instagram" value={draft.contact.instagram} onChange={(next) => update((value) => { value.contact.instagram = next; })} />
             <TextField label="PDF 索取邮箱" type="email" value={draft.contact.pdfRequest} onChange={(next) => update((value) => { value.contact.pdfRequest = next; })} />
           </div>
@@ -1014,7 +1319,7 @@ function SiteSettingsEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="联系页文案" description="联系页页头与联系方式标签统一维护。">
+        <SectionBlock id="section-contactPage" title="联系页文案" description="联系页页头与联系方式标签统一维护。" reminders={sectionReminders.contactPage}>
           <div className="grid gap-4">
             <BilingualInput label="页眉标签" value={draft.contactPage.eyebrow} onChange={(next) => update((value) => { value.contactPage.eyebrow = next; })} />
             <BilingualInput label="联系页标题" value={draft.contactPage.title} onChange={(next) => update((value) => { value.contactPage.title = next; })} />
@@ -1028,9 +1333,9 @@ function SiteSettingsEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="页脚" description="页脚简介、预约说明和页脚标签统一在这里维护。">
+        <SectionBlock id="section-footer" title="页脚" description="页脚简介、预约说明和页脚标签统一在这里维护。" reminders={sectionReminders.footer}>
           <div className="grid gap-4">
-            <BilingualTextarea label="页脚简介" value={draft.footer.intro} onChange={(next) => update((value) => { value.footer.intro = next; })} rows={4} />
+            <BilingualTextarea label="页脚简介" value={draft.footer.intro} onChange={(next) => update((value) => { value.footer.intro = next; })} rows={4} fieldKeys={{ zh: "footer.intro.zh", en: "footer.intro.en" }} />
             <BilingualInput label="预约说明" value={draft.footer.appointment} onChange={(next) => update((value) => { value.footer.appointment = next; })} />
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <BilingualInput label="版权标签" value={draft.footer.copyrightLabel} onChange={(next) => update((value) => { value.footer.copyrightLabel = next; })} />
@@ -1055,18 +1360,37 @@ function HomeContentEditor({
   description,
   initialValue,
   content,
+  initialFocus,
 }: {
   title: string;
   description: string;
   initialValue: HomeContentEditorValue;
   content: SiteContent;
+  initialFocus?: string;
 }) {
   const { draft, persisted, setDraft, saveState, isDirty } = useAutosaveSection("homeContent", initialValue);
+  const reminders = useMemo(() => getHomeContentReminders(draft), [draft]);
+  const sectionLabels = {
+    hero: "Hero",
+    focus: "当前专题",
+    selectedWorks: "精选作品",
+    directions: "收藏方向",
+    trust: "专业信任",
+  } satisfies Record<string, string>;
+  const sectionReminders = {
+    hero: reminders.filter((item) => item.section === "hero").map((item) => item.message),
+    focus: reminders.filter((item) => item.section === "focus").map((item) => item.message),
+    selectedWorks: reminders.filter((item) => item.section === "selectedWorks").map((item) => item.message),
+    directions: reminders.filter((item) => item.section === "directions").map((item) => item.message),
+    trust: reminders.filter((item) => item.section === "trust").map((item) => item.message),
+  };
   const syncState = useWebsiteSyncStatus({
     target: { section: "homeContent" },
     changeToken: JSON.stringify(persisted),
     hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
   });
+
+  useInitialFieldFocus(initialFocus);
 
   function update(recipe: (value: HomeContentEditorValue) => void) {
     setDraft((current) => {
@@ -1088,13 +1412,14 @@ function HomeContentEditor({
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
+      <ReminderSummary title="当前还有一些建议补充项" reminders={reminders} sectionLabels={sectionLabels} />
 
       <div className="grid gap-6">
-        <SectionBlock title="Hero" description="首页首屏的主标题、副标题和按钮文案。">
+        <SectionBlock id="section-hero" title="Hero" description="首页首屏的主标题、副标题和按钮文案。" reminders={sectionReminders.hero}>
           <div className="grid gap-4">
             <BilingualInput label="页眉标签" value={draft.homeContent.heroEyebrow} onChange={(next) => update((value) => { value.homeContent.heroEyebrow = next; })} />
-            <BilingualInput label="主标题" value={draft.homeContent.heroTitle} onChange={(next) => update((value) => { value.homeContent.heroTitle = next; })} />
-            <BilingualTextarea label="副标题" value={draft.homeContent.heroSubtitle} onChange={(next) => update((value) => { value.homeContent.heroSubtitle = next; })} rows={3} />
+            <BilingualInput label="主标题" value={draft.homeContent.heroTitle} onChange={(next) => update((value) => { value.homeContent.heroTitle = next; })} fieldKeys={{ zh: "homeContent.heroTitle.zh", en: "homeContent.heroTitle.en" }} />
+            <BilingualTextarea label="副标题" value={draft.homeContent.heroSubtitle} onChange={(next) => update((value) => { value.homeContent.heroSubtitle = next; })} rows={3} fieldKeys={{ zh: "homeContent.heroSubtitle.zh", en: "homeContent.heroSubtitle.en" }} />
             <BilingualTextarea label="首页短介绍" value={draft.intro} onChange={(next) => update((value) => { value.intro = next; })} rows={4} />
             <div className="grid gap-4 md:grid-cols-2">
               <BilingualInput label="主按钮" value={draft.homeContent.heroPrimaryAction} onChange={(next) => update((value) => { value.homeContent.heroPrimaryAction = next; })} />
@@ -1103,13 +1428,13 @@ function HomeContentEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="当前专题" description="控制首页第二屏的专题区文案。">
+        <SectionBlock id="section-focus" title="当前专题" description="控制首页第二屏的专题区文案。" reminders={sectionReminders.focus}>
           <div className="grid gap-4 md:grid-cols-2">
-            <BilingualTextarea label="当前专题标签与说明" value={draft.homeContent.focusCurrent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusCurrent.eyebrow = next; })} rows={2} />
+            <BilingualTextarea label="当前专题标签与说明" value={draft.homeContent.focusCurrent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusCurrent.eyebrow = next; })} rows={2} fieldKeys={{ zh: "homeContent.focusCurrent.eyebrow.zh", en: "homeContent.focusCurrent.eyebrow.en" }} />
             <BilingualTextarea label="近期展览标签与说明" value={draft.homeContent.focusRecent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusRecent.eyebrow = next; })} rows={2} />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <BilingualTextarea label="当前专题说明" value={draft.homeContent.focusCurrent.description} onChange={(next) => update((value) => { value.homeContent.focusCurrent.description = next; })} rows={4} />
+            <BilingualTextarea label="当前专题说明" value={draft.homeContent.focusCurrent.description} onChange={(next) => update((value) => { value.homeContent.focusCurrent.description = next; })} rows={4} fieldKeys={{ zh: "homeContent.focusCurrent.description.zh", en: "homeContent.focusCurrent.description.en" }} />
             <BilingualTextarea label="近期展览说明" value={draft.homeContent.focusRecent.description} onChange={(next) => update((value) => { value.homeContent.focusRecent.description = next; })} rows={4} />
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -1119,7 +1444,7 @@ function HomeContentEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="精选作品" description="控制精选作品区标题，并选择哪些藏品出现在首页。">
+        <SectionBlock id="section-selectedWorks" title="精选作品" description="控制精选作品区标题，并选择哪些藏品出现在首页。" reminders={sectionReminders.selectedWorks}>
           <div className="grid gap-4">
             <BilingualInput label="区块标签" value={draft.homeContent.selectedWorks.eyebrow} onChange={(next) => update((value) => { value.homeContent.selectedWorks.eyebrow = next; })} />
             <BilingualInput label="区块标题" value={draft.homeContent.selectedWorks.title} onChange={(next) => update((value) => { value.homeContent.selectedWorks.title = next; })} />
@@ -1133,16 +1458,17 @@ function HomeContentEditor({
                   ? next.featuredArtworkIds.filter((item) => item !== value)
                   : [...next.featuredArtworkIds, value];
               })}
+              fieldKey="featuredArtworkIds"
             />
           </div>
         </SectionBlock>
 
-        <SectionBlock title="收藏方向" description="维护首页收藏方向区块标题与具体条目。">
+        <SectionBlock id="section-directions" title="收藏方向" description="维护首页收藏方向区块标题与具体条目。" reminders={sectionReminders.directions}>
           <div className="grid gap-4">
             <BilingualInput label="区块标签" value={draft.homeContent.collectingDirections.eyebrow} onChange={(next) => update((value) => { value.homeContent.collectingDirections.eyebrow = next; })} />
             <BilingualInput label="区块标题" value={draft.homeContent.collectingDirections.title} onChange={(next) => update((value) => { value.homeContent.collectingDirections.title = next; })} />
             <BilingualTextarea label="区块说明" value={draft.homeContent.collectingDirections.description} onChange={(next) => update((value) => { value.homeContent.collectingDirections.description = next; })} rows={4} />
-            <div className="grid gap-4">
+            <div data-field-key="operationalFacts" className="grid gap-4">
               {draft.collectingDirections.map((direction, index) => (
                 <div key={`direction-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
                   <div className="flex items-center justify-between gap-3">
@@ -1170,7 +1496,7 @@ function HomeContentEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock title="专业信任" description="维护首页专业信任区标题与数据条目。">
+        <SectionBlock id="section-trust" title="专业信任" description="维护首页专业信任区标题与数据条目。" reminders={sectionReminders.trust}>
           <div className="grid gap-4">
             <BilingualInput label="区块标签" value={draft.homeContent.operationalFacts.eyebrow} onChange={(next) => update((value) => { value.homeContent.operationalFacts.eyebrow = next; })} />
             <BilingualInput label="区块标题" value={draft.homeContent.operationalFacts.title} onChange={(next) => update((value) => { value.homeContent.operationalFacts.title = next; })} />
@@ -1390,6 +1716,7 @@ function ArtworkDetailGalleryGrid({
         {gallery.map((image, index) => (
           <div
             key={`${image}-${index}`}
+            data-field-key={`gallery.${index}`}
             draggable
             onDragStart={() => setDragIndex(index)}
             onDragOver={(event) => event.preventDefault()}
@@ -1446,7 +1773,7 @@ function ArtworkDetailGalleryGrid({
           </div>
         ))}
         {gallery.length < 8 ? (
-          <label className="flex min-h-[260px] cursor-pointer flex-col items-center justify-center gap-3 border border-dashed border-[var(--line-strong)] bg-white/20 p-4 text-center transition-colors hover:bg-[var(--surface-strong)]">
+          <label data-field-key="gallery.add" className="flex min-h-[260px] cursor-pointer flex-col items-center justify-center gap-3 border border-dashed border-[var(--line-strong)] bg-white/20 p-4 text-center transition-colors hover:bg-[var(--surface-strong)]">
             <span className="text-sm text-[var(--ink)]">{uploadingSlot === "append" ? "处理中..." : "新增细节图"}</span>
             <span className="text-xs leading-6 text-[var(--muted)]">系统会自动裁切并压缩为前台适用尺寸。</span>
             <input
@@ -1476,27 +1803,43 @@ function ArtworkEditor({
   initialValue,
   content,
   autoCreate,
+  initialSearch,
+  initialStatusFilter,
+  initialFocus,
 }: {
   title: string;
   description: string;
   initialValue: Artwork[];
   content: SiteContent;
   autoCreate?: boolean;
+  initialSearch?: string;
+  initialStatusFilter?: string;
+  initialFocus?: string;
 }) {
   const [artworks, setArtworks] = useState<Artwork[]>(() => cloneValue(initialValue));
   const [persisted, setPersisted] = useState<Artwork[]>(() => cloneValue(initialValue));
   const [selectedId, setSelectedId] = useState<string | null>(initialValue[0] ? getArtworkId(initialValue[0]) : null);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState(initialSearch ?? "");
+  const [statusFilter, setStatusFilter] = useState(initialStatusFilter ?? "all");
   const [saveState, setSaveState] = useState<SaveState>({ phase: "idle" });
+  const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
   const requestRef = useRef(0);
+  const sectionLabels = {
+    basic: "基础信息",
+    images: "图片",
+    scholarly: "学术说明",
+    references: "来源与记录",
+  } satisfies Record<string, string>;
 
   useEffect(() => {
     setArtworks(cloneValue(initialValue));
     setPersisted(cloneValue(initialValue));
     setSelectedId(initialValue[0] ? getArtworkId(initialValue[0]) : null);
+    setSearch(initialSearch ?? "");
+    setStatusFilter(initialStatusFilter ?? "all");
     setSaveState({ phase: "idle" });
-  }, [initialValue]);
+    setValidationIssues([]);
+  }, [initialSearch, initialStatusFilter, initialValue]);
 
   const serializedArtworks = useMemo(() => JSON.stringify(artworks), [artworks]);
   const serializedPersisted = useMemo(() => JSON.stringify(persisted), [persisted]);
@@ -1515,6 +1858,7 @@ function ArtworkEditor({
       setArtworks(payload.artworks);
       setPersisted(payload.artworks);
       setSelectedId(getArtworkId(payload.artwork));
+      setValidationIssues([]);
       setSaveState({ phase: "saved", message: payload.message ?? "草稿已创建，现在可以直接上传图片。" });
     } catch (error) {
       setSaveState({
@@ -1555,11 +1899,44 @@ function ArtworkEditor({
   const selectedIndex = selectedArtwork
     ? artworks.findIndex((artwork) => getArtworkId(artwork) === getArtworkId(selectedArtwork))
     : -1;
+  const duplicateArtwork = useCallback(async () => {
+    if (!selectedArtwork) {
+      return;
+    }
+
+    setSaveState({ phase: "creating", message: "正在复制当前藏品..." });
+
+    try {
+      const payload = await requestJson<{ artwork: Artwork; artworks: Artwork[]; message?: string }>("/api/admin/artworks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sourceId: getArtworkId(selectedArtwork),
+        }),
+      });
+
+      setArtworks(payload.artworks);
+      setPersisted(payload.artworks);
+      setSelectedId(getArtworkId(payload.artwork));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "已复制当前藏品。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "复制藏品失败。",
+      });
+    }
+  }, [selectedArtwork]);
+
   const syncState = useWebsiteSyncStatus({
     target: selectedArtwork ? { section: "artworks", id: getArtworkId(selectedArtwork) } : null,
     changeToken: JSON.stringify(selectedPersistedArtwork ?? null),
     hasPendingChanges: hasPendingChanges || saveState.phase === "saving" || saveState.phase === "creating",
   });
+
+  useInitialFieldFocus(initialFocus, "basic");
 
   useEffect(() => {
     if (!selectedArtwork && filteredArtworks[0]) {
@@ -1577,6 +1954,12 @@ function ArtworkEditor({
     title: exhibition.title.zh || exhibition.slug,
     note: exhibition.period.zh || exhibition.venue.zh,
   }));
+  const sectionIssues = {
+    basic: validationIssues.filter((issue) => issue.section === "basic"),
+    images: validationIssues.filter((issue) => issue.section === "images"),
+    scholarly: validationIssues.filter((issue) => issue.section === "scholarly"),
+    references: validationIssues.filter((issue) => issue.section === "references"),
+  };
 
   function updateSelected(recipe: (artwork: Artwork) => void) {
     if (!selectedArtwork) {
@@ -1593,6 +1976,7 @@ function ArtworkEditor({
 
       next[index] = cloneValue(next[index]);
       recipe(next[index]);
+      setValidationIssues([]);
       return next;
     });
   }
@@ -1615,6 +1999,7 @@ function ArtworkEditor({
       return next;
     });
     setSaveState({ phase: "saved", message });
+    setValidationIssues([]);
   }
 
   const saveArtwork = useCallback(
@@ -1646,19 +2031,17 @@ function ArtworkEditor({
         }
 
         setPersisted(payload.artworks);
-        setArtworks((current) => {
-          const currentRecord = current.find((item) => getArtworkId(item) === artworkId);
-          return currentRecord && JSON.stringify(currentRecord) !== snapshot
-            ? payload.artworks.map((item) => (getArtworkId(item) === artworkId ? currentRecord : item))
-            : payload.artworks;
-        });
         setSelectedId(artworkId);
         setSaveState({ phase: "saved", message: payload.message ?? "藏品已保存。" });
+        setValidationIssues([]);
       } catch (error) {
         if (requestRef.current !== requestId) {
           return;
         }
 
+        if (error instanceof AdminValidationError) {
+          setValidationIssues(error.issues);
+        }
         setSaveState({
           phase: "error",
           message: error instanceof Error ? error.message : "保存藏品失败。",
@@ -1670,7 +2053,7 @@ function ArtworkEditor({
   );
 
   useEffect(() => {
-    if (!selectedArtwork) {
+    if (!selectedArtwork || isImeCompositionActive()) {
       return;
     }
 
@@ -1762,23 +2145,28 @@ function ArtworkEditor({
       return;
     }
 
-    if (nextStatus === "published") {
-      const validationError = getArtworkPublishError(selectedArtwork);
+    const previousStatus = selectedArtwork.publicationStatus ?? "draft";
+    const nextArtwork = {
+      ...selectedArtwork,
+      publicationStatus: nextStatus,
+    };
 
-      if (validationError) {
-        setSaveState({ phase: "error", message: validationError });
-        return;
-      }
+    if (nextStatus === "published") {
+      setValidationIssues(getArtworkPublicationIssues(nextArtwork, artworks));
     }
 
     updateSelected((artwork) => {
       artwork.publicationStatus = nextStatus;
     });
-    const nextArtwork = {
-      ...selectedArtwork,
-      publicationStatus: nextStatus,
-    };
-    void saveArtwork(nextArtwork, "manual").catch(() => {});
+    void saveArtwork(nextArtwork, "manual").catch((error) => {
+      updateSelected((artwork) => {
+        artwork.publicationStatus = previousStatus;
+      });
+
+      if (error instanceof AdminValidationError) {
+        setValidationIssues(error.issues);
+      }
+    });
   }
 
   const previewHref = selectedArtwork?.slug
@@ -1800,6 +2188,7 @@ function ArtworkEditor({
                 publicationStatus={selectedArtwork.publicationStatus ?? "draft"}
                 onChange={changePublicationStatus}
               />
+              <ToolbarButton onClick={() => void duplicateArtwork()}>复制当前藏品</ToolbarButton>
               {previewHref ? (
                 <Link
                   href={previewHref}
@@ -1817,6 +2206,7 @@ function ArtworkEditor({
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
+      <ValidationSummary issues={validationIssues} sectionLabels={sectionLabels} />
 
       <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
         <aside>
@@ -1826,6 +2216,7 @@ function ArtworkEditor({
             onSelect={(index) => setSelectedId(getArtworkId(filteredArtworks[index]))}
             renderTitle={(artwork) => artwork.title.zh || "未命名藏品"}
             renderMeta={(artwork) => `${artwork.publicationStatus === "published" ? "已发布" : "草稿"} · ${artwork.slug}`}
+            renderWarnings={(artwork) => summarizeIssueBadges(getArtworkPublicationIssues(artwork, artworks))}
             onAdd={() => void createArtwork()}
             search={search}
             onSearchChange={setSearch}
@@ -1837,22 +2228,23 @@ function ArtworkEditor({
         <div className="space-y-6">
           {selectedArtwork ? (
             <>
-              <SectionBlock title="基础信息" description="标题、基本分类与作品参数。">
+              <SectionBlock id="section-basic" title="基础信息" description="标题、基本分类与作品参数。" issues={sectionIssues.basic}>
                 <div className="grid gap-4">
-                  <BilingualInput label="标题" value={selectedArtwork.title} onChange={(next) => updateSelected((artwork) => { artwork.title = next; })} />
-                  <BilingualInput label="副标题" value={selectedArtwork.subtitle} onChange={(next) => updateSelected((artwork) => { artwork.subtitle = next; })} />
+                  <BilingualInput label="标题" value={selectedArtwork.title} onChange={(next) => updateSelected((artwork) => { artwork.title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
+                  <BilingualInput label="副标题" value={selectedArtwork.subtitle} onChange={(next) => updateSelected((artwork) => { artwork.subtitle = next; })} fieldKeys={{ zh: "subtitle.zh", en: "subtitle.en" }} />
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <TextField label="Slug" value={selectedArtwork.slug} onChange={(next) => updateSelected((artwork) => { artwork.slug = next; })} />
-                    <BilingualInput label="年代" value={selectedArtwork.period} onChange={(next) => updateSelected((artwork) => { artwork.period = next; })} />
-                    <BilingualInput label="地区" value={selectedArtwork.region} onChange={(next) => updateSelected((artwork) => { artwork.region = next; })} />
-                    <BilingualInput label="产地" value={selectedArtwork.origin} onChange={(next) => updateSelected((artwork) => { artwork.origin = next; })} />
-                    <BilingualInput label="材质" value={selectedArtwork.material} onChange={(next) => updateSelected((artwork) => { artwork.material = next; })} />
-                    <BilingualInput label="品类" value={selectedArtwork.category} onChange={(next) => updateSelected((artwork) => { artwork.category = next; })} />
-                    <BilingualInput label="尺寸" value={selectedArtwork.dimensions} onChange={(next) => updateSelected((artwork) => { artwork.dimensions = next; })} />
+                    <TextField label="Slug" value={selectedArtwork.slug} onChange={(next) => updateSelected((artwork) => { artwork.slug = next; })} fieldKey="slug" />
+                    <BilingualInput label="年代" value={selectedArtwork.period} onChange={(next) => updateSelected((artwork) => { artwork.period = next; })} fieldKeys={{ zh: "period.zh", en: "period.en" }} />
+                    <BilingualInput label="地区" value={selectedArtwork.region} onChange={(next) => updateSelected((artwork) => { artwork.region = next; })} fieldKeys={{ zh: "region.zh", en: "region.en" }} />
+                    <BilingualInput label="产地" value={selectedArtwork.origin} onChange={(next) => updateSelected((artwork) => { artwork.origin = next; })} fieldKeys={{ zh: "origin.zh", en: "origin.en" }} />
+                    <BilingualInput label="材质" value={selectedArtwork.material} onChange={(next) => updateSelected((artwork) => { artwork.material = next; })} fieldKeys={{ zh: "material.zh", en: "material.en" }} />
+                    <BilingualInput label="品类" value={selectedArtwork.category} onChange={(next) => updateSelected((artwork) => { artwork.category = next; })} fieldKeys={{ zh: "category.zh", en: "category.en" }} />
+                    <BilingualInput label="尺寸" value={selectedArtwork.dimensions} onChange={(next) => updateSelected((artwork) => { artwork.dimensions = next; })} fieldKeys={{ zh: "dimensions.zh", en: "dimensions.en" }} />
                   </div>
                   <label className="grid gap-2">
                     <Label>前台状态</Label>
                     <select
+                      data-field-key="status"
                       value={selectedArtwork.status}
                       onChange={(event) => updateSelected((artwork) => { artwork.status = event.target.value as ArtworkStatus; })}
                       className="min-h-11 border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
@@ -1865,10 +2257,11 @@ function ArtworkEditor({
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="图片" description="主图单独管理，细节图按前台顺序显示，可直接上传、删除与排序。">
+              <SectionBlock id="section-images" title="图片" description="主图单独管理，细节图按前台顺序显示，可直接上传、删除与排序。" issues={sectionIssues.images}>
                 <div className="grid gap-6">
                   <AdminMediaField
                     fieldKey={`${getArtworkId(selectedArtwork)}:image`}
+                    anchorKey="image"
                     label="主图"
                     folder="artworks"
                     value={selectedArtwork.image}
@@ -1896,20 +2289,21 @@ function ArtworkEditor({
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="学术说明" description="用于前台的观看描述、比较判断与列表摘要。">
+              <SectionBlock id="section-scholarly" title="学术说明" description="用于前台的观看描述、比较判断与列表摘要。" issues={sectionIssues.scholarly}>
                 <div className="grid gap-4">
-                  <BilingualTextarea label="列表摘要" value={selectedArtwork.excerpt} onChange={(next) => updateSelected((artwork) => { artwork.excerpt = next; })} rows={4} />
-                  <BilingualTextarea label="观看描述" value={selectedArtwork.viewingNote} onChange={(next) => updateSelected((artwork) => { artwork.viewingNote = next; })} rows={5} />
-                  <BilingualTextarea label="比较判断" value={selectedArtwork.comparisonNote} onChange={(next) => updateSelected((artwork) => { artwork.comparisonNote = next; })} rows={5} />
+                  <BilingualTextarea label="列表摘要" value={selectedArtwork.excerpt} onChange={(next) => updateSelected((artwork) => { artwork.excerpt = next; })} rows={4} fieldKeys={{ zh: "excerpt.zh", en: "excerpt.en" }} />
+                  <BilingualTextarea label="观看描述" value={selectedArtwork.viewingNote} onChange={(next) => updateSelected((artwork) => { artwork.viewingNote = next; })} rows={5} fieldKeys={{ zh: "viewingNote.zh", en: "viewingNote.en" }} />
+                  <BilingualTextarea label="比较判断" value={selectedArtwork.comparisonNote} onChange={(next) => updateSelected((artwork) => { artwork.comparisonNote = next; })} rows={5} fieldKeys={{ zh: "comparisonNote.zh", en: "comparisonNote.en" }} />
                 </div>
               </SectionBlock>
 
-              <SectionBlock title="来源 / 展览 / 出版" description="按古董商目录习惯维护 provenance、exhibition 和 publication 信息。">
+              <SectionBlock id="section-references" title="来源 / 展览 / 出版" description="按古董商目录习惯维护 provenance、exhibition 和 publication 信息。" issues={sectionIssues.references}>
                 <div className="grid gap-6">
-                  <div className="grid gap-4">
+                  <div data-field-key="provenance" className="grid gap-4">
                     <div className="flex items-center justify-between gap-3">
                       <Label>来源</Label>
                       <button
+                        data-field-key="provenance.add"
                         type="button"
                         onClick={() => updateSelected((artwork) => { artwork.provenance = [...artwork.provenance, { label: emptyBilingual() } as ProvenanceEntry]; })}
                         className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)]"
@@ -1918,21 +2312,22 @@ function ArtworkEditor({
                       </button>
                     </div>
                     {selectedArtwork.provenance.map((entry, index) => (
-                      <div key={`provenance-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+                      <div key={`provenance-${index}`} data-field-key={`provenance.${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
                         <div className="flex items-center justify-between gap-3">
                           <Label>{`来源 ${index + 1}`}</Label>
                           <button type="button" onClick={() => updateSelected((artwork) => { artwork.provenance = removeArrayItem(artwork.provenance, index); })} className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]">删除</button>
                         </div>
-                        <BilingualInput label="来源标题" value={entry.label} onChange={(next) => updateSelected((artwork) => { artwork.provenance = updateArrayItem(artwork.provenance, index, (item) => { item.label = next; }); })} />
-                        <BilingualTextarea label="补充说明" value={entry.note ?? emptyBilingual()} onChange={(next) => updateSelected((artwork) => { artwork.provenance = updateArrayItem(artwork.provenance, index, (item) => { item.note = next; }); })} rows={3} />
+                        <BilingualInput label="来源标题" value={entry.label} onChange={(next) => updateSelected((artwork) => { artwork.provenance = updateArrayItem(artwork.provenance, index, (item) => { item.label = next; }); })} fieldKeys={{ zh: `provenance.${index}.zh`, en: `provenance.${index}.en` }} />
+                        <BilingualTextarea label="补充说明" value={entry.note ?? emptyBilingual()} onChange={(next) => updateSelected((artwork) => { artwork.provenance = updateArrayItem(artwork.provenance, index, (item) => { item.note = next; }); })} rows={3} fieldKeys={{ zh: `provenance.${index}.note.zh`, en: `provenance.${index}.note.en` }} />
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid gap-4">
+                  <div data-field-key="exhibitions" className="grid gap-4">
                     <div className="flex items-center justify-between gap-3">
                       <Label>展览</Label>
                       <button
+                        data-field-key="exhibitions.add"
                         type="button"
                         onClick={() => updateSelected((artwork) => { artwork.exhibitions = [...artwork.exhibitions, { title: emptyBilingual(), venue: emptyBilingual(), year: "" }]; })}
                         className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)]"
@@ -1941,22 +2336,23 @@ function ArtworkEditor({
                       </button>
                     </div>
                     {selectedArtwork.exhibitions.map((entry, index) => (
-                      <div key={`artwork-exhibition-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+                      <div key={`artwork-exhibition-${index}`} data-field-key={`exhibitions.${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
                         <div className="flex items-center justify-between gap-3">
                           <Label>{`展览 ${index + 1}`}</Label>
                           <button type="button" onClick={() => updateSelected((artwork) => { artwork.exhibitions = removeArrayItem(artwork.exhibitions, index); })} className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]">删除</button>
                         </div>
-                        <BilingualInput label="展览标题" value={entry.title} onChange={(next) => updateSelected((artwork) => { artwork.exhibitions = updateArrayItem(artwork.exhibitions, index, (item) => { item.title = next; }); })} />
-                        <BilingualInput label="场地" value={entry.venue} onChange={(next) => updateSelected((artwork) => { artwork.exhibitions = updateArrayItem(artwork.exhibitions, index, (item) => { item.venue = next; }); })} />
-                        <TextField label="年份" value={entry.year} onChange={(next) => updateSelected((artwork) => { artwork.exhibitions = updateArrayItem(artwork.exhibitions, index, (item) => { item.year = next; }); })} />
+                        <BilingualInput label="展览标题" value={entry.title} onChange={(next) => updateSelected((artwork) => { artwork.exhibitions = updateArrayItem(artwork.exhibitions, index, (item) => { item.title = next; }); })} fieldKeys={{ zh: `exhibitions.${index}.zh`, en: `exhibitions.${index}.en` }} />
+                        <BilingualInput label="场地" value={entry.venue} onChange={(next) => updateSelected((artwork) => { artwork.exhibitions = updateArrayItem(artwork.exhibitions, index, (item) => { item.venue = next; }); })} fieldKeys={{ zh: `exhibitions.${index}.venue.zh`, en: `exhibitions.${index}.venue.en` }} />
+                        <TextField label="年份" value={entry.year} onChange={(next) => updateSelected((artwork) => { artwork.exhibitions = updateArrayItem(artwork.exhibitions, index, (item) => { item.year = next; }); })} fieldKey={`exhibitions.${index}.year`} />
                       </div>
                     ))}
                   </div>
 
-                  <div className="grid gap-4">
+                  <div data-field-key="publications" className="grid gap-4">
                     <div className="flex items-center justify-between gap-3">
                       <Label>出版</Label>
                       <button
+                        data-field-key="publications.add"
                         type="button"
                         onClick={() => updateSelected((artwork) => { artwork.publications = [...artwork.publications, { title: emptyBilingual(), year: "", pages: emptyBilingual() } as PublicationReference]; })}
                         className="text-xs tracking-[0.14em] text-[var(--accent)] transition-colors hover:text-[var(--ink)]"
@@ -1965,17 +2361,17 @@ function ArtworkEditor({
                       </button>
                     </div>
                     {selectedArtwork.publications.map((entry, index) => (
-                      <div key={`publication-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
+                      <div key={`publication-${index}`} data-field-key={`publications.${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
                         <div className="flex items-center justify-between gap-3">
                           <Label>{`出版 ${index + 1}`}</Label>
                           <button type="button" onClick={() => updateSelected((artwork) => { artwork.publications = removeArrayItem(artwork.publications, index); })} className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]">删除</button>
                         </div>
-                        <BilingualInput label="图录 / 书名" value={entry.title} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.title = next; }); })} />
+                        <BilingualInput label="图录 / 书名" value={entry.title} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.title = next; }); })} fieldKeys={{ zh: `publications.${index}.zh`, en: `publications.${index}.en` }} />
                         <div className="grid gap-4 md:grid-cols-2">
-                          <TextField label="年份" value={entry.year} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.year = next; }); })} />
-                          <BilingualInput label="页码" value={entry.pages} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.pages = next; }); })} />
+                          <TextField label="年份" value={entry.year} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.year = next; }); })} fieldKey={`publications.${index}.year`} />
+                          <BilingualInput label="页码" value={entry.pages} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.pages = next; }); })} fieldKeys={{ zh: `publications.${index}.pages.zh`, en: `publications.${index}.pages.en` }} />
                         </div>
-                        <BilingualTextarea label="补充说明" value={entry.note ?? emptyBilingual()} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.note = next; }); })} rows={3} />
+                        <BilingualTextarea label="补充说明" value={entry.note ?? emptyBilingual()} onChange={(next) => updateSelected((artwork) => { artwork.publications = updateArrayItem(artwork.publications, index, (item) => { item.note = next; }); })} rows={3} fieldKeys={{ zh: `publications.${index}.note.zh`, en: `publications.${index}.note.en` }} />
                       </div>
                     ))}
                   </div>
@@ -2013,27 +2409,9 @@ function ArtworkEditor({
               <SectionBlock title="发布设置" description="这里处理预览、发布、下线和删除。">
                 <div className="flex flex-wrap items-center gap-3">
                   <RecordStatusActions publicationStatus={selectedArtwork.publicationStatus ?? "draft"} onChange={changePublicationStatus} />
-                  <button
-                    type="button"
-                    onClick={() => void reorderCurrentArtwork("up")}
-                    className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
-                  >
-                    上移排序
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void reorderCurrentArtwork("down")}
-                    className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
-                  >
-                    下移排序
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void deleteSelectedArtwork()}
-                    className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[#8e4e3b] transition-colors hover:border-[#8e4e3b]"
-                  >
-                    删除藏品
-                  </button>
+                  <ToolbarButton onClick={() => void reorderCurrentArtwork("up")}>上移排序</ToolbarButton>
+                  <ToolbarButton onClick={() => void reorderCurrentArtwork("down")}>下移排序</ToolbarButton>
+                  <ToolbarButton tone="danger" onClick={() => void deleteSelectedArtwork()}>删除藏品</ToolbarButton>
                 </div>
               </SectionBlock>
             </>
@@ -2048,61 +2426,23 @@ function ArtworkEditor({
   );
 }
 
-function createExhibition(): Exhibition {
-  return {
-    slug: createSlug("exhibition"),
-    publicationStatus: "draft",
-    title: emptyBilingual(),
-    subtitle: emptyBilingual(),
-    period: emptyBilingual(),
-    venue: emptyBilingual(),
-    intro: emptyBilingual(),
-    description: [emptyBilingual()],
-    highlightArtworkSlugs: [],
-    highlightCount: 0,
-    catalogueTitle: emptyBilingual(),
-    catalogueIntro: emptyBilingual(),
-    cataloguePages: 0,
-    curatorialLead: emptyBilingual(),
-    relatedArticleSlugs: [],
-    cover: "",
-    current: false,
-  };
-}
-
-function createArticle(): Article {
-  return {
-    slug: createSlug("article"),
-    publicationStatus: "draft",
-    title: emptyBilingual(),
-    category: emptyBilingual(),
-    column: emptyBilingual(),
-    author: emptyBilingual(),
-    date: new Date().toISOString().slice(0, 10),
-    excerpt: emptyBilingual(),
-    body: [emptyBilingual()],
-    keywords: [emptyBilingual()],
-    relatedArtworkSlugs: [],
-    relatedExhibitionSlugs: [],
-    cover: "",
-  };
-}
-
 function ExhibitionsEditor({
   title,
   description,
   initialValue,
   content,
+  initialFocus,
 }: {
   title: string;
   description: string;
   initialValue: Exhibition[];
   content: SiteContent;
+  initialFocus?: string;
 }) {
-  const { draft, persisted, setDraft, saveNow, saveState, isDirty } = useAutosaveSection("exhibitions", initialValue, {
+  const { draft, persisted, setDraft, setPersisted, saveNow, saveState, setSaveState, isDirty } = useAutosaveSection("exhibitions", initialValue, {
     validate: (items) => {
-      const invalid = items.find((item) => (item.publicationStatus ?? "draft") === "published" && getExhibitionPublishError(item));
-      return invalid ? getExhibitionPublishError(invalid) : null;
+      const invalid = items.find((item) => (item.publicationStatus ?? "draft") === "published" && getExhibitionPublicationIssues(item, items).some((issue) => issue.level === "error"));
+      return invalid ? getExhibitionPublicationIssues(invalid, items).find((issue) => issue.level === "error")?.message ?? null : null;
     },
   });
   const syncState = useWebsiteSyncStatus({
@@ -2111,12 +2451,22 @@ function ExhibitionsEditor({
     hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
+  const sectionLabels = {
+    basic: "展览信息",
+    catalogue: "图录与关联",
+  } satisfies Record<string, string>;
 
   useEffect(() => {
     setSelectedIndex(0);
+    setValidationIssues([]);
   }, [initialValue]);
 
+  useInitialFieldFocus(initialFocus, "basic");
+
   const exhibition = draft[selectedIndex];
+  const persistedExhibition = persisted[selectedIndex] ?? null;
+  const persistedExhibitionSlug = persistedExhibition?.slug ?? exhibition?.slug ?? "";
   const articleOptions = content.articles.map((article) => ({
     value: article.slug,
     title: article.title.zh || article.slug,
@@ -2132,8 +2482,63 @@ function ExhibitionsEditor({
     setDraft((current) => {
       const next = cloneValue(current);
       recipe(next);
+      setValidationIssues([]);
       return next;
     });
+  }
+
+  async function createExhibitionDraftRemote() {
+    setSaveState({ phase: "creating", message: "正在创建展览草稿..." });
+
+    try {
+      const payload = await requestJson<{ item: Exhibition; value: Exhibition[]; message?: string }>("/api/admin/sections/exhibitions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "create" }),
+      });
+
+      setDraft(payload.value);
+      setPersisted(payload.value);
+      setSelectedIndex(Math.max(0, payload.value.findIndex((item) => item.slug === payload.item.slug)));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "新展览草稿已创建。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "新增展览失败。",
+      });
+    }
+  }
+
+  async function duplicateCurrentExhibition() {
+    if (!exhibition) {
+      return;
+    }
+
+    setSaveState({ phase: "creating", message: "正在复制当前展览..." });
+
+    try {
+      const payload = await requestJson<{ item: Exhibition; value: Exhibition[]; message?: string }>("/api/admin/sections/exhibitions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "duplicate", slug: exhibition.slug }),
+      });
+
+      setDraft(payload.value);
+      setPersisted(payload.value);
+      setSelectedIndex(Math.max(0, payload.value.findIndex((item) => item.slug === payload.item.slug)));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "已复制当前展览。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "复制展览失败。",
+      });
+    }
   }
 
   function changePublicationStatus(nextStatus: PublicationStatus) {
@@ -2141,18 +2546,28 @@ function ExhibitionsEditor({
       return;
     }
 
+    const previousDraft = cloneValue(draft);
     const nextDraft = cloneValue(draft);
     nextDraft[selectedIndex].publicationStatus = nextStatus;
-    const validationError = nextStatus === "published" ? getExhibitionPublishError(nextDraft[selectedIndex]) : null;
-
-    if (validationError) {
-      void saveNow(nextDraft, "manual");
-      return;
+    if (nextStatus === "published") {
+      setValidationIssues(getExhibitionPublicationIssues(nextDraft[selectedIndex], nextDraft));
     }
 
     setDraft(nextDraft);
-    void saveNow(nextDraft, "manual");
+    void saveNow(nextDraft, "manual", true)
+      .then(() => setValidationIssues([]))
+      .catch((error) => {
+        setDraft(previousDraft);
+        if (error instanceof AdminValidationError) {
+          setValidationIssues(error.issues);
+        }
+      });
   }
+
+  const sectionIssues = {
+    basic: validationIssues.filter((issue) => issue.section === "basic"),
+    catalogue: validationIssues.filter((issue) => issue.section === "catalogue"),
+  };
 
   return (
     <div className="space-y-6">
@@ -2162,16 +2577,20 @@ function ExhibitionsEditor({
         sync={syncState}
         actions={
           exhibition ? (
-            <RecordStatusActions
-              publicationStatus={exhibition.publicationStatus ?? "draft"}
-              onChange={changePublicationStatus}
-            />
+            <>
+              <RecordStatusActions
+                publicationStatus={exhibition.publicationStatus ?? "draft"}
+                onChange={changePublicationStatus}
+              />
+              <ToolbarButton onClick={() => void duplicateCurrentExhibition()}>复制当前展览</ToolbarButton>
+            </>
           ) : undefined
         }
       />
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
+      <ValidationSummary issues={validationIssues} sectionLabels={sectionLabels} />
       <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
         <aside>
           <ListSidebar
@@ -2180,14 +2599,16 @@ function ExhibitionsEditor({
             onSelect={setSelectedIndex}
             renderTitle={(item) => item.title.zh || "未命名展览"}
             renderMeta={(item) => `${item.publicationStatus === "published" ? "已发布" : "草稿"} · ${item.slug}`}
-            onAdd={() => update((items) => { items.push(createExhibition()); setSelectedIndex(items.length - 1); })}
+            renderWarnings={(item) => summarizeIssueBadges(getExhibitionPublicationIssues(item, draft))}
+            onAdd={() => void createExhibitionDraftRemote()}
           />
         </aside>
         {exhibition ? (
           <div className="space-y-6">
-            <SectionBlock title="基础信息">
+            <SectionBlock id="section-basic" title="基础信息" issues={sectionIssues.basic}>
               <div className="grid gap-4">
                 <AdminMediaField
+                  anchorKey="cover"
                   label="展览封面"
                   folder="exhibitions"
                   value={exhibition.cover}
@@ -2196,17 +2617,37 @@ function ExhibitionsEditor({
                   recommendedUse="展览列表与详情封面"
                   recommendedSize="1600 x 1000 像素以上"
                   autoSaveAfterUpload={false}
+                  saveTarget={{
+                    section: "exhibitions",
+                    id: persistedExhibitionSlug,
+                    field: "cover",
+                  }}
                   onChange={(next) => update((items) => { items[selectedIndex].cover = next; })}
+                  onPersisted={(next) => {
+                    setPersisted((current) => {
+                      const nextItems = cloneValue(current);
+                      const recordIndex = nextItems.findIndex((item) => item.slug === persistedExhibitionSlug);
+
+                      if (recordIndex < 0) {
+                        return current;
+                      }
+
+                      nextItems[recordIndex].cover = next;
+                      return nextItems;
+                    });
+                    setSaveState({ phase: "saved", message: next ? "展览封面已保存。" : "展览封面已移除。" });
+                  }}
+                  onPersistError={(message) => setSaveState({ phase: "error", message })}
                 />
-                <BilingualInput label="标题" value={exhibition.title} onChange={(next) => update((items) => { items[selectedIndex].title = next; })} />
+                <BilingualInput label="标题" value={exhibition.title} onChange={(next) => update((items) => { items[selectedIndex].title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
                 <BilingualInput label="副标题" value={exhibition.subtitle} onChange={(next) => update((items) => { items[selectedIndex].subtitle = next; })} />
                 <div className="grid gap-4 md:grid-cols-2">
-                  <TextField label="Slug" value={exhibition.slug} onChange={(next) => update((items) => { items[selectedIndex].slug = next; })} />
+                  <TextField label="Slug" value={exhibition.slug} onChange={(next) => update((items) => { items[selectedIndex].slug = next; })} fieldKey="slug" />
                   <TextField label="图录页数" type="number" value={String(exhibition.cataloguePages)} onChange={(next) => update((items) => { items[selectedIndex].cataloguePages = Number(next || 0); })} />
                 </div>
-                <BilingualInput label="时间" value={exhibition.period} onChange={(next) => update((items) => { items[selectedIndex].period = next; })} />
-                <BilingualInput label="地点" value={exhibition.venue} onChange={(next) => update((items) => { items[selectedIndex].venue = next; })} />
-                <BilingualTextarea label="简介" value={exhibition.intro} onChange={(next) => update((items) => { items[selectedIndex].intro = next; })} rows={4} />
+                <BilingualInput label="时间" value={exhibition.period} onChange={(next) => update((items) => { items[selectedIndex].period = next; })} fieldKeys={{ zh: "period.zh", en: "period.en" }} />
+                <BilingualInput label="地点" value={exhibition.venue} onChange={(next) => update((items) => { items[selectedIndex].venue = next; })} fieldKeys={{ zh: "venue.zh", en: "venue.en" }} />
+                <BilingualTextarea label="简介" value={exhibition.intro} onChange={(next) => update((items) => { items[selectedIndex].intro = next; })} rows={4} fieldKeys={{ zh: "intro.zh", en: "intro.en" }} />
                 <BilingualTextarea label="策展前言" value={exhibition.curatorialLead} onChange={(next) => update((items) => { items[selectedIndex].curatorialLead = next; })} rows={4} />
                 <div className="grid gap-4">
                   {exhibition.description.map((paragraph, index) => (
@@ -2216,11 +2657,11 @@ function ExhibitionsEditor({
                 </div>
               </div>
             </SectionBlock>
-            <SectionBlock title="图录与关联">
+            <SectionBlock id="section-catalogue" title="图录与关联" issues={sectionIssues.catalogue}>
               <div className="grid gap-4">
                 <BilingualInput label="图录标题" value={exhibition.catalogueTitle} onChange={(next) => update((items) => { items[selectedIndex].catalogueTitle = next; })} />
                 <BilingualTextarea label="图录说明" value={exhibition.catalogueIntro} onChange={(next) => update((items) => { items[selectedIndex].catalogueIntro = next; })} rows={4} />
-                <RelationChecklist label="重点作品" options={artworkOptions} selected={exhibition.highlightArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].highlightArtworkSlugs; items[selectedIndex].highlightArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; items[selectedIndex].highlightCount = items[selectedIndex].highlightArtworkSlugs.length; })} />
+                <RelationChecklist fieldKey="highlightArtworkSlugs" label="重点作品" options={artworkOptions} selected={exhibition.highlightArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].highlightArtworkSlugs; items[selectedIndex].highlightArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; items[selectedIndex].highlightCount = items[selectedIndex].highlightArtworkSlugs.length; })} />
                 <RelationChecklist label="相关文章" options={articleOptions} selected={exhibition.relatedArticleSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].relatedArticleSlugs; items[selectedIndex].relatedArticleSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
               </div>
             </SectionBlock>
@@ -2236,16 +2677,18 @@ function ArticlesEditor({
   description,
   initialValue,
   content,
+  initialFocus,
 }: {
   title: string;
   description: string;
   initialValue: Article[];
   content: SiteContent;
+  initialFocus?: string;
 }) {
-  const { draft, persisted, setDraft, saveNow, saveState, isDirty } = useAutosaveSection("articles", initialValue, {
+  const { draft, persisted, setDraft, setPersisted, saveNow, saveState, setSaveState, isDirty } = useAutosaveSection("articles", initialValue, {
     validate: (items) => {
-      const invalid = items.find((item) => (item.publicationStatus ?? "draft") === "published" && getArticlePublishError(item));
-      return invalid ? getArticlePublishError(invalid) : null;
+      const invalid = items.find((item) => (item.publicationStatus ?? "draft") === "published" && getArticlePublicationIssues(item, items).some((issue) => issue.level === "error"));
+      return invalid ? getArticlePublicationIssues(invalid, items).find((issue) => issue.level === "error")?.message ?? null : null;
     },
   });
   const syncState = useWebsiteSyncStatus({
@@ -2254,12 +2697,22 @@ function ArticlesEditor({
     hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
+  const sectionLabels = {
+    basic: "基础信息",
+    body: "正文与关键词",
+  } satisfies Record<string, string>;
 
   useEffect(() => {
     setSelectedIndex(0);
+    setValidationIssues([]);
   }, [initialValue]);
 
+  useInitialFieldFocus(initialFocus, "basic");
+
   const article = draft[selectedIndex];
+  const persistedArticle = persisted[selectedIndex] ?? null;
+  const persistedArticleSlug = persistedArticle?.slug ?? article?.slug ?? "";
   const artworkOptions = content.artworks.map((artwork) => ({
     value: artwork.slug,
     title: artwork.title.zh || artwork.slug,
@@ -2275,8 +2728,63 @@ function ArticlesEditor({
     setDraft((current) => {
       const next = cloneValue(current);
       recipe(next);
+      setValidationIssues([]);
       return next;
     });
+  }
+
+  async function createArticleDraftRemote() {
+    setSaveState({ phase: "creating", message: "正在创建文章草稿..." });
+
+    try {
+      const payload = await requestJson<{ item: Article; value: Article[]; message?: string }>("/api/admin/sections/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "create" }),
+      });
+
+      setDraft(payload.value);
+      setPersisted(payload.value);
+      setSelectedIndex(Math.max(0, payload.value.findIndex((item) => item.slug === payload.item.slug)));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "新文章草稿已创建。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "新增文章失败。",
+      });
+    }
+  }
+
+  async function duplicateCurrentArticle() {
+    if (!article) {
+      return;
+    }
+
+    setSaveState({ phase: "creating", message: "正在复制当前文章..." });
+
+    try {
+      const payload = await requestJson<{ item: Article; value: Article[]; message?: string }>("/api/admin/sections/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "duplicate", slug: article.slug }),
+      });
+
+      setDraft(payload.value);
+      setPersisted(payload.value);
+      setSelectedIndex(Math.max(0, payload.value.findIndex((item) => item.slug === payload.item.slug)));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "已复制当前文章。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "复制文章失败。",
+      });
+    }
   }
 
   function changePublicationStatus(nextStatus: PublicationStatus) {
@@ -2284,18 +2792,28 @@ function ArticlesEditor({
       return;
     }
 
+    const previousDraft = cloneValue(draft);
     const nextDraft = cloneValue(draft);
     nextDraft[selectedIndex].publicationStatus = nextStatus;
-    const validationError = nextStatus === "published" ? getArticlePublishError(nextDraft[selectedIndex]) : null;
-
-    if (validationError) {
-      void saveNow(nextDraft, "manual");
-      return;
+    if (nextStatus === "published") {
+      setValidationIssues(getArticlePublicationIssues(nextDraft[selectedIndex], nextDraft));
     }
 
     setDraft(nextDraft);
-    void saveNow(nextDraft, "manual");
+    void saveNow(nextDraft, "manual", true)
+      .then(() => setValidationIssues([]))
+      .catch((error) => {
+        setDraft(previousDraft);
+        if (error instanceof AdminValidationError) {
+          setValidationIssues(error.issues);
+        }
+      });
   }
+
+  const sectionIssues = {
+    basic: validationIssues.filter((issue) => issue.section === "basic"),
+    body: validationIssues.filter((issue) => issue.section === "body"),
+  };
 
   return (
     <div className="space-y-6">
@@ -2305,16 +2823,20 @@ function ArticlesEditor({
         sync={syncState}
         actions={
           article ? (
-            <RecordStatusActions
-              publicationStatus={article.publicationStatus ?? "draft"}
-              onChange={changePublicationStatus}
-            />
+            <>
+              <RecordStatusActions
+                publicationStatus={article.publicationStatus ?? "draft"}
+                onChange={changePublicationStatus}
+              />
+              <ToolbarButton onClick={() => void duplicateCurrentArticle()}>复制当前文章</ToolbarButton>
+            </>
           ) : undefined
         }
       />
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
+      <ValidationSummary issues={validationIssues} sectionLabels={sectionLabels} />
       <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
         <aside>
           <ListSidebar
@@ -2323,14 +2845,16 @@ function ArticlesEditor({
             onSelect={setSelectedIndex}
             renderTitle={(item) => item.title.zh || "未命名文章"}
             renderMeta={(item) => `${item.publicationStatus === "published" ? "已发布" : "草稿"} · ${item.slug}`}
-            onAdd={() => update((items) => { items.push(createArticle()); setSelectedIndex(items.length - 1); })}
+            renderWarnings={(item) => summarizeIssueBadges(getArticlePublicationIssues(item, draft))}
+            onAdd={() => void createArticleDraftRemote()}
           />
         </aside>
         {article ? (
           <div className="space-y-6">
-            <SectionBlock title="基础信息">
+            <SectionBlock id="section-basic" title="基础信息" issues={sectionIssues.basic}>
               <div className="grid gap-4">
                 <AdminMediaField
+                  anchorKey="cover"
                   label="文章封面"
                   folder="articles"
                   value={article.cover}
@@ -2339,27 +2863,47 @@ function ArticlesEditor({
                   recommendedUse="文章列表与详情封面"
                   recommendedSize="1400 x 900 像素以上"
                   autoSaveAfterUpload={false}
+                  saveTarget={{
+                    section: "articles",
+                    id: persistedArticleSlug,
+                    field: "cover",
+                  }}
                   onChange={(next) => update((items) => { items[selectedIndex].cover = next; })}
+                  onPersisted={(next) => {
+                    setPersisted((current) => {
+                      const nextItems = cloneValue(current);
+                      const recordIndex = nextItems.findIndex((item) => item.slug === persistedArticleSlug);
+
+                      if (recordIndex < 0) {
+                        return current;
+                      }
+
+                      nextItems[recordIndex].cover = next;
+                      return nextItems;
+                    });
+                    setSaveState({ phase: "saved", message: next ? "文章封面已保存。" : "文章封面已移除。" });
+                  }}
+                  onPersistError={(message) => setSaveState({ phase: "error", message })}
                 />
-                <BilingualInput label="标题" value={article.title} onChange={(next) => update((items) => { items[selectedIndex].title = next; })} />
+                <BilingualInput label="标题" value={article.title} onChange={(next) => update((items) => { items[selectedIndex].title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
                 <div className="grid gap-4 md:grid-cols-2">
-                  <TextField label="Slug" value={article.slug} onChange={(next) => update((items) => { items[selectedIndex].slug = next; })} />
-                  <TextField label="日期" type="date" value={article.date} onChange={(next) => update((items) => { items[selectedIndex].date = next; })} />
+                  <TextField label="Slug" value={article.slug} onChange={(next) => update((items) => { items[selectedIndex].slug = next; })} fieldKey="slug" />
+                  <TextField label="日期" type="date" value={article.date} onChange={(next) => update((items) => { items[selectedIndex].date = next; })} fieldKey="date" />
                 </div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <BilingualInput label="分类" value={article.category} onChange={(next) => update((items) => { items[selectedIndex].category = next; })} />
+                  <BilingualInput label="分类" value={article.category} onChange={(next) => update((items) => { items[selectedIndex].category = next; })} fieldKeys={{ zh: "category.zh", en: "category.en" }} />
                   <BilingualInput label="栏目" value={article.column} onChange={(next) => update((items) => { items[selectedIndex].column = next; })} />
                   <BilingualInput label="作者" value={article.author} onChange={(next) => update((items) => { items[selectedIndex].author = next; })} />
                 </div>
-                <BilingualTextarea label="摘要" value={article.excerpt} onChange={(next) => update((items) => { items[selectedIndex].excerpt = next; })} rows={4} />
+                <BilingualTextarea label="摘要" value={article.excerpt} onChange={(next) => update((items) => { items[selectedIndex].excerpt = next; })} rows={4} fieldKeys={{ zh: "excerpt.zh", en: "excerpt.en" }} />
               </div>
             </SectionBlock>
-            <SectionBlock title="正文与关键词">
-              <div className="grid gap-4">
+            <SectionBlock id="section-body" title="正文与关键词" issues={sectionIssues.body}>
+              <div data-field-key="body" className="grid gap-4">
                 {article.body.map((paragraph, index) => (
-                  <BilingualTextarea key={`article-body-${index}`} label={`正文 ${index + 1}`} value={paragraph} onChange={(next) => update((items) => { items[selectedIndex].body = updateArrayItem(items[selectedIndex].body, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} rows={5} />
+                  <BilingualTextarea key={`article-body-${index}`} label={`正文 ${index + 1}`} value={paragraph} onChange={(next) => update((items) => { items[selectedIndex].body = updateArrayItem(items[selectedIndex].body, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} rows={5} fieldKeys={{ zh: `body.${index}.zh`, en: `body.${index}.en` }} />
                 ))}
-                <button type="button" onClick={() => update((items) => { items[selectedIndex].body = [...items[selectedIndex].body, emptyBilingual()]; })} className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]">新增正文段落</button>
+                <button data-field-key="body.add" type="button" onClick={() => update((items) => { items[selectedIndex].body = [...items[selectedIndex].body, emptyBilingual()]; })} className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]">新增正文段落</button>
                 {article.keywords.map((keyword, index) => (
                   <BilingualInput key={`article-keyword-${index}`} label={`关键词 ${index + 1}`} value={keyword} onChange={(next) => update((items) => { items[selectedIndex].keywords = updateArrayItem(items[selectedIndex].keywords, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} />
                 ))}
@@ -2381,20 +2925,20 @@ function ArticlesEditor({
 
 export function AdminCmsEditor(props: AdminCmsEditorProps) {
   if (props.section === "siteConfig") {
-    return <SiteSettingsEditor title={props.title} description={props.description} initialValue={props.initialValue as SiteConfigContent} />;
+    return <SiteSettingsEditor title={props.title} description={props.description} initialValue={props.initialValue as SiteConfigContent} initialFocus={props.initialFocus} />;
   }
 
   if (props.section === "homeContent") {
-    return <HomeContentEditor title={props.title} description={props.description} initialValue={props.initialValue as HomeContentEditorValue} content={props.content} />;
+    return <HomeContentEditor title={props.title} description={props.description} initialValue={props.initialValue as HomeContentEditorValue} content={props.content} initialFocus={props.initialFocus} />;
   }
 
   if (props.section === "artworks") {
-    return <ArtworkEditor title={props.title} description={props.description} initialValue={props.initialValue as Artwork[]} content={props.content} autoCreate={props.autoCreate} />;
+    return <ArtworkEditor title={props.title} description={props.description} initialValue={props.initialValue as Artwork[]} content={props.content} autoCreate={props.autoCreate} initialSearch={props.initialSearch} initialStatusFilter={props.initialStatusFilter} initialFocus={props.initialFocus} />;
   }
 
   if (props.section === "exhibitions") {
-    return <ExhibitionsEditor title={props.title} description={props.description} initialValue={props.initialValue as Exhibition[]} content={props.content} />;
+    return <ExhibitionsEditor title={props.title} description={props.description} initialValue={props.initialValue as Exhibition[]} content={props.content} initialFocus={props.initialFocus} />;
   }
 
-  return <ArticlesEditor title={props.title} description={props.description} initialValue={props.initialValue as Article[]} content={props.content} />;
+  return <ArticlesEditor title={props.title} description={props.description} initialValue={props.initialValue as Article[]} content={props.content} initialFocus={props.initialFocus} />;
 }

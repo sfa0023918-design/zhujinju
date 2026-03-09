@@ -37,6 +37,7 @@ export async function PATCH(request: Request, { params }: ArtworkRouteProps) {
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "藏品保存失败。",
+        issues: error instanceof ContentValidationError ? error.issues : undefined,
       },
       { status: error instanceof ContentValidationError ? 400 : 500 },
     );

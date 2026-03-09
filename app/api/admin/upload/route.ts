@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/admin-auth";
-import { saveArtworkMediaField } from "@/lib/content-store";
+import { assertMediaTargetExists, saveArtworkMediaField, saveRecordMediaField } from "@/lib/content-store";
 import { uploadAdminImage } from "@/lib/admin-media";
 
 export async function POST(request: Request) {
@@ -24,8 +24,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "未检测到上传文件。" }, { status: 400 });
     }
 
-    if (targetSection === "artworks" && !targetId) {
-      return NextResponse.json({ error: "当前藏品还没有真实记录，不能上传图片。" }, { status: 400 });
+    if ((targetSection === "artworks" || targetSection === "exhibitions" || targetSection === "articles") && !targetId) {
+      return NextResponse.json({ error: "当前内容还没有真实记录，不能上传图片。" }, { status: 400 });
+    }
+
+    if (targetSection === "artworks" || targetSection === "exhibitions" || targetSection === "articles") {
+      await assertMediaTargetExists(targetSection, targetId);
     }
 
     const result = await uploadAdminImage(file, folder, session.email);
@@ -39,6 +43,16 @@ export async function POST(request: Request) {
         ...result,
         saved: true,
         message: "图片已上传并写入当前藏品。",
+      });
+    }
+
+    if ((targetSection === "exhibitions" || targetSection === "articles") && targetId && targetField === "cover") {
+      await saveRecordMediaField(targetSection, targetId, "cover", result.url, session.email);
+
+      return NextResponse.json({
+        ...result,
+        saved: true,
+        message: "图片已上传并写入当前内容。",
       });
     }
 

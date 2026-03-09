@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
 
-import { loginAdmin } from "@/app/admin/actions";
-import { AdminLoginForm } from "@/components/admin-login-form";
 import { getAdminSession, isAdminConfigured } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 
@@ -11,8 +9,14 @@ export const metadata = buildMetadata({
   path: "/admin/login",
 });
 
-export default async function AdminLoginPage() {
+export default async function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
   const session = await getAdminSession();
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const error = resolvedSearchParams.error;
 
   if (session) {
     redirect("/admin");
@@ -34,7 +38,37 @@ export default async function AdminLoginPage() {
           </div>
         ) : null}
       </div>
-      <AdminLoginForm action={loginAdmin} />
+      <form
+        action="/admin/auth/login"
+        method="post"
+        className="space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8"
+      >
+        <label className="grid gap-2 text-sm text-[var(--muted)]">
+          <span className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">管理员邮箱</span>
+          <input
+            required
+            name="email"
+            type="email"
+            className="h-11 border border-[var(--line)] bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+          />
+        </label>
+        <label className="grid gap-2 text-sm text-[var(--muted)]">
+          <span className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">管理员密码</span>
+          <input
+            required
+            name="password"
+            type="password"
+            className="h-11 border border-[var(--line)] bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+          />
+        </label>
+        <button
+          type="submit"
+          className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-6 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)]"
+        >
+          进入内容后台
+        </button>
+        {error ? <p className="text-sm leading-7 text-[#8e4e3b]">{decodeURIComponent(error)}</p> : null}
+      </form>
     </section>
   );
 }

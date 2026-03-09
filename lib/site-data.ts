@@ -23,9 +23,15 @@ export type {
 } from "./data/types";
 
 export {
+  assertMediaTargetExists,
   ContentValidationError,
+  createArticleDraft,
   createArtworkDraft,
+  createExhibitionDraft,
   deleteArtworkRecord,
+  duplicateArticleRecord,
+  duplicateArtworkRecord,
+  duplicateExhibitionRecord,
   editableSections,
   getEditableSectionValue,
   getArticleBySlug,
@@ -48,8 +54,17 @@ export {
   readSiteContentFresh,
   saveArtworkMediaField,
   saveArtworkRecord,
+  saveRecordMediaField,
   saveSiteSection,
 } from "./content-store";
+
+export {
+  getArticlePublicationIssues,
+  getArtworkPublicationIssues,
+  getExhibitionPublicationIssues,
+} from "./publication-validation";
+
+export type { ValidationIssue, ValidationSection } from "./publication-validation";
 
 export { articles } from "./data/articles";
 export { artworks } from "./data/artworks";

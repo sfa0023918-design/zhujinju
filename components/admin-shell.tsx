@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import type { ReactNode } from "react";
 
 import { logoutAdmin } from "@/app/admin/actions";
+import { AdminNavLink } from "@/components/admin-nav-link";
 import { editableSections } from "@/lib/site-data";
 
 type AdminShellProps = {
@@ -29,7 +28,7 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
             </h2>
           </div>
           <nav className="grid gap-2">
-            <Link
+            <AdminNavLink
               href="/admin"
               className={`border px-4 py-3 text-sm transition-colors ${
                 !activeSection
@@ -38,14 +37,14 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
               }`}
             >
               后台首页
-            </Link>
+            </AdminNavLink>
           </nav>
 
           <div className="space-y-3">
             <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">内容入口</p>
             <nav className="grid gap-2">
               {primaryLinks.map((link) => (
-                <Link
+                <AdminNavLink
                   key={link.href}
                   href={link.href}
                   className={`border px-4 py-3 text-sm transition-colors ${
@@ -56,7 +55,7 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
                 >
                   <p>{link.title}</p>
                   <p className="mt-1 text-[0.72rem] leading-6 text-[var(--accent)]/78">{link.description}</p>
-                </Link>
+                </AdminNavLink>
               ))}
             </nav>
           </div>

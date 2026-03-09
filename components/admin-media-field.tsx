@@ -13,14 +13,15 @@ type TargetSize = {
 };
 
 export type UploadSaveTarget = {
-  section: "artworks";
+  section: "artworks" | "exhibitions" | "articles";
   id: string;
-  field: "image" | "gallery";
+  field: "image" | "gallery" | "cover";
   index?: number;
 };
 
 type AdminMediaFieldProps = {
   fieldKey?: string;
+  anchorKey?: string;
   label: string;
   note?: string;
   folder: string;
@@ -229,6 +230,7 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
 
 export function AdminMediaField({
   fieldKey,
+  anchorKey,
   label,
   note,
   folder,
@@ -427,7 +429,7 @@ export function AdminMediaField({
   }
 
   return (
-    <div className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+    <div data-field-key={anchorKey} className="space-y-3 border border-[var(--line)] bg-[var(--surface)] p-4">
       <div className="space-y-1">
         <label htmlFor={inputId} className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">
           {label}

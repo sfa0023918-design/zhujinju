@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/admin-auth";
-import { saveArtworkMediaField } from "@/lib/content-store";
+import { saveArtworkMediaField, saveRecordMediaField } from "@/lib/content-store";
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -19,27 +19,49 @@ export async function POST(request: Request) {
       value?: string;
     };
 
-    if (body.targetSection !== "artworks" || !body.targetId || (body.targetField !== "image" && body.targetField !== "gallery")) {
+    if (!body.targetId) {
       return NextResponse.json({ error: "无效的图片字段请求。" }, { status: 400 });
     }
 
-    await saveArtworkMediaField(
-      body.targetId,
-      body.targetField,
-      String(body.value ?? ""),
-      session.email,
-      {
-        galleryIndex: body.targetField === "gallery" && typeof body.targetIndex === "number" ? body.targetIndex : undefined,
-      },
-    );
+    if (body.targetSection === "artworks" && (body.targetField === "image" || body.targetField === "gallery")) {
+      await saveArtworkMediaField(
+        body.targetId,
+        body.targetField,
+        String(body.value ?? ""),
+        session.email,
+        {
+          galleryIndex: body.targetField === "gallery" && typeof body.targetIndex === "number" ? body.targetIndex : undefined,
+        },
+      );
 
-    return NextResponse.json({
-      saved: true,
-      message:
-        body.value && String(body.value).trim()
-          ? "图片路径已写入当前藏品。"
-          : "图片已从当前藏品中移除。",
-    });
+      return NextResponse.json({
+        saved: true,
+        message:
+          body.value && String(body.value).trim()
+            ? "图片路径已写入当前藏品。"
+            : "图片已从当前藏品中移除。",
+      });
+    }
+
+    if ((body.targetSection === "exhibitions" || body.targetSection === "articles") && body.targetField === "cover") {
+      await saveRecordMediaField(
+        body.targetSection,
+        body.targetId,
+        "cover",
+        String(body.value ?? ""),
+        session.email,
+      );
+
+      return NextResponse.json({
+        saved: true,
+        message:
+          body.value && String(body.value).trim()
+            ? "封面图已写入当前内容。"
+            : "封面图已从当前内容中移除。",
+      });
+    }
+
+    return NextResponse.json({ error: "无效的图片字段请求。" }, { status: 400 });
   } catch (error) {
     return NextResponse.json(
       {

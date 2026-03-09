@@ -10,6 +10,9 @@ type AdminSectionPageProps = {
   }>;
   searchParams?: Promise<{
     new?: string;
+    search?: string;
+    status?: string;
+    focus?: string;
   }>;
 };
 
@@ -34,6 +37,9 @@ export default async function AdminSectionPage({ params, searchParams }: AdminSe
         initialValue={value}
         content={content}
         autoCreate={query.new === "1"}
+        initialSearch={query.search}
+        initialStatusFilter={query.status}
+        initialFocus={query.focus}
       />
     </AdminShell>
   );

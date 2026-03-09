@@ -23,17 +23,21 @@ import type {
   SiteConfigContent,
 } from "./data/types";
 import { getRepoUtf8File, hasGitHubRepoConfig, putRepoUtf8File } from "./github-repo";
+import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "./publication-validation";
 import { siteConfig as defaultSiteConfig } from "./site-config";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const CONTENT_FILE_PATH = path.join(CONTENT_DIR, "site-content.json");
 const CONTENT_REPO_PATH = "content/site-content.json";
-const UNTITLED_ARTWORK_TITLES = new Set(["未命名藏品", "Untitled Artwork"]);
+import type { ValidationIssue } from "./publication-validation";
 
 export class ContentValidationError extends Error {
-  constructor(message: string) {
-    super(message);
+  issues: ValidationIssue[];
+
+  constructor(message: string, issues: ValidationIssue[] = []) {
+    super(message || "当前内容尚不能发布，请先补全必要字段。");
     this.name = "ContentValidationError";
+    this.issues = issues;
   }
 }
 
@@ -155,6 +159,14 @@ function makeArtworkSlug() {
   return `artwork-${Date.now()}`;
 }
 
+function makeExhibitionSlug() {
+  return `exhibition-${Date.now()}`;
+}
+
+function makeArticleSlug() {
+  return `article-${Date.now()}`;
+}
+
 function createArtworkDraftRecord(): Artwork {
   return {
     id: makeArtworkId(),
@@ -188,63 +200,96 @@ function createArtworkDraftRecord(): Artwork {
   };
 }
 
+function createExhibitionDraftRecord(): Exhibition {
+  return {
+    slug: makeExhibitionSlug(),
+    publicationStatus: "draft",
+    title: bt("", ""),
+    subtitle: bt("", ""),
+    period: bt("", ""),
+    venue: bt("", ""),
+    intro: bt("", ""),
+    description: [bt("", "")],
+    highlightArtworkSlugs: [],
+    highlightCount: 0,
+    catalogueTitle: bt("", ""),
+    catalogueIntro: bt("", ""),
+    cataloguePages: 0,
+    curatorialLead: bt("", ""),
+    relatedArticleSlugs: [],
+    cover: "",
+    current: false,
+  };
+}
+
+function createArticleDraftRecord(): Article {
+  return {
+    slug: makeArticleSlug(),
+    publicationStatus: "draft",
+    title: bt("", ""),
+    category: bt("", ""),
+    column: bt("", ""),
+    author: bt("", ""),
+    date: new Date().toISOString().slice(0, 10),
+    excerpt: bt("", ""),
+    body: [bt("", "")],
+    keywords: [bt("", "")],
+    relatedArtworkSlugs: [],
+    relatedExhibitionSlugs: [],
+    cover: "",
+  };
+}
+
+function appendCopySuffix(text: BilingualText, fallbackZh: string, fallbackEn: string) {
+  const zh = text.zh.trim() || fallbackZh;
+  const en = text.en.trim() || fallbackEn;
+
+  return {
+    zh: zh.includes("副本") ? zh : `${zh}（副本）`,
+    en: /\(copy\)$/i.test(en) ? en : `${en} (Copy)`,
+  };
+}
+
 function getArtworkId(artwork: Artwork) {
   return artwork.id?.trim() || artwork.slug;
 }
 
-function getPrimaryText(text: BilingualText | undefined) {
-  return text?.zh.trim() || text?.en.trim() || "";
+
+function throwIfBlockingIssues(issues: ValidationIssue[]) {
+  const blocking = issues.filter((issue) => issue.level === "error");
+
+  if (!blocking.length) {
+    return;
+  }
+
+  throw new ContentValidationError(
+    `当前内容尚不能发布，请先完成以下字段：${blocking.map((issue) => issue.message.replace(/^请/, "").replace(/。$/, "")).join("、")}`,
+    issues,
+  );
 }
 
-function hasMeaningfulArtworkTitle(text: BilingualText | undefined) {
-  const primary = getPrimaryText(text);
-  return Boolean(primary) && !UNTITLED_ARTWORK_TITLES.has(primary);
-}
-
-function validateArtworkForPublication(artwork: Artwork) {
+function validateArtworkForPublication(artwork: Artwork, artworks: Artwork[]) {
   if ((artwork.publicationStatus ?? "draft") !== "published") {
     return;
   }
 
-  if (!hasMeaningfulArtworkTitle(artwork.title)) {
-    throw new ContentValidationError("发布藏品前请填写作品标题。");
-  }
-
-  if (!artwork.slug.trim()) {
-    throw new ContentValidationError("发布藏品前请填写 slug。");
-  }
-
-  if (!artwork.image.trim()) {
-    throw new ContentValidationError("发布藏品前请先上传主图。");
-  }
+  throwIfBlockingIssues(getArtworkPublicationIssues(artwork, artworks));
 }
 
-function validateExhibitionForPublication(exhibition: Exhibition) {
+function validateExhibitionForPublication(exhibition: Exhibition, exhibitions: Exhibition[]) {
   if ((exhibition.publicationStatus ?? "draft") !== "published") {
     return;
   }
 
-  if (!getPrimaryText(exhibition.title)) {
-    throw new ContentValidationError("发布展览前请填写标题。");
-  }
-
-  if (!exhibition.slug.trim()) {
-    throw new ContentValidationError("发布展览前请填写 slug。");
-  }
+  throwIfBlockingIssues(getExhibitionPublicationIssues(exhibition, exhibitions));
 }
 
-function validateArticleForPublication(article: Article) {
+function validateArticleForPublication(article: Article, articles: Article[]) {
   if ((article.publicationStatus ?? "draft") !== "published") {
     return;
   }
 
-  if (!getPrimaryText(article.title)) {
-    throw new ContentValidationError("发布文章前请填写标题。");
-  }
-
-  if (!article.slug.trim()) {
-    throw new ContentValidationError("发布文章前请填写 slug。");
-  }
+  throwIfBlockingIssues(getArticlePublicationIssues(article, articles));
 }
 
 function validateSectionBeforeSave(
@@ -252,15 +297,15 @@ function validateSectionBeforeSave(
   nextValue: EditableSectionValueMap[EditableSectionKey],
 ) {
   if (section === "artworks") {
-    (nextValue as Artwork[]).forEach(validateArtworkForPublication);
+    (nextValue as Artwork[]).forEach((artwork) => validateArtworkForPublication(artwork, nextValue as Artwork[]));
   }
 
   if (section === "exhibitions") {
-    (nextValue as Exhibition[]).forEach(validateExhibitionForPublication);
+    (nextValue as Exhibition[]).forEach((exhibition) => validateExhibitionForPublication(exhibition, nextValue as Exhibition[]));
   }
 
   if (section === "articles") {
-    (nextValue as Article[]).forEach(validateArticleForPublication);
+    (nextValue as Article[]).forEach((article) => validateArticleForPublication(article, nextValue as Article[]));
   }
 }
 
@@ -317,9 +362,8 @@ export async function saveSiteSection(
   nextValue: EditableSectionValueMap[EditableSectionKey],
   actor: string,
 ) {
-  validateSectionBeforeSave(section, nextValue);
-
   const current = await readSiteContentFresh();
+  validateSectionBeforeSave(section, nextValue);
   const nextContent =
     section === "homeContent"
       ? applyHomeContentEditorValue(current, nextValue as HomeContentEditorValue)
@@ -370,6 +414,115 @@ export async function createArtworkDraft(actor: string) {
   };
 }
 
+export async function duplicateArtworkRecord(artworkId: string, actor: string) {
+  const current = await readSiteContentFresh();
+  const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
+
+  if (artworkIndex < 0) {
+    throw new Error("未找到要复制的藏品记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const source = nextContent.artworks[artworkIndex];
+  const duplicate: Artwork = {
+    ...structuredClone(source),
+    id: makeArtworkId(),
+    slug: makeArtworkSlug(),
+    publicationStatus: "draft",
+    title: appendCopySuffix(source.title, "未命名藏品", "Untitled Artwork"),
+    featured: false,
+  };
+
+  nextContent.artworks.splice(artworkIndex + 1, 0, duplicate);
+  await persistSiteContent(nextContent, `Duplicate artwork record from admin by ${actor}`);
+
+  return {
+    artwork: duplicate,
+    artworks: nextContent.artworks,
+  };
+}
+
+export async function createExhibitionDraft(actor: string) {
+  const current = await readSiteContentFresh();
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const exhibition = createExhibitionDraftRecord();
+
+  nextContent.exhibitions.push(exhibition);
+  await persistSiteContent(nextContent, `Create exhibition draft from admin by ${actor}`);
+
+  return {
+    exhibition,
+    exhibitions: nextContent.exhibitions,
+  };
+}
+
+export async function duplicateExhibitionRecord(slug: string, actor: string) {
+  const current = await readSiteContentFresh();
+  const exhibitionIndex = current.exhibitions.findIndex((item) => item.slug === slug);
+
+  if (exhibitionIndex < 0) {
+    throw new Error("未找到要复制的展览记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const source = nextContent.exhibitions[exhibitionIndex];
+  const duplicate: Exhibition = {
+    ...structuredClone(source),
+    slug: makeExhibitionSlug(),
+    publicationStatus: "draft",
+    title: appendCopySuffix(source.title, "未命名展览", "Untitled Exhibition"),
+    current: false,
+  };
+
+  nextContent.exhibitions.splice(exhibitionIndex + 1, 0, duplicate);
+  await persistSiteContent(nextContent, `Duplicate exhibition record from admin by ${actor}`);
+
+  return {
+    exhibition: duplicate,
+    exhibitions: nextContent.exhibitions,
+  };
+}
+
+export async function createArticleDraft(actor: string) {
+  const current = await readSiteContentFresh();
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const article = createArticleDraftRecord();
+
+  nextContent.articles.push(article);
+  await persistSiteContent(nextContent, `Create article draft from admin by ${actor}`);
+
+  return {
+    article,
+    articles: nextContent.articles,
+  };
+}
+
+export async function duplicateArticleRecord(slug: string, actor: string) {
+  const current = await readSiteContentFresh();
+  const articleIndex = current.articles.findIndex((item) => item.slug === slug);
+
+  if (articleIndex < 0) {
+    throw new Error("未找到要复制的文章记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  const source = nextContent.articles[articleIndex];
+  const duplicate: Article = {
+    ...structuredClone(source),
+    slug: makeArticleSlug(),
+    publicationStatus: "draft",
+    title: appendCopySuffix(source.title, "未命名文章", "Untitled Article"),
+  };
+
+  nextContent.articles.splice(articleIndex + 1, 0, duplicate);
+  await persistSiteContent(nextContent, `Duplicate article record from admin by ${actor}`);
+
+  return {
+    article: duplicate,
+    articles: nextContent.articles,
+  };
+}
+
 export async function saveArtworkRecord(
   artworkId: string,
   nextArtwork: Artwork,
@@ -390,7 +543,7 @@ export async function saveArtworkRecord(
     id: currentArtwork.id,
   };
 
-  validateArtworkForPublication(mergedArtwork);
+  validateArtworkForPublication(mergedArtwork, current.artworks.map((item, index) => (index === artworkIndex ? mergedArtwork : item)));
 
   nextContent.artworks[artworkIndex] = mergedArtwork;
   const normalized = normalizeSiteContent(nextContent);
@@ -472,6 +625,74 @@ export async function saveArtworkMediaField(
   return {
     artwork: normalized.artworks[artworkIndex],
     artworks: normalized.artworks,
+  };
+}
+
+export async function assertMediaTargetExists(
+  section: "artworks" | "exhibitions" | "articles",
+  recordId: string,
+) {
+  const current = await readSiteContentFresh();
+
+  if (section === "artworks") {
+    if (findArtworkIndexById(current.artworks, recordId) < 0) {
+      throw new Error("未找到要更新图片的藏品。");
+    }
+
+    return;
+  }
+
+  if (section === "exhibitions") {
+    if (!current.exhibitions.some((item) => item.slug === recordId)) {
+      throw new Error("未找到要更新图片的展览。");
+    }
+
+    return;
+  }
+
+  if (!current.articles.some((item) => item.slug === recordId)) {
+    throw new Error("未找到要更新图片的文章。");
+  }
+}
+
+export async function saveRecordMediaField(
+  section: "exhibitions" | "articles",
+  recordId: string,
+  field: "cover",
+  value: string,
+  actor: string,
+) {
+  const current = await readSiteContentFresh();
+  const nextContent = normalizeSiteContent(structuredClone(current));
+
+  if (section === "exhibitions") {
+    const recordIndex = nextContent.exhibitions.findIndex((item) => item.slug === recordId);
+
+    if (recordIndex < 0) {
+      throw new Error("未找到要更新图片的展览。");
+    }
+
+    nextContent.exhibitions[recordIndex].cover = value.trim();
+    await persistSiteContent(nextContent, `Update exhibition media from admin by ${actor}`);
+
+    return {
+      item: nextContent.exhibitions[recordIndex],
+      value: nextContent.exhibitions,
+    };
+  }
+
+  const recordIndex = nextContent.articles.findIndex((item) => item.slug === recordId);
+
+  if (recordIndex < 0) {
+    throw new Error("未找到要更新图片的文章。");
+  }
+
+  nextContent.articles[recordIndex].cover = value.trim();
+  await persistSiteContent(nextContent, `Update article media from admin by ${actor}`);
+
+  return {
+    item: nextContent.articles[recordIndex],
+    value: nextContent.articles,
   };
 }
 
