@@ -124,7 +124,7 @@ function DetailIndexSection({
   );
 }
 
-export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
+export function ArtworkFacts({ items }: ArtworkFactsProps) {
   const visibleItems = items.filter((item) => hasText(item.value));
 
   if (!visibleItems.length) {
@@ -136,22 +136,33 @@ export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
       {visibleItems.map((item) => (
         <div
           key={item.label.zh}
-          className="grid gap-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[92px_minmax(0,1fr)] md:gap-3.5"
+          className="grid items-start gap-x-3 gap-y-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[102px_minmax(0,1fr)] md:gap-x-4 md:gap-y-1.5"
         >
-          <dt className="text-[var(--accent)]">
-            <p className="text-[0.96rem] font-medium tracking-[0.04em] text-[var(--accent)]/88 md:text-[0.84rem] md:tracking-[0.08em]">
-              {getLocalizedText(item.label, locale)}
+          <dt className="min-w-0 text-[var(--accent)]">
+            <p className="text-[0.98rem] font-medium leading-[1.24] tracking-[0.02em] text-[var(--accent)]/90 md:text-[0.95rem]">
+              {item.label.zh}
             </p>
+            {item.label.en?.trim() ? (
+              <p
+                lang="en"
+                className="mt-1 text-[0.8rem] font-medium uppercase tracking-[0.12em] text-[var(--accent)]/74 leading-[1.45] md:text-[0.79rem]"
+              >
+                {item.label.en}
+              </p>
+            ) : null}
           </dt>
           <dd className="min-w-0">
-            <p
-              lang={locale === "en" ? "en" : "zh-CN"}
-              className={locale === "zh"
-                ? "text-[1.2rem] leading-[1.72] text-[var(--ink)] md:text-[1.12rem]"
-                : "text-[0.9rem] font-medium uppercase tracking-[0.04em] text-[var(--ink)]/94 md:text-[0.86rem]"}
-            >
-              {getLocalizedText(item.value, locale)}
+            <p className="text-[1.16rem] font-medium leading-[1.28] text-[var(--ink)] md:text-[1.08rem]">
+              {item.value.zh}
             </p>
+            {item.value.en?.trim() ? (
+              <p
+                lang="en"
+                className="mt-1 text-[0.88rem] leading-[1.5] text-[var(--ink)]/86 md:text-[0.86rem]"
+              >
+                {item.value.en}
+              </p>
+            ) : null}
           </dd>
         </div>
       ))}
