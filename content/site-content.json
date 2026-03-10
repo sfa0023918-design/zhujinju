@@ -1112,6 +1112,54 @@
       ],
       "cover": "/api/placeholder/between-gilding-and-pigment?kind=landscape",
       "publicationStatus": "published"
+    },
+    {
+      "slug": "exhibition-1773128950888",
+      "publicationStatus": "draft",
+      "title": {
+        "zh": "",
+        "en": ""
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "",
+        "en": ""
+      },
+      "venue": {
+        "zh": "",
+        "en": ""
+      },
+      "intro": {
+        "zh": "",
+        "en": ""
+      },
+      "description": [
+        {
+          "zh": "",
+          "en": ""
+        }
+      ],
+      "highlightArtworkSlugs": [],
+      "highlightCount": 0,
+      "catalogueTitle": {
+        "zh": "",
+        "en": ""
+      },
+      "catalogueIntro": {
+        "zh": "",
+        "en": ""
+      },
+      "cataloguePages": 0,
+      "curatorialLead": {
+        "zh": "",
+        "en": ""
+      },
+      "relatedArticleSlugs": [],
+      "cover": "",
+      "current": false
     }
   ],
   "articles": [
