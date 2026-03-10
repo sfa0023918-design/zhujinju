@@ -986,6 +986,78 @@
         "/uploads/artworks/1773059388376-47帝释天-特.jpg"
       ],
       "featured": true
+    },
+    {
+      "id": "artwork_1ca16c9c-abf7-48c8-95a4-a2a063f1fd59",
+      "slug": "artwork-1773132602982",
+      "publicationStatus": "draft",
+      "title": {
+        "zh": "未命名藏品",
+        "en": "Untitled Artwork"
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "",
+        "en": ""
+      },
+      "region": {
+        "zh": "",
+        "en": ""
+      },
+      "origin": {
+        "zh": "",
+        "en": ""
+      },
+      "material": {
+        "zh": "",
+        "en": ""
+      },
+      "category": {
+        "zh": "",
+        "en": ""
+      },
+      "dimensions": {
+        "zh": "",
+        "en": ""
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "",
+        "en": ""
+      },
+      "viewingNote": {
+        "zh": "",
+        "en": ""
+      },
+      "comparisonNote": {
+        "zh": "",
+        "en": ""
+      },
+      "provenance": [],
+      "exhibitions": [],
+      "publications": [],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available on request"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available on request"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available on request"
+        }
+      ],
+      "relatedArticleSlugs": [],
+      "relatedExhibitionSlugs": [],
+      "image": "",
+      "gallery": [],
+      "featured": false
     }
   ],
   "exhibitions": [
