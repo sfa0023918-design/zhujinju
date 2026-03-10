@@ -374,8 +374,14 @@ export type HomeContentEditorValue = {
   featuredArtworkIds: string[];
 };
 
-export type EditableSectionValueMap = {
+export type SiteConfigEditorValue = {
   siteConfig: SiteConfigContent;
+  brandIntroHeroImage: string;
+  brandIntroHeroAlt: BilingualText;
+};
+
+export type EditableSectionValueMap = {
+  siteConfig: SiteConfigEditorValue;
   homeContent: HomeContentEditorValue;
   artworks: Artwork[];
   exhibitions: Exhibition[];

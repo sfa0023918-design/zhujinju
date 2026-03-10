@@ -19,6 +19,7 @@ export type {
   PublicationReference,
   PublicationStatus,
   SiteConfigContent,
+  SiteConfigEditorValue,
   SiteContent,
 } from "./data/types";
 

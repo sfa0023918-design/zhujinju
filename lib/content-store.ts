@@ -21,6 +21,7 @@ import type {
   PublicationStatus,
   SiteContent,
   SiteConfigContent,
+  SiteConfigEditorValue,
 } from "./data/types";
 import { getRepoUtf8File, hasGitHubRepoConfig, putRepoUtf8File } from "./github-repo";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "./publication-validation";
@@ -323,10 +324,22 @@ function buildHomeContentEditorValue(content: SiteContent): HomeContentEditorVal
   };
 }
 
+function buildSiteConfigEditorValue(content: SiteContent): SiteConfigEditorValue {
+  return {
+    siteConfig: content.siteConfig,
+    brandIntroHeroImage: content.brandIntro.heroImage ?? "",
+    brandIntroHeroAlt: content.brandIntro.heroAlt ?? bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
+  };
+}
+
 export function getEditableSectionValue<K extends EditableSectionKey>(
   content: SiteContent,
   section: K,
 ): EditableSectionValueMap[K] {
+  if (section === "siteConfig") {
+    return buildSiteConfigEditorValue(content) as EditableSectionValueMap[K];
+  }
+
   if (section === "homeContent") {
     return buildHomeContentEditorValue(content) as EditableSectionValueMap[K];
   }
@@ -353,6 +366,18 @@ function applyHomeContentEditorValue(content: SiteContent, nextValue: HomeConten
   });
 }
 
+function applySiteConfigEditorValue(content: SiteContent, nextValue: SiteConfigEditorValue) {
+  return normalizeSiteContent({
+    ...content,
+    siteConfig: nextValue.siteConfig,
+    brandIntro: {
+      ...content.brandIntro,
+      heroImage: nextValue.brandIntroHeroImage.trim(),
+      heroAlt: nextValue.brandIntroHeroAlt,
+    },
+  });
+}
+
 function findArtworkIndexById(artworks: Artwork[], artworkId: string) {
   return artworks.findIndex((artwork) => getArtworkId(artwork) === artworkId);
 }
@@ -365,7 +390,9 @@ export async function saveSiteSection(
   const current = await readSiteContentFresh();
   validateSectionBeforeSave(section, nextValue);
   const nextContent =
-    section === "homeContent"
+    section === "siteConfig"
+      ? applySiteConfigEditorValue(current, nextValue as SiteConfigEditorValue)
+      : section === "homeContent"
       ? applyHomeContentEditorValue(current, nextValue as HomeContentEditorValue)
       : normalizeSiteContent({
           ...current,

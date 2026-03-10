@@ -140,7 +140,7 @@ export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
           className="grid gap-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[92px_minmax(0,1fr)] md:gap-3.5"
         >
           <dt className="text-[var(--accent)]">
-            <p className="text-[0.52rem] tracking-[0.13em] text-[var(--accent)]/76">
+            <p className="text-[0.96rem] font-medium tracking-[0.04em] text-[var(--accent)]/88 md:text-[0.82rem] md:tracking-[0.08em]">
               {getLocalizedText(item.label, locale)}
             </p>
           </dt>
@@ -148,8 +148,8 @@ export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
             <p
               lang={locale === "en" ? "en" : "zh-CN"}
               className={locale === "zh"
-                ? "text-[1.02rem] leading-7 text-[var(--ink)] md:text-[1.06rem]"
-                : "text-[0.74rem] uppercase tracking-[0.08em] text-[var(--ink)] md:text-[0.8rem]"}
+                ? "text-[1.22rem] leading-[1.74] text-[var(--ink)] md:text-[1.1rem]"
+                : "text-[0.88rem] font-medium uppercase tracking-[0.05em] text-[var(--ink)]/92 md:text-[0.82rem]"}
             >
               {getLocalizedText(item.value, locale)}
             </p>
@@ -355,6 +355,7 @@ export function ArtworkScholarlyNote({
           key: "excerpt",
           content: artwork.excerpt,
           variant: (!hasViewing && !hasComparison ? "lead" : "body") as "lead" | "body",
+          expandable: true,
         }
       : null,
     hasViewing
@@ -363,6 +364,7 @@ export function ArtworkScholarlyNote({
           label: detailCopy.viewingNote,
           content: artwork.viewingNote,
           variant: "body" as const,
+          expandable: true,
         }
       : null,
     hasComparison

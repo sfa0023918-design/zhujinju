@@ -109,14 +109,18 @@ select:focus-visible {
 }
 
 .prose-block--zh {
+  text-align: justify;
+  text-justify: inter-ideograph;
   word-break: normal;
   overflow-wrap: break-word;
 }
 
 .prose-block--en {
+  text-align: left;
   word-break: normal;
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: none;
+  letter-spacing: normal;
 }
 
 @keyframes siteFadeIn {

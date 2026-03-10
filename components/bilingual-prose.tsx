@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -24,6 +24,7 @@ type ReadingSection = {
   label?: BilingualValue;
   content: BilingualProseContent;
   variant?: ProseVariant;
+  expandable?: boolean;
 };
 
 type BilingualReadingPanelProps = {
@@ -69,19 +70,115 @@ function hasLocaleContent(content: BilingualProseContent, locale: ReadingLocale)
 function proseClasses(variant: ProseVariant, locale: ReadingLocale) {
   if (variant === "lead") {
     return locale === "zh"
-      ? "prose-block prose-block--zh max-w-[38rem] text-[1.02rem] leading-[2.02] text-[var(--ink)] md:text-[1.06rem]"
-      : "prose-block prose-block--en max-w-[33rem] text-[0.92rem] leading-[1.92] tracking-[0.01em] text-[var(--muted)]/88 md:text-[0.96rem]";
+      ? "prose-block prose-block--zh max-w-[39rem] text-[1.04rem] leading-[2.08] text-[var(--ink)] md:text-[1.08rem]"
+      : "prose-block prose-block--en max-w-[31rem] text-[0.93rem] leading-[1.86] text-[var(--muted)]/92 md:text-[0.97rem]";
   }
 
   if (variant === "secondary") {
     return locale === "zh"
-      ? "prose-block prose-block--zh max-w-[38rem] text-[0.94rem] leading-[1.96] text-[var(--muted)]"
-      : "prose-block prose-block--en max-w-[32rem] text-[0.85rem] leading-[1.84] tracking-[0.01em] text-[var(--muted)]/84";
+      ? "prose-block prose-block--zh max-w-[38rem] text-[0.95rem] leading-[2.02] text-[var(--muted)]"
+      : "prose-block prose-block--en max-w-[30rem] text-[0.86rem] leading-[1.82] text-[var(--muted)]/88";
   }
 
   return locale === "zh"
-    ? "prose-block prose-block--zh max-w-[42rem] text-[0.99rem] leading-[2] text-[var(--muted)]"
-    : "prose-block prose-block--en max-w-[35rem] text-[0.89rem] leading-[1.88] tracking-[0.01em] text-[var(--muted)]/84";
+    ? "prose-block prose-block--zh max-w-[42rem] text-[1rem] leading-[2.08] text-[var(--muted)]"
+    : "prose-block prose-block--en max-w-[33rem] text-[0.9rem] leading-[1.84] text-[var(--muted)]/90";
+}
+
+function ExpandableReadingText({
+  paragraphs,
+  locale,
+  variant,
+}: {
+  paragraphs: string[];
+  locale: ReadingLocale;
+  variant: ProseVariant;
+}) {
+  const [expandedByLocale, setExpandedByLocale] = useState<Record<ReadingLocale, boolean>>({
+    zh: false,
+    en: false,
+  });
+  const [canExpand, setCanExpand] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const expanded = expandedByLocale[locale];
+
+  useEffect(() => {
+    const element = contentRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    const measure = () => {
+      if (!element) {
+        return;
+      }
+
+      const wasExpanded = element.dataset.expanded === "true";
+
+      if (wasExpanded) {
+        element.dataset.expanded = "false";
+      }
+
+      const nextCanExpand = element.scrollHeight - element.clientHeight > 8;
+      setCanExpand(nextCanExpand);
+
+      if (wasExpanded) {
+        element.dataset.expanded = "true";
+      }
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [locale, paragraphs]);
+
+  return (
+    <div className="space-y-3">
+      <div
+        ref={contentRef}
+        data-expanded={expanded ? "true" : "false"}
+        className={`relative overflow-hidden transition-[max-height] duration-300 ease-out ${
+          !expanded
+            ? locale === "zh"
+              ? "max-h-[14.8rem] md:max-h-[20rem]"
+              : "max-h-[10.4rem] md:max-h-[14rem]"
+            : "max-h-[999rem]"
+        }`}
+      >
+        <div className="space-y-4 md:space-y-5">
+          {paragraphs.map((paragraph, index) => (
+            <p
+              key={`${locale}-${index}`}
+              lang={locale === "en" ? "en" : "zh-CN"}
+              className={proseClasses(variant, locale)}
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        {canExpand && !expanded ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--bg)] via-[rgba(244,240,232,0.9)] to-transparent" />
+        ) : null}
+      </div>
+      {canExpand ? (
+        <button
+          type="button"
+          onClick={() =>
+            setExpandedByLocale((current) => ({
+              ...current,
+              [locale]: !current[locale],
+            }))
+          }
+          className="inline-flex items-center gap-2 text-[0.78rem] tracking-[0.06em] text-[var(--accent)]/88 transition-colors hover:text-[var(--ink)]"
+        >
+          {locale === "zh" ? (expanded ? "收起" : "查看更多") : expanded ? "Show less" : "View more"}
+        </button>
+      ) : null}
+    </div>
+  );
 }
 
 export function BilingualProse({
@@ -208,17 +305,25 @@ export function BilingualReadingPanel({
                   enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
                 />
               ) : null}
-              <div className="space-y-4 md:space-y-5">
-                {paragraphs.map((paragraph, index) => (
-                  <p
-                    key={`${section.key}-${locale}-${index}`}
-                    lang={locale === "en" ? "en" : "zh-CN"}
-                    className={proseClasses(section.variant ?? "body", locale)}
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+              {section.expandable ? (
+                <ExpandableReadingText
+                  paragraphs={paragraphs}
+                  locale={locale}
+                  variant={section.variant ?? "body"}
+                />
+              ) : (
+                <div className="space-y-4 md:space-y-5">
+                  {paragraphs.map((paragraph, index) => (
+                    <p
+                      key={`${section.key}-${locale}-${index}`}
+                      lang={locale === "en" ? "en" : "zh-CN"}
+                      className={proseClasses(section.variant ?? "body", locale)}
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
