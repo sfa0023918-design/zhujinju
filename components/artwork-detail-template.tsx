@@ -295,6 +295,7 @@ export function ArtworkHero({
         <ArtworkGallery
           title={`${artwork.title.zh} ${artwork.title.en}`.trim()}
           primaryImage={artwork.image}
+          category={artwork.category.zh || artwork.category.en}
           gallery={artwork.gallery}
         />
 

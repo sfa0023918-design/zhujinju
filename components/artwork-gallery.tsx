@@ -10,14 +10,17 @@ import { MediaPlaceholder } from "./media-placeholder";
 type ArtworkGalleryProps = {
   title: string;
   primaryImage: string;
+  category?: string;
   gallery?: string[];
 };
 
 export function ArtworkGallery({
   title,
   primaryImage,
+  category = "",
   gallery = [],
 }: ArtworkGalleryProps) {
+  const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
   const detailImages = useMemo(() => {
     const seen = new Set<string>();
 
@@ -49,6 +52,22 @@ export function ArtworkGallery({
   const thumbnailImages = [primaryImage, ...detailImages];
   const activeImageSrc = withImageVersion(activeImage);
   const isActivePlaceholder = !activeImage || activeImage.startsWith("/api/placeholder/");
+  const categoryHint = category.toLowerCase();
+  const isPaintingLike =
+    categoryHint.includes("唐卡") ||
+    categoryHint.includes("绘画") ||
+    categoryHint.includes("thangka") ||
+    categoryHint.includes("painting");
+  const isVeryTall = naturalRatio !== null && naturalRatio < 0.78;
+  const desktopContainerClass = isPaintingLike || isVeryTall
+    ? "lg:min-h-[46rem] lg:items-start lg:p-2"
+    : "lg:min-h-[40rem] lg:items-start lg:p-2";
+  const desktopFrameClass = isPaintingLike || isVeryTall
+    ? "lg:flex lg:w-full lg:min-w-[30rem] lg:justify-center xl:min-w-[34rem]"
+    : "lg:flex lg:w-full lg:justify-center";
+  const desktopImageClass = isPaintingLike || isVeryTall
+    ? "lg:h-auto lg:w-auto lg:min-w-[30rem] lg:max-h-[82vh] lg:max-w-full lg:object-contain lg:object-top xl:min-w-[34rem]"
+    : "lg:h-auto lg:w-full lg:max-h-[78vh] lg:max-w-full lg:object-contain lg:object-top";
 
   return (
     <div className="grid gap-5 lg:grid-cols-[72px_minmax(0,1fr)] lg:items-start lg:gap-6">
@@ -97,21 +116,29 @@ export function ArtworkGallery({
         </div>
       ) : null}
       <div className="order-1 min-w-0 grid gap-3.5">
-        <div className="relative overflow-hidden bg-[var(--surface-strong)] lg:flex lg:min-h-[28rem] lg:items-start lg:justify-center lg:overflow-visible lg:p-4">
+        <div className={`relative overflow-hidden bg-[var(--surface-strong)] lg:flex lg:overflow-visible ${desktopContainerClass}`}>
           {isActivePlaceholder ? (
-            <div className="aspect-[4/5] lg:flex lg:min-h-[28rem] lg:w-full lg:items-start lg:justify-center">
+            <div className="aspect-[4/5] lg:flex lg:min-h-full lg:w-full lg:items-start lg:justify-center">
               <MediaPlaceholder eyebrow="Artwork Image" title={title} />
             </div>
           ) : (
-            <Image
-              src={activeImageSrc}
-              alt={title}
-              width={1200}
-              height={1500}
-              priority
-              unoptimized
-              className="aspect-[4/5] h-full w-full object-cover lg:h-auto lg:w-auto lg:max-h-[72vh] lg:max-w-full lg:object-contain lg:object-top"
-            />
+            <div className={desktopFrameClass}>
+              <Image
+                src={activeImageSrc}
+                alt={title}
+                width={1200}
+                height={1500}
+                priority
+                unoptimized
+                onLoad={(event) => {
+                  const target = event.currentTarget;
+                  if (target.naturalWidth > 0 && target.naturalHeight > 0) {
+                    setNaturalRatio(target.naturalWidth / target.naturalHeight);
+                  }
+                }}
+                className={`aspect-[4/5] h-full w-full object-cover ${desktopImageClass}`}
+              />
+            </div>
           )}
         </div>
         {thumbnailImages.length > 1 && activeImage !== primaryImage && !primaryImage.startsWith("/api/placeholder/") ? (
