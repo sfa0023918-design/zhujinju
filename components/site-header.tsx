@@ -29,7 +29,7 @@ export async function SiteHeader() {
               alt={siteConfig.siteName.zh}
               width={980}
               height={180}
-              className="block h-auto w-[168px] md:w-[204px] lg:w-[224px]"
+              className="block h-auto w-[210px] md:w-[268px] lg:w-[308px] xl:w-[328px]"
             />
           </span>
         </Link>
