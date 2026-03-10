@@ -160,13 +160,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "登录状态已失效，请重新登录后台。" }, { status: 401 });
   }
 
-  if (!OPENAI_TRANSLATION_API_KEY) {
-    return NextResponse.json(
-      { error: "后台尚未配置翻译接口密钥，暂时无法自动生成英文。" },
-      { status: 503 },
-    );
-  }
-
   try {
     const { text, label } = (await request.json()) as {
       text?: string;
@@ -177,6 +170,19 @@ export async function POST(request: Request) {
 
     if (!sourceText) {
       return NextResponse.json({ error: "未检测到需要翻译的中文内容。" }, { status: 400 });
+    }
+
+    if (!OPENAI_TRANSLATION_API_KEY) {
+      const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
+
+      if (fallback) {
+        return NextResponse.json({ translation: fallback, fallback: true });
+      }
+
+      return NextResponse.json(
+        { error: "后台尚未配置可用翻译服务，暂时无法自动生成英文。" },
+        { status: 503 },
+      );
     }
 
     const systemPrompt = [
@@ -222,11 +228,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ translation: fallback, fallback: true });
       }
 
+      const status = result.status ?? 502;
       const message =
-        result.status === 401
+        status === 401 || status === 429 || status >= 500
           ? "翻译服务当前较忙，请稍后再试一次。"
           : result.error ?? "自动翻译失败。";
-      return NextResponse.json({ error: message }, { status: result.status });
+      return NextResponse.json({ error: message }, { status });
     }
 
     const translation =

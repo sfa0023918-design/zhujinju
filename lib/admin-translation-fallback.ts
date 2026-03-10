@@ -269,9 +269,7 @@ async function getTranslationMemory() {
       collectBilingualPairs(content, memory);
 
       for (const [zh, en] of EXACT_GLOSSARY.entries()) {
-        if (!memory.has(zh)) {
-          memory.set(zh, en);
-        }
+        memory.set(zh, en);
       }
 
       return memory;
@@ -287,6 +285,11 @@ function buildSentenceFallback(text: string, memory: TranslationMemory) {
     return null;
   }
 
+  const glossaryExact = EXACT_GLOSSARY.get(normalized);
+  if (glossaryExact) {
+    return glossaryExact;
+  }
+
   const exact = memory.get(normalized);
   if (exact) {
     return exact;
@@ -299,6 +302,11 @@ export async function fallbackTranslateChineseToEnglish(text: string, label?: st
   const normalizedText = normalizeKey(text);
   if (!normalizedText) {
     return null;
+  }
+
+  const glossaryExact = EXACT_GLOSSARY.get(normalizedText);
+  if (glossaryExact) {
+    return glossaryExact;
   }
 
   const memory = await getTranslationMemory();
