@@ -62,7 +62,7 @@
         "en": "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange."
       },
       "aside": {
-        "zh": "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排看件与我们。",
+        "zh": "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排与我们看件。",
         "en": "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Shanghai are by appointment."
       },
       "infoLabels": {
@@ -138,12 +138,12 @@
         "en": "Chengdu, China · By Appointment"
       },
       "replyWindow": {
-        "zh": "作品咨询通常于 24 小时内回复。",
-        "en": "Artwork inquiries are usually answered within 24 hours."
+        "zh": "地址：成都市青羊区草堂东路88号 竹瑾居艺术空间",
+        "en": "Address: 88 Caotang East Road, Qingyang District, Chengdu Zhujinju Art Space"
       },
       "collaborationNote": {
-        "zh": "可联系借展、研究合作、图录交换与机构预约看件。",
-        "en": "Loans, research collaboration, catalogue exchange, and institutional viewings may be arranged."
+        "zh": "作品咨询通常于 24 小时内回复。 可联系借展、研究合作、图录交换与机构预约看件。",
+        "en": "**Collaboration and Loans** Inquiries are typically answered within 24 hours. We welcome requests for exhibition loans, research collaborations, publication exchanges, and institutional viewings by appointment."
       },
       "appointmentNote": {
         "zh": "By appointment in Chengdu.",
