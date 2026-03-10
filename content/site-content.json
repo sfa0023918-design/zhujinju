@@ -930,7 +930,14 @@
         "zh": "",
         "en": ""
       },
-      "provenance": [],
+      "provenance": [
+        {
+          "label": {
+            "zh": "",
+            "en": ""
+          }
+        }
+      ],
       "exhibitions": [],
       "publications": [],
       "inquirySupport": [
