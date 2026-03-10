@@ -1049,7 +1049,17 @@
         "why-exhibitions-matter"
       ],
       "cover": "/api/placeholder/silent-radiance?kind=landscape",
-      "publicationStatus": "published"
+      "publicationStatus": "published",
+      "featuredWorksCount": 18,
+      "cataloguePageCount": 96,
+      "catalogueNote": {
+        "zh": "收录 18 件重点作品，附策展前言、作品页与图像索引。",
+        "en": "Including 18 key works with a curatorial preface, object entries, and image index."
+      },
+      "curatorialNote": {
+        "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
+        "en": "The exhibition avoids category accumulation and instead lets works form a comparable field of looking."
+      }
     },
     {
       "slug": "between-gilding-and-pigment",
@@ -1111,55 +1121,17 @@
         "why-exhibitions-matter"
       ],
       "cover": "/api/placeholder/between-gilding-and-pigment?kind=landscape",
-      "publicationStatus": "published"
-    },
-    {
-      "slug": "exhibition-1773128950888",
-      "publicationStatus": "draft",
-      "title": {
-        "zh": "",
-        "en": ""
+      "publicationStatus": "published",
+      "featuredWorksCount": 16,
+      "cataloguePageCount": 88,
+      "catalogueNote": {
+        "zh": "围绕材料、区域与图像关系展开，收录 16 件重点作品与一篇研究前言。",
+        "en": "Focused on material, region, and image, with 16 key works and a research preface."
       },
-      "subtitle": {
-        "zh": "",
-        "en": ""
-      },
-      "period": {
-        "zh": "",
-        "en": ""
-      },
-      "venue": {
-        "zh": "",
-        "en": ""
-      },
-      "intro": {
-        "zh": "",
-        "en": ""
-      },
-      "description": [
-        {
-          "zh": "",
-          "en": ""
-        }
-      ],
-      "highlightArtworkSlugs": [],
-      "highlightCount": 0,
-      "catalogueTitle": {
-        "zh": "",
-        "en": ""
-      },
-      "catalogueIntro": {
-        "zh": "",
-        "en": ""
-      },
-      "cataloguePages": 0,
-      "curatorialLead": {
-        "zh": "",
-        "en": ""
-      },
-      "relatedArticleSlugs": [],
-      "cover": "",
-      "current": false
+      "curatorialNote": {
+        "zh": "材质并非附属信息，而是理解图像与时代判断的第一入口。",
+        "en": "Material is not secondary information but one of the first entries into image and period judgement."
+      }
     }
   ],
   "articles": [
