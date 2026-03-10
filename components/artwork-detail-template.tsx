@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import type {
   Article,
@@ -71,6 +72,26 @@ function hasText(value?: { zh?: string; en?: string } | null) {
   return Boolean(value.zh?.trim() || value.en?.trim());
 }
 
+function getLocalizedText(
+  value: { zh?: string; en?: string } | null | undefined,
+  locale: "zh" | "en",
+) {
+  if (!value) {
+    return "";
+  }
+
+  const preferred = locale === "zh" ? value.zh?.trim() : value.en?.trim();
+  const fallback = locale === "zh" ? value.en?.trim() : value.zh?.trim();
+  return preferred || fallback || "";
+}
+
+function getParagraphs(value: { zh?: string; en?: string } | null | undefined, locale: "zh" | "en") {
+  return getLocalizedText(value, locale)
+    .split(/\n\s*\n+/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
 function joinBilingual(primary: { zh: string; en: string }, secondary?: { zh: string; en: string }) {
   if (!secondary || (!secondary.zh.trim() && !secondary.en.trim())) {
     return primary;
@@ -138,9 +159,9 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
             </p>
           </dt>
           <dd className="min-w-0">
-            <p className="text-[0.9rem] leading-7 text-[var(--ink)]">{item.value.zh}</p>
+            <p className="text-[0.98rem] leading-7 text-[var(--ink)] md:text-[1.02rem]">{item.value.zh}</p>
             {item.value.en.trim() ? (
-              <p className="mt-0.5 text-[0.48rem] uppercase tracking-[0.14em] text-[var(--accent)]/36">
+              <p className="mt-0.5 text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/38 md:text-[0.58rem]">
                 {item.value.en}
               </p>
             ) : null}
@@ -316,7 +337,16 @@ export function ArtworkScholarlyNote({
   const hasExcerpt = hasText(artwork.excerpt);
   const hasViewing = hasText(artwork.viewingNote);
   const hasComparison = hasText(artwork.comparisonNote);
+  const hasEnglishContent =
+    Boolean(artwork.excerpt.en?.trim()) ||
+    Boolean(artwork.viewingNote.en?.trim()) ||
+    Boolean(artwork.comparisonNote.en?.trim());
   const showExcerptAsLead = hasExcerpt && !hasViewing && !hasComparison;
+  const [locale, setLocale] = useState<"zh" | "en">("zh");
+
+  const excerptParagraphs = useMemo(() => getParagraphs(artwork.excerpt, locale), [artwork.excerpt, locale]);
+  const viewingParagraphs = useMemo(() => getParagraphs(artwork.viewingNote, locale), [artwork.viewingNote, locale]);
+  const comparisonParagraphs = useMemo(() => getParagraphs(artwork.comparisonNote, locale), [artwork.comparisonNote, locale]);
 
   if (!hasExcerpt && !hasViewing && !hasComparison) {
     return null;
@@ -325,18 +355,45 @@ export function ArtworkScholarlyNote({
   return (
     <section className="max-w-[42rem] space-y-7">
       <div className="space-y-2">
-        <BilingualText
-          as="p"
-          text={detailCopy.scholarlyNote}
-          mode="inline"
-          className="text-[var(--accent)]"
-          zhClassName="text-[0.66rem] tracking-[0.16em]"
-          enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
-        />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <BilingualText
+            as="p"
+            text={detailCopy.scholarlyNote}
+            mode="inline"
+            className="text-[var(--accent)]"
+            zhClassName="text-[0.66rem] tracking-[0.16em]"
+            enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
+          />
+          {hasEnglishContent ? (
+            <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
+              {(["zh", "en"] as const).map((option) => {
+                const active = locale === option;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setLocale(option)}
+                    className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                      active
+                        ? "bg-[var(--surface)] text-[var(--ink)]"
+                        : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                    }`}
+                  >
+                    {option.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
         {showExcerptAsLead ? (
-          <p className="text-[1rem] leading-8 text-[var(--ink)] md:text-[1.04rem]">
-            {artwork.excerpt.zh}
-          </p>
+          <div className="space-y-4">
+            {excerptParagraphs.map((paragraph, index) => (
+              <p key={`excerpt-${locale}-${index}`} className="max-w-[38rem] text-[1rem] leading-8 text-[var(--ink)] md:text-[1.04rem]">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         ) : null}
       </div>
 
@@ -350,7 +407,13 @@ export function ArtworkScholarlyNote({
             zhClassName="text-[0.58rem] tracking-[0.15em]"
             enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
           />
-          <p className="text-[0.96rem] leading-8 text-[var(--muted)]">{artwork.viewingNote.zh}</p>
+          <div className="space-y-4">
+            {viewingParagraphs.map((paragraph, index) => (
+              <p key={`viewing-${locale}-${index}`} className="max-w-[38rem] text-[0.98rem] leading-8 text-[var(--muted)]">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </div>
       ) : null}
 
@@ -364,7 +427,13 @@ export function ArtworkScholarlyNote({
             zhClassName="text-[0.58rem] tracking-[0.15em]"
             enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
           />
-          <p className="text-[0.96rem] leading-8 text-[var(--muted)]">{artwork.comparisonNote.zh}</p>
+          <div className="space-y-4">
+            {comparisonParagraphs.map((paragraph, index) => (
+              <p key={`comparison-${locale}-${index}`} className="max-w-[38rem] text-[0.98rem] leading-8 text-[var(--muted)]">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </div>
       ) : null}
     </section>

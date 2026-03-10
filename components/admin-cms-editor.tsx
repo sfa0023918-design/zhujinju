@@ -76,6 +76,7 @@ type SyncState = {
 
 type AutosaveOptions<T> = {
   validate?: (value: T) => string | null;
+  prepare?: (value: T) => T;
 };
 
 function cloneValue<T>(value: T): T {
@@ -145,13 +146,169 @@ function removeArrayItem<T>(items: T[], index: number) {
   return items.filter((_, currentIndex) => currentIndex !== index);
 }
 
-function isImeCompositionActive() {
-  if (typeof document === "undefined") {
-    return false;
+function normalizeLineText(value: string) {
+  return value.replace(/\r\n/g, "\n").trim();
+}
+
+function normalizeLongText(value: string) {
+  const normalized = normalizeLineText(value);
+
+  if (!normalized) {
+    return "";
   }
 
-  const activeElement = document.activeElement;
-  return activeElement instanceof HTMLElement && activeElement.dataset.imeActive === "true";
+  return normalized
+    .split(/\n\s*\n+/)
+    .map((paragraph) => paragraph.replace(/\s*\n+\s*/g, " ").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function normalizeBilingualText(value: BilingualText, mode: "line" | "long" = "line"): BilingualText {
+  return {
+    zh: mode === "long" ? normalizeLongText(value.zh) : normalizeLineText(value.zh),
+    en: mode === "long" ? normalizeLongText(value.en) : normalizeLineText(value.en),
+  };
+}
+
+function normalizeSiteConfigDraft(value: SiteConfigContent) {
+  const next = cloneValue(value);
+  next.siteName = normalizeBilingualText(next.siteName);
+  next.homeIntro = normalizeBilingualText(next.homeIntro, "long");
+  next.title = normalizeBilingualText(next.title);
+  next.description = normalizeBilingualText(next.description, "long");
+  next.about.eyebrow = normalizeBilingualText(next.about.eyebrow);
+  next.about.title = normalizeBilingualText(next.about.title);
+  next.about.subtitle = normalizeBilingualText(next.about.subtitle, "long");
+  next.about.body = next.about.body.map((paragraph) => normalizeBilingualText(paragraph, "long"));
+  next.contact.address = normalizeBilingualText(next.contact.address);
+  next.contact.appointmentNote = normalizeBilingualText(next.contact.appointmentNote, "long");
+  next.contact.replyWindow = normalizeBilingualText(next.contact.replyWindow, "long");
+  next.contact.collaborationNote = normalizeBilingualText(next.contact.collaborationNote, "long");
+  next.contactPage.eyebrow = normalizeBilingualText(next.contactPage.eyebrow);
+  next.contactPage.title = normalizeBilingualText(next.contactPage.title);
+  next.contactPage.description = normalizeBilingualText(next.contactPage.description, "long");
+  next.contactPage.aside = normalizeBilingualText(next.contactPage.aside, "long");
+  next.footer.intro = normalizeBilingualText(next.footer.intro, "long");
+  next.footer.appointment = normalizeBilingualText(next.footer.appointment);
+  next.defaultDomain = normalizeLineText(next.defaultDomain);
+  next.ogImagePath = normalizeLineText(next.ogImagePath);
+  next.protocol = normalizeLineText(next.protocol) as SiteConfigContent["protocol"];
+  next.locale = normalizeLineText(next.locale);
+  next.contact.email = normalizeLineText(next.contact.email);
+  next.contact.phone = normalizeLineText(next.contact.phone);
+  next.contact.whatsapp = normalizeLineText(next.contact.whatsapp);
+  next.contact.wechat = normalizeLineText(next.contact.wechat);
+  next.contact.instagram = normalizeLineText(next.contact.instagram);
+  next.contact.pdfRequest = normalizeLineText(next.contact.pdfRequest);
+  return next;
+}
+
+function normalizeHomeContentDraft(value: HomeContentEditorValue) {
+  const next = cloneValue(value);
+  next.intro = normalizeBilingualText(next.intro, "long");
+  next.homeContent.heroEyebrow = normalizeBilingualText(next.homeContent.heroEyebrow);
+  next.homeContent.heroTitle = normalizeBilingualText(next.homeContent.heroTitle);
+  next.homeContent.heroSubtitle = normalizeBilingualText(next.homeContent.heroSubtitle, "long");
+  next.homeContent.heroPrimaryAction = normalizeBilingualText(next.homeContent.heroPrimaryAction);
+  next.homeContent.heroSecondaryAction = normalizeBilingualText(next.homeContent.heroSecondaryAction);
+  next.homeContent.focusCurrent.eyebrow = normalizeBilingualText(next.homeContent.focusCurrent.eyebrow, "long");
+  next.homeContent.focusRecent.eyebrow = normalizeBilingualText(next.homeContent.focusRecent.eyebrow, "long");
+  next.homeContent.focusCurrent.description = normalizeBilingualText(next.homeContent.focusCurrent.description, "long");
+  next.homeContent.focusRecent.description = normalizeBilingualText(next.homeContent.focusRecent.description, "long");
+  next.homeContent.focusSummaryLine.highlightUnit = normalizeBilingualText(next.homeContent.focusSummaryLine.highlightUnit);
+  next.homeContent.focusSummaryLine.catalogueUnit = normalizeBilingualText(next.homeContent.focusSummaryLine.catalogueUnit);
+  next.homeContent.focusAction = normalizeBilingualText(next.homeContent.focusAction);
+  next.homeContent.selectedWorks.eyebrow = normalizeBilingualText(next.homeContent.selectedWorks.eyebrow);
+  next.homeContent.selectedWorks.title = normalizeBilingualText(next.homeContent.selectedWorks.title);
+  next.homeContent.selectedWorks.description = normalizeBilingualText(next.homeContent.selectedWorks.description, "long");
+  next.homeContent.collectingDirections.eyebrow = normalizeBilingualText(next.homeContent.collectingDirections.eyebrow);
+  next.homeContent.collectingDirections.title = normalizeBilingualText(next.homeContent.collectingDirections.title);
+  next.homeContent.collectingDirections.description = normalizeBilingualText(next.homeContent.collectingDirections.description, "long");
+  next.homeContent.operationalFacts.eyebrow = normalizeBilingualText(next.homeContent.operationalFacts.eyebrow);
+  next.homeContent.operationalFacts.title = normalizeBilingualText(next.homeContent.operationalFacts.title);
+  next.homeContent.operationalFacts.description = normalizeBilingualText(next.homeContent.operationalFacts.description, "long");
+  next.collectingDirections = next.collectingDirections.map((item) => ({
+    ...item,
+    name: normalizeBilingualText(item.name),
+    description: normalizeBilingualText(item.description, "long"),
+  }));
+  next.operationalFacts = next.operationalFacts.map((item) => ({
+    ...item,
+    title: normalizeBilingualText(item.title),
+    value: normalizeBilingualText(item.value),
+    description: normalizeBilingualText(item.description, "long"),
+  }));
+  return next;
+}
+
+function normalizeArtworkDraft(value: Artwork) {
+  const next = cloneValue(value);
+  next.title = normalizeBilingualText(next.title);
+  next.subtitle = normalizeBilingualText(next.subtitle, "long");
+  next.slug = normalizeLineText(next.slug);
+  next.period = normalizeBilingualText(next.period);
+  next.region = normalizeBilingualText(next.region);
+  next.origin = normalizeBilingualText(next.origin);
+  next.material = normalizeBilingualText(next.material);
+  next.category = normalizeBilingualText(next.category);
+  next.dimensions = normalizeBilingualText(next.dimensions);
+  next.image = normalizeLineText(next.image);
+  next.gallery = (next.gallery ?? []).map((item) => normalizeLineText(item)).filter(Boolean);
+  next.excerpt = normalizeBilingualText(next.excerpt, "long");
+  next.viewingNote = normalizeBilingualText(next.viewingNote, "long");
+  next.comparisonNote = normalizeBilingualText(next.comparisonNote, "long");
+  next.provenance = (next.provenance ?? []).map((item) => ({
+    ...item,
+    label: normalizeBilingualText(item.label),
+    note: item.note ? normalizeBilingualText(item.note, "long") : item.note,
+  }));
+  next.exhibitions = (next.exhibitions ?? []).map((item) => ({
+    ...item,
+    title: normalizeBilingualText(item.title),
+    venue: normalizeBilingualText(item.venue),
+    year: normalizeLineText(item.year),
+  }));
+  next.publications = (next.publications ?? []).map((item) => ({
+    ...item,
+    title: normalizeBilingualText(item.title),
+    year: normalizeLineText(item.year),
+    pages: normalizeBilingualText(item.pages),
+    note: item.note ? normalizeBilingualText(item.note, "long") : item.note,
+  }));
+  next.inquirySupport = (next.inquirySupport ?? []).map((item) => normalizeBilingualText(item));
+  return next;
+}
+
+function normalizeExhibitionDraft(value: Exhibition) {
+  const next = cloneValue(value);
+  next.title = normalizeBilingualText(next.title);
+  next.subtitle = normalizeBilingualText(next.subtitle);
+  next.slug = normalizeLineText(next.slug);
+  next.period = normalizeBilingualText(next.period);
+  next.venue = normalizeBilingualText(next.venue);
+  next.cover = normalizeLineText(next.cover);
+  next.intro = normalizeBilingualText(next.intro, "long");
+  next.curatorialLead = normalizeBilingualText(next.curatorialLead, "long");
+  next.description = (next.description ?? []).map((item) => normalizeBilingualText(item, "long"));
+  next.catalogueTitle = normalizeBilingualText(next.catalogueTitle);
+  next.catalogueIntro = normalizeBilingualText(next.catalogueIntro, "long");
+  return next;
+}
+
+function normalizeArticleDraft(value: Article) {
+  const next = cloneValue(value);
+  next.title = normalizeBilingualText(next.title);
+  next.slug = normalizeLineText(next.slug);
+  next.date = normalizeLineText(next.date);
+  next.category = normalizeBilingualText(next.category);
+  next.column = normalizeBilingualText(next.column);
+  next.author = normalizeBilingualText(next.author);
+  next.cover = normalizeLineText(next.cover);
+  next.excerpt = normalizeBilingualText(next.excerpt, "long");
+  next.body = (next.body ?? []).map((item) => normalizeBilingualText(item, "long"));
+  next.keywords = (next.keywords ?? []).map((item) => normalizeBilingualText(item));
+  return next;
 }
 
 function summarizeIssueBadges(issues: ValidationIssue[], limit = 2) {
@@ -579,15 +736,19 @@ function StatusBar({
   state,
   sync,
   actions,
+  isDirty = false,
 }: {
   title: string;
   state: SaveState;
   sync?: SyncState;
   actions?: React.ReactNode;
+  isDirty?: boolean;
 }) {
   const statusLabel =
     state.phase === "error"
       ? "保存失败"
+      : isDirty
+        ? "未保存"
       : state.phase === "saved"
         ? "已保存"
         : state.phase === "saving" || state.phase === "creating"
@@ -596,6 +757,8 @@ function StatusBar({
   const tone =
     state.phase === "error"
       ? "text-[#8e4e3b]"
+      : isDirty
+        ? "text-[var(--muted)]"
       : state.phase === "saved"
         ? "text-[var(--ink)]"
         : "text-[var(--muted)]";
@@ -1060,31 +1223,30 @@ function ToolbarButton({
 
 function RecordStatusActions({
   publicationStatus,
-  onChange,
+  onSaveDraft,
+  onSavePublish,
 }: {
   publicationStatus: PublicationStatus;
-  onChange: (status: PublicationStatus) => void;
+  onSaveDraft: () => void;
+  onSavePublish: () => void;
 }) {
   return (
     <>
       <span className="text-sm text-[var(--muted)]">{publicationStatus === "published" ? "已发布" : "草稿"}</span>
-      {publicationStatus === "published" ? (
-        <button
-          type="button"
-          onClick={() => onChange("draft")}
-          className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
-        >
-          取消发布
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => onChange("published")}
-          className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-        >
-          发布
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={onSaveDraft}
+        className="inline-flex min-h-11 items-center border border-[var(--line)] px-4 text-sm text-[var(--muted)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]"
+      >
+        保存草稿
+      </button>
+      <button
+        type="button"
+        onClick={onSavePublish}
+        className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+      >
+        保存并发布
+      </button>
     </>
   );
 }
@@ -1106,10 +1268,10 @@ function useAutosaveSection<T>(
   }, [initialValue, section]);
 
   const saveValue = useCallback(
-    async (nextValue: T, reason: "autosave" | "manual" = "autosave", throwOnError = false) => {
+    async (nextValue: T, _reason: "manual" = "manual", throwOnError = false) => {
       const requestId = requestRef.current + 1;
-      const snapshot = JSON.stringify(nextValue);
-      const validationError = options?.validate?.(nextValue) ?? null;
+      const preparedValue = options?.prepare ? options.prepare(cloneValue(nextValue)) : cloneValue(nextValue);
+      const validationError = options?.validate?.(preparedValue) ?? null;
 
       if (validationError) {
         setSaveState({ phase: "error", message: validationError });
@@ -1122,7 +1284,7 @@ function useAutosaveSection<T>(
       requestRef.current = requestId;
       setSaveState({
         phase: "saving",
-        message: reason === "manual" ? "正在写入最新修改。" : "检测到修改，正在自动保存。",
+        message: "正在写入最新修改。",
       });
 
       try {
@@ -1132,7 +1294,7 @@ function useAutosaveSection<T>(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            value: nextValue,
+            value: preparedValue,
           }),
         });
 
@@ -1140,6 +1302,7 @@ function useAutosaveSection<T>(
           return;
         }
 
+        setDraft(payload.value);
         setPersisted(payload.value);
         setSaveState({ phase: "saved", message: payload.message ?? "刚刚已保存。" });
       } catch (error) {
@@ -1167,22 +1330,14 @@ function useAutosaveSection<T>(
   useLeavePageProtection(isDirty || saveState.phase === "saving" || saveState.phase === "creating");
 
   useEffect(() => {
-    if (!isDirty || isImeCompositionActive()) {
+    if (!isDirty) {
       return;
     }
 
     setSaveState((current) =>
-      current.phase === "error"
-        ? current
-        : { phase: "saving", message: "检测到修改，正在自动保存。" },
+      current.phase === "saving" || current.phase === "creating" || current.phase === "error" ? current : { phase: "idle" },
     );
-
-    const timer = window.setTimeout(() => {
-      void saveValue(draft);
-    }, 700);
-
-    return () => window.clearTimeout(timer);
-  }, [draft, isDirty, saveValue, serializedDraft, serializedPersisted]);
+  }, [isDirty]);
 
   return {
     draft,
@@ -1207,7 +1362,9 @@ function SiteSettingsEditor({
   initialValue: SiteConfigContent;
   initialFocus?: string;
 }) {
-  const { draft, persisted, setDraft, saveState, isDirty } = useAutosaveSection("siteConfig", initialValue);
+  const { draft, persisted, setDraft, saveNow, saveState, isDirty } = useAutosaveSection("siteConfig", initialValue, {
+    prepare: normalizeSiteConfigDraft,
+  });
   const reminders = useMemo(() => getSiteConfigReminders(draft), [draft]);
   const sectionLabels = {
     branding: "品牌与 SEO",
@@ -1241,7 +1398,13 @@ function SiteSettingsEditor({
 
   return (
     <div className="space-y-6">
-      <StatusBar title={title} state={saveState} sync={syncState} />
+      <StatusBar
+        title={title}
+        state={saveState}
+        sync={syncState}
+        isDirty={isDirty}
+        actions={<ToolbarButton onClick={() => void saveNow(draft, "manual")}>保存更改</ToolbarButton>}
+      />
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
@@ -1368,7 +1531,9 @@ function HomeContentEditor({
   content: SiteContent;
   initialFocus?: string;
 }) {
-  const { draft, persisted, setDraft, saveState, isDirty } = useAutosaveSection("homeContent", initialValue);
+  const { draft, persisted, setDraft, saveNow, saveState, isDirty } = useAutosaveSection("homeContent", initialValue, {
+    prepare: normalizeHomeContentDraft,
+  });
   const reminders = useMemo(() => getHomeContentReminders(draft), [draft]);
   const sectionLabels = {
     hero: "Hero",
@@ -1408,7 +1573,13 @@ function HomeContentEditor({
 
   return (
     <div className="space-y-6">
-      <StatusBar title={title} state={saveState} sync={syncState} />
+      <StatusBar
+        title={title}
+        state={saveState}
+        sync={syncState}
+        isDirty={isDirty}
+        actions={<ToolbarButton onClick={() => void saveNow(draft, "manual")}>保存更改</ToolbarButton>}
+      />
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
       </div>
@@ -2003,15 +2174,15 @@ function ArtworkEditor({
   }
 
   const saveArtwork = useCallback(
-    async (artwork: Artwork, reason: "autosave" | "manual" = "autosave") => {
+    async (artwork: Artwork, reason: "manual" = "manual") => {
       const artworkId = getArtworkId(artwork);
-      const snapshot = JSON.stringify(artwork);
       const requestId = requestRef.current + 1;
+      const preparedArtwork = normalizeArtworkDraft(artwork);
 
       requestRef.current = requestId;
       setSaveState({
         phase: "saving",
-        message: reason === "manual" ? "正在写入这件藏品的最新修改。" : "检测到藏品修改，正在自动保存。",
+        message: "正在写入这件藏品的最新修改。",
       });
 
       try {
@@ -2022,7 +2193,7 @@ function ArtworkEditor({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ artwork }),
+            body: JSON.stringify({ artwork: preparedArtwork }),
           },
         );
 
@@ -2030,6 +2201,7 @@ function ArtworkEditor({
           return;
         }
 
+        setArtworks(payload.artworks);
         setPersisted(payload.artworks);
         setSelectedId(artworkId);
         setSaveState({ phase: "saved", message: payload.message ?? "藏品已保存。" });
@@ -2053,28 +2225,16 @@ function ArtworkEditor({
   );
 
   useEffect(() => {
-    if (!selectedArtwork || isImeCompositionActive()) {
-      return;
-    }
-
-    const persistedArtwork = persisted.find((item) => getArtworkId(item) === getArtworkId(selectedArtwork));
-
-    if (!persistedArtwork || JSON.stringify(persistedArtwork) === JSON.stringify(selectedArtwork)) {
+    if (!hasPendingChanges) {
       return;
     }
 
     setSaveState((current) =>
-      current.phase === "error"
+      current.phase === "saving" || current.phase === "creating" || current.phase === "error"
         ? current
-        : { phase: "saving", message: "检测到藏品修改，正在自动保存。" },
+        : { phase: "idle" },
     );
-
-    const timer = window.setTimeout(() => {
-      void saveArtwork(selectedArtwork).catch(() => {});
-    }, 700);
-
-    return () => window.clearTimeout(timer);
-  }, [persisted, saveArtwork, selectedArtwork]);
+  }, [hasPendingChanges]);
 
   async function deleteSelectedArtwork() {
     if (!selectedArtwork) {
@@ -2140,33 +2300,35 @@ function ArtworkEditor({
     }
   }
 
-  function changePublicationStatus(nextStatus: PublicationStatus) {
+  async function saveCurrentArtwork(nextStatus: PublicationStatus) {
     if (!selectedArtwork) {
       return;
     }
 
-    const previousStatus = selectedArtwork.publicationStatus ?? "draft";
-    const nextArtwork = {
+    const previousArtworks = cloneValue(artworks);
+    const nextArtwork = normalizeArtworkDraft({
       ...selectedArtwork,
       publicationStatus: nextStatus,
-    };
+    });
 
     if (nextStatus === "published") {
       setValidationIssues(getArtworkPublicationIssues(nextArtwork, artworks));
+    } else {
+      setValidationIssues([]);
     }
 
-    updateSelected((artwork) => {
-      artwork.publicationStatus = nextStatus;
-    });
-    void saveArtwork(nextArtwork, "manual").catch((error) => {
-      updateSelected((artwork) => {
-        artwork.publicationStatus = previousStatus;
-      });
+    setArtworks((current) =>
+      current.map((item) => (getArtworkId(item) === getArtworkId(selectedArtwork) ? nextArtwork : item)),
+    );
 
+    try {
+      await saveArtwork(nextArtwork, "manual");
+    } catch (error) {
+      setArtworks(previousArtworks);
       if (error instanceof AdminValidationError) {
         setValidationIssues(error.issues);
       }
-    });
+    }
   }
 
   const previewHref = selectedArtwork?.slug
@@ -2181,12 +2343,14 @@ function ArtworkEditor({
         title={title}
         state={saveState}
         sync={syncState}
+        isDirty={hasPendingChanges}
         actions={
           selectedArtwork ? (
             <>
               <RecordStatusActions
                 publicationStatus={selectedArtwork.publicationStatus ?? "draft"}
-                onChange={changePublicationStatus}
+                onSaveDraft={() => void saveCurrentArtwork("draft")}
+                onSavePublish={() => void saveCurrentArtwork("published")}
               />
               <ToolbarButton onClick={() => void duplicateArtwork()}>复制当前藏品</ToolbarButton>
               {previewHref ? (
@@ -2408,7 +2572,11 @@ function ArtworkEditor({
 
               <SectionBlock title="发布设置" description="这里处理预览、发布、下线和删除。">
                 <div className="flex flex-wrap items-center gap-3">
-                  <RecordStatusActions publicationStatus={selectedArtwork.publicationStatus ?? "draft"} onChange={changePublicationStatus} />
+                  <RecordStatusActions
+                    publicationStatus={selectedArtwork.publicationStatus ?? "draft"}
+                    onSaveDraft={() => void saveCurrentArtwork("draft")}
+                    onSavePublish={() => void saveCurrentArtwork("published")}
+                  />
                   <ToolbarButton onClick={() => void reorderCurrentArtwork("up")}>上移排序</ToolbarButton>
                   <ToolbarButton onClick={() => void reorderCurrentArtwork("down")}>下移排序</ToolbarButton>
                   <ToolbarButton tone="danger" onClick={() => void deleteSelectedArtwork()}>删除藏品</ToolbarButton>
@@ -2440,6 +2608,7 @@ function ExhibitionsEditor({
   initialFocus?: string;
 }) {
   const { draft, persisted, setDraft, setPersisted, saveNow, saveState, setSaveState, isDirty } = useAutosaveSection("exhibitions", initialValue, {
+    prepare: (items) => items.map((item) => normalizeExhibitionDraft(item)),
     validate: (items) => {
       const invalid = items.find((item) => (item.publicationStatus ?? "draft") === "published" && getExhibitionPublicationIssues(item, items).some((issue) => issue.level === "error"));
       return invalid ? getExhibitionPublicationIssues(invalid, items).find((issue) => issue.level === "error")?.message ?? null : null;
@@ -2541,7 +2710,7 @@ function ExhibitionsEditor({
     }
   }
 
-  function changePublicationStatus(nextStatus: PublicationStatus) {
+  async function saveCurrentExhibition(nextStatus: PublicationStatus) {
     if (!exhibition) {
       return;
     }
@@ -2551,17 +2720,20 @@ function ExhibitionsEditor({
     nextDraft[selectedIndex].publicationStatus = nextStatus;
     if (nextStatus === "published") {
       setValidationIssues(getExhibitionPublicationIssues(nextDraft[selectedIndex], nextDraft));
+    } else {
+      setValidationIssues([]);
     }
 
     setDraft(nextDraft);
-    void saveNow(nextDraft, "manual", true)
-      .then(() => setValidationIssues([]))
-      .catch((error) => {
-        setDraft(previousDraft);
-        if (error instanceof AdminValidationError) {
-          setValidationIssues(error.issues);
-        }
-      });
+    try {
+      await saveNow(nextDraft, "manual", true);
+      setValidationIssues([]);
+    } catch (error) {
+      setDraft(previousDraft);
+      if (error instanceof AdminValidationError) {
+        setValidationIssues(error.issues);
+      }
+    }
   }
 
   const sectionIssues = {
@@ -2575,12 +2747,14 @@ function ExhibitionsEditor({
         title={title}
         state={saveState}
         sync={syncState}
+        isDirty={isDirty}
         actions={
           exhibition ? (
             <>
               <RecordStatusActions
                 publicationStatus={exhibition.publicationStatus ?? "draft"}
-                onChange={changePublicationStatus}
+                onSaveDraft={() => void saveCurrentExhibition("draft")}
+                onSavePublish={() => void saveCurrentExhibition("published")}
               />
               <ToolbarButton onClick={() => void duplicateCurrentExhibition()}>复制当前展览</ToolbarButton>
             </>
@@ -2686,6 +2860,7 @@ function ArticlesEditor({
   initialFocus?: string;
 }) {
   const { draft, persisted, setDraft, setPersisted, saveNow, saveState, setSaveState, isDirty } = useAutosaveSection("articles", initialValue, {
+    prepare: (items) => items.map((item) => normalizeArticleDraft(item)),
     validate: (items) => {
       const invalid = items.find((item) => (item.publicationStatus ?? "draft") === "published" && getArticlePublicationIssues(item, items).some((issue) => issue.level === "error"));
       return invalid ? getArticlePublicationIssues(invalid, items).find((issue) => issue.level === "error")?.message ?? null : null;
@@ -2787,7 +2962,7 @@ function ArticlesEditor({
     }
   }
 
-  function changePublicationStatus(nextStatus: PublicationStatus) {
+  async function saveCurrentArticle(nextStatus: PublicationStatus) {
     if (!article) {
       return;
     }
@@ -2797,17 +2972,20 @@ function ArticlesEditor({
     nextDraft[selectedIndex].publicationStatus = nextStatus;
     if (nextStatus === "published") {
       setValidationIssues(getArticlePublicationIssues(nextDraft[selectedIndex], nextDraft));
+    } else {
+      setValidationIssues([]);
     }
 
     setDraft(nextDraft);
-    void saveNow(nextDraft, "manual", true)
-      .then(() => setValidationIssues([]))
-      .catch((error) => {
-        setDraft(previousDraft);
-        if (error instanceof AdminValidationError) {
-          setValidationIssues(error.issues);
-        }
-      });
+    try {
+      await saveNow(nextDraft, "manual", true);
+      setValidationIssues([]);
+    } catch (error) {
+      setDraft(previousDraft);
+      if (error instanceof AdminValidationError) {
+        setValidationIssues(error.issues);
+      }
+    }
   }
 
   const sectionIssues = {
@@ -2821,12 +2999,14 @@ function ArticlesEditor({
         title={title}
         state={saveState}
         sync={syncState}
+        isDirty={isDirty}
         actions={
           article ? (
             <>
               <RecordStatusActions
                 publicationStatus={article.publicationStatus ?? "draft"}
-                onChange={changePublicationStatus}
+                onSaveDraft={() => void saveCurrentArticle("draft")}
+                onSavePublish={() => void saveCurrentArticle("published")}
               />
               <ToolbarButton onClick={() => void duplicateCurrentArticle()}>复制当前文章</ToolbarButton>
             </>
