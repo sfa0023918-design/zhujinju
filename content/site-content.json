@@ -951,7 +951,19 @@
           "year": ""
         }
       ],
-      "publications": [],
+      "publications": [
+        {
+          "title": {
+            "zh": "",
+            "en": ""
+          },
+          "year": "",
+          "pages": {
+            "zh": "",
+            "en": ""
+          }
+        }
+      ],
       "inquirySupport": [
         {
           "zh": "可索取高清图",
