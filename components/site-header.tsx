@@ -1,11 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { bt } from "@/lib/bilingual";
 import { loadSiteContent } from "@/lib/site-data";
 
-import { BilingualText } from "./bilingual-text";
 import { SiteHeaderNav } from "./site-header-nav";
+import { bt } from "@/lib/bilingual";
 
 const navigation = [
   { href: "/", label: bt("首页", "Home") },
@@ -23,21 +22,14 @@ export async function SiteHeader() {
     <header className="border-b border-[var(--line)]">
       <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-5 px-5 py-4 md:px-10 md:py-5">
         <Link href="/" className="min-w-fit">
-          <span className="flex items-center gap-3 text-[var(--ink)]">
+          <span className="flex items-center text-[var(--ink)]">
             <Image
-              src="/zhujinju-mark.svg"
+              src="/zhujinju-header.svg"
               alt={siteConfig.siteName.zh}
-              width={34}
-              height={34}
+              width={980}
+              height={180}
               priority
-              className="h-[34px] w-[34px] flex-none"
-            />
-            <BilingualText
-              as="span"
-              text={siteConfig.siteName}
-              className="flex flex-col gap-1 text-[var(--ink)]"
-              zhClassName="text-[0.95rem] tracking-[0.24em]"
-              enClassName="text-[0.56rem] uppercase tracking-[0.24em] text-[var(--accent)]/88"
+              className="h-auto w-[176px] md:w-[212px]"
             />
           </span>
         </Link>
