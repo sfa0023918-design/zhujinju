@@ -992,20 +992,20 @@
     {
       "slug": "silent-radiance",
       "title": {
-        "zh": "寂照：喜马拉雅造像与图像的观看",
-        "en": "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"
+        "zh": "竹瑾居｜喜马拉雅艺术 2025",
+        "en": "Zhujinju | Himalayan Art 2025"
       },
       "subtitle": {
         "zh": "专题展览",
         "en": "Special Exhibition"
       },
       "period": {
-        "zh": "2025.10.18 - 2025.12.28",
-        "en": "18 Oct 2025 - 28 Dec 2025"
+        "zh": "2025.10.21 - 2025.10.26",
+        "en": "October 21 – 26, 2025"
       },
       "venue": {
-        "zh": "竹瑾居 · 上海预约制空间",
-        "en": "Zhu Jin Ju, Appointment Space, Shanghai"
+        "zh": "北京·嘉德艺术中心",
+        "en": "Guardian Art Center, Beijing"
       },
       "intro": {
         "zh": "以造像与绘画并置的方式重新建立观看路径，讨论图像秩序、材质语汇与近距离观察的重要性。",
@@ -1030,31 +1030,30 @@
         "shakyamuni-bhumisparsha",
         "vajrapani-thangka"
       ],
-      "highlightCount": 18,
+      "highlightCount": 38,
       "catalogueTitle": {
-        "zh": "《寂照》展览图录",
-        "en": "Catalogue for Silent Radiance"
+        "zh": "竹瑾居｜喜马拉雅艺术 2025 展览图录",
+        "en": "Zhujinju | Himalayan Art: 2025 Exhibition Catalogue"
       },
       "catalogueIntro": {
-        "zh": "收录 18 件重点作品，附策展前言、作品页与图像索引。",
-        "en": "Including 18 key works with a curatorial preface, object entries, and image index."
+        "zh": "收录 38 件重点作品，附策展前言、作品页与图像索引。",
+        "en": "Featuring 38 key works, including a curatorial preface, catalogue entries, and an image index."
       },
-      "cataloguePages": 96,
+      "cataloguePages": 207,
       "curatorialLead": {
         "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
         "en": "The exhibition avoids category accumulation and instead lets works form a comparable field of looking."
       },
       "relatedArticleSlugs": [
-        "how-to-look-at-a-bronze",
         "why-exhibitions-matter"
       ],
       "cover": "/uploads/exhibitions/1773131800503-微信图片-20260310163557-19-129.jpg",
       "publicationStatus": "published",
-      "featuredWorksCount": 18,
-      "cataloguePageCount": 96,
+      "featuredWorksCount": 38,
+      "cataloguePageCount": 207,
       "catalogueNote": {
-        "zh": "收录 18 件重点作品，附策展前言、作品页与图像索引。",
-        "en": "Including 18 key works with a curatorial preface, object entries, and image index."
+        "zh": "收录 38 件重点作品，附策展前言、作品页与图像索引。",
+        "en": "Featuring 38 key works, including a curatorial preface, catalogue entries, and an image index."
       },
       "curatorialNote": {
         "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
