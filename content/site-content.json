@@ -1444,67 +1444,6 @@
       "publicationStatus": "published"
     },
     {
-      "slug": "thangka-as-structure",
-      "title": {
-        "zh": "唐卡的价值，不只在设色",
-        "en": "The Value of a Thangka Is Not Only Color"
-      },
-      "category": {
-        "zh": "市场观察",
-        "en": "Market Observation"
-      },
-      "column": {
-        "zh": "作品判断",
-        "en": "Object Judgement"
-      },
-      "author": {
-        "zh": "竹瑾居",
-        "en": "Zhu Jin Ju"
-      },
-      "date": "2025.08.14",
-      "excerpt": {
-        "zh": "设色只是表层入口，图像秩序、尺幅关系与保存状态同样决定作品能否成立。",
-        "en": "Color is only the surface entry point; iconographic order, scale, and condition are equally decisive."
-      },
-      "body": [
-        {
-          "zh": "在市场讨论中，唐卡常被简化为颜色是否鲜明、金线是否充足，但真正构成作品品质的，是图像系统是否完整、笔法是否稳定，以及画面各部分是否保持必要的秩序。",
-          "en": "In the market, thangkas are often reduced to brightness of color or abundance of gold line, yet true quality rests on a complete iconographic system, stable brushwork, and overall pictorial order."
-        },
-        {
-          "zh": "尤其在高等级作品中，设色并不追求炫目，而是服务于图像结构与观看节奏。",
-          "en": "In higher-level works, color rarely aims for spectacle; it serves structure and the pacing of vision."
-        },
-        {
-          "zh": "这也是我们在展览与图录中强调局部细节与整体布局并重的原因。",
-          "en": "This is why our exhibitions and catalogues give equal weight to details and the total composition."
-        }
-      ],
-      "keywords": [
-        {
-          "zh": "唐卡",
-          "en": "Thangka"
-        },
-        {
-          "zh": "设色",
-          "en": "Pigment"
-        },
-        {
-          "zh": "保存状态",
-          "en": "Condition"
-        }
-      ],
-      "relatedArtworkSlugs": [
-        "manjushri-thangka",
-        "vajrapani-thangka"
-      ],
-      "relatedExhibitionSlugs": [
-        "between-gilding-and-pigment"
-      ],
-      "cover": "/api/placeholder/thangka-as-structure?kind=landscape",
-      "publicationStatus": "published"
-    },
-    {
       "slug": "why-exhibitions-matter",
       "title": {
         "zh": "为什么我们持续做展览与图录",
