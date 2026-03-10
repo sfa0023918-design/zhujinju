@@ -50,6 +50,7 @@ export function ArtworkGallery({
   }, [activeImage, detailImages, primaryImage]);
 
   const thumbnailImages = [primaryImage, ...detailImages];
+  const hasMultipleImages = thumbnailImages.length > 1;
   const activeImageSrc = withImageVersion(activeImage);
   const isActivePlaceholder = !activeImage || activeImage.startsWith("/api/placeholder/");
   const categoryHint = category.toLowerCase();
@@ -60,18 +61,22 @@ export function ArtworkGallery({
     categoryHint.includes("painting");
   const isVeryTall = naturalRatio !== null && naturalRatio < 0.78;
   const desktopContainerClass = isPaintingLike || isVeryTall
-    ? "lg:min-h-[46rem] lg:items-start lg:p-2"
-    : "lg:min-h-[40rem] lg:items-start lg:p-2";
+    ? "lg:min-h-[48rem] lg:items-start lg:px-1 lg:py-1"
+    : "lg:min-h-[41rem] lg:items-start lg:px-1 lg:py-1";
   const desktopFrameClass = isPaintingLike || isVeryTall
-    ? "lg:flex lg:w-full lg:min-w-[30rem] lg:justify-center xl:min-w-[34rem]"
+    ? "lg:flex lg:w-full lg:justify-center"
     : "lg:flex lg:w-full lg:justify-center";
   const desktopImageClass = isPaintingLike || isVeryTall
-    ? "lg:h-auto lg:w-auto lg:min-w-[30rem] lg:max-h-[82vh] lg:max-w-full lg:object-contain lg:object-top xl:min-w-[34rem]"
-    : "lg:h-auto lg:w-full lg:max-h-[78vh] lg:max-w-full lg:object-contain lg:object-top";
+    ? "lg:h-auto lg:w-auto lg:min-w-[34rem] lg:max-h-[84vh] lg:max-w-[46rem] lg:object-contain lg:object-top xl:min-w-[38rem] xl:max-w-[50rem]"
+    : "lg:h-auto lg:w-full lg:max-h-[78vh] lg:max-w-[54rem] lg:object-contain lg:object-top";
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[72px_minmax(0,1fr)] lg:items-start lg:gap-6">
-      {thumbnailImages.length > 1 ? (
+    <div
+      className={`grid gap-5 lg:items-start lg:gap-6 ${
+        hasMultipleImages ? "lg:grid-cols-[72px_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"
+      }`}
+    >
+      {hasMultipleImages ? (
         <div className="order-2 flex gap-2.5 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible">
           {thumbnailImages.map((image, index) => {
             const active = image === activeImage;
@@ -115,7 +120,7 @@ export function ArtworkGallery({
           })}
         </div>
       ) : null}
-      <div className="order-1 min-w-0 grid gap-3.5">
+      <div className={`order-1 min-w-0 grid gap-3.5 ${hasMultipleImages ? "" : "lg:justify-items-center"}`}>
         <div className={`relative overflow-hidden bg-[var(--surface-strong)] lg:flex lg:overflow-visible ${desktopContainerClass}`}>
           {isActivePlaceholder ? (
             <div className="aspect-[4/5] lg:flex lg:min-h-full lg:w-full lg:items-start lg:justify-center">
