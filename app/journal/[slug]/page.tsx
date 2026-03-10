@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { BilingualReadingPanel } from "@/components/bilingual-prose";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
@@ -68,6 +69,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedExhibitions = getExhibitionsBySlugs(content, article.relatedExhibitionSlugs);
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
+  const articleBodyLabel = { zh: "正文", en: "Essay" };
 
   return (
     <>
@@ -126,12 +128,23 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           )}
         </div>
 
-        <div className="mt-10 space-y-6">
-          {article.body.map((paragraph) => (
-            <p key={paragraph.zh} className="max-w-3xl text-[1rem] leading-8 text-[var(--muted)] md:text-[1.05rem]">
-              {paragraph.zh}
-            </p>
-          ))}
+        <div className="mt-10 max-w-[42rem]">
+          <BilingualReadingPanel
+            sections={[
+              {
+                key: "excerpt",
+                content: article.excerpt,
+                variant: "lead",
+              },
+              {
+                key: "body",
+                label: articleBodyLabel,
+                content: article.body,
+                variant: "body",
+              },
+            ]}
+            defaultLocale="zh"
+          />
         </div>
 
         {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (

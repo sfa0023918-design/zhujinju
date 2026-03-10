@@ -1,6 +1,7 @@
 import type { ComponentPropsWithoutRef, ElementType } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
+import type { ReadingLocale } from "./bilingual-prose";
 
 type BilingualTextProps<T extends ElementType> = {
   as?: T;
@@ -8,7 +9,8 @@ type BilingualTextProps<T extends ElementType> = {
   className?: string;
   zhClassName?: string;
   enClassName?: string;
-  mode?: "stacked" | "inline";
+  mode?: "stacked" | "inline" | "single";
+  locale?: ReadingLocale;
   separator?: string;
 } & Omit<ComponentPropsWithoutRef<T>, "as" | "children" | "className">;
 
@@ -19,10 +21,22 @@ export function BilingualText<T extends ElementType = "div">({
   zhClassName,
   enClassName,
   mode = "stacked",
+  locale = "zh",
   separator = "·",
   ...props
 }: BilingualTextProps<T>) {
   const Component = as ?? "div";
+
+  if (mode === "single") {
+    const value = locale === "en" ? text.en : text.zh;
+    const singleClassName = locale === "en" ? enClassName : zhClassName;
+
+    return (
+      <Component className={className} {...props}>
+        <span className={singleClassName}>{value}</span>
+      </Component>
+    );
+  }
 
   if (mode === "inline") {
     return (

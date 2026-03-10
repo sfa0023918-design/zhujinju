@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import type {
   Article,
@@ -14,6 +14,7 @@ import type {
 import { ActionLabel } from "./action-label";
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
+import { BilingualProse, BilingualReadingPanel, getLocalizedText, type ReadingLocale } from "./bilingual-prose";
 import { BilingualText } from "./bilingual-text";
 import { StatusPill } from "./status-pill";
 
@@ -29,6 +30,7 @@ type ArtworkDetailTemplateProps = {
 };
 
 type ArtworkFactsProps = {
+  locale: ReadingLocale;
   items: Array<{
     label: { zh: string; en: string };
     value: { zh: string; en: string };
@@ -39,17 +41,21 @@ type ArtworkInquiryProps = {
   artwork: Artwork;
   detailCopy: ArtworkDetailCopy;
   siteConfig: SiteConfigContent;
+  locale: ReadingLocale;
 };
 
 type ArtworkHeroProps = {
   artwork: Artwork;
   detailCopy: ArtworkDetailCopy;
   siteConfig: SiteConfigContent;
+  locale: ReadingLocale;
 };
 
 type ArtworkScholarlyNoteProps = {
   artwork: Artwork;
   detailCopy: ArtworkDetailCopy;
+  locale: ReadingLocale;
+  onLocaleChange: (locale: ReadingLocale) => void;
 };
 
 type ArtworkReferencesProps = {
@@ -57,6 +63,7 @@ type ArtworkReferencesProps = {
   detailCopy: ArtworkDetailCopy;
   relatedArticles: Article[];
   relatedExhibitions: Exhibition[];
+  locale: ReadingLocale;
 };
 
 type RelatedWorksProps = {
@@ -72,26 +79,6 @@ function hasText(value?: { zh?: string; en?: string } | null) {
   return Boolean(value.zh?.trim() || value.en?.trim());
 }
 
-function getLocalizedText(
-  value: { zh?: string; en?: string } | null | undefined,
-  locale: "zh" | "en",
-) {
-  if (!value) {
-    return "";
-  }
-
-  const preferred = locale === "zh" ? value.zh?.trim() : value.en?.trim();
-  const fallback = locale === "zh" ? value.en?.trim() : value.zh?.trim();
-  return preferred || fallback || "";
-}
-
-function getParagraphs(value: { zh?: string; en?: string } | null | undefined, locale: "zh" | "en") {
-  return getLocalizedText(value, locale)
-    .split(/\n\s*\n+/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
-}
-
 function joinBilingual(primary: { zh: string; en: string }, secondary?: { zh: string; en: string }) {
   if (!secondary || (!secondary.zh.trim() && !secondary.en.trim())) {
     return primary;
@@ -105,10 +92,12 @@ function joinBilingual(primary: { zh: string; en: string }, secondary?: { zh: st
 
 function DetailIndexSection({
   label,
+  locale,
   tone = "primary",
   children,
 }: {
   label: { zh: string; en: string };
+  locale: ReadingLocale;
   tone?: "primary" | "secondary";
   children: React.ReactNode;
 }) {
@@ -125,20 +114,18 @@ function DetailIndexSection({
 
   return (
     <section className="border-t border-[var(--line)]/34 pt-4.5 first:border-t-0 first:pt-0">
-      <BilingualText
-        as="p"
-        text={label}
-        mode="inline"
-        className="text-[var(--accent)]"
-        zhClassName={titleClasses.zh}
-        enClassName={titleClasses.en}
-      />
+      <p
+        lang={locale === "en" ? "en" : "zh-CN"}
+        className={`text-[var(--accent)] ${locale === "zh" ? titleClasses.zh : titleClasses.en}`}
+      >
+        {getLocalizedText(label, locale)}
+      </p>
       <div className="mt-3">{children}</div>
     </section>
   );
 }
 
-export function ArtworkFacts({ items }: ArtworkFactsProps) {
+export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
   const visibleItems = items.filter((item) => hasText(item.value));
 
   if (!visibleItems.length) {
@@ -153,18 +140,19 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
           className="grid gap-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[92px_minmax(0,1fr)] md:gap-3.5"
         >
           <dt className="text-[var(--accent)]">
-            <p className="text-[0.52rem] tracking-[0.13em] text-[var(--accent)]/76">{item.label.zh}</p>
-            <p className="mt-0.5 text-[0.4rem] uppercase tracking-[0.14em] text-[var(--accent)]/34">
-              {item.label.en}
+            <p className="text-[0.52rem] tracking-[0.13em] text-[var(--accent)]/76">
+              {getLocalizedText(item.label, locale)}
             </p>
           </dt>
           <dd className="min-w-0">
-            <p className="text-[0.98rem] leading-7 text-[var(--ink)] md:text-[1.02rem]">{item.value.zh}</p>
-            {item.value.en.trim() ? (
-              <p className="mt-0.5 text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/38 md:text-[0.58rem]">
-                {item.value.en}
-              </p>
-            ) : null}
+            <p
+              lang={locale === "en" ? "en" : "zh-CN"}
+              className={locale === "zh"
+                ? "text-[1.02rem] leading-7 text-[var(--ink)] md:text-[1.06rem]"
+                : "text-[0.74rem] uppercase tracking-[0.08em] text-[var(--ink)] md:text-[0.8rem]"}
+            >
+              {getLocalizedText(item.value, locale)}
+            </p>
           </dd>
         </div>
       ))}
@@ -176,6 +164,7 @@ export function ArtworkInquiry({
   artwork,
   detailCopy,
   siteConfig,
+  locale,
 }: ArtworkInquiryProps) {
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
   const supportItems = artwork.inquirySupport.filter(hasText);
@@ -212,7 +201,8 @@ export function ArtworkInquiry({
               <BilingualText
                 as="span"
                 text={item}
-                mode="inline"
+                mode="single"
+                locale={locale}
                 className="leading-none"
                 zhClassName="text-[0.64rem]"
                 enClassName="text-[0.38rem] uppercase tracking-[0.14em] text-[var(--accent)]/36"
@@ -246,8 +236,11 @@ export function ArtworkInquiry({
           ) : null}
 
           {hasText(siteConfig.contact.appointmentNote) ? (
-            <p className="max-w-[26rem] text-[0.76rem] leading-7 text-[var(--muted)]">
-              {siteConfig.contact.appointmentNote.zh}
+            <p
+              lang={locale === "en" ? "en" : "zh-CN"}
+              className="max-w-[26rem] text-[0.76rem] leading-7 text-[var(--muted)]"
+            >
+              {getLocalizedText(siteConfig.contact.appointmentNote, locale)}
             </p>
           ) : null}
 
@@ -267,6 +260,7 @@ export function ArtworkHero({
   artwork,
   detailCopy,
   siteConfig,
+  locale,
 }: ArtworkHeroProps) {
   const facts = [
     { label: detailCopy.fieldLabels.period, value: artwork.period },
@@ -315,15 +309,26 @@ export function ArtworkHero({
               </p>
             </div>
             {hasText(artwork.subtitle) ? (
-              <p className="max-w-[28rem] text-[0.9rem] leading-7 text-[var(--muted)]">{artwork.subtitle.zh}</p>
+              <p
+                lang={locale === "en" ? "en" : "zh-CN"}
+                className="max-w-[28rem] text-[0.9rem] leading-7 text-[var(--muted)]"
+              >
+                {getLocalizedText(artwork.subtitle, locale)}
+              </p>
             ) : null}
             {hasLead ? (
-              <p className="max-w-[30rem] text-[0.82rem] leading-7 text-[var(--muted)]">{artwork.excerpt.zh}</p>
+              <BilingualProse
+                content={artwork.excerpt}
+                variant="lead"
+                className="max-w-[30rem]"
+                mode="single"
+                locale={locale}
+              />
             ) : null}
           </div>
 
-          <ArtworkFacts items={facts} />
-          <ArtworkInquiry artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} />
+          <ArtworkFacts items={facts} locale={locale} />
+          <ArtworkInquiry artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} locale={locale} />
         </aside>
       </div>
     </section>
@@ -333,109 +338,80 @@ export function ArtworkHero({
 export function ArtworkScholarlyNote({
   artwork,
   detailCopy,
+  locale,
+  onLocaleChange,
 }: ArtworkScholarlyNoteProps) {
   const hasExcerpt = hasText(artwork.excerpt);
   const hasViewing = hasText(artwork.viewingNote);
   const hasComparison = hasText(artwork.comparisonNote);
-  const hasEnglishContent =
-    Boolean(artwork.excerpt.en?.trim()) ||
-    Boolean(artwork.viewingNote.en?.trim()) ||
-    Boolean(artwork.comparisonNote.en?.trim());
-  const showExcerptAsLead = hasExcerpt && !hasViewing && !hasComparison;
-  const [locale, setLocale] = useState<"zh" | "en">("zh");
-
-  const excerptParagraphs = useMemo(() => getParagraphs(artwork.excerpt, locale), [artwork.excerpt, locale]);
-  const viewingParagraphs = useMemo(() => getParagraphs(artwork.viewingNote, locale), [artwork.viewingNote, locale]);
-  const comparisonParagraphs = useMemo(() => getParagraphs(artwork.comparisonNote, locale), [artwork.comparisonNote, locale]);
 
   if (!hasExcerpt && !hasViewing && !hasComparison) {
     return null;
   }
 
+  const sections = [
+    hasExcerpt
+      ? {
+          key: "excerpt",
+          content: artwork.excerpt,
+          variant: (!hasViewing && !hasComparison ? "lead" : "body") as "lead" | "body",
+        }
+      : null,
+    hasViewing
+      ? {
+          key: "viewing",
+          label: detailCopy.viewingNote,
+          content: artwork.viewingNote,
+          variant: "body" as const,
+        }
+      : null,
+    hasComparison
+      ? {
+          key: "comparison",
+          label: detailCopy.comparisonNote,
+          content: artwork.comparisonNote,
+          variant: "body" as const,
+        }
+      : null,
+  ].filter(Boolean) as Array<{
+    key: string;
+    label?: { zh: string; en: string };
+    content: { zh: string; en: string };
+    variant?: "lead" | "body" | "secondary";
+  }>;
+
   return (
-    <section className="max-w-[42rem] space-y-7">
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <BilingualText
-            as="p"
-            text={detailCopy.scholarlyNote}
-            mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.66rem] tracking-[0.16em]"
-            enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
-          />
-          {hasEnglishContent ? (
-            <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
-              {(["zh", "en"] as const).map((option) => {
-                const active = locale === option;
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setLocale(option)}
-                    className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
-                      active
-                        ? "bg-[var(--surface)] text-[var(--ink)]"
-                        : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
-                    }`}
-                  >
-                    {option.toUpperCase()}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
+    <section className="max-w-[42rem] space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <BilingualText
+          as="p"
+          text={detailCopy.scholarlyNote}
+          mode="inline"
+          className="text-[var(--accent)]"
+          zhClassName="text-[0.66rem] tracking-[0.16em]"
+          enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
+        />
+        <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
+          {(["zh", "en"] as const).map((option) => {
+            const active = locale === option;
+            return (
+              <button
+                key={option}
+                type="button"
+                onClick={() => onLocaleChange(option)}
+                className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                  active
+                    ? "bg-[var(--surface)] text-[var(--ink)]"
+                    : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                }`}
+              >
+                {option.toUpperCase()}
+              </button>
+            );
+          })}
         </div>
-        {showExcerptAsLead ? (
-          <div className="space-y-4">
-            {excerptParagraphs.map((paragraph, index) => (
-              <p key={`excerpt-${locale}-${index}`} className="max-w-[38rem] text-[1rem] leading-8 text-[var(--ink)] md:text-[1.04rem]">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        ) : null}
       </div>
-
-      {hasViewing ? (
-        <div className="space-y-2.5">
-          <BilingualText
-            as="p"
-            text={detailCopy.viewingNote}
-            mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.58rem] tracking-[0.15em]"
-            enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
-          />
-          <div className="space-y-4">
-            {viewingParagraphs.map((paragraph, index) => (
-              <p key={`viewing-${locale}-${index}`} className="max-w-[38rem] text-[0.98rem] leading-8 text-[var(--muted)]">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      {hasComparison ? (
-        <div className="space-y-2.5">
-          <BilingualText
-            as="p"
-            text={detailCopy.comparisonNote}
-            mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.58rem] tracking-[0.15em]"
-            enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
-          />
-          <div className="space-y-4">
-            {comparisonParagraphs.map((paragraph, index) => (
-              <p key={`comparison-${locale}-${index}`} className="max-w-[38rem] text-[0.98rem] leading-8 text-[var(--muted)]">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      <BilingualReadingPanel sections={sections} locale={locale} onLocaleChange={onLocaleChange} showToggle={false} />
     </section>
   );
 }
@@ -445,6 +421,7 @@ export function ArtworkReferences({
   detailCopy,
   relatedArticles,
   relatedExhibitions,
+  locale,
 }: ArtworkReferencesProps) {
   const hasProvenance = artwork.provenance.length > 0;
   const hasExhibitions = artwork.exhibitions.length > 0;
@@ -459,13 +436,17 @@ export function ArtworkReferences({
   return (
     <aside className="space-y-4.5 lg:pl-6">
       {hasProvenance ? (
-        <DetailIndexSection label={detailCopy.provenance}>
+        <DetailIndexSection label={detailCopy.provenance} locale={locale}>
           <ul className="space-y-3">
             {artwork.provenance.map((item) => (
               <li key={item.label.zh} className="space-y-0.5">
-                <p className="text-[0.86rem] leading-7 text-[var(--ink)]">{item.label.zh}</p>
+                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.86rem] leading-7 text-[var(--ink)]">
+                  {getLocalizedText(item.label, locale)}
+                </p>
                 {item.note && hasText(item.note) ? (
-                  <p className="text-[0.76rem] leading-6 text-[var(--muted)]">{item.note.zh}</p>
+                  <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                    {getLocalizedText(item.note, locale)}
+                  </p>
                 ) : null}
               </li>
             ))}
@@ -474,13 +455,17 @@ export function ArtworkReferences({
       ) : null}
 
       {hasExhibitions ? (
-        <DetailIndexSection label={detailCopy.exhibitions}>
+        <DetailIndexSection label={detailCopy.exhibitions} locale={locale}>
           <ul className="space-y-3">
             {artwork.exhibitions.map((item) => (
               <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
-                <p className="text-[0.86rem] leading-7 text-[var(--ink)]">{item.title.zh}</p>
-                <p className="text-[0.76rem] leading-6 text-[var(--muted)]">
-                  {item.venue.zh}，{item.year}
+                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.86rem] leading-7 text-[var(--ink)]">
+                  {getLocalizedText(item.title, locale)}
+                </p>
+                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                  {getLocalizedText(item.venue, locale)}
+                  {locale === "zh" ? "，" : ", "}
+                  {item.year}
                 </p>
               </li>
             ))}
@@ -489,16 +474,22 @@ export function ArtworkReferences({
       ) : null}
 
       {hasPublications ? (
-        <DetailIndexSection label={detailCopy.publications}>
+        <DetailIndexSection label={detailCopy.publications} locale={locale}>
           <ul className="space-y-3">
             {artwork.publications.map((item) => (
               <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
-                <p className="text-[0.86rem] leading-7 text-[var(--ink)]">{item.title.zh}</p>
-                <p className="text-[0.76rem] leading-6 text-[var(--muted)]">
-                  {item.year}，{item.pages.zh}
+                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.86rem] leading-7 text-[var(--ink)]">
+                  {getLocalizedText(item.title, locale)}
+                </p>
+                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                  {item.year}
+                  {locale === "zh" ? "，" : ", "}
+                  {getLocalizedText(item.pages, locale)}
                 </p>
                 {item.note && hasText(item.note) ? (
-                  <p className="text-[0.76rem] leading-6 text-[var(--muted)]">{item.note.zh}</p>
+                  <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                    {getLocalizedText(item.note, locale)}
+                  </p>
                 ) : null}
               </li>
             ))}
@@ -507,7 +498,7 @@ export function ArtworkReferences({
       ) : null}
 
       {hasRelatedExhibitions ? (
-        <DetailIndexSection label={detailCopy.relatedExhibitions} tone="secondary">
+        <DetailIndexSection label={detailCopy.relatedExhibitions} locale={locale} tone="secondary">
           <div className="space-y-2">
             {relatedExhibitions.map((item) => (
               <Link
@@ -515,7 +506,7 @@ export function ArtworkReferences({
                 href={`/exhibitions/${item.slug}`}
                 className="block text-[0.8rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
               >
-                {item.title.zh}
+                {getLocalizedText(item.title, locale)}
               </Link>
             ))}
           </div>
@@ -523,7 +514,7 @@ export function ArtworkReferences({
       ) : null}
 
       {hasRelatedArticles ? (
-        <DetailIndexSection label={detailCopy.relatedArticles} tone="secondary">
+        <DetailIndexSection label={detailCopy.relatedArticles} locale={locale} tone="secondary">
           <div className="space-y-2">
             {relatedArticles.map((item) => (
               <Link
@@ -531,7 +522,7 @@ export function ArtworkReferences({
                 href={`/journal/${item.slug}`}
                 className="block text-[0.8rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
               >
-                {item.title.zh}
+                {getLocalizedText(item.title, locale)}
               </Link>
             ))}
           </div>
@@ -595,18 +586,21 @@ export function ArtworkDetailTemplate({
   relatedArticles,
   relatedExhibitions,
 }: ArtworkDetailTemplateProps) {
+  const [locale, setLocale] = useState<ReadingLocale>("zh");
+
   return (
     <>
-      <ArtworkHero artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} />
+      <ArtworkHero artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} locale={locale} />
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(260px,0.62fr)] lg:gap-14">
-          <ArtworkScholarlyNote artwork={artwork} detailCopy={detailCopy} />
+          <ArtworkScholarlyNote artwork={artwork} detailCopy={detailCopy} locale={locale} onLocaleChange={setLocale} />
           <ArtworkReferences
             artwork={artwork}
             detailCopy={detailCopy}
             relatedArticles={relatedArticles}
             relatedExhibitions={relatedExhibitions}
+            locale={locale}
           />
         </div>
       </section>

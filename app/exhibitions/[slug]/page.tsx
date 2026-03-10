@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { BilingualProse, BilingualReadingPanel } from "@/components/bilingual-prose";
 import { ArtworkCard } from "@/components/artwork-card";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { getAdminSession } from "@/lib/admin-auth";
@@ -71,6 +72,8 @@ export default async function ExhibitionDetailPage({
   const highlightArtworks = getHighlightedArtworks(content, exhibition.highlightArtworkSlugs);
   const relatedArticles = getArticlesBySlugs(content, exhibition.relatedArticleSlugs);
   const detailCopy = content.pageCopy.exhibitionDetail;
+  const exhibitionTextLabel = { zh: "展览介绍", en: "Exhibition Text" };
+  const curatorialLeadLabel = { zh: "策展文字", en: "Curatorial Note" };
 
   return (
     <>
@@ -94,13 +97,6 @@ export default async function ExhibitionDetailPage({
               className="max-w-5xl font-serif text-[var(--ink)]"
               zhClassName="block text-[2.8rem] leading-[0.94] tracking-[-0.05em] md:text-[5rem]"
               enClassName="mt-3 block font-sans text-[0.84rem] uppercase tracking-[0.22em] text-[var(--accent)]"
-            />
-            <BilingualText
-              as="p"
-              text={exhibition.intro}
-              className="max-w-3xl text-[var(--muted)] md:text-[0.98rem]"
-              zhClassName="text-sm leading-8"
-              enClassName="hidden"
             />
           </div>
         </div>
@@ -136,31 +132,43 @@ export default async function ExhibitionDetailPage({
       </section>
 
       <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,0.8fr)] lg:px-10 lg:py-20">
-        <div className="space-y-6">
-          {exhibition.description.map((paragraph) => (
-            <p key={paragraph.zh} className="text-[0.98rem] leading-8 text-[var(--muted)]">
-              {paragraph.zh}
-            </p>
-          ))}
+        <div className="max-w-[42rem]">
+          <BilingualReadingPanel
+            sections={[
+              {
+                key: "intro",
+                label: exhibitionTextLabel,
+                content: exhibition.intro,
+                variant: "lead",
+              },
+              {
+                key: "description",
+                content: exhibition.description,
+                variant: "body",
+              },
+            ]}
+            defaultLocale="zh"
+          />
         </div>
-        <div className="border-t border-[var(--line)] pt-5 text-sm leading-8 text-[var(--muted)] md:border-t-0 md:border-l md:pl-8 md:pt-0">
-          <BilingualText
-            as="p"
-            text={detailCopy.catalogueNote}
-            className="mb-4 flex flex-col gap-1 text-[var(--accent)]"
-            zhClassName="text-[0.72rem] tracking-[0.22em]"
-            enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+        <div className="border-t border-[var(--line)] pt-5 md:border-t-0 md:border-l md:pl-8 md:pt-0">
+          <BilingualReadingPanel
+            className="space-y-6"
+            sections={[
+              {
+                key: "catalogue-intro",
+                label: detailCopy.catalogueNote,
+                content: exhibition.catalogueIntro,
+                variant: "secondary",
+              },
+              {
+                key: "curatorial-lead",
+                label: curatorialLeadLabel,
+                content: exhibition.curatorialLead,
+                variant: "secondary",
+              },
+            ]}
+            defaultLocale="zh"
           />
-          <BilingualText
-            as="p"
-            text={exhibition.catalogueIntro}
-            className="block"
-            zhClassName="text-sm leading-8"
-            enClassName="hidden"
-          />
-          <p className="mt-4 border-l border-[var(--line)] pl-4 text-sm leading-8 text-[var(--muted)]">
-            {exhibition.curatorialLead.zh}
-          </p>
           {relatedArticles.length > 0 ? (
             <div className="mt-6 border-t border-[var(--line)] pt-5">
               <BilingualText

@@ -104,6 +104,21 @@ select:focus-visible {
   margin-top: 0.5rem;
 }
 
+.prose-block {
+  margin: 0;
+}
+
+.prose-block--zh {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.prose-block--en {
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
 @keyframes siteFadeIn {
   from {
     opacity: 0;

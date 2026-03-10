@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { BilingualProse } from "@/components/bilingual-prose";
 import { ArtworkCard } from "@/components/artwork-card";
 import {
   getCurrentExhibition,
@@ -91,12 +92,7 @@ export default async function HomePage() {
             </span>
           </p>
           <div className="space-y-3">
-            <p className="max-w-[25ch] text-[0.98rem] leading-[2.02] text-[var(--muted)] md:text-[1.02rem]">
-              {siteConfig.homeIntro.zh}
-            </p>
-            <p className="max-w-[28rem] text-[0.66rem] leading-6 text-[var(--accent)]/62 md:text-[0.7rem]">
-              {siteConfig.homeIntro.en}
-            </p>
+            <BilingualProse content={siteConfig.homeIntro} variant="body" className="max-w-[30rem]" />
           </div>
         </div>
       </section>
@@ -138,9 +134,11 @@ export default async function HomePage() {
                   {currentExhibition.highlightCount} 件重点作品 · {currentExhibition.cataloguePages} 页图录
                 </p>
               </div>
-              <p className="max-w-[26rem] text-[0.92rem] leading-7 text-[var(--muted)]">
-                {currentExhibition.curatorialLead.zh}
-              </p>
+              <BilingualProse
+                content={currentExhibition.curatorialLead}
+                variant="secondary"
+                className="max-w-[26rem]"
+              />
               <Link href={`/exhibitions/${currentExhibition.slug}`} className="inline-flex text-[var(--ink)]">
                 <ActionLabel text={homeContent.focusAction} align="start" />
               </Link>

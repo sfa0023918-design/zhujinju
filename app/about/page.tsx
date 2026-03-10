@@ -1,4 +1,5 @@
 import { BilingualText } from "@/components/bilingual-text";
+import { BilingualProse } from "@/components/bilingual-prose";
 import { EditorialPageHero } from "@/components/editorial-page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
@@ -51,12 +52,8 @@ export default async function AboutPage() {
             enClassName="mt-2.5 block font-sans text-[0.74rem] uppercase tracking-[0.2em] text-[var(--accent)]/62"
           />
         </div>
-        <div className="max-w-[42rem] space-y-5">
-          {siteConfig.about.body.map((paragraph) => (
-            <p key={paragraph.zh} className="text-[0.96rem] leading-8 text-[var(--muted)]">
-              {paragraph.zh}
-            </p>
-          ))}
+        <div className="max-w-[42rem]">
+          <BilingualProse content={siteConfig.about.body} variant="body" />
         </div>
       </section>
 
