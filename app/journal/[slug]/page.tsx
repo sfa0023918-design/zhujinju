@@ -70,35 +70,39 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
   const articleBodyLabel = { zh: "正文", en: "Essay" };
+  const detailHeadingZhClass = "block max-w-[14ch] text-[clamp(2.25rem,4.1vw,3.85rem)] leading-[0.98] tracking-[-0.042em] text-balance md:max-w-[12ch]";
+  const detailHeadingEnClass = "mt-3 block max-w-[34rem] font-sans text-[0.74rem] uppercase tracking-[0.18em] leading-[1.5] text-[var(--accent)]/82 md:text-[0.78rem]";
 
   return (
     <>
-      <section className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
+      <section className="mx-auto w-full max-w-[1120px] px-5 py-7 md:px-8 md:py-8 lg:px-10 lg:py-10">
         <Link href="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
           <ActionLabel text={detailCopy.backAction} align="start" />
         </Link>
       </section>
 
       <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-8 md:pb-24 lg:px-10 lg:pb-28">
-        <header className="space-y-5 border-t border-[var(--line)] pt-6">
+        <header className="space-y-4.5 border-t border-[var(--line)] pt-5">
           <BilingualText
             as="p"
             text={article.category}
             mode="inline"
             className="text-[var(--accent)]"
             zhClassName="text-[0.72rem] tracking-[0.22em]"
-            enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
+            enClassName="text-[0.64rem] uppercase tracking-[0.16em] leading-[1.45] text-[var(--accent)]/76"
           />
           <BilingualText
             as="h1"
             text={article.title}
             className="max-w-4xl font-serif text-[var(--ink)]"
-            zhClassName="block text-[2.8rem] leading-[0.94] tracking-[-0.05em] md:text-[5rem]"
-            enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+            zhClassName={detailHeadingZhClass}
+            enClassName={detailHeadingEnClass}
           />
-          <div className="grid gap-3 text-sm text-[var(--muted)] md:grid-cols-3">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.9rem] leading-7 text-[var(--muted)]">
             <p>{article.date}</p>
+            <span className="text-[var(--accent)]/34">·</span>
             <p>{article.author.zh}</p>
+            <span className="text-[var(--accent)]/34">·</span>
             <p>{article.column.zh}</p>
           </div>
           <div className="flex flex-wrap gap-2">

@@ -74,10 +74,12 @@ export default async function ExhibitionDetailPage({
   const detailCopy = content.pageCopy.exhibitionDetail;
   const exhibitionTextLabel = { zh: "展览介绍", en: "Exhibition Text" };
   const curatorialLeadLabel = { zh: "策展文字", en: "Curatorial Note" };
+  const detailHeadingZhClass = "block max-w-[14ch] text-[clamp(2.35rem,4.4vw,4.1rem)] leading-[0.98] tracking-[-0.042em] text-balance md:max-w-[12ch]";
+  const detailHeadingEnClass = "mt-3 block max-w-[34rem] font-sans text-[0.76rem] uppercase tracking-[0.18em] leading-[1.5] text-[var(--accent)]/82 md:text-[0.8rem]";
 
   return (
     <>
-      <section className="mx-auto grid w-full max-w-[1480px] gap-8 px-5 py-8 md:px-8 md:py-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-10 lg:py-12">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-7 px-5 py-7 md:px-8 md:py-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-10 lg:py-10">
         <div className="space-y-6">
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
             <ActionLabel text={detailCopy.backAction} align="start" />
@@ -95,16 +97,16 @@ export default async function ExhibitionDetailPage({
               as="h1"
               text={exhibition.title}
               className="max-w-5xl font-serif text-[var(--ink)]"
-              zhClassName="block text-[2.8rem] leading-[0.94] tracking-[-0.05em] md:text-[5rem]"
-              enClassName="mt-3 block font-sans text-[0.84rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+              zhClassName={detailHeadingZhClass}
+              enClassName={detailHeadingEnClass}
             />
           </div>
         </div>
-        <div className="space-y-4 border-t border-[var(--line)] pt-5 text-sm leading-7 text-[var(--muted)] md:pt-0">
-          <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
-          <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
-          <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.66rem] text-[var(--accent)]/75" />
-          <p>
+        <div className="space-y-3.5 border-t border-[var(--line)] pt-5 text-[0.92rem] leading-7 text-[var(--muted)] md:space-y-3 md:pt-1">
+          <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
+          <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
+          <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
+          <p className="pt-0.5">
             {exhibition.highlightCount} {detailCopy.summaryLine.highlightUnit.zh} · {exhibition.cataloguePages}{" "}
             {detailCopy.summaryLine.catalogueUnit.zh}
           </p>

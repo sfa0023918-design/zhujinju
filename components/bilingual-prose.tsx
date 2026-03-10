@@ -100,40 +100,46 @@ function ExpandableReadingText({
   });
   const [canExpand, setCanExpand] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const expanded = expandedByLocale[locale];
 
   useEffect(() => {
     const element = contentRef.current;
+    const inner = innerRef.current;
 
-    if (!element) {
+    if (!element || !inner) {
       return;
     }
 
+    const getCollapsedHeight = () => {
+      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+
+      if (locale === "zh") {
+        return isDesktop ? 320 : 236.8;
+      }
+
+      return isDesktop ? 224 : 166.4;
+    };
+
     const measure = () => {
-      if (!element) {
+      if (!inner) {
         return;
       }
-
-      const wasExpanded = element.dataset.expanded === "true";
-
-      if (wasExpanded) {
-        element.dataset.expanded = "false";
-      }
-
-      const nextCanExpand = element.scrollHeight - element.clientHeight > 8;
+      const nextCanExpand = inner.scrollHeight - getCollapsedHeight() > 8;
       setCanExpand(nextCanExpand);
-
-      if (wasExpanded) {
-        element.dataset.expanded = "true";
-      }
     };
 
     measure();
 
     const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
+    observer.observe(inner);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [locale, paragraphs]);
 
   function toggleExpanded() {
@@ -147,8 +153,9 @@ function ExpandableReadingText({
 
     if (!nextExpanded && wrapperTop !== null) {
       requestAnimationFrame(() => {
-        const nextTop = wrapperRef.current?.getBoundingClientRect().top ?? wrapperTop;
-        window.scrollBy({ top: nextTop - wrapperTop, behavior: "auto" });
+        requestAnimationFrame(() => {
+          wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
       });
     }
   }
@@ -166,7 +173,7 @@ function ExpandableReadingText({
             : "max-h-[999rem]"
         }`}
       >
-        <div className="space-y-4 md:space-y-5">
+        <div ref={innerRef} className="space-y-4 md:space-y-5">
           {paragraphs.map((paragraph, index) => (
             <p
               key={`${locale}-${index}`}
