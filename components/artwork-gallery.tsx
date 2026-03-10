@@ -51,7 +51,7 @@ export function ArtworkGallery({
   const isActivePlaceholder = !activeImage || activeImage.startsWith("/api/placeholder/");
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-6">
+    <div className="grid gap-5 lg:grid-cols-[72px_minmax(0,1fr)] lg:items-start lg:gap-6">
       {thumbnailImages.length > 1 ? (
         <div className="order-2 flex gap-2.5 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible">
           {thumbnailImages.map((image, index) => {
@@ -96,10 +96,10 @@ export function ArtworkGallery({
           })}
         </div>
       ) : null}
-      <div className="order-1 grid gap-3.5">
-        <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+      <div className="order-1 min-w-0 grid gap-3.5">
+        <div className="relative overflow-hidden bg-[var(--surface-strong)] lg:flex lg:min-h-[28rem] lg:items-start lg:justify-center lg:overflow-visible lg:p-4">
           {isActivePlaceholder ? (
-            <div className="aspect-[4/5]">
+            <div className="aspect-[4/5] lg:flex lg:min-h-[28rem] lg:w-full lg:items-start lg:justify-center">
               <MediaPlaceholder eyebrow="Artwork Image" title={title} />
             </div>
           ) : (
@@ -110,7 +110,7 @@ export function ArtworkGallery({
               height={1500}
               priority
               unoptimized
-              className="aspect-[4/5] h-full w-full object-cover"
+              className="aspect-[4/5] h-full w-full object-cover lg:h-auto lg:w-auto lg:max-h-[72vh] lg:max-w-full lg:object-contain lg:object-top"
             />
           )}
         </div>

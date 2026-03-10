@@ -54,7 +54,7 @@ function ExhibitionCover({
 
   if (isPlaceholder) {
     return (
-      <div className="aspect-[1.42/1]">
+      <div className="aspect-[1.28/1]">
         <MediaPlaceholder eyebrow="Exhibition Image" title={title.zh} />
       </div>
     );
@@ -67,7 +67,7 @@ function ExhibitionCover({
       width={1600}
       height={1000}
       unoptimized
-      className="aspect-[1.42/1] h-full w-full object-cover"
+      className="aspect-[1.28/1] h-full w-full object-cover"
     />
   );
 }
@@ -110,16 +110,19 @@ export default async function ExhibitionsPage() {
       </section>
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
-        <div className="grid gap-9">
+        <div className="grid gap-8">
           {exhibitions.map((exhibition) => (
             <article
               key={exhibition.slug}
-              className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.63fr)_minmax(320px,0.37fr)] lg:gap-7"
+              className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.58fr)_minmax(360px,0.42fr)] lg:items-start lg:gap-8"
             >
-              <Link href={`/exhibitions/${exhibition.slug}`} className="relative overflow-hidden bg-[var(--surface-strong)]">
+              <Link
+                href={`/exhibitions/${exhibition.slug}`}
+                className="relative overflow-hidden bg-[var(--surface-strong)]"
+              >
                 <ExhibitionCover cover={exhibition.cover} title={exhibition.title} />
               </Link>
-              <div className="flex flex-col justify-between gap-5">
+              <div className="flex flex-col justify-between gap-4">
                 <div className="space-y-4">
                   <BilingualText
                     as="p"
@@ -159,12 +162,12 @@ export default async function ExhibitionsPage() {
                   <BilingualText
                     as="p"
                     text={exhibition.intro}
-                    className="max-w-[30ch] text-[var(--muted)]"
+                    className="max-w-[28ch] text-[var(--muted)]"
                     zhClassName="text-[0.94rem] leading-7"
                     enClassName="hidden"
                   />
                 </div>
-                <div className="space-y-4 border-t border-[var(--line)]/75 pt-4 text-sm leading-7 text-[var(--muted)]">
+                <div className="space-y-4 border-t border-[var(--line)]/72 pt-4 text-sm leading-7 text-[var(--muted)]">
                   <div className="grid gap-3 border-y border-[var(--line)]/70 py-3 md:grid-cols-3">
                     <ExhibitionFact
                       label={cardLabels.highlightWorks}

@@ -268,8 +268,8 @@ export function CollectionFilters({
         </div>
       </div>
 
-      <div className="grid gap-2 md:hidden">
-        <div className="flex flex-wrap gap-2">
+      <div className="grid gap-2.5 md:hidden">
+        <div className="grid grid-cols-2 gap-2">
           {filterFields.map((field) => {
             const currentLabel =
               field.options.find((option) => option.value === current[field.name])?.label ?? options.all;
@@ -284,6 +284,8 @@ export function CollectionFilters({
                   setOpenKey(field.name);
                 }}
                 className={`inline-flex min-h-[2.15rem] cursor-pointer select-none items-center gap-2 rounded-full border px-3 py-[0.35rem] ${
+                  field.name === "status" ? "col-span-2" : ""
+                } ${
                   isActive
                     ? "border-[var(--line-strong)]/50 text-[var(--ink)]"
                     : "border-[var(--line)]/52 text-[var(--muted)]"
@@ -295,13 +297,15 @@ export function CollectionFilters({
             );
           })}
         </div>
-        <div className="flex items-center justify-between gap-3">
+        <div>
           <Link
             href="/collection"
             className="inline-flex min-h-[2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/52 px-2.75 py-[0.32rem] text-[var(--muted)]"
           >
             <span className="text-[0.66rem]">{labels.reset.zh}</span>
           </Link>
+        </div>
+        <div>
           <span className="select-none text-[0.72rem] tracking-[0.06em] text-[var(--muted)]/82">{`${resultCount} 件作品`}</span>
         </div>
       </div>
