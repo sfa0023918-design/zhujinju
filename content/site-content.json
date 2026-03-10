@@ -938,7 +938,19 @@
           }
         }
       ],
-      "exhibitions": [],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "",
+            "en": ""
+          },
+          "venue": {
+            "zh": "",
+            "en": ""
+          },
+          "year": ""
+        }
+      ],
       "publications": [],
       "inquirySupport": [
         {
