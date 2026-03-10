@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="180" viewBox="0 0 980 180" fill="none">
+  <rect width="980" height="180" fill="#171311"/>
+  <g transform="translate(24 26)">
+    <rect x="0" y="0" width="128" height="128" stroke="#EADCCF" stroke-width="4"/>
+    <path fill="#EADCCF" d="M19.2 19.2h88l-6.4 8H19.2z"/>
+    <path fill="#EADCCF" d="M25.6 100.8h83.2v8H19.2z"/>
+    <path fill="#EADCCF" d="M102.4 27.2h11.2l-52.8 64H49.6z"/>
+    <path fill="#EADCCF" d="M56 32h9.6v52c0 5.6-1.6 10.4-4.8 14.4-4 4.8-9.6 7.2-17.6 7.2H33.6v-8h8c5.6 0 9.6-.8 12-3.2 1.6-2.4 2.4-5.6 2.4-10.4V32z"/>
+    <path fill="#EADCCF" d="M80 32h9.6v52c0 5.6-1.6 10.4-4.8 14.4-4 4.8-9.6 7.2-17.6 7.2H57.6v-8h8c5.6 0 9.6-.8 12-3.2 1.6-2.4 2.4-5.6 2.4-10.4V32z"/>
+  </g>
+  <text x="178" y="81" fill="#EADCCF" font-size="42" letter-spacing="8" font-family="Songti SC, Noto Serif CJK SC, STSong, serif">竹瑾居</text>
+  <text x="178" y="120" fill="#CDBEB2" font-size="15" letter-spacing="4.2" font-family="Helvetica Neue, Arial, PingFang SC, sans-serif">ZHU JIN JU | HIMALAYAN ART AND ASIAN ANTIQUITIES</text>
+</svg>

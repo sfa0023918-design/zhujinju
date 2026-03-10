@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { bt } from "@/lib/bilingual";
@@ -22,13 +23,23 @@ export async function SiteHeader() {
     <header className="border-b border-[var(--line)]">
       <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-5 px-5 py-4 md:px-10 md:py-5">
         <Link href="/" className="min-w-fit">
-          <BilingualText
-            as="span"
-            text={siteConfig.siteName}
-            className="flex flex-col gap-1 text-[var(--ink)]"
-            zhClassName="text-[0.95rem] tracking-[0.28em]"
-            enClassName="text-[0.56rem] uppercase tracking-[0.28em] text-[var(--accent)]"
-          />
+          <span className="flex items-center gap-3 text-[var(--ink)]">
+            <Image
+              src="/zhujinju-mark.svg"
+              alt={siteConfig.siteName.zh}
+              width={34}
+              height={34}
+              priority
+              className="h-[34px] w-[34px] flex-none"
+            />
+            <BilingualText
+              as="span"
+              text={siteConfig.siteName}
+              className="flex flex-col gap-1 text-[var(--ink)]"
+              zhClassName="text-[0.95rem] tracking-[0.24em]"
+              enClassName="text-[0.56rem] uppercase tracking-[0.24em] text-[var(--accent)]/88"
+            />
+          </span>
         </Link>
         <SiteHeaderNav items={navigation} />
       </div>
