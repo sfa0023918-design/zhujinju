@@ -62,10 +62,14 @@ export type Exhibition = {
   description: BilingualText[];
   highlightArtworkSlugs: string[];
   highlightCount: number;
+  featuredWorksCount?: number;
   catalogueTitle: BilingualText;
   catalogueIntro: BilingualText;
   cataloguePages: number;
+  cataloguePageCount?: number;
+  catalogueNote?: BilingualText;
   curatorialLead: BilingualText;
+  curatorialNote?: BilingualText;
   relatedArticleSlugs: string[];
   cover: string;
   current?: boolean;

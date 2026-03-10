@@ -73,9 +73,15 @@ export default async function ExhibitionDetailPage({
   const relatedArticles = getArticlesBySlugs(content, exhibition.relatedArticleSlugs);
   const detailCopy = content.pageCopy.exhibitionDetail;
   const exhibitionTextLabel = { zh: "展览介绍", en: "Exhibition Text" };
-  const curatorialLeadLabel = { zh: "策展文字", en: "Curatorial Note" };
-  const detailHeadingZhClass = "block max-w-[14ch] text-[clamp(2.35rem,4.4vw,4.1rem)] leading-[0.98] tracking-[-0.042em] text-balance md:max-w-[12ch]";
-  const detailHeadingEnClass = "mt-3 block max-w-[34rem] font-sans text-[0.76rem] uppercase tracking-[0.18em] leading-[1.5] text-[var(--accent)]/82 md:text-[0.8rem]";
+  const curatorialLeadLabel = { zh: "策展说明", en: "Curatorial Note" };
+  const catalogueTitleLabel = { zh: "图录标题", en: "Catalogue Title" };
+  const detailHeadingZhClass = "block max-w-[13ch] text-[clamp(2.1rem,3.95vw,3.6rem)] leading-[0.95] tracking-[-0.044em] text-balance md:max-w-[11ch]";
+  const detailHeadingEnClass = "mt-3 block max-w-[32rem] font-sans text-[0.76rem] uppercase tracking-[0.18em] leading-[1.48] text-[var(--accent)]/84 md:text-[0.8rem]";
+  const featuredWorksCount = exhibition.featuredWorksCount ?? exhibition.highlightCount ?? highlightArtworks.length;
+  const cataloguePageCount = exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0;
+  const catalogueTitle = exhibition.catalogueTitle;
+  const catalogueNote = exhibition.catalogueNote ?? exhibition.catalogueIntro;
+  const curatorialNote = exhibition.curatorialNote ?? exhibition.curatorialLead;
 
   return (
     <>
@@ -84,7 +90,7 @@ export default async function ExhibitionDetailPage({
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
             <ActionLabel text={detailCopy.backAction} align="start" />
           </Link>
-          <div className="space-y-4">
+        <div className="space-y-4">
             <BilingualText
               as="p"
               text={exhibition.subtitle}
@@ -102,21 +108,26 @@ export default async function ExhibitionDetailPage({
             />
           </div>
         </div>
-        <div className="space-y-3.5 border-t border-[var(--line)] pt-5 text-[0.92rem] leading-7 text-[var(--muted)] md:space-y-3 md:pt-1">
+        <div className="space-y-3 border-t border-[var(--line)] pt-5 text-[0.92rem] leading-7 text-[var(--muted)] md:space-y-2.5 md:pt-1">
           <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
           <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
-          <BilingualText as="p" text={exhibition.catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
-          <p className="pt-0.5">
-            {exhibition.highlightCount} {detailCopy.summaryLine.highlightUnit.zh} · {exhibition.cataloguePages}{" "}
-            {detailCopy.summaryLine.catalogueUnit.zh}
-          </p>
+          {getPrimaryText(catalogueTitle) ? (
+            <BilingualText as="p" text={catalogueTitle} mode="inline" className="block" zhClassName="block" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
+          ) : null}
+          <div className="space-y-2 border-t border-[var(--line)]/70 pt-3">
+            <InfoFact label={detailCopy.summaryLine.highlightUnit} value={{ zh: `${featuredWorksCount} 件`, en: `${featuredWorksCount} works` }} />
+            <InfoFact label={detailCopy.summaryLine.catalogueUnit} value={{ zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` }} />
+            {getPrimaryText(catalogueTitle) ? (
+              <InfoFact label={catalogueTitleLabel} value={catalogueTitle} />
+            ) : null}
+          </div>
         </div>
       </section>
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-8 md:pb-18 lg:px-10 lg:pb-20">
-        <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+        <div className="relative overflow-hidden bg-[var(--surface-strong)] max-h-[360px] md:max-h-[440px] lg:max-h-[520px]">
           {exhibition.cover.startsWith("/api/placeholder/") ? (
-            <div className="aspect-[1.65/1]">
+            <div className="aspect-[1.9/1] h-full max-h-[inherit]">
               <MediaPlaceholder eyebrow="Exhibition Image" title={exhibition.title.zh} />
             </div>
           ) : (
@@ -127,7 +138,7 @@ export default async function ExhibitionDetailPage({
               height={1100}
               priority
               unoptimized
-              className="aspect-[1.65/1] h-full w-full object-cover"
+              className="aspect-[1.9/1] h-full max-h-[inherit] w-full object-cover"
             />
           )}
         </div>
@@ -159,13 +170,13 @@ export default async function ExhibitionDetailPage({
               {
                 key: "catalogue-intro",
                 label: detailCopy.catalogueNote,
-                content: exhibition.catalogueIntro,
+                content: catalogueNote,
                 variant: "secondary",
               },
               {
                 key: "curatorial-lead",
                 label: curatorialLeadLabel,
-                content: exhibition.curatorialLead,
+                content: curatorialNote,
                 variant: "secondary",
               },
             ]}
@@ -223,5 +234,38 @@ export default async function ExhibitionDetailPage({
         </div>
       </section>
     </>
+  );
+}
+
+function getPrimaryText(text: { zh: string; en: string } | undefined) {
+  return text?.zh.trim() || text?.en.trim() || "";
+}
+
+function InfoFact({
+  label,
+  value,
+}: {
+  label: { zh: string; en: string };
+  value: { zh: string; en: string };
+}) {
+  return (
+    <div className="grid gap-1.5 border-b border-[var(--line)]/55 pb-2 last:border-b-0 last:pb-0">
+      <BilingualText
+        as="p"
+        text={label}
+        mode="inline"
+        className="text-[var(--accent)]"
+        zhClassName="text-[0.68rem] tracking-[0.18em]"
+        enClassName="text-[0.5rem] uppercase tracking-[0.15em] text-[var(--accent)]/78"
+      />
+      <BilingualText
+        as="p"
+        text={value}
+        mode="inline"
+        className="text-[var(--muted)]"
+        zhClassName="text-[0.96rem] leading-[1.65]"
+        enClassName="text-[0.82rem] leading-[1.55] text-[var(--accent)]/84"
+      />
+    </div>
   );
 }

@@ -32,13 +32,23 @@ export const exhibitions: Exhibition[] = [
       "vajrapani-thangka",
     ],
     highlightCount: 18,
+    featuredWorksCount: 18,
     catalogueTitle: bt("《寂照》展览图录", "Catalogue for Silent Radiance"),
     catalogueIntro: bt(
       "收录 18 件重点作品，附策展前言、作品页与图像索引。",
       "Including 18 key works with a curatorial preface, object entries, and image index."
     ),
     cataloguePages: 96,
+    cataloguePageCount: 96,
+    catalogueNote: bt(
+      "收录 18 件重点作品，附策展前言、作品页与图像索引。",
+      "Including 18 key works with a curatorial preface, object entries, and image index."
+    ),
     curatorialLead: bt(
+      "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
+      "The exhibition avoids category accumulation and instead lets works form a comparable field of looking."
+    ),
+    curatorialNote: bt(
       "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
       "The exhibition avoids category accumulation and instead lets works form a comparable field of looking."
     ),
@@ -75,13 +85,23 @@ export const exhibitions: Exhibition[] = [
       "ritual-conch-set",
     ],
     highlightCount: 16,
+    featuredWorksCount: 16,
     catalogueTitle: bt("《金铜之间》展览图录", "Catalogue for Between Gilding and Pigment"),
     catalogueIntro: bt(
       "围绕材料、区域与图像关系展开，收录 16 件重点作品与一篇研究前言。",
       "Focused on material, region, and image, with 16 key works and a research preface."
     ),
     cataloguePages: 88,
+    cataloguePageCount: 88,
+    catalogueNote: bt(
+      "围绕材料、区域与图像关系展开，收录 16 件重点作品与一篇研究前言。",
+      "Focused on material, region, and image, with 16 key works and a research preface."
+    ),
     curatorialLead: bt(
+      "材质并非附属信息，而是理解图像与时代判断的第一入口。",
+      "Material is not secondary information but one of the first entries into image and period judgement."
+    ),
+    curatorialNote: bt(
       "材质并非附属信息，而是理解图像与时代判断的第一入口。",
       "Material is not secondary information but one of the first entries into image and period judgement."
     ),

@@ -213,10 +213,14 @@ function createExhibitionDraftRecord(): Exhibition {
     description: [bt("", "")],
     highlightArtworkSlugs: [],
     highlightCount: 0,
+    featuredWorksCount: 0,
     catalogueTitle: bt("", ""),
     catalogueIntro: bt("", ""),
     cataloguePages: 0,
+    cataloguePageCount: 0,
+    catalogueNote: bt("", ""),
     curatorialLead: bt("", ""),
+    curatorialNote: bt("", ""),
     relatedArticleSlugs: [],
     cover: "",
     current: false,
@@ -510,6 +514,23 @@ export async function duplicateExhibitionRecord(slug: string, actor: string) {
   };
 }
 
+export async function deleteExhibitionRecord(slug: string, actor: string) {
+  const current = await readSiteContentFresh();
+  const exhibitionIndex = current.exhibitions.findIndex((item) => item.slug === slug);
+
+  if (exhibitionIndex < 0) {
+    throw new Error("未找到要删除的展览记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  nextContent.exhibitions.splice(exhibitionIndex, 1);
+  await persistSiteContent(nextContent, `Delete exhibition record from admin by ${actor}`);
+
+  return {
+    exhibitions: nextContent.exhibitions,
+  };
+}
+
 export async function createArticleDraft(actor: string) {
   const current = await readSiteContentFresh();
   const nextContent = normalizeSiteContent(structuredClone(current));
@@ -546,6 +567,23 @@ export async function duplicateArticleRecord(slug: string, actor: string) {
 
   return {
     article: duplicate,
+    articles: nextContent.articles,
+  };
+}
+
+export async function deleteArticleRecord(slug: string, actor: string) {
+  const current = await readSiteContentFresh();
+  const articleIndex = current.articles.findIndex((item) => item.slug === slug);
+
+  if (articleIndex < 0) {
+    throw new Error("未找到要删除的文章记录。");
+  }
+
+  const nextContent = normalizeSiteContent(structuredClone(current));
+  nextContent.articles.splice(articleIndex, 1);
+  await persistSiteContent(nextContent, `Delete article record from admin by ${actor}`);
+
+  return {
     articles: nextContent.articles,
   };
 }
@@ -1058,6 +1096,10 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
     exhibitions: content.exhibitions.map((exhibition) => ({
       ...exhibition,
       publicationStatus: exhibition.publicationStatus ?? "published",
+      featuredWorksCount: exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length,
+      cataloguePageCount: exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0,
+      catalogueNote: exhibition.catalogueNote ?? exhibition.catalogueIntro ?? bt("", ""),
+      curatorialNote: exhibition.curatorialNote ?? exhibition.curatorialLead ?? bt("", ""),
     })),
     articles: content.articles.map((article) => ({
       ...article,

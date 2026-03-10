@@ -293,9 +293,13 @@ function normalizeExhibitionDraft(value: Exhibition) {
   next.cover = normalizeLineText(next.cover);
   next.intro = normalizeBilingualText(next.intro, "long");
   next.curatorialLead = normalizeBilingualText(next.curatorialLead, "long");
+  next.curatorialNote = normalizeBilingualText(next.curatorialNote ?? next.curatorialLead, "long");
   next.description = (next.description ?? []).map((item) => normalizeBilingualText(item, "long"));
   next.catalogueTitle = normalizeBilingualText(next.catalogueTitle);
   next.catalogueIntro = normalizeBilingualText(next.catalogueIntro, "long");
+  next.catalogueNote = normalizeBilingualText(next.catalogueNote ?? next.catalogueIntro, "long");
+  next.featuredWorksCount = Number((next.featuredWorksCount ?? next.highlightCount ?? next.highlightArtworkSlugs.length) || 0);
+  next.cataloguePageCount = Number(next.cataloguePageCount ?? next.cataloguePages ?? 0);
   return next;
 }
 
@@ -2726,6 +2730,49 @@ function ExhibitionsEditor({
     }
   }
 
+  async function deleteCurrentExhibition() {
+    if (!exhibition) {
+      return;
+    }
+
+    const isPublished = (exhibition.publicationStatus ?? "draft") === "published";
+    const baseMessage = isPublished
+      ? "这条展览已发布。删除后前台详情页将无法继续访问，是否继续？"
+      : "确认删除这条展览草稿吗？";
+    const secondMessage = "请再次确认删除这条已发布展览。此操作不可撤销。";
+
+    if (!window.confirm(baseMessage)) {
+      return;
+    }
+
+    if (isPublished && !window.confirm(secondMessage)) {
+      return;
+    }
+
+    setSaveState({ phase: "saving", message: "正在删除展览..." });
+
+    try {
+      const payload = await requestJson<{ value: Exhibition[]; message?: string }>("/api/admin/sections/exhibitions", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ slug: exhibition.slug }),
+      });
+
+      setDraft(payload.value);
+      setPersisted(payload.value);
+      setSelectedIndex(Math.min(selectedIndex, Math.max(0, payload.value.length - 1)));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "展览已删除。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "删除展览失败。",
+      });
+    }
+  }
+
   async function saveCurrentExhibition(nextStatus: PublicationStatus) {
     if (!exhibition) {
       return;
@@ -2773,6 +2820,7 @@ function ExhibitionsEditor({
                 onSavePublish={() => void saveCurrentExhibition("published")}
               />
               <ToolbarButton onClick={() => void duplicateCurrentExhibition()}>复制当前展览</ToolbarButton>
+              <ToolbarButton tone="danger" onClick={() => void deleteCurrentExhibition()}>删除展览</ToolbarButton>
             </>
           ) : undefined
         }
@@ -2833,12 +2881,12 @@ function ExhibitionsEditor({
                 <BilingualInput label="副标题" value={exhibition.subtitle} onChange={(next) => update((items) => { items[selectedIndex].subtitle = next; })} />
                 <div className="grid gap-4 md:grid-cols-2">
                   <TextField label="Slug" value={exhibition.slug} onChange={(next) => update((items) => { items[selectedIndex].slug = next; })} fieldKey="slug" />
-                  <TextField label="图录页数" type="number" value={String(exhibition.cataloguePages)} onChange={(next) => update((items) => { items[selectedIndex].cataloguePages = Number(next || 0); })} />
+                  <TextField label="图录页数" type="number" value={String(exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0)} onChange={(next) => update((items) => { items[selectedIndex].cataloguePageCount = Number(next || 0); items[selectedIndex].cataloguePages = Number(next || 0); })} />
                 </div>
+                <TextField label="重点作品数量" type="number" value={String(exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length)} onChange={(next) => update((items) => { items[selectedIndex].featuredWorksCount = Number(next || 0); items[selectedIndex].highlightCount = Number(next || 0); })} />
                 <BilingualInput label="时间" value={exhibition.period} onChange={(next) => update((items) => { items[selectedIndex].period = next; })} fieldKeys={{ zh: "period.zh", en: "period.en" }} />
                 <BilingualInput label="地点" value={exhibition.venue} onChange={(next) => update((items) => { items[selectedIndex].venue = next; })} fieldKeys={{ zh: "venue.zh", en: "venue.en" }} />
                 <BilingualTextarea label="简介" value={exhibition.intro} onChange={(next) => update((items) => { items[selectedIndex].intro = next; })} rows={4} fieldKeys={{ zh: "intro.zh", en: "intro.en" }} />
-                <BilingualTextarea label="策展前言" value={exhibition.curatorialLead} onChange={(next) => update((items) => { items[selectedIndex].curatorialLead = next; })} rows={4} />
                 <div className="grid gap-4">
                   {exhibition.description.map((paragraph, index) => (
                     <BilingualTextarea key={`exhibition-paragraph-${index}`} label={`正文 ${index + 1}`} value={paragraph} onChange={(next) => update((items) => { items[selectedIndex].description = updateArrayItem(items[selectedIndex].description, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} rows={4} />
@@ -2850,8 +2898,9 @@ function ExhibitionsEditor({
             <SectionBlock id="section-catalogue" title="图录与关联" issues={sectionIssues.catalogue}>
               <div className="grid gap-4">
                 <BilingualInput label="图录标题" value={exhibition.catalogueTitle} onChange={(next) => update((items) => { items[selectedIndex].catalogueTitle = next; })} />
-                <BilingualTextarea label="图录说明" value={exhibition.catalogueIntro} onChange={(next) => update((items) => { items[selectedIndex].catalogueIntro = next; })} rows={4} />
-                <RelationChecklist fieldKey="highlightArtworkSlugs" label="重点作品" options={artworkOptions} selected={exhibition.highlightArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].highlightArtworkSlugs; items[selectedIndex].highlightArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; items[selectedIndex].highlightCount = items[selectedIndex].highlightArtworkSlugs.length; })} />
+                <BilingualTextarea label="图录说明" value={exhibition.catalogueNote ?? exhibition.catalogueIntro} onChange={(next) => update((items) => { items[selectedIndex].catalogueNote = next; items[selectedIndex].catalogueIntro = next; })} rows={4} />
+                <BilingualTextarea label="策展说明" value={exhibition.curatorialNote ?? exhibition.curatorialLead} onChange={(next) => update((items) => { items[selectedIndex].curatorialNote = next; items[selectedIndex].curatorialLead = next; })} rows={4} />
+                <RelationChecklist fieldKey="highlightArtworkSlugs" label="重点作品" options={artworkOptions} selected={exhibition.highlightArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].highlightArtworkSlugs; items[selectedIndex].highlightArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
                 <RelationChecklist label="相关文章" options={articleOptions} selected={exhibition.relatedArticleSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].relatedArticleSlugs; items[selectedIndex].relatedArticleSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
               </div>
             </SectionBlock>
@@ -2978,6 +3027,49 @@ function ArticlesEditor({
     }
   }
 
+  async function deleteCurrentArticle() {
+    if (!article) {
+      return;
+    }
+
+    const isPublished = (article.publicationStatus ?? "draft") === "published";
+    const baseMessage = isPublished
+      ? "这篇文章已发布。删除后前台详情页将无法继续访问，是否继续？"
+      : "确认删除这篇文章草稿吗？";
+    const secondMessage = "请再次确认删除这篇已发布文章。此操作不可撤销。";
+
+    if (!window.confirm(baseMessage)) {
+      return;
+    }
+
+    if (isPublished && !window.confirm(secondMessage)) {
+      return;
+    }
+
+    setSaveState({ phase: "saving", message: "正在删除文章..." });
+
+    try {
+      const payload = await requestJson<{ value: Article[]; message?: string }>("/api/admin/sections/articles", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ slug: article.slug }),
+      });
+
+      setDraft(payload.value);
+      setPersisted(payload.value);
+      setSelectedIndex(Math.min(selectedIndex, Math.max(0, payload.value.length - 1)));
+      setValidationIssues([]);
+      setSaveState({ phase: "saved", message: payload.message ?? "文章已删除。" });
+    } catch (error) {
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "删除文章失败。",
+      });
+    }
+  }
+
   async function saveCurrentArticle(nextStatus: PublicationStatus) {
     if (!article) {
       return;
@@ -3025,6 +3117,7 @@ function ArticlesEditor({
                 onSavePublish={() => void saveCurrentArticle("published")}
               />
               <ToolbarButton onClick={() => void duplicateCurrentArticle()}>复制当前文章</ToolbarButton>
+              <ToolbarButton tone="danger" onClick={() => void deleteCurrentArticle()}>删除文章</ToolbarButton>
             </>
           ) : undefined
         }

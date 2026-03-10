@@ -5,6 +5,8 @@ import {
   ContentValidationError,
   createArticleDraft,
   createExhibitionDraft,
+  deleteArticleRecord,
+  deleteExhibitionRecord,
   duplicateArticleRecord,
   duplicateExhibitionRecord,
   editableSections,
@@ -120,6 +122,55 @@ export async function POST(request: Request, { params }: SectionRouteProps) {
         issues: error instanceof ContentValidationError ? error.issues : undefined,
       },
       { status: error instanceof ContentValidationError ? 400 : 500 },
+    );
+  }
+}
+
+export async function DELETE(request: Request, { params }: SectionRouteProps) {
+  const session = await getAdminSession();
+
+  if (!session) {
+    return NextResponse.json({ error: "登录状态已失效，请重新登录后台。" }, { status: 401 });
+  }
+
+  const { section } = await params;
+
+  if (section !== "exhibitions" && section !== "articles") {
+    return NextResponse.json({ error: "当前分区不支持删除操作。" }, { status: 400 });
+  }
+
+  try {
+    const body = await request
+      .json()
+      .catch(() => ({})) as { slug?: string };
+
+    if (!body.slug?.trim()) {
+      return NextResponse.json({ error: "缺少要删除的记录。" }, { status: 400 });
+    }
+
+    if (section === "exhibitions") {
+      const result = await deleteExhibitionRecord(body.slug.trim(), session.email);
+
+      return NextResponse.json({
+        section,
+        value: result.exhibitions,
+        message: "展览已删除。",
+      });
+    }
+
+    const result = await deleteArticleRecord(body.slug.trim(), session.email);
+
+    return NextResponse.json({
+      section,
+      value: result.articles,
+      message: "文章已删除。",
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "删除失败。",
+      },
+      { status: 500 },
     );
   }
 }
