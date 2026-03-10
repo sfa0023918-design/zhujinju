@@ -11,7 +11,6 @@ import type {
   SiteConfigContent,
 } from "@/lib/site-data";
 
-import { ActionLabel } from "./action-label";
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
 import { BilingualProse, BilingualReadingPanel, getLocalizedText, type ReadingLocale } from "./bilingual-prose";
@@ -104,12 +103,12 @@ function DetailIndexSection({
   const titleClasses =
     tone === "secondary"
       ? {
-          zh: "text-[0.56rem] tracking-[0.14em]",
-          en: "text-[0.4rem] uppercase tracking-[0.14em] text-[var(--accent)]/34",
+          zh: "text-[0.74rem] tracking-[0.12em] text-[var(--accent)]/90",
+          en: "text-[0.62rem] uppercase tracking-[0.13em] text-[var(--accent)]/62 leading-[1.45]",
         }
       : {
-          zh: "text-[0.6rem] tracking-[0.15em]",
-          en: "text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/42",
+          zh: "text-[0.78rem] tracking-[0.12em] text-[var(--accent)]/92",
+          en: "text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/68 leading-[1.45]",
         };
 
   return (
@@ -140,7 +139,7 @@ export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
           className="grid gap-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[92px_minmax(0,1fr)] md:gap-3.5"
         >
           <dt className="text-[var(--accent)]">
-            <p className="text-[0.96rem] font-medium tracking-[0.04em] text-[var(--accent)]/88 md:text-[0.82rem] md:tracking-[0.08em]">
+            <p className="text-[0.96rem] font-medium tracking-[0.04em] text-[var(--accent)]/88 md:text-[0.84rem] md:tracking-[0.08em]">
               {getLocalizedText(item.label, locale)}
             </p>
           </dt>
@@ -148,8 +147,8 @@ export function ArtworkFacts({ items, locale }: ArtworkFactsProps) {
             <p
               lang={locale === "en" ? "en" : "zh-CN"}
               className={locale === "zh"
-                ? "text-[1.22rem] leading-[1.74] text-[var(--ink)] md:text-[1.1rem]"
-                : "text-[0.88rem] font-medium uppercase tracking-[0.05em] text-[var(--ink)]/92 md:text-[0.82rem]"}
+                ? "text-[1.2rem] leading-[1.72] text-[var(--ink)] md:text-[1.12rem]"
+                : "text-[0.9rem] font-medium uppercase tracking-[0.04em] text-[var(--ink)]/94 md:text-[0.86rem]"}
             >
               {getLocalizedText(item.value, locale)}
             </p>
@@ -187,7 +186,13 @@ export function ArtworkInquiry({
         href={inquiryHref}
         className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line-strong)]/62 px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
       >
-        <ActionLabel text={detailCopy.inquireAction} />
+        <BilingualText
+          as="span"
+          text={detailCopy.inquireAction}
+          className="flex flex-col items-center text-center"
+          zhClassName="text-sm leading-none tracking-[0.01em]"
+          enClassName="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--accent)]/78 leading-[1.45]"
+        />
       </Link>
 
       {supportItems.length ? (
@@ -204,8 +209,8 @@ export function ArtworkInquiry({
                 mode="single"
                 locale={locale}
                 className="leading-none"
-                zhClassName="text-[0.64rem]"
-                enClassName="text-[0.38rem] uppercase tracking-[0.14em] text-[var(--accent)]/36"
+                zhClassName="text-[0.72rem]"
+                enClassName="text-[0.62rem] uppercase tracking-[0.12em] text-[var(--accent)]/66 leading-[1.45]"
               />
             </Link>
           ))}
@@ -218,10 +223,10 @@ export function ArtworkInquiry({
             <dl className="grid gap-y-2 sm:grid-cols-2 sm:gap-x-6">
               {contactRows.map((item) => (
                 <div key={`${artwork.slug}-${item.label}`} className="min-w-0">
-                  <dt className="text-[0.42rem] uppercase tracking-[0.16em] text-[var(--accent)]/40">
+                  <dt className="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/68 leading-[1.45]">
                     {item.label}
                   </dt>
-                  <dd className="mt-1 text-[0.76rem] leading-6 text-[var(--ink)]">
+                  <dd className="mt-1 text-[0.84rem] leading-6 text-[var(--ink)]">
                     {item.href ? (
                       <a href={item.href} className="transition-colors hover:text-[var(--accent)]">
                         {item.value}
@@ -238,7 +243,7 @@ export function ArtworkInquiry({
           {hasText(siteConfig.contact.appointmentNote) ? (
             <p
               lang={locale === "en" ? "en" : "zh-CN"}
-              className="max-w-[26rem] text-[0.76rem] leading-7 text-[var(--muted)]"
+              className="max-w-[26rem] text-[0.84rem] leading-7 text-[var(--muted)]/92"
             >
               {getLocalizedText(siteConfig.contact.appointmentNote, locale)}
             </p>
@@ -248,7 +253,13 @@ export function ArtworkInquiry({
             href="/collection"
             className="inline-flex items-center text-[0.72rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
           >
-            <ActionLabel text={detailCopy.backAction} />
+            <BilingualText
+              as="span"
+              text={detailCopy.backAction}
+              className="flex flex-col items-start text-left"
+              zhClassName="text-[0.8rem] leading-none tracking-[0.01em]"
+              enClassName="mt-1 text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+            />
           </Link>
         </div>
       ) : null}
@@ -295,8 +306,8 @@ export function ArtworkHero({
                 text={artwork.category}
                 mode="inline"
                 className="text-[var(--accent)]"
-                zhClassName="text-[0.68rem] tracking-[0.16em]"
-                enClassName="text-[0.46rem] uppercase tracking-[0.15em] text-[var(--accent)]/48"
+                zhClassName="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/94"
+                enClassName="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
               />
               <StatusPill status={artwork.status} />
             </div>
@@ -304,7 +315,7 @@ export function ArtworkHero({
               <h1 className="font-serif text-[clamp(2.5rem,3.8vw,3.4rem)] leading-[0.98] tracking-[-0.045em] text-[var(--ink)]">
                 {artwork.title.zh}
               </h1>
-              <p className="text-[0.56rem] uppercase tracking-[0.16em] text-[var(--accent)]/44">
+              <p className="text-[0.8rem] uppercase tracking-[0.12em] text-[var(--accent)]/76 leading-[1.45]">
                 {artwork.title.en}
               </p>
             </div>
@@ -390,8 +401,8 @@ export function ArtworkScholarlyNote({
           text={detailCopy.scholarlyNote}
           mode="inline"
           className="text-[var(--accent)]"
-          zhClassName="text-[0.66rem] tracking-[0.16em]"
-          enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
+          zhClassName="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/94"
+          enClassName="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
         />
         <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
           {(["zh", "en"] as const).map((option) => {

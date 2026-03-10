@@ -100,6 +100,7 @@ function ExpandableReadingText({
   });
   const [canExpand, setCanExpand] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const expanded = expandedByLocale[locale];
 
   useEffect(() => {
@@ -135,8 +136,25 @@ function ExpandableReadingText({
     return () => observer.disconnect();
   }, [locale, paragraphs]);
 
+  function toggleExpanded() {
+    const wrapperTop = wrapperRef.current?.getBoundingClientRect().top ?? null;
+    const nextExpanded = !expanded;
+
+    setExpandedByLocale((current) => ({
+      ...current,
+      [locale]: nextExpanded,
+    }));
+
+    if (!nextExpanded && wrapperTop !== null) {
+      requestAnimationFrame(() => {
+        const nextTop = wrapperRef.current?.getBoundingClientRect().top ?? wrapperTop;
+        window.scrollBy({ top: nextTop - wrapperTop, behavior: "auto" });
+      });
+    }
+  }
+
   return (
-    <div className="space-y-3">
+    <div ref={wrapperRef} className="space-y-3">
       <div
         ref={contentRef}
         data-expanded={expanded ? "true" : "false"}
@@ -166,15 +184,11 @@ function ExpandableReadingText({
       {canExpand ? (
         <button
           type="button"
-          onClick={() =>
-            setExpandedByLocale((current) => ({
-              ...current,
-              [locale]: !current[locale],
-            }))
-          }
-          className="inline-flex items-center gap-2 text-[0.78rem] tracking-[0.06em] text-[var(--accent)]/88 transition-colors hover:text-[var(--ink)]"
+          onClick={toggleExpanded}
+          className="inline-flex cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent)]/92 transition-colors hover:text-[var(--ink)]"
         >
           {locale === "zh" ? (expanded ? "收起" : "查看更多") : expanded ? "Show less" : "View more"}
+          {expanded ? <span aria-hidden="true">∧</span> : null}
         </button>
       ) : null}
     </div>
