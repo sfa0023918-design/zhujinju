@@ -1971,7 +1971,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773229993893-89上师像-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773229997976-88上师像-左.jpg"
+      ],
       "featured": false
     }
   ],
