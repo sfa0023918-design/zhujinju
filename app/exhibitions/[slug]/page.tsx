@@ -75,8 +75,10 @@ export default async function ExhibitionDetailPage({
   const exhibitionTextLabel = { zh: "展览介绍", en: "Exhibition Text" };
   const curatorialLeadLabel = { zh: "策展说明", en: "Curatorial Note" };
   const catalogueTitleLabel = { zh: "图录标题", en: "Catalogue Title" };
-  const detailHeadingZhClass = "block max-w-[12ch] text-[clamp(1.95rem,3.55vw,3.2rem)] leading-[0.93] tracking-[-0.044em] text-balance md:max-w-[10.5ch]";
-  const detailHeadingEnClass = "mt-3 block max-w-[32rem] font-sans text-[0.76rem] uppercase tracking-[0.18em] leading-[1.48] text-[var(--accent)]/84 md:text-[0.8rem]";
+  const detailHeadingZhClass =
+    "block max-w-[11.5ch] text-[clamp(1.78rem,3.15vw,2.82rem)] leading-[0.95] tracking-[-0.042em] text-balance md:max-w-[10ch]";
+  const detailHeadingEnClass =
+    "mt-2.5 block max-w-[28rem] font-sans text-[0.72rem] uppercase tracking-[0.16em] leading-[1.46] text-[var(--accent)]/78 md:text-[0.76rem]";
   const featuredWorksCount = exhibition.featuredWorksCount ?? exhibition.highlightCount ?? highlightArtworks.length;
   const cataloguePageCount = exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0;
   const catalogueTitle = exhibition.catalogueTitle;
@@ -85,12 +87,12 @@ export default async function ExhibitionDetailPage({
 
   return (
     <>
-      <section className="mx-auto grid w-full max-w-[1480px] gap-6 px-5 py-7 md:px-8 md:py-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-10 lg:py-10">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-5 px-5 py-6 md:px-8 md:py-7 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end lg:px-10 lg:py-8">
         <div className="space-y-6">
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
             <ActionLabel text={detailCopy.backAction} align="start" />
           </Link>
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             <BilingualText
               as="p"
               text={exhibition.subtitle}
@@ -108,12 +110,27 @@ export default async function ExhibitionDetailPage({
             />
           </div>
         </div>
-        <div className="space-y-4 border-t border-[var(--line)] pt-5 text-[0.92rem] leading-7 text-[var(--muted)] md:space-y-3 md:pt-1">
-          <div className="space-y-2.5">
-            <BilingualText as="p" text={exhibition.period} mode="inline" className="block" zhClassName="block text-[0.94rem]" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
-            <BilingualText as="p" text={exhibition.venue} mode="inline" className="block" zhClassName="block text-[0.94rem]" enClassName="text-[0.76rem] leading-[1.45] text-[var(--accent)]/82" />
+        <div className="space-y-3.5 border-t border-[var(--line)] pt-4 text-[0.9rem] leading-7 text-[var(--muted)] md:space-y-3 md:pt-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-[var(--line)]/62 pb-3 text-[0.84rem] leading-7 text-[var(--muted)]/92">
+            <BilingualText
+              as="span"
+              text={exhibition.period}
+              mode="inline"
+              className="inline-flex"
+              zhClassName="text-[0.86rem]"
+              enClassName="text-[0.66rem] uppercase tracking-[0.12em] text-[var(--accent)]/72"
+            />
+            <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
+            <BilingualText
+              as="span"
+              text={exhibition.venue}
+              mode="inline"
+              className="inline-flex"
+              zhClassName="text-[0.86rem]"
+              enClassName="text-[0.66rem] uppercase tracking-[0.12em] text-[var(--accent)]/72"
+            />
           </div>
-          <div className="space-y-2 border-t border-[var(--line)]/68 pt-3">
+          <div className="space-y-2.5 border-t border-[var(--line)]/65 pt-3">
             <InfoFact label={detailCopy.summaryLine.highlightUnit} value={{ zh: `${featuredWorksCount} 件`, en: `${featuredWorksCount} works` }} />
             <InfoFact label={detailCopy.summaryLine.catalogueUnit} value={{ zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` }} />
             {getPrimaryText(catalogueTitle) ? <InfoFact label={catalogueTitleLabel} value={catalogueTitle} /> : null}
@@ -121,7 +138,7 @@ export default async function ExhibitionDetailPage({
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-8 md:pb-18 lg:px-10 lg:pb-20">
+      <section className="mx-auto w-full max-w-[1480px] px-5 pb-12 md:px-8 md:pb-16 lg:px-10 lg:pb-18">
         <div className="relative overflow-hidden border border-[var(--line)]/65 bg-[var(--surface-strong)]">
           {exhibition.cover.startsWith("/api/placeholder/") ? (
             <div className="flex aspect-[1.32/1] max-h-[320px] items-center justify-center md:max-h-[420px] lg:max-h-[500px]">
@@ -156,7 +173,7 @@ export default async function ExhibitionDetailPage({
       />
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-20">
-        <div className="mb-10 flex items-end justify-between gap-4">
+        <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <BilingualText
               as="p"
@@ -169,8 +186,8 @@ export default async function ExhibitionDetailPage({
               as="h2"
               text={detailCopy.highlightedWorksTitle}
               className="font-serif text-[var(--ink)]"
-              zhClassName="block text-[2rem] leading-none tracking-[-0.04em] md:text-[3.5rem]"
-              enClassName="mt-3 block font-sans text-[0.82rem] uppercase tracking-[0.22em] text-[var(--accent)]"
+              zhClassName="block text-[1.75rem] leading-none tracking-[-0.038em] md:text-[2.6rem]"
+              enClassName="mt-2.5 block font-sans text-[0.72rem] uppercase tracking-[0.18em] text-[var(--accent)]/76"
             />
           </div>
         </div>

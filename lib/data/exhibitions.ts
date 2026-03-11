@@ -7,7 +7,7 @@ export const exhibitions: Exhibition[] = [
     title: bt("寂照：喜马拉雅造像与图像的观看", "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"),
     subtitle: bt("专题展览", "Special Exhibition"),
     period: bt("2025.10.18 - 2025.12.28", "18 Oct 2025 - 28 Dec 2025"),
-    venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+    venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
     intro: bt(
       "以造像与绘画并置的方式重新建立观看路径，讨论图像秩序、材质语汇与近距离观察的重要性。",
       "By placing sculpture and painting in dialogue, the exhibition reconsiders how image order, material language, and close looking shape understanding."
@@ -60,7 +60,7 @@ export const exhibitions: Exhibition[] = [
     title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
     subtitle: bt("研究型展览", "Research Exhibition"),
     period: bt("2024.05.12 - 2024.07.30", "12 May 2024 - 30 Jul 2024"),
-    venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+    venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
     intro: bt(
       "从金铜造像到设色唐卡，讨论材质与图像如何共同塑造宗教艺术的观看经验。",
       "From gilt bronzes to painted thangkas, the exhibition considers how material and image together shape the experience of sacred art."

@@ -48,21 +48,21 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
 
       <nav
         aria-label="主导航"
-        className="hidden flex-shrink-0 items-center justify-end gap-3 overflow-x-auto text-sm text-[var(--muted)] lg:flex lg:gap-3 xl:gap-[1.125rem] 2xl:gap-[1.35rem]"
+        className="hidden min-w-0 flex-shrink-0 items-center justify-end gap-3 overflow-x-auto text-sm text-[var(--muted)] lg:flex lg:gap-[1rem] xl:gap-[1.2rem] 2xl:gap-[1.45rem]"
       >
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="min-w-fit cursor-pointer select-none whitespace-nowrap transition-colors duration-300 hover:text-[var(--ink)]"
+            className="min-w-fit cursor-pointer select-none whitespace-nowrap py-1 transition-colors duration-300 hover:text-[var(--ink)]"
           >
             <BilingualText
               as="span"
               text={item.label}
               mode="inline"
-              className="text-[0.84rem] xl:text-[0.88rem] 2xl:text-[0.91rem]"
-              zhClassName="text-[0.84rem] xl:text-[0.88rem] 2xl:text-[0.91rem]"
-              enClassName="text-[0.5rem] uppercase tracking-[0.13em] text-[var(--accent)]/86 xl:text-[0.52rem] xl:tracking-[0.135em] 2xl:text-[0.55rem] 2xl:tracking-[0.14em]"
+              className="text-[0.82rem] xl:text-[0.86rem] 2xl:text-[0.9rem]"
+              zhClassName="text-[0.82rem] xl:text-[0.86rem] 2xl:text-[0.9rem]"
+              enClassName="text-[0.54rem] uppercase tracking-[0.12em] text-[var(--accent)]/92 xl:text-[0.56rem] xl:tracking-[0.125em] 2xl:text-[0.58rem] 2xl:tracking-[0.13em]"
             />
           </Link>
         ))}

@@ -17,72 +17,71 @@ export async function SiteFooter() {
   ];
 
   return (
-    <footer className="border-t border-[var(--line)]/75">
-      <div className="mx-auto grid w-full max-w-[1480px] gap-6 px-5 py-5 text-sm text-[var(--muted)] md:grid-cols-2 md:px-8 md:py-6 lg:grid-cols-[0.96fr_0.74fr_0.82fr] lg:px-10 lg:py-7">
-        <div className="max-w-[24rem] space-y-2.5">
+    <footer className="border-t border-[var(--line)]/68">
+      <div className="mx-auto grid w-full max-w-[1480px] gap-5 px-5 py-4 text-sm text-[var(--muted)] md:grid-cols-2 md:px-8 md:py-5 lg:grid-cols-[0.9fr_0.68fr_0.72fr] lg:px-10 lg:py-6">
+        <div className="max-w-[21rem] space-y-2">
           <BilingualText
             as="p"
             text={siteConfig.siteName}
             className="flex flex-col gap-1 text-[var(--ink)]"
-            zhClassName="text-[0.8rem] tracking-[0.2em]"
-            enClassName="text-[0.46rem] uppercase tracking-[0.18em] text-[var(--accent)]/44"
+            zhClassName="text-[0.76rem] tracking-[0.18em]"
+            enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/52"
           />
           <BilingualText
             as="p"
             text={siteConfig.footer.intro}
             className="flex flex-col gap-2"
-            zhClassName="text-[0.84rem] leading-[1.6]"
-            enClassName="text-[0.64rem] leading-[1.5] text-[var(--accent)]/44"
+            zhClassName="text-[0.8rem] leading-[1.58] text-[var(--muted)]/92"
+            enClassName="text-[0.64rem] leading-[1.48] text-[var(--accent)]/54"
           />
-          <p className="text-[0.84rem] leading-[1.6] text-[var(--muted)]/88">{siteConfig.footer.appointment.zh}</p>
-          <p className="text-[0.8rem] leading-[1.6] text-[var(--muted)]/82">
+          <p className="text-[0.78rem] leading-[1.55] text-[var(--muted)]/86">{siteConfig.footer.appointment.zh}</p>
+          <p className="text-[0.76rem] leading-[1.55] text-[var(--muted)]/78">
             {siteConfig.footer.copyrightLabel.zh} © {year} {siteConfig.siteName.zh} {siteConfig.siteName.en}
           </p>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <BilingualText
             as="p"
             text={siteConfig.footer.contactHeading}
             mode="inline"
             className="text-[var(--ink)]"
-            zhClassName="text-[0.84rem]"
-            enClassName="text-[0.42rem] uppercase tracking-[0.12em] text-[var(--accent)]/44"
+            zhClassName="text-[0.8rem]"
+            enClassName="text-[0.48rem] uppercase tracking-[0.12em] text-[var(--accent)]/52"
           />
-          <a className="block text-[0.84rem] leading-[1.6]" href={`mailto:${siteConfig.contact.email}`}>
+          <a className="block text-[0.8rem] leading-[1.55]" href={`mailto:${siteConfig.contact.email}`}>
             {siteConfig.contact.email}
           </a>
-          <p className="text-[0.84rem] leading-[1.6]">{siteConfig.contact.phone}</p>
-          {showWhatsApp ? <p className="text-[0.84rem] leading-[1.6]">{siteConfig.contact.whatsapp}</p> : null}
-          <p className="text-[0.84rem] leading-[1.6]">WeChat: {siteConfig.contact.wechat}</p>
+          <p className="text-[0.8rem] leading-[1.55]">{siteConfig.contact.phone}</p>
+          {showWhatsApp ? <p className="text-[0.8rem] leading-[1.55]">{siteConfig.contact.whatsapp}</p> : null}
+          <p className="text-[0.8rem] leading-[1.55]">WeChat: {siteConfig.contact.wechat}</p>
+          <p className="text-[0.8rem] leading-[1.55]">Instagram: {siteConfig.contact.instagram}</p>
         </div>
-        <div className="space-y-2 md:col-span-2 lg:col-span-1">
+        <div className="space-y-1.5 md:col-span-2 lg:col-span-1">
           <BilingualText
             as="p"
             text={siteConfig.footer.informationHeading}
             mode="inline"
             className="text-[var(--ink)]"
-            zhClassName="text-[0.84rem]"
-            enClassName="text-[0.42rem] uppercase tracking-[0.12em] text-[var(--accent)]/44"
+            zhClassName="text-[0.8rem]"
+            enClassName="text-[0.48rem] uppercase tracking-[0.12em] text-[var(--accent)]/52"
           />
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             {footerLinks.map((item) => (
-              <Link key={item.href} className="block text-[0.84rem] leading-[1.6]" href={item.href}>
+              <Link key={item.href} className="block text-[0.8rem] leading-[1.55]" href={item.href}>
                 <BilingualText
                   as="span"
                   text={item.label}
                   mode="inline"
                   className="block"
                   zhClassName="block"
-                  enClassName="text-[0.4rem] uppercase tracking-[0.12em] text-[var(--accent)]/44"
+                  enClassName="text-[0.46rem] uppercase tracking-[0.12em] text-[var(--accent)]/52"
                 />
               </Link>
             ))}
           </div>
-          <a className="block text-[0.84rem] leading-[1.6]" href={`mailto:${siteConfig.contact.pdfRequest}`}>
+          <a className="block text-[0.8rem] leading-[1.55]" href={`mailto:${siteConfig.contact.pdfRequest}`}>
             {siteConfig.footer.pdfRequestLabel.zh}
           </a>
-          <p className="text-[0.84rem] leading-[1.6]">{siteConfig.footer.instagramLabel.zh}: {siteConfig.contact.instagram}</p>
-          <p className="text-[0.84rem] leading-[1.6]">{siteConfig.footer.wechatLabel.zh}: {siteConfig.contact.wechat}</p>
         </div>
       </div>
     </footer>

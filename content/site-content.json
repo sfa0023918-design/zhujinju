@@ -63,7 +63,7 @@
       },
       "aside": {
         "zh": "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排与我们看件。",
-        "en": "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Shanghai are by appointment."
+        "en": "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment."
       },
       "infoLabels": {
         "email": {
@@ -138,12 +138,12 @@
         "en": "Chengdu, China · By Appointment"
       },
       "replyWindow": {
-        "zh": "地址：成都市青羊区草堂东路88号 竹瑾居艺术空间",
-        "en": "Address: 88 Caotang East Road, Qingyang District, Chengdu Zhujinju Art Space"
+        "zh": "作品咨询通常于 24 小时内回复。",
+        "en": "Artwork inquiries are usually answered within 24 hours."
       },
       "collaborationNote": {
-        "zh": "作品咨询通常于 24 小时内回复。 可联系借展、研究合作、图录交换与我们预约看件。",
-        "en": "Collaboration and Loans Inquiries are typically addressed within 24 hours. Please contact us regarding loans, research collaborations, catalogue exchanges, or to schedule a private viewing."
+        "zh": "可联系借展、研究合作、图录交换与我们预约看件。",
+        "en": "Please contact us regarding loans, research collaboration, catalogue exchange, or to arrange a private viewing."
       },
       "appointmentNote": {
         "zh": "By appointment in Chengdu.",
@@ -159,8 +159,8 @@
           "en": "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
         },
         "appointment": {
-          "zh": "By Appointment in Shanghai",
-          "en": "By Appointment in Shanghai"
+          "zh": "By Appointment in Chengdu",
+          "en": "By Appointment in Chengdu"
         },
         "copyrightLabel": {
           "zh": "版权所有",
@@ -441,13 +441,13 @@
           "en": "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange."
         },
         "aside": {
-          "zh": "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。上海会面采用预约制，可安排看件与研究交流。",
-          "en": "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Shanghai are by appointment."
+          "zh": "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排看件与研究交流。",
+          "en": "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment."
         }
       },
       "appointmentLine": {
-        "zh": "By appointment in Shanghai.",
-        "en": "By appointment in Shanghai."
+        "zh": "By appointment in Chengdu.",
+        "en": "By appointment in Chengdu."
       },
       "cooperationLine": {
         "zh": "借展、研究合作、图录交换与机构看件，请在留言中说明机构名称、时间安排与需求方向。",

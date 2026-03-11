@@ -7,7 +7,7 @@ export const pageCopy = {
         "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
         "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research.",
       ),
-      appointment: bt("By Appointment in Shanghai", "By Appointment in Shanghai"),
+      appointment: bt("By Appointment in Chengdu", "By Appointment in Chengdu"),
       copyrightLabel: bt("版权所有", "Copyright"),
       contactHeading: bt("联络", "Contact"),
       informationHeading: bt("信息与请求", "Information"),
@@ -140,11 +140,11 @@ export const pageCopy = {
         "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange.",
       ),
       aside: bt(
-        "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。上海会面采用预约制，可安排看件与研究交流。",
-        "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Shanghai are by appointment.",
+        "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排看件与研究交流。",
+        "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment.",
       ),
     },
-    appointmentLine: bt("By appointment in Shanghai.", "By appointment in Shanghai."),
+    appointmentLine: bt("By appointment in Chengdu.", "By appointment in Chengdu."),
     cooperationLine: bt(
       "借展、研究合作、图录交换与机构看件，请在留言中说明机构名称、时间安排与需求方向。",
       "For loans, research collaboration, catalogue exchange, and institutional viewings, please include your institution, schedule, and requirements.",

@@ -99,8 +99,8 @@ export const operationalFacts = [
     ),
   },
   {
-    title: bt("上海预约制空间", "By Appointment in Shanghai"),
-    value: bt("上海 · 预约制会面", "Shanghai appointment space"),
+    title: bt("成都预约制空间", "By Appointment in Chengdu"),
+    value: bt("成都 · 预约制会面", "Chengdu appointment space"),
     description: bt(
       "以预约制接待作品查看、借展洽谈、研究交流与图录交换。",
       "Meetings are arranged by appointment for viewings, loan discussion, research exchange, and catalogue requests."

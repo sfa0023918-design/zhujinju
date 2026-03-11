@@ -70,8 +70,10 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
   const articleBodyLabel = { zh: "正文", en: "Essay" };
-  const detailHeadingZhClass = "block max-w-[14ch] text-[clamp(2.25rem,4.1vw,3.85rem)] leading-[0.98] tracking-[-0.042em] text-balance md:max-w-[12ch]";
-  const detailHeadingEnClass = "mt-3 block max-w-[34rem] font-sans text-[0.74rem] uppercase tracking-[0.18em] leading-[1.5] text-[var(--accent)]/82 md:text-[0.78rem]";
+  const detailHeadingZhClass =
+    "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
+  const detailHeadingEnClass =
+    "mt-2.5 block max-w-[30rem] font-sans text-[0.7rem] uppercase tracking-[0.16em] leading-[1.48] text-[var(--accent)]/78 md:text-[0.74rem]";
 
   return (
     <>
@@ -82,7 +84,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
       </section>
 
       <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-8 md:pb-24 lg:px-10 lg:pb-28">
-        <header className="space-y-4.5 border-t border-[var(--line)] pt-5">
+        <header className="space-y-4 border-t border-[var(--line)] pt-5">
           <BilingualText
             as="p"
             text={article.category}
@@ -98,16 +100,19 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
             zhClassName={detailHeadingZhClass}
             enClassName={detailHeadingEnClass}
           />
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.9rem] leading-7 text-[var(--muted)]">
-            <p>{article.date}</p>
-            <span className="text-[var(--accent)]/34">·</span>
-            <p>{article.author.zh}</p>
-            <span className="text-[var(--accent)]/34">·</span>
-            <p>{article.column.zh}</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-2 text-[0.84rem] leading-7 text-[var(--muted)]/92">
+            <p className="select-none">{article.date}</p>
+            <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
+            <p className="select-none">{article.author.zh}</p>
+            <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
+            <p className="select-none">{article.column.zh}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 border-t border-[var(--line)]/62 pt-3.5">
             {article.keywords.map((keyword) => (
-              <span key={keyword.zh} className="border border-[var(--line)] px-3 py-1 text-[0.72rem] tracking-[0.08em] text-[var(--muted)]">
+              <span
+                key={keyword.zh}
+                className="border border-[var(--line)]/65 px-2.5 py-0.5 text-[0.68rem] tracking-[0.06em] text-[var(--muted)]/84"
+              >
                 {keyword.zh}
               </span>
             ))}

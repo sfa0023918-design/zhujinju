@@ -227,7 +227,7 @@ export default async function HomePage() {
           <div className="border-y border-[var(--line)] md:grid md:grid-cols-5 md:divide-x md:divide-[var(--line)]">
             {operationalFacts.map((pillar) => {
               const hasDenseValue =
-                pillar.title.zh === "服务对象" || pillar.title.zh === "上海预约制空间";
+                pillar.title.zh === "服务对象" || pillar.title.zh.includes("预约制空间");
 
               return (
                 <div key={pillar.title.zh} className="border-t border-[var(--line)] px-3 py-4 first:border-t-0 md:border-t-0 md:px-4">

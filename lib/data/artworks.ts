@@ -38,7 +38,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("寂照：喜马拉雅造像与图像的观看", "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2025",
       },
     ],
@@ -95,7 +95,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
     ],
@@ -149,7 +149,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("寂照：喜马拉雅造像与图像的观看", "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2025",
       },
     ],
@@ -202,7 +202,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
     ],
@@ -256,7 +256,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("寂照：喜马拉雅造像与图像的观看", "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2025",
       },
     ],
@@ -308,7 +308,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
     ],
@@ -360,7 +360,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("寂照：喜马拉雅造像与图像的观看", "Silent Radiance: Ways of Seeing Himalayan Sculpture and Image"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2025",
       },
     ],
@@ -412,7 +412,7 @@ export const artworks: Artwork[] = [
     exhibitions: [
       {
         title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
-        venue: bt("竹瑾居 · 上海预约制空间", "Zhu Jin Ju, Appointment Space, Shanghai"),
+        venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
     ],
