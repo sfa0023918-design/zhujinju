@@ -1088,7 +1088,7 @@
         "/uploads/artworks/1773146992939-l1000792.jpg",
         "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
       ],
-      "featured": true
+      "featured": false
     },
     {
       "id": "artwork_edbea557-00d5-43a9-8d0b-ec1630f13553",
@@ -1190,7 +1190,7 @@
         "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
         "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg"
       ],
-      "featured": true
+      "featured": false
     },
     {
       "id": "artwork_4b97b29a-b96b-47e4-a860-490bc721804d",
@@ -1423,7 +1423,7 @@
         "/uploads/artworks/1773202166808-l1001089.jpg",
         "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg"
       ],
-      "featured": false
+      "featured": true
     },
     {
       "id": "artwork_cbdee93c-924e-4ad6-bbe0-a4d410c81f17",
@@ -1523,7 +1523,7 @@
       "gallery": [
         "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
       ],
-      "featured": false
+      "featured": true
     },
     {
       "id": "artwork_b1a24c0e-ed53-4eda-92b1-2a8b8dde8346",
@@ -1656,7 +1656,7 @@
         "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
         "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg"
       ],
-      "featured": false
+      "featured": true
     }
   ],
   "exhibitions": [
