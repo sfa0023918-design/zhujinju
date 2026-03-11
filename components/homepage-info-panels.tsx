@@ -1,6 +1,15 @@
 "use client";
 
-import { useState, type Dispatch, type FocusEvent, type KeyboardEvent, type MouseEvent, type SetStateAction } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type FocusEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+  type SetStateAction,
+} from "react";
 
 import type { CollectingDirection, OperationalFact } from "@/lib/data/types";
 
@@ -10,6 +19,13 @@ type CollectingDirectionsGridProps = {
 
 type OperationalFactsGridProps = {
   items: OperationalFact[];
+};
+
+type RevealBlockProps = {
+  id: string;
+  expanded: boolean;
+  children: React.ReactNode;
+  paddingClassName: string;
 };
 
 function handleCardKeyToggle(
@@ -68,6 +84,38 @@ function buildExpandHandlers(
   };
 }
 
+function RevealBlock({ id, expanded, children, paddingClassName }: RevealBlockProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = useState(0);
+
+  useEffect(() => {
+    if (!contentRef.current) {
+      return;
+    }
+
+    if (!expanded) {
+      setMaxHeight(0);
+      return;
+    }
+
+    setMaxHeight(contentRef.current.scrollHeight);
+  }, [expanded, children]);
+
+  return (
+    <div
+      id={id}
+      className={`overflow-hidden transition-[max-height,opacity,transform,padding-top] duration-200 ease-out ${
+        expanded ? `translate-y-0 pt-3 opacity-100 ${paddingClassName}` : "max-h-0 translate-y-1 pt-0 opacity-0"
+      }`}
+      style={expanded ? { maxHeight: `${maxHeight}px` } : { maxHeight: "0px" }}
+    >
+      <div ref={contentRef} className="min-h-0">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function CollectingDirectionsGrid({ items }: CollectingDirectionsGridProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
@@ -97,29 +145,20 @@ export function CollectingDirectionsGrid({ items }: CollectingDirectionsGridProp
               {direction.name.en}
             </p>
             {(direction.description.zh || direction.description.en) ? (
-              <div
-                id={detailId}
-                className={`grid overflow-hidden transition-[grid-template-rows,opacity,transform,padding-top] duration-200 ease-out ${
-                  isExpanded
-                    ? "grid-rows-[1fr] translate-y-0 pt-2.5 opacity-100"
-                    : "grid-rows-[0fr] translate-y-1 pt-0 opacity-0"
-                }`}
-              >
-                <div className="min-h-0">
-                  <div className="space-y-1 border-t border-[var(--line)]/40 pt-2.5">
-                    {direction.description.zh ? (
-                      <p className="text-[13px] leading-[1.65] text-[var(--muted)]/92">
-                        {direction.description.zh}
-                      </p>
-                    ) : null}
-                    {direction.description.en ? (
-                      <p className="text-[11px] leading-[1.58] text-[var(--accent)]/72">
-                        {direction.description.en}
-                      </p>
-                    ) : null}
-                  </div>
+              <RevealBlock id={detailId} expanded={isExpanded} paddingClassName="">
+                <div className="space-y-1 border-t border-[var(--line)]/40 pt-2.5">
+                  {direction.description.zh ? (
+                    <p className="text-[13px] leading-[1.65] text-[var(--muted)]/92">
+                      {direction.description.zh}
+                    </p>
+                  ) : null}
+                  {direction.description.en ? (
+                    <p className="text-[11px] leading-[1.58] text-[var(--accent)]/76">
+                      {direction.description.en}
+                    </p>
+                  ) : null}
                 </div>
-              </div>
+              </RevealBlock>
             ) : null}
           </button>
         );
@@ -181,29 +220,20 @@ export function OperationalFactsGrid({ items }: OperationalFactsGridProps) {
               ) : null}
             </div>
             {(pillar.description.zh || pillar.description.en) ? (
-              <div
-                id={detailId}
-                className={`grid overflow-hidden transition-[grid-template-rows,opacity,transform,padding-top] duration-200 ease-out ${
-                  isExpanded
-                    ? "grid-rows-[1fr] translate-y-0 pt-3 opacity-100"
-                    : "grid-rows-[0fr] translate-y-1 pt-0 opacity-0"
-                }`}
-              >
-                <div className="min-h-0">
-                  <div className="space-y-1 border-t border-[var(--line)]/40 pt-2.5">
-                    {pillar.description.zh ? (
-                      <p className="text-[13px] leading-[1.68] text-[var(--muted)]/92">
-                        {pillar.description.zh}
-                      </p>
-                    ) : null}
-                    {pillar.description.en ? (
-                      <p className="text-[11px] leading-[1.58] text-[var(--accent)]/70">
-                        {pillar.description.en}
-                      </p>
-                    ) : null}
-                  </div>
+              <RevealBlock id={detailId} expanded={isExpanded} paddingClassName="">
+                <div className="space-y-1 border-t border-[var(--line)]/40 pt-2.5">
+                  {pillar.description.zh ? (
+                    <p className="text-[13px] leading-[1.68] text-[var(--muted)]/92">
+                      {pillar.description.zh}
+                    </p>
+                  ) : null}
+                  {pillar.description.en ? (
+                    <p className="text-[11px] leading-[1.58] text-[var(--accent)]/76">
+                      {pillar.description.en}
+                    </p>
+                  ) : null}
                 </div>
-              </div>
+              </RevealBlock>
             ) : null}
           </button>
         );

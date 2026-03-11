@@ -31,8 +31,8 @@ export default async function HomePage() {
   return (
     <>
       <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,1.12fr)_minmax(320px,0.88fr)] lg:items-end lg:gap-10">
-          <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,1.22fr)_minmax(300px,0.78fr)] lg:items-start lg:gap-10 xl:grid-cols-[minmax(0,1.26fr)_minmax(320px,0.74fr)]">
+          <div className="relative self-start overflow-hidden bg-[var(--surface-strong)]">
             <Image
               src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
               alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
@@ -40,7 +40,7 @@ export default async function HomePage() {
               height={1080}
               priority
               unoptimized
-              className="aspect-[1.22/1] h-full w-full object-cover"
+              className="aspect-[1.28/1] w-full object-cover md:aspect-[1.4/1] lg:aspect-[1.58/1] xl:aspect-[1.68/1]"
             />
           </div>
           <div className="flex flex-col justify-end gap-6 lg:pb-1">
