@@ -1594,7 +1594,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg"
+      ],
       "featured": false
     }
   ],
