@@ -43,6 +43,12 @@ type FilterOption = {
   label: BilingualValue;
 };
 
+function getPeriodStartCentury(option: BilingualValue) {
+  const source = `${option.zh} ${option.en}`;
+  const match = source.match(/(\d{1,2})/);
+  return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
+}
+
 function buildFilterHref(
   current: CollectionFiltersProps["current"],
   fieldName: FilterKey,
@@ -103,7 +109,9 @@ export function CollectionFilters({
         {
           name: "period" as const,
           label: labels.period,
-          options: options.periods.map((item) => ({ value: item.zh, label: item })),
+          options: [...options.periods]
+            .sort((left, right) => getPeriodStartCentury(left) - getPeriodStartCentury(right))
+            .map((item) => ({ value: item.zh, label: item })),
         },
         {
           name: "material" as const,
@@ -177,7 +185,7 @@ export function CollectionFilters({
                 }}
                 className={`inline-flex min-h-[2rem] w-full cursor-pointer select-none items-center gap-2 rounded-full border px-3 py-[0.32rem] text-left transition-colors duration-150 md:min-w-[138px] ${
                   isOpen || isActive
-                    ? "border-[var(--line-strong)]/50 text-[var(--ink)]"
+                    ? "border-[var(--line-strong)]/62 bg-[rgba(230,224,214,0.42)] text-[var(--ink)]"
                     : "border-[var(--line)]/52 text-[var(--muted)] hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)]"
                 }`}
               >
@@ -195,8 +203,12 @@ export function CollectionFilters({
                     text={currentLabel}
                     mode="inline"
                     className="mt-[0.18rem] block truncate text-[var(--ink)]"
-                    zhClassName="text-[0.72rem]"
-                    enClassName="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/34"
+                    zhClassName={isOpen || isActive ? "text-[0.72rem] text-[var(--ink)]" : "text-[0.72rem]"}
+                    enClassName={
+                      isOpen || isActive
+                        ? "text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/52"
+                        : "text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/34"
+                    }
                   />
                 </div>
                 <span
@@ -219,7 +231,7 @@ export function CollectionFilters({
                         setOpenKey(null);
                       }}
                       className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.46rem] text-[var(--muted)] transition-colors duration-150 hover:bg-[var(--surface-strong)] hover:text-[var(--ink)] ${
-                        !current[field.name] ? "bg-[var(--surface-strong)] text-[var(--ink)]" : ""
+                        !current[field.name] ? "bg-[rgba(230,224,214,0.42)] text-[var(--ink)]" : ""
                       }`}
                     >
                       <span className="text-[0.74rem]">{options.all.zh}</span>
@@ -236,7 +248,9 @@ export function CollectionFilters({
                           setOpenKey(null);
                         }}
                         className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.46rem] text-[var(--muted)] transition-colors duration-150 hover:bg-[var(--surface-strong)] hover:text-[var(--ink)] ${
-                          current[field.name] === option.value ? "bg-[var(--surface-strong)] text-[var(--ink)]" : ""
+                          current[field.name] === option.value
+                            ? "bg-[rgba(230,224,214,0.42)] text-[var(--ink)]"
+                            : ""
                         }`}
                       >
                         <span className="text-[0.74rem] leading-6">{option.label.zh}</span>
@@ -295,12 +309,16 @@ export function CollectionFilters({
                   }}
                   className={`inline-flex min-h-[2.15rem] w-full cursor-pointer select-none items-center justify-between gap-2 rounded-full border px-3 py-[0.35rem] ${
                     isActive || isOpen
-                      ? "border-[var(--line-strong)]/50 text-[var(--ink)]"
+                      ? "border-[var(--line-strong)]/62 bg-[rgba(230,224,214,0.42)] text-[var(--ink)]"
                       : "border-[var(--line)]/52 text-[var(--muted)]"
                   }`}
                 >
                   <span className="text-[0.72rem]">{field.label.zh}</span>
-                  <span className="text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">
+                  <span
+                    className={`text-[0.46rem] uppercase tracking-[0.14em] ${
+                      isActive || isOpen ? "text-[var(--accent)]/56" : "text-[var(--accent)]/42"
+                    }`}
+                  >
                     {currentLabel.zh}
                   </span>
                 </button>
@@ -314,11 +332,11 @@ export function CollectionFilters({
                           cancelClose();
                           setOpenKey(null);
                         }}
-                        className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.66rem] transition-colors duration-150 ${
-                          !current[field.name]
-                            ? "bg-[var(--surface-strong)] text-[var(--ink)]"
-                            : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--ink)]"
-                        }`}
+                          className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.66rem] transition-colors duration-150 ${
+                            !current[field.name]
+                              ? "bg-[rgba(230,224,214,0.42)] text-[var(--ink)]"
+                              : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--ink)]"
+                          }`}
                       >
                         <span className="text-[0.82rem]">{options.all.zh}</span>
                         <span className="text-[0.44rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">
@@ -335,7 +353,7 @@ export function CollectionFilters({
                           }}
                           className={`flex w-full cursor-pointer select-none items-center justify-between gap-3 bg-[var(--surface)] px-3 py-[0.66rem] transition-colors duration-150 ${
                             current[field.name] === option.value
-                              ? "bg-[var(--surface-strong)] text-[var(--ink)]"
+                              ? "bg-[rgba(230,224,214,0.42)] text-[var(--ink)]"
                               : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--ink)]"
                           }`}
                         >

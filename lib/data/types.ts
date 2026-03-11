@@ -382,6 +382,7 @@ export type SiteConfigEditorValue = {
   siteConfig: SiteConfigContent;
   brandIntroHeroImage: string;
   brandIntroHeroAlt: BilingualText;
+  collectionHero: PageHeroCopy;
 };
 
 export type EditableSectionValueMap = {

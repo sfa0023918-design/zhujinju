@@ -204,6 +204,9 @@ function normalizeSiteConfigDraft(value: SiteConfigEditorValue) {
   next.siteConfig.contact.pdfRequest = normalizeLineText(next.siteConfig.contact.pdfRequest);
   next.brandIntroHeroImage = normalizeLineText(next.brandIntroHeroImage);
   next.brandIntroHeroAlt = normalizeBilingualText(next.brandIntroHeroAlt);
+  next.collectionHero.eyebrow = normalizeBilingualText(next.collectionHero.eyebrow);
+  next.collectionHero.title = normalizeBilingualText(next.collectionHero.title);
+  next.collectionHero.description = normalizeBilingualText(next.collectionHero.description, "long");
   return next;
 }
 
@@ -1434,6 +1437,31 @@ function SiteSettingsEditor({
             />
             <BilingualInput label="首页主视觉替代文字" value={draft.brandIntroHeroAlt} onChange={(next) => update((value) => { value.brandIntroHeroAlt = next; })} fieldKeys={{ zh: "brandIntro.heroAlt.zh", en: "brandIntro.heroAlt.en" }} />
             <BilingualTextarea label="首页短介绍" value={draft.siteConfig.homeIntro} onChange={(next) => update((value) => { value.siteConfig.homeIntro = next; })} rows={4} fieldKeys={{ zh: "homeIntro.zh", en: "homeIntro.en" }} />
+            <div className="space-y-4 border-t border-[var(--line)] pt-6">
+              <div className="space-y-1">
+                <p className="text-[0.7rem] tracking-[0.16em] text-[var(--accent)]/88">藏品浏览页</p>
+                <p className="text-sm leading-7 text-[var(--muted)]">维护 collection 页面顶部的眉题、标题和说明文案。</p>
+              </div>
+              <BilingualInput
+                label="页头眉题"
+                value={draft.collectionHero.eyebrow}
+                onChange={(next) => update((value) => { value.collectionHero.eyebrow = next; })}
+                fieldKeys={{ zh: "collection.hero.eyebrow.zh", en: "collection.hero.eyebrow.en" }}
+              />
+              <BilingualInput
+                label="页头标题"
+                value={draft.collectionHero.title}
+                onChange={(next) => update((value) => { value.collectionHero.title = next; })}
+                fieldKeys={{ zh: "collection.hero.title.zh", en: "collection.hero.title.en" }}
+              />
+              <BilingualTextarea
+                label="页头说明"
+                value={draft.collectionHero.description}
+                onChange={(next) => update((value) => { value.collectionHero.description = next; })}
+                rows={4}
+                fieldKeys={{ zh: "collection.hero.description.zh", en: "collection.hero.description.en" }}
+              />
+            </div>
             <BilingualInput label="浏览器标题" value={draft.siteConfig.title} onChange={(next) => update((value) => { value.siteConfig.title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
             <BilingualTextarea label="站点描述" value={draft.siteConfig.description} onChange={(next) => update((value) => { value.siteConfig.description = next; })} rows={4} fieldKeys={{ zh: "description.zh", en: "description.en" }} />
             <div className="grid gap-4 md:grid-cols-2">

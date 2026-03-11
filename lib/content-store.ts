@@ -333,6 +333,7 @@ function buildSiteConfigEditorValue(content: SiteContent): SiteConfigEditorValue
     siteConfig: content.siteConfig,
     brandIntroHeroImage: content.brandIntro.heroImage ?? "",
     brandIntroHeroAlt: content.brandIntro.heroAlt ?? bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
+    collectionHero: structuredClone(content.pageCopy.collection.hero),
   };
 }
 
@@ -378,6 +379,13 @@ function applySiteConfigEditorValue(content: SiteContent, nextValue: SiteConfigE
       ...content.brandIntro,
       heroImage: nextValue.brandIntroHeroImage.trim(),
       heroAlt: nextValue.brandIntroHeroAlt,
+    },
+    pageCopy: {
+      ...content.pageCopy,
+      collection: {
+        ...content.pageCopy.collection,
+        hero: structuredClone(nextValue.collectionHero),
+      },
     },
   });
 }
@@ -1230,10 +1238,57 @@ export function getHighlightedArtworks(content: SiteContent, slugs: string[]) {
     .filter((artwork): artwork is Artwork => Boolean(artwork));
 }
 
+function normalizeCompareValue(value?: string) {
+  return value?.trim().toLowerCase() ?? "";
+}
+
+function scoreRelatedArtwork(current: Artwork, candidate: Artwork) {
+  let score = 0;
+
+  const sameRegion = normalizeCompareValue(candidate.region.zh) === normalizeCompareValue(current.region.zh);
+  const sameOrigin = normalizeCompareValue(candidate.origin.zh) === normalizeCompareValue(current.origin.zh);
+  const samePeriod = normalizeCompareValue(candidate.period.zh) === normalizeCompareValue(current.period.zh);
+  const sameMaterial = normalizeCompareValue(candidate.material.zh) === normalizeCompareValue(current.material.zh);
+  const sameCategory = normalizeCompareValue(candidate.category.zh) === normalizeCompareValue(current.category.zh);
+  const sharedExhibition = candidate.relatedExhibitionSlugs.some((slug) =>
+    current.relatedExhibitionSlugs.includes(slug),
+  );
+
+  if (sameRegion) score += 40;
+  if (sameOrigin) score += 36;
+  if (samePeriod) score += 32;
+  if (sameMaterial) score += 24;
+  if (sameCategory) score += 20;
+  if (sharedExhibition) score += 16;
+
+  return score;
+}
+
 export function getRelatedArtworks(content: SiteContent, currentSlug: string, categoryZh: string) {
+  const currentArtwork = getArtworkBySlug(content, currentSlug);
+
+  if (!currentArtwork) {
+    return getPublicArtworks(content)
+      .filter((artwork) => artwork.slug !== currentSlug && artwork.category.zh === categoryZh)
+      .slice(0, 4);
+  }
+
   return getPublicArtworks(content)
-    .filter((artwork) => artwork.slug !== currentSlug && artwork.category.zh === categoryZh)
-    .slice(0, 3);
+    .filter((artwork) => artwork.slug !== currentSlug)
+    .map((artwork) => ({
+      artwork,
+      score: scoreRelatedArtwork(currentArtwork, artwork),
+    }))
+    .sort((left, right) => {
+      if (right.score !== left.score) {
+        return right.score - left.score;
+      }
+
+      return left.artwork.title.zh.localeCompare(right.artwork.title.zh, "zh-CN");
+    })
+    .filter((item, index) => item.score > 0 || index < 4)
+    .slice(0, 4)
+    .map((item) => item.artwork);
 }
 
 export function getFilteredArtworks(

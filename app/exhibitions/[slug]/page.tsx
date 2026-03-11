@@ -76,7 +76,7 @@ export default async function ExhibitionDetailPage({
   const curatorialLeadLabel = { zh: "策展说明", en: "Curatorial Note" };
   const catalogueTitleLabel = { zh: "图录标题", en: "Catalogue Title" };
   const detailHeadingZhClass =
-    "block max-w-[11.5ch] text-[clamp(1.78rem,3.15vw,2.82rem)] leading-[0.95] tracking-[-0.042em] text-balance md:max-w-[10ch]";
+    "block max-w-[10.5ch] text-[clamp(1.68rem,2.9vw,2.56rem)] leading-[0.93] tracking-[-0.042em] text-balance md:max-w-[9.5ch]";
   const detailHeadingEnClass =
     "mt-2.5 block max-w-[28rem] font-sans text-[0.72rem] uppercase tracking-[0.16em] leading-[1.46] text-[var(--accent)]/78 md:text-[0.76rem]";
   const featuredWorksCount = exhibition.featuredWorksCount ?? exhibition.highlightCount ?? highlightArtworks.length;
@@ -87,7 +87,7 @@ export default async function ExhibitionDetailPage({
 
   return (
     <>
-      <section className="mx-auto grid w-full max-w-[1480px] gap-5 px-5 py-6 md:px-8 md:py-7 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end lg:px-10 lg:py-8">
+      <section className="mx-auto grid w-full max-w-[1480px] gap-5 px-5 py-6 md:px-8 md:py-7 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:px-10 lg:py-8">
         <div className="space-y-6">
           <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
             <ActionLabel text={detailCopy.backAction} align="start" />
@@ -110,7 +110,7 @@ export default async function ExhibitionDetailPage({
             />
           </div>
         </div>
-        <div className="space-y-3.5 border-t border-[var(--line)] pt-4 text-[0.9rem] leading-7 text-[var(--muted)] md:space-y-3 md:pt-1">
+        <div className="space-y-3.5 border-t border-[var(--line)] pt-4 text-[0.9rem] leading-7 text-[var(--muted)] md:space-y-3 lg:pt-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-[var(--line)]/62 pb-3 text-[0.84rem] leading-7 text-[var(--muted)]/92">
             <BilingualText
               as="span"
@@ -141,11 +141,11 @@ export default async function ExhibitionDetailPage({
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-12 md:px-8 md:pb-16 lg:px-10 lg:pb-18">
         <div className="relative overflow-hidden border border-[var(--line)]/65 bg-[var(--surface-strong)]">
           {exhibition.cover.startsWith("/api/placeholder/") ? (
-            <div className="flex aspect-[1.32/1] max-h-[320px] items-center justify-center md:max-h-[420px] lg:max-h-[500px]">
+            <div className="flex min-h-[220px] items-center justify-center px-4 py-4 md:min-h-[260px] md:px-6 md:py-5 lg:min-h-[300px] lg:px-8 lg:py-6">
               <MediaPlaceholder eyebrow="Exhibition Image" title={exhibition.title.zh} />
             </div>
           ) : (
-            <div className="flex aspect-[1.32/1] max-h-[320px] items-center justify-center p-4 md:max-h-[420px] md:p-6 lg:max-h-[500px] lg:p-8">
+            <div className="flex items-center justify-center px-4 py-4 md:px-6 md:py-5 lg:px-8 lg:py-6">
               <Image
                 src={exhibition.cover}
                 alt={`${exhibition.title.zh} ${exhibition.title.en}`}
@@ -153,7 +153,7 @@ export default async function ExhibitionDetailPage({
                 height={1100}
                 priority
                 unoptimized
-                className="h-full w-full object-contain"
+                className="h-auto w-auto max-h-[320px] max-w-full object-contain md:max-h-[420px] lg:max-h-[540px]"
               />
             </div>
           )}

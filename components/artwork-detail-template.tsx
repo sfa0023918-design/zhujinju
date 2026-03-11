@@ -70,6 +70,20 @@ type RelatedWorksProps = {
   detailCopy: ArtworkDetailCopy;
 };
 
+type DetailSectionLink = {
+  id: string;
+  label: { zh: string; en: string };
+};
+
+const DETAIL_SECTION_IDS = {
+  info: "artwork-info",
+  viewing: "artwork-viewing",
+  provenance: "artwork-provenance",
+  exhibitions: "artwork-exhibitions",
+  publications: "artwork-publications",
+  relatedArticles: "artwork-related-articles",
+} as const;
+
 function hasText(value?: { zh?: string; en?: string } | null) {
   if (!value) {
     return false;
@@ -90,11 +104,13 @@ function joinBilingual(primary: { zh: string; en: string }, secondary?: { zh: st
 }
 
 function DetailIndexSection({
+  id,
   label,
   locale,
   tone = "primary",
   children,
 }: {
+  id?: string;
   label: { zh: string; en: string };
   locale: ReadingLocale;
   tone?: "primary" | "secondary";
@@ -112,7 +128,7 @@ function DetailIndexSection({
         };
 
   return (
-    <section className="border-t border-[var(--line)]/34 pt-4.5 first:border-t-0 first:pt-0">
+    <section id={id} className="scroll-mt-28 border-t border-[var(--line)]/34 pt-4.5 first:border-t-0 first:pt-0">
       <p
         lang={locale === "en" ? "en" : "zh-CN"}
         className={`text-[var(--accent)] ${locale === "zh" ? titleClasses.zh : titleClasses.en}`}
@@ -293,7 +309,7 @@ export function ArtworkHero({
   const hasLead = hasText(artwork.excerpt);
 
   return (
-    <section className="mx-auto w-full max-w-[1480px] px-5 py-7 md:px-8 md:py-9 lg:px-10 lg:py-10">
+    <section id={DETAIL_SECTION_IDS.info} className="mx-auto scroll-mt-28 w-full max-w-[1480px] px-5 py-7 md:px-8 md:py-9 lg:px-10 lg:py-10">
       <div className="mb-5 text-[0.82rem] leading-6 text-[var(--muted)]">
         <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
           {detailCopy.breadcrumb.zh}
@@ -406,7 +422,7 @@ export function ArtworkScholarlyNote({
   }>;
 
   return (
-    <section className="max-w-[42rem] space-y-4">
+    <section id={DETAIL_SECTION_IDS.viewing} className="max-w-[42rem] scroll-mt-28 space-y-4">
       <div className="flex items-center justify-between gap-4">
         <BilingualText
           as="p"
@@ -461,7 +477,7 @@ export function ArtworkReferences({
   return (
     <aside className="space-y-4.5 lg:pl-6">
       {hasProvenance ? (
-        <DetailIndexSection label={detailCopy.provenance} locale={locale}>
+        <DetailIndexSection id={DETAIL_SECTION_IDS.provenance} label={detailCopy.provenance} locale={locale}>
           <ul className="space-y-3">
             {artwork.provenance.map((item) => (
               <li key={item.label.zh} className="space-y-0.5">
@@ -480,7 +496,7 @@ export function ArtworkReferences({
       ) : null}
 
       {hasExhibitions ? (
-        <DetailIndexSection label={detailCopy.exhibitions} locale={locale}>
+        <DetailIndexSection id={DETAIL_SECTION_IDS.exhibitions} label={detailCopy.exhibitions} locale={locale}>
           <ul className="space-y-3">
             {artwork.exhibitions.map((item) => (
               <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
@@ -499,7 +515,7 @@ export function ArtworkReferences({
       ) : null}
 
       {hasPublications ? (
-        <DetailIndexSection label={detailCopy.publications} locale={locale}>
+        <DetailIndexSection id={DETAIL_SECTION_IDS.publications} label={detailCopy.publications} locale={locale}>
           <ul className="space-y-3">
             {artwork.publications.map((item) => (
               <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
@@ -539,7 +555,12 @@ export function ArtworkReferences({
       ) : null}
 
       {hasRelatedArticles ? (
-        <DetailIndexSection label={detailCopy.relatedArticles} locale={locale} tone="secondary">
+        <DetailIndexSection
+          id={DETAIL_SECTION_IDS.relatedArticles}
+          label={detailCopy.relatedArticles}
+          locale={locale}
+          tone="secondary"
+        >
           <div className="space-y-2">
             {relatedArticles.map((item) => (
               <Link
@@ -554,6 +575,49 @@ export function ArtworkReferences({
         </DetailIndexSection>
       ) : null}
     </aside>
+  );
+}
+
+function DetailSectionNav({ sections }: { sections: DetailSectionLink[] }) {
+  if (!sections.length) {
+    return null;
+  }
+
+  function scrollToSection(id: string) {
+    const target = document.getElementById(id);
+
+    if (!target) {
+      return;
+    }
+
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  return (
+    <nav
+      aria-label="Artwork sections"
+      className="mx-auto w-full max-w-[1480px] px-5 pb-1 md:px-8 lg:px-10"
+    >
+      <div className="flex flex-wrap gap-2.5 border-t border-[var(--line)]/28 pt-4">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            onClick={() => scrollToSection(section.id)}
+            className="inline-flex cursor-pointer select-none items-center rounded-full border border-[var(--line)]/26 px-3 py-1.5 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/36 hover:text-[var(--ink)] focus-visible:border-[var(--line-strong)]/42 focus-visible:outline-none"
+          >
+            <BilingualText
+              as="span"
+              text={section.label}
+              mode="inline"
+              className="leading-none"
+              zhClassName="text-[0.76rem] tracking-[0.01em]"
+              enClassName="text-[0.64rem] uppercase tracking-[0.12em] text-[var(--accent)]/68 leading-[1.45]"
+            />
+          </button>
+        ))}
+      </div>
+    </nav>
   );
 }
 
@@ -612,10 +676,29 @@ export function ArtworkDetailTemplate({
   relatedExhibitions,
 }: ArtworkDetailTemplateProps) {
   const [locale, setLocale] = useState<ReadingLocale>("zh");
+  const sections: DetailSectionLink[] = [
+    { id: DETAIL_SECTION_IDS.info, label: { zh: "作品信息", en: "Artwork Info" } },
+    (hasText(artwork.excerpt) || hasText(artwork.viewingNote) || hasText(artwork.comparisonNote))
+      ? { id: DETAIL_SECTION_IDS.viewing, label: { zh: "观看描述", en: "Visual Description" } }
+      : null,
+    artwork.provenance.length
+      ? { id: DETAIL_SECTION_IDS.provenance, label: detailCopy.provenance }
+      : null,
+    artwork.exhibitions.length
+      ? { id: DETAIL_SECTION_IDS.exhibitions, label: detailCopy.exhibitions }
+      : null,
+    artwork.publications.length
+      ? { id: DETAIL_SECTION_IDS.publications, label: detailCopy.publications }
+      : null,
+    relatedArticles.length
+      ? { id: DETAIL_SECTION_IDS.relatedArticles, label: detailCopy.relatedArticles }
+      : null,
+  ].filter(Boolean) as DetailSectionLink[];
 
   return (
     <>
       <ArtworkHero artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} locale={locale} />
+      <DetailSectionNav sections={sections} />
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(260px,0.62fr)] lg:gap-14">

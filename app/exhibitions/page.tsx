@@ -54,7 +54,7 @@ function ExhibitionCover({
 
   if (isPlaceholder) {
     return (
-      <div className="aspect-[1.28/1]">
+      <div className="aspect-[1.18/1]">
         <MediaPlaceholder eyebrow="Exhibition Image" title={title.zh} />
       </div>
     );
@@ -67,7 +67,7 @@ function ExhibitionCover({
       width={1600}
       height={1000}
       unoptimized
-      className="aspect-[1.28/1] h-full w-full object-cover"
+      className="aspect-[1.18/1] h-full w-full object-cover"
     />
   );
 }
@@ -114,7 +114,7 @@ export default async function ExhibitionsPage() {
           {exhibitions.map((exhibition) => (
             <article
               key={exhibition.slug}
-              className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.58fr)_minmax(360px,0.42fr)] lg:items-start lg:gap-8"
+              className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.54fr)_minmax(360px,0.46fr)] lg:items-start lg:gap-7"
             >
               <Link
                 href={`/exhibitions/${exhibition.slug}`}
