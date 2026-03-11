@@ -5,6 +5,15 @@ type GitHubRepoConfig = {
   branch: string;
 };
 
+const DEV_PUBLIC_REPO_FALLBACK =
+  process.env.NODE_ENV !== "production"
+    ? {
+        owner: "sfa0023918-design",
+        repo: "zhujinju",
+        branch: "main",
+      }
+    : null;
+
 function getGitHubRepoConfig(): GitHubRepoConfig | null {
   const token = process.env.GITHUB_CONTENTS_TOKEN;
   const owner = process.env.GITHUB_REPO_OWNER;
@@ -133,7 +142,22 @@ export async function getRepoUtf8File(repoPath: string) {
       throw new Error("未配置 GitHub 内容读取环境变量，生产环境无法读取最新内容。");
     }
 
-    return null;
+    if (!DEV_PUBLIC_REPO_FALLBACK) {
+      return null;
+    }
+
+    const response = await fetch(
+      `https://raw.githubusercontent.com/${DEV_PUBLIC_REPO_FALLBACK.owner}/${DEV_PUBLIC_REPO_FALLBACK.repo}/${DEV_PUBLIC_REPO_FALLBACK.branch}/${repoPath}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.text();
   }
 
   const payload = await getRepoFilePayload(config, repoPath);

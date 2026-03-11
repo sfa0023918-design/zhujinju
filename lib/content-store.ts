@@ -107,7 +107,7 @@ async function readGitHubContentFile() {
 }
 
 async function readBestAvailableContentFile() {
-  if (process.env.NODE_ENV === "production" && hasGitHubRepoConfig()) {
+  if (hasGitHubRepoConfig()) {
     const remote = await readGitHubContentFile();
 
     if (remote) {

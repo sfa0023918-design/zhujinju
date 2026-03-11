@@ -211,7 +211,7 @@ export function CollectionFilters({
 
               {isOpen ? (
                 <div className="absolute left-0 top-[calc(100%+0.35rem)] z-20 min-w-[204px] border border-[var(--line)]/52 bg-[var(--surface)] p-[3px] shadow-[0_12px_26px_rgba(26,22,18,0.05)]">
-                  <div className="grid gap-px bg-[var(--line)]/10">
+                  <div className="grid max-h-[224px] gap-px overflow-y-auto overscroll-contain bg-[var(--line)]/10 [scrollbar-gutter:stable]">
                     <Link
                       href={buildFilterHref(current, field.name, undefined)}
                       onClick={() => {
@@ -307,7 +307,7 @@ export function CollectionFilters({
 
                 {isOpen ? (
                   <div className="absolute left-0 top-[calc(100%+0.5rem)] z-30 min-w-0 w-full max-w-[calc(100vw-2.5rem)] overflow-hidden rounded-[16px] border border-[var(--line)]/60 bg-[var(--surface)] p-[3px] shadow-[0_18px_36px_rgba(17,14,12,0.1)]">
-                    <div className="grid gap-px bg-[var(--line)]/10">
+                    <div className="grid max-h-[280px] gap-px overflow-y-auto overscroll-contain bg-[var(--line)]/10 [scrollbar-gutter:stable]">
                       <Link
                         href={buildFilterHref(current, field.name, undefined)}
                         onClick={() => {

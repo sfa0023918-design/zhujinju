@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { ArtworkCard } from "@/components/artwork-card";
 import { CollectionFilters } from "@/components/collection-filters";
 import { getArtworkStatusText } from "@/lib/bilingual";
@@ -7,6 +9,8 @@ import { getFilterOptions, getFilteredArtworks, getPublicArtworks, loadSiteConte
 
 export const dynamic = "force-dynamic";
 
+const ARTWORKS_PER_PAGE = 9;
+
 type CollectionPageProps = {
   searchParams?: Promise<{
     category?: string;
@@ -14,8 +18,38 @@ type CollectionPageProps = {
     period?: string;
     material?: string;
     status?: string;
+    page?: string;
   }>;
 };
+
+function buildCollectionPageHref(
+  filters: NonNullable<Awaited<CollectionPageProps["searchParams"]>>,
+  page: number,
+) {
+  const params = new URLSearchParams();
+
+  if (filters.category) {
+    params.set("category", filters.category);
+  }
+  if (filters.region) {
+    params.set("region", filters.region);
+  }
+  if (filters.period) {
+    params.set("period", filters.period);
+  }
+  if (filters.material) {
+    params.set("material", filters.material);
+  }
+  if (filters.status) {
+    params.set("status", filters.status);
+  }
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+
+  const query = params.toString();
+  return query ? `/collection?${query}` : "/collection";
+}
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
@@ -33,9 +67,16 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
   const content = await loadSiteContent();
   const baseArtworks = getFilteredArtworks(content, filters);
   const publicArtworks = getPublicArtworks(content);
-  const artworks = !filters.status
+  const filteredArtworks = !filters.status
     ? baseArtworks
     : baseArtworks.filter((artwork) => artwork.status === filters.status);
+  const requestedPage = Number.parseInt(filters.page ?? "1", 10);
+  const totalPages = Math.max(1, Math.ceil(filteredArtworks.length / ARTWORKS_PER_PAGE));
+  const currentPage = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(requestedPage, 1), totalPages)
+    : 1;
+  const pageStartIndex = (currentPage - 1) * ARTWORKS_PER_PAGE;
+  const artworks = filteredArtworks.slice(pageStartIndex, pageStartIndex + ARTWORKS_PER_PAGE);
   const filterOptions = {
     ...getFilterOptions(content),
     statuses: Array.from(new Set(publicArtworks.map((artwork) => artwork.status))).map((status) => ({
@@ -76,7 +117,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
           current={filters}
           options={filterOptions}
           labels={filterLabels}
-          resultCount={artworks.length}
+          resultCount={filteredArtworks.length}
         />
         <div className="mt-6 grid gap-x-8 gap-y-11 md:grid-cols-2 xl:grid-cols-3">
           {artworks.length > 0 ? (
@@ -97,6 +138,55 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
             </div>
           )}
         </div>
+
+        {filteredArtworks.length > ARTWORKS_PER_PAGE ? (
+          <div className="mt-12 border-t border-[var(--line)]/55 pt-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-[0.76rem] leading-7 text-[var(--muted)]/86">
+                第 {currentPage} 页，共 {totalPages} 页
+              </p>
+              <div className="flex flex-wrap items-center gap-2.5">
+                {currentPage > 1 ? (
+                  <Link
+                    href={buildCollectionPageHref(filters, currentPage - 1)}
+                    className="inline-flex min-h-[2.2rem] items-center rounded-full border border-[var(--line)]/55 px-3.5 py-[0.42rem] text-[0.72rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
+                  >
+                    上一页
+                  </Link>
+                ) : null}
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
+                    const isCurrent = page === currentPage;
+                    return (
+                      <Link
+                        key={page}
+                        href={buildCollectionPageHref(filters, page)}
+                        aria-current={isCurrent ? "page" : undefined}
+                        className={`inline-flex min-h-[2.2rem] min-w-[2.2rem] items-center justify-center rounded-full border px-3 py-[0.42rem] text-[0.72rem] transition-colors duration-150 ${
+                          isCurrent
+                            ? "border-[var(--line-strong)]/55 text-[var(--ink)]"
+                            : "border-[var(--line)]/45 text-[var(--muted)] hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)]"
+                        }`}
+                      >
+                        {page}
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {currentPage < totalPages ? (
+                  <Link
+                    href={buildCollectionPageHref(filters, currentPage + 1)}
+                    className="inline-flex min-h-[2.2rem] items-center rounded-full border border-[var(--line)]/55 px-3.5 py-[0.42rem] text-[0.72rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
+                  >
+                    下一页
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </section>
     </>
   );
