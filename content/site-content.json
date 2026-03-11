@@ -1244,8 +1244,20 @@
       "provenance": [
         {
           "label": {
-            "zh": "Richard C. Blum and Senator Dianne Feinstein Collection； 普利兹克收藏 ； 2006年购买于 Carlo Cristi；",
-            "en": "Richard C. Blum and Senator Dianne Feinstein Collection; Pritzker Collection; Acquired from Carlo Cristi, 2006."
+            "zh": "Richard C. Blum and Senator Dianne Feinstein Collection",
+            "en": "Richard C. Blum and Senator Dianne Feinstein Collection"
+          }
+        },
+        {
+          "label": {
+            "zh": "普利兹克收藏",
+            "en": "Pritzker Collection"
+          }
+        },
+        {
+          "label": {
+            "zh": "2006年购买于 Carlo Cristi",
+            "en": "Acquired from Carlo Cristi, 2006"
           }
         }
       ],
@@ -1265,10 +1277,10 @@
       "publications": [
         {
           "title": {
-            "zh": "Pal 《喜马拉雅山：美学冒险》，2003年，P195； 艾米·海勒，《噶举派两位藏族上师的唐卡》，2008年。",
-            "en": "Pratapaditya Pal, *Himalayas: An Aesthetic Adventure*, 2003, p. 195; Amy Heller, *Thangkas of Two Tibetan Masters of the Kagyu Lineage*, 2008."
+            "zh": "Pal 博士《喜马拉雅山：美学冒险》",
+            "en": "Dr. Pratapaditya Pal, *Himalayas: An Aesthetic Adventure*"
           },
-          "year": "2003年，2008年",
+          "year": "2003年",
           "pages": {
             "zh": "第195页",
             "en": "p. 195"
@@ -1283,6 +1295,17 @@
           "pages": {
             "zh": "第77页",
             "en": "Page 77"
+          }
+        },
+        {
+          "title": {
+            "zh": "艾米·海勒，《噶举派两位藏族上师的唐卡》",
+            "en": "Amy Heller, *Thangkas of Two Tibetan Masters of the Kagyu School*"
+          },
+          "year": "2008年",
+          "pages": {
+            "zh": "",
+            "en": ""
           }
         }
       ],
