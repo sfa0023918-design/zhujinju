@@ -1494,7 +1494,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
+      ],
       "featured": false
     }
   ],
