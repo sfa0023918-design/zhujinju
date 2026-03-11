@@ -1627,8 +1627,8 @@
       "publications": [
         {
           "title": {
-            "zh": "Oriental Art, 46 (2000), pp. 36-46, p. 45",
-            "en": "Oriental Art, 46 (2000), pp. 36-46, p. 45"
+            "zh": "Oriental Art, 46 (2000年)p. 36-46, p. 45",
+            "en": "Oriental Art, 46 (2000年)p. 36-46, p. 45"
           },
           "year": "2000年",
           "pages": {
@@ -1670,7 +1670,9 @@
           "en": "Catalogue pages available on request"
         }
       ],
-      "relatedArticleSlugs": [],
+      "relatedArticleSlugs": [
+        "why-exhibitions-matter"
+      ],
       "relatedExhibitionSlugs": [
         "silent-radiance"
       ],
