@@ -1835,7 +1835,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg"
+      ],
       "featured": false
     }
   ],
