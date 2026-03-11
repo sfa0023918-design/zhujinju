@@ -759,12 +759,12 @@
   "collectingDirections": [
     {
       "name": {
-        "zh": "铜造像",
-        "en": "Bronze Sculpture"
+        "zh": "造像",
+        "en": "Figure"
       },
       "description": {
-        "zh": "聚焦十三至十八世纪西藏、尼泊尔与相关区域的金铜佛教造像。",
-        "en": "Focused on gilt and copper alloy Buddhist sculpture from Tibet, Nepal, and related regions between the 13th and 18th centuries."
+        "zh": "聚焦早期西藏、尼泊尔、印度与相关区域的佛教造像。",
+        "en": "Focusing on early Buddhist sculpture from Tibet, Nepal, India, and related regions."
       }
     },
     {
