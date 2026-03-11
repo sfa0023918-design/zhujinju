@@ -1,13 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="180" viewBox="0 0 980 180" fill="none">
-  <rect width="980" height="180" fill="#171311"/>
-  <g transform="translate(24 26)">
-    <rect x="0" y="0" width="128" height="128" stroke="#EADCCF" stroke-width="4"/>
-    <path fill="#EADCCF" d="M19.2 19.2h88l-6.4 8H19.2z"/>
-    <path fill="#EADCCF" d="M25.6 100.8h83.2v8H19.2z"/>
-    <path fill="#EADCCF" d="M102.4 27.2h11.2l-52.8 64H49.6z"/>
-    <path fill="#EADCCF" d="M56 32h9.6v52c0 5.6-1.6 10.4-4.8 14.4-4 4.8-9.6 7.2-17.6 7.2H33.6v-8h8c5.6 0 9.6-.8 12-3.2 1.6-2.4 2.4-5.6 2.4-10.4V32z"/>
-    <path fill="#EADCCF" d="M80 32h9.6v52c0 5.6-1.6 10.4-4.8 14.4-4 4.8-9.6 7.2-17.6 7.2H57.6v-8h8c5.6 0 9.6-.8 12-3.2 1.6-2.4 2.4-5.6 2.4-10.4V32z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 120" fill="none">
+  <defs>
+    <linearGradient id="contourStroke" x1="72" y1="56" x2="168" y2="182" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0E7DB"/>
+      <stop offset="0.55" stop-color="#D9CCBC"/>
+      <stop offset="1" stop-color="#BEAF9D"/>
+    </linearGradient>
+    <linearGradient id="axisStroke" x1="82" y1="80" x2="158" y2="158" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3EBE2"/>
+      <stop offset="0.55" stop-color="#D9C9B7"/>
+      <stop offset="1" stop-color="#BDA58A"/>
+    </linearGradient>
+    <linearGradient id="hairStroke" x1="78" y1="76" x2="162" y2="164" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF6F0"/>
+      <stop offset="1" stop-color="#E5D9CA"/>
+    </linearGradient>
+    <linearGradient id="accentStroke" x1="109" y1="109" x2="131" y2="131" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9A894"/>
+      <stop offset="1" stop-color="#BF7F6D"/>
+    </linearGradient>
+    <linearGradient id="coreFill" x1="116" y1="116" x2="124" y2="124" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0E4D6"/>
+      <stop offset="1" stop-color="#D5BD9D"/>
+    </linearGradient>
+    <style>
+      .cn {
+        fill: #F0E7DB;
+        font-family: "Songti SC", "Noto Serif CJK SC", serif;
+        font-size: 30px;
+        letter-spacing: 0.24em;
+      }
+      .en {
+        fill: rgba(240, 231, 219, 0.8);
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        font-size: 10px;
+        letter-spacing: 0.28em;
+      }
+    </style>
+  </defs>
+
+  <g transform="translate(10 10) scale(0.42)">
+    <g transform="translate(120 120)">
+      <g stroke="url(#contourStroke)" stroke-width="3.8" stroke-linecap="round" opacity="0.95">
+        <path d="M-80 -5C-60 -17 -36 -18 -16 -5"/>
+        <path d="M-80 5C-60 17 -36 18 -16 5"/>
+        <path d="M80 -5C60 -17 36 -18 16 -5"/>
+        <path d="M80 5C60 17 36 18 16 5"/>
+        <path d="M-5 -80C-17 -60 -18 -36 -5 -16"/>
+        <path d="M5 -80C17 -60 18 -36 5 -16"/>
+        <path d="M-5 80C-17 60 -18 36 -5 16"/>
+        <path d="M5 80C17 60 18 36 5 16"/>
+      </g>
+      <g stroke="url(#axisStroke)" stroke-width="3" stroke-linecap="round" opacity="0.84">
+        <path d="M-50 -52L-22 -24"/>
+        <path d="M22 24L50 52"/>
+        <path d="M50 -52L22 -24"/>
+        <path d="M-22 24L-50 52"/>
+      </g>
+      <g stroke="url(#hairStroke)" stroke-width="1.05" stroke-linecap="round" opacity="0.45">
+        <path d="M-42 -60L-12 -30"/>
+        <path d="M12 30L42 60"/>
+        <path d="M42 -60L12 -30"/>
+        <path d="M-12 30L-42 60"/>
+      </g>
+      <g stroke="url(#accentStroke)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.92">
+        <path d="M-8 -4C-7 -7 -5 -9 -2 -10"/>
+        <path d="M4 -8C7 -7 9 -5 10 -2"/>
+        <path d="M8 4C7 7 5 9 2 10"/>
+        <path d="M-4 8C-7 7 -9 5 -10 2"/>
+      </g>
+    </g>
+    <rect x="116.4" y="116.4" width="7.2" height="7.2" rx="1.5" transform="rotate(45 120 120)" fill="url(#coreFill)" opacity="0.94"/>
   </g>
-  <text x="178" y="81" fill="#EADCCF" font-size="42" letter-spacing="8" font-family="Songti SC, Noto Serif CJK SC, STSong, serif">竹瑾居</text>
-  <text x="178" y="120" fill="#CDBEB2" font-size="15" letter-spacing="4.2" font-family="Helvetica Neue, Arial, PingFang SC, sans-serif">ZHU JIN JU | HIMALAYAN ART AND ASIAN ANTIQUITIES</text>
+
+  <text class="cn" x="122" y="49">竹瑾居</text>
+  <text class="en" x="122" y="72">ZHUJINJU | HIMALAYAN ART AND ASIAN ANTIQUITIES</text>
 </svg>

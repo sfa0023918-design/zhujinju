@@ -1,5 +1,5 @@
 {
-  "name": "竹瑾居 | Zhu Jin Ju",
+  "name": "竹瑾居",
   "short_name": "竹瑾居",
   "icons": [
     {
@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#f4f0e8",
-  "background_color": "#f4f0e8",
+  "theme_color": "#F6F1EA",
+  "background_color": "#F6F1EA",
   "display": "standalone"
 }
