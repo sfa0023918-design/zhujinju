@@ -1309,55 +1309,97 @@
     {
       "id": "artwork_bb32d185-8cfe-4df7-a73b-239f36b3cffa",
       "slug": "artwork-1773201814846",
-      "publicationStatus": "draft",
+      "publicationStatus": "published",
       "title": {
-        "zh": "未命名藏品",
-        "en": "Untitled Artwork"
+        "zh": "释迦牟尼",
+        "en": "Shakyamuni Buddha"
       },
       "subtitle": {
         "zh": "",
         "en": ""
       },
       "period": {
-        "zh": "",
-        "en": ""
+        "zh": "11世纪",
+        "en": "11th century"
       },
       "region": {
-        "zh": "",
-        "en": ""
+        "zh": "西藏",
+        "en": "Tibet"
       },
       "origin": {
-        "zh": "",
-        "en": ""
+        "zh": "藏中地区",
+        "en": "Central Tibet"
       },
       "material": {
-        "zh": "",
-        "en": ""
+        "zh": "铜鎏金",
+        "en": "Gilt copper"
       },
       "category": {
-        "zh": "",
-        "en": ""
+        "zh": "造像",
+        "en": "Sculpture"
       },
       "dimensions": {
-        "zh": "",
-        "en": ""
+        "zh": "高：28cm",
+        "en": "Height: 28 cm"
       },
       "status": "inquiry",
       "excerpt": {
-        "zh": "",
-        "en": ""
+        "zh": "释迦摩尼",
+        "en": "Shakyamuni Buddha"
       },
       "viewingNote": {
-        "zh": "",
-        "en": ""
+        "zh": "这是一尊来自西藏中部的佛造像 。乍看之下，祂似乎与其他很多古代造像 无异，但每次凝视 ，内心总被一种无法言说的情绪悄然触动——像雾、像 风，是一种朦胧的辽阔感，像一种“在”，却又“无形”的存在 。后来我才慢慢 意识到，那是一种“虚空”的感觉 。 这是一尊受到帕拉风格影响的造像 。高高的发髻、细长上扬的眉眼、嘴角 一抹耐人寻味的笑意，以及飞扬的衣袖，都带着一种流动的帕拉艺术风格。那 是千年前从东南边境吹入雪域的风 ，停留在了这尊造像上 。",
+        "en": "This is a Buddha statue from central Tibet. You may think it is no different from many other ancient Buddhist sculptures, yet each time I look at it, I feel quietly moved by an indescribable emotion—like mist or wind, a presence both hazy and expansive, there yet formless. It took me some time to recognize that what I was sensing was a feeling of “emptiness.” The statue shows clear influences of the Pala style. Its high ushnīṣa, slender up\u0002curved eyes, subtly intriguing smile, and flowing robes all carry the characteris\u0002tically fluid grace of Pala art. It is as though a wind that blew a thousand years ago from the southeastern borders came to rest in this very sculpture.Since most early statues either had wooden bases or were made without one, we decided to create a base for this piece. I contacted an old friend in Chengdu—Yuren, a mas\u0002ter goldsmith we often work with. He has a deep understanding of the “person\u0002ality” of metal. Whenever we need a base made, he is the first person we turn to. This time was no different."
       },
       "comparisonNote": {
         "zh": "",
         "en": ""
       },
-      "provenance": [],
-      "exhibitions": [],
-      "publications": [],
+      "provenance": [
+        {
+          "label": {
+            "zh": "欧洲私人收藏1970s",
+            "en": "Private European Collection, 1970s"
+          }
+        }
+      ],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "竹瑾居2025年展览",
+            "en": "Zhujinju 2025 Exhibition"
+          },
+          "venue": {
+            "zh": "北京嘉德艺术中心",
+            "en": "Guardian Art Center, Beijing"
+          },
+          "year": "2025年"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "Buddhist Art of the Tibetan Realm, P.110, fig.12.",
+            "en": "Buddhist Art of the Tibetan Realm, p. 110, fig. 12."
+          },
+          "year": "1987年",
+          "pages": {
+            "zh": "第110页",
+            "en": "Page 110"
+          }
+        },
+        {
+          "title": {
+            "zh": "竹瑾居2025年展览图录",
+            "en": "Zhu Jin Ju: 2025 Exhibition Catalogue"
+          },
+          "year": "2025年",
+          "pages": {
+            "zh": "第76页",
+            "en": "Page 76"
+          }
+        }
+      ],
       "inquirySupport": [
         {
           "zh": "可索取高清图",
@@ -1373,7 +1415,9 @@
         }
       ],
       "relatedArticleSlugs": [],
-      "relatedExhibitionSlugs": [],
+      "relatedExhibitionSlugs": [
+        "silent-radiance"
+      ],
       "image": "/uploads/artworks/1773202158809-58西藏释迦牟尼-正.jpg",
       "gallery": [
         "/uploads/artworks/1773202166808-l1001089.jpg",
