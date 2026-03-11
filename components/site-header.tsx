@@ -19,10 +19,10 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b border-[var(--line)]">
-      <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-4 px-5 py-4 md:px-10 md:py-5 xl:gap-5">
+      <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-3.5 px-5 py-4 md:gap-4 md:px-8 md:py-5 lg:px-10 xl:gap-5 2xl:px-12">
         <Link
           href="/"
-          className="min-w-0 flex-1 max-w-[228px] md:max-w-[292px] lg:max-w-[252px] xl:max-w-[320px] 2xl:max-w-[336px]"
+          className="min-w-0 flex-1 max-w-[238px] md:max-w-[304px] lg:max-w-[282px] xl:max-w-[340px] 2xl:max-w-[364px]"
         >
           <span className="flex min-w-0 items-center text-[var(--ink)]">
             {/* The approved logo lockup is a fixed SVG asset; render it directly to preserve exact proportions. */}
@@ -32,7 +32,7 @@ export async function SiteHeader() {
               alt={siteConfig.siteName.zh}
               width={980}
               height={180}
-              className="block h-auto w-full max-w-[228px] md:max-w-[292px] lg:max-w-[252px] xl:max-w-[320px] 2xl:max-w-[336px]"
+              className="block h-auto w-full max-w-[238px] md:max-w-[304px] lg:max-w-[282px] xl:max-w-[340px] 2xl:max-w-[364px]"
             />
           </span>
         </Link>
