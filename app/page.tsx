@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { BilingualProse } from "@/components/bilingual-prose";
+import { CollectingDirectionsGrid, OperationalFactsGrid } from "@/components/homepage-info-panels";
 import { ArtworkCard } from "@/components/artwork-card";
 import {
   getCurrentExhibition,
@@ -193,33 +194,7 @@ export default async function HomePage() {
               {homeContent.collectingDirections.title.zh}
             </h2>
           </div>
-          <div className="grid gap-x-5 gap-y-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {collectingDirections.map((direction) => (
-              <div
-                key={direction.name.zh}
-                className="flex min-h-[88px] flex-col justify-start gap-1.5 border-b border-[var(--line)] px-1 pb-3 pt-2"
-              >
-                <p className="text-[15px] font-[450] leading-[1.45] text-[var(--ink)]">{direction.name.zh}</p>
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/38">
-                  {direction.name.en}
-                </p>
-                {(direction.description.zh || direction.description.en) ? (
-                  <div className="space-y-1 pt-0.5">
-                    {direction.description.zh ? (
-                      <p className="text-[13px] leading-[1.65] text-[var(--muted)]/92">
-                        {direction.description.zh}
-                      </p>
-                    ) : null}
-                    {direction.description.en ? (
-                      <p className="text-[11px] leading-[1.6] text-[var(--accent)]/64">
-                        {direction.description.en}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-            ))}
-          </div>
+          <CollectingDirectionsGrid items={collectingDirections} />
         </div>
       </section>
 
@@ -238,57 +213,7 @@ export default async function HomePage() {
               {homeContent.operationalFacts.title.zh}
             </h2>
           </div>
-          <div className="border-y border-[var(--line)] md:grid md:grid-cols-5 md:divide-x md:divide-[var(--line)]">
-            {operationalFacts.map((pillar) => {
-              const hasDenseValue =
-                pillar.title.zh === "服务对象" || pillar.title.zh.includes("预约制空间");
-
-              return (
-                <div key={pillar.title.zh} className="border-t border-[var(--line)] px-3 py-4 first:border-t-0 md:border-t-0 md:px-4">
-                  <p className="text-[0.66rem] tracking-[0.14em] text-[var(--accent)]/78">{pillar.title.zh}</p>
-                  <p
-                    className={
-                      hasDenseValue
-                        ? "mt-2.5 text-[15px] font-[450] leading-[1.72] text-[var(--muted)]"
-                        : "mt-2.5 font-serif text-[1.34rem] leading-[1.06] tracking-[-0.028em] text-[var(--ink)]"
-                    }
-                  >
-                    {pillar.value.zh}
-                  </p>
-                  <div className="mt-2 space-y-1">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/48">
-                      {pillar.title.en}
-                    </p>
-                    {pillar.value.en ? (
-                      <p
-                        className={
-                          hasDenseValue
-                            ? "text-[12px] leading-[1.55] text-[var(--accent)]/76"
-                            : "text-[13px] leading-[1.5] text-[var(--accent)]/82"
-                        }
-                      >
-                        {pillar.value.en}
-                      </p>
-                    ) : null}
-                  </div>
-                  {(pillar.description.zh || pillar.description.en) ? (
-                    <div className="space-y-1 pt-2.5">
-                      {pillar.description.zh ? (
-                        <p className="text-[13px] leading-[1.68] text-[var(--muted)]/92">
-                          {pillar.description.zh}
-                        </p>
-                      ) : null}
-                      {pillar.description.en ? (
-                        <p className="text-[11px] leading-[1.6] text-[var(--accent)]/64">
-                          {pillar.description.en}
-                        </p>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
+          <OperationalFactsGrid items={operationalFacts} />
         </div>
       </section>
 
