@@ -1524,6 +1524,78 @@
         "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
       ],
       "featured": false
+    },
+    {
+      "id": "artwork_b1a24c0e-ed53-4eda-92b1-2a8b8dde8346",
+      "slug": "artwork-1773203033967",
+      "publicationStatus": "draft",
+      "title": {
+        "zh": "未命名藏品",
+        "en": "Untitled Artwork"
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "",
+        "en": ""
+      },
+      "region": {
+        "zh": "",
+        "en": ""
+      },
+      "origin": {
+        "zh": "",
+        "en": ""
+      },
+      "material": {
+        "zh": "",
+        "en": ""
+      },
+      "category": {
+        "zh": "",
+        "en": ""
+      },
+      "dimensions": {
+        "zh": "",
+        "en": ""
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "",
+        "en": ""
+      },
+      "viewingNote": {
+        "zh": "",
+        "en": ""
+      },
+      "comparisonNote": {
+        "zh": "",
+        "en": ""
+      },
+      "provenance": [],
+      "exhibitions": [],
+      "publications": [],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available on request"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available on request"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available on request"
+        }
+      ],
+      "relatedArticleSlugs": [],
+      "relatedExhibitionSlugs": [],
+      "image": "",
+      "gallery": [],
+      "featured": false
     }
   ],
   "exhibitions": [
