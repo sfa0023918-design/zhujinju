@@ -2116,68 +2116,6 @@
   ],
   "articles": [
     {
-      "slug": "how-to-look-at-a-bronze",
-      "title": {
-        "zh": "一件铜造像为何值得反复观看",
-        "en": "Why a Bronze Deserves Repeated Looking"
-      },
-      "category": {
-        "zh": "研究短文",
-        "en": "Research Note"
-      },
-      "column": {
-        "zh": "观看方法",
-        "en": "Ways of Looking"
-      },
-      "author": {
-        "zh": "竹瑾居研究部",
-        "en": "Zhu Jin Ju Research Desk"
-      },
-      "date": "2025.11.06",
-      "excerpt": {
-        "zh": "真正重要的观看，不是迅速确认题材，而是在比例、体量与工艺节奏里建立判断。",
-        "en": "The most important act of looking is not quick identification, but judgement built through proportion, mass, and the rhythm of workmanship."
-      },
-      "body": [
-        {
-          "zh": "观看金铜造像时，最先进入视线的往往是题材与姿态，但真正构成作品层次的，是比例、结构与细部处理之间的内在关系。",
-          "en": "When looking at gilt bronze sculpture, subject and pose are often the first things seen, yet what truly gives a work depth is the internal relation between proportion, structure, and detail."
-        },
-        {
-          "zh": "例如肩部如何展开、胸腹如何起伏、手指与莲座是否保持稳定节奏，这些因素共同决定了一件作品的时代气息与完成度。",
-          "en": "How the shoulders open, how the torso rises and settles, and whether the fingers and lotus base maintain a steady rhythm all contribute to a work's period character and level of completion."
-        },
-        {
-          "zh": "因此，竹瑾居在呈现造像时更重视近距离观看与并置比较，而不是以单一标签替代完整判断。",
-          "en": "For this reason, Zhu Jin Ju favors close viewing and comparative display rather than allowing a single label to stand in for complete judgement."
-        }
-      ],
-      "keywords": [
-        {
-          "zh": "铜造像",
-          "en": "Bronze Sculpture"
-        },
-        {
-          "zh": "观看方法",
-          "en": "Close Looking"
-        },
-        {
-          "zh": "比例判断",
-          "en": "Proportion"
-        }
-      ],
-      "relatedArtworkSlugs": [
-        "ekadasamukha-avalokiteshvara",
-        "green-tara-malla",
-        "shakyamuni-bhumisparsha"
-      ],
-      "relatedExhibitionSlugs": [
-        "silent-radiance"
-      ],
-      "cover": "/api/placeholder/how-to-look-at-a-bronze?kind=landscape",
-      "publicationStatus": "published"
-    },
-    {
       "slug": "why-exhibitions-matter",
       "title": {
         "zh": "为什么我们持续做展览与图录",
