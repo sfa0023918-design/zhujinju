@@ -197,12 +197,26 @@ export default async function HomePage() {
             {collectingDirections.map((direction) => (
               <div
                 key={direction.name.zh}
-                className="flex min-h-[62px] flex-col justify-center gap-1 border-b border-[var(--line)] px-1 pb-2 pt-1.5"
+                className="flex min-h-[88px] flex-col justify-start gap-1.5 border-b border-[var(--line)] px-1 pb-3 pt-2"
               >
                 <p className="text-[15px] font-[450] leading-[1.45] text-[var(--ink)]">{direction.name.zh}</p>
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/38">
                   {direction.name.en}
                 </p>
+                {(direction.description.zh || direction.description.en) ? (
+                  <div className="space-y-1 pt-0.5">
+                    {direction.description.zh ? (
+                      <p className="text-[13px] leading-[1.65] text-[var(--muted)]/92">
+                        {direction.description.zh}
+                      </p>
+                    ) : null}
+                    {direction.description.en ? (
+                      <p className="text-[11px] leading-[1.6] text-[var(--accent)]/64">
+                        {direction.description.en}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -241,9 +255,36 @@ export default async function HomePage() {
                   >
                     {pillar.value.zh}
                   </p>
-                  <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/38">
-                    {pillar.title.en}
-                  </p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)]/48">
+                      {pillar.title.en}
+                    </p>
+                    {pillar.value.en ? (
+                      <p
+                        className={
+                          hasDenseValue
+                            ? "text-[12px] leading-[1.55] text-[var(--accent)]/76"
+                            : "text-[13px] leading-[1.5] text-[var(--accent)]/82"
+                        }
+                      >
+                        {pillar.value.en}
+                      </p>
+                    ) : null}
+                  </div>
+                  {(pillar.description.zh || pillar.description.en) ? (
+                    <div className="space-y-1 pt-2.5">
+                      {pillar.description.zh ? (
+                        <p className="text-[13px] leading-[1.68] text-[var(--muted)]/92">
+                          {pillar.description.zh}
+                        </p>
+                      ) : null}
+                      {pillar.description.en ? (
+                        <p className="text-[11px] leading-[1.6] text-[var(--accent)]/64">
+                          {pillar.description.en}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
