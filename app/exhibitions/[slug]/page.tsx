@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -8,6 +7,7 @@ import { BilingualText } from "@/components/bilingual-text";
 import { ArtworkCard } from "@/components/artwork-card";
 import { ExhibitionDetailReading } from "@/components/exhibition-detail-reading";
 import { MediaPlaceholder } from "@/components/media-placeholder";
+import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 import {
@@ -146,13 +146,14 @@ export default async function ExhibitionDetailPage({
             </div>
           ) : (
             <div className="flex items-center justify-center px-3 py-3 md:px-5 md:py-4 lg:px-6 lg:py-5">
-              <Image
+              <ProtectedImage
                 src={exhibition.cover}
                 alt={`${exhibition.title.zh} ${exhibition.title.en}`}
                 width={1800}
                 height={1100}
                 priority
                 unoptimized
+                wrapperClassName="block"
                 className="h-auto w-full max-w-full object-contain md:max-h-[56vh] lg:max-h-[62vh]"
               />
             </div>

@@ -60,6 +60,34 @@ select {
 
 img {
   display: block;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+[data-protect="true"] {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.protected-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.protected-media__shield {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 a:focus-visible,

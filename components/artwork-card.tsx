@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { withImageVersion } from "@/lib/image-url";
@@ -6,6 +5,7 @@ import type { Artwork } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
 import { MediaPlaceholder } from "./media-placeholder";
+import { ProtectedImage } from "./protected-image";
 import { StatusPill } from "./status-pill";
 
 type ArtworkCardProps = {
@@ -38,13 +38,14 @@ export function ArtworkCard({
                 <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
               </div>
             ) : (
-              <Image
+              <ProtectedImage
                 src={withImageVersion(artwork.image)}
                 alt={`${artwork.title.zh} ${artwork.title.en}`}
                 width={900}
                 height={1200}
                 priority={priority}
                 unoptimized
+                wrapperClassName="block"
                 className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.004]"
               />
             )}
@@ -85,13 +86,14 @@ export function ArtworkCard({
                 <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
               </div>
             ) : (
-              <Image
+              <ProtectedImage
                 src={withImageVersion(artwork.image)}
                 alt={`${artwork.title.zh} ${artwork.title.en}`}
                 width={900}
                 height={1200}
                 priority={priority}
                 unoptimized
+                wrapperClassName="block"
                 className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.012]"
               />
             )}
@@ -131,13 +133,14 @@ export function ArtworkCard({
               <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} />
             </div>
           ) : (
-            <Image
+            <ProtectedImage
               src={withImageVersion(artwork.image)}
               alt={`${artwork.title.zh} ${artwork.title.en}`}
               width={900}
               height={1200}
               priority={priority}
               unoptimized
+              wrapperClassName="block"
               className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.008]"
             />
           )}

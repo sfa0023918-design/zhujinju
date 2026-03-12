@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { withImageVersion } from "@/lib/image-url";
 
 import { MediaPlaceholder } from "./media-placeholder";
+import { ProtectedImage } from "./protected-image";
 
 type ArtworkGalleryProps = {
   title: string;
@@ -168,12 +168,13 @@ export function ArtworkGallery({
                       </div>
                     </div>
                   ) : (
-                    <Image
+                    <ProtectedImage
                       src={withImageVersion(image)}
                       alt={title}
                       width={220}
                       height={275}
                       unoptimized
+                      wrapperClassName="block"
                       className="aspect-[4/5] h-[90px] w-[68px] object-cover lg:h-[98px] lg:w-[72px]"
                     />
                   )}
@@ -196,17 +197,14 @@ export function ArtworkGallery({
                 className={`block w-full cursor-zoom-in ${desktopFrameClass}`}
                 data-protect-wrap="true"
               >
-                <Image
+                <ProtectedImage
                   src={activeImageSrc}
                   alt={title}
                   width={1200}
                   height={1500}
                   priority
                   unoptimized
-                  draggable={false}
-                  data-protect="true"
-                  onContextMenu={(event) => event.preventDefault()}
-                  onDragStart={(event) => event.preventDefault()}
+                  wrapperClassName="block"
                   onLoad={(event) => {
                     const target = event.currentTarget;
                     if (target.naturalWidth > 0 && target.naturalHeight > 0) {
@@ -278,16 +276,13 @@ export function ArtworkGallery({
               ) : null}
               <div className="relative z-20 flex h-full min-h-full overflow-auto px-3 py-3 md:px-6 md:py-6">
                 <div className="flex min-h-[calc(100vh-9rem)] w-full items-center justify-center md:min-h-[calc(100vh-11rem)]">
-                  <Image
+                  <ProtectedImage
                     src={activeImageSrc}
                     alt={title}
                     width={1600}
                     height={2000}
                     unoptimized
-                    draggable={false}
-                    data-protect="true"
-                    onContextMenu={(event) => event.preventDefault()}
-                    onDragStart={(event) => event.preventDefault()}
+                    wrapperClassName="block"
                     className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
                   />
                 </div>

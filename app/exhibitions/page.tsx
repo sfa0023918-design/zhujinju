@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { MediaPlaceholder } from "@/components/media-placeholder";
+import { ProtectedImage } from "@/components/protected-image";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
@@ -61,12 +61,13 @@ function ExhibitionCover({
   }
 
   return (
-    <Image
+    <ProtectedImage
       src={cover}
       alt={`${title.zh} ${title.en}`}
       width={1600}
       height={1000}
       unoptimized
+      wrapperClassName="block"
       className="aspect-[1.18/1] h-full w-full object-cover"
     />
   );

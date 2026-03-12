@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -7,6 +6,7 @@ import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { BilingualReadingPanel } from "@/components/bilingual-prose";
 import { MediaPlaceholder } from "@/components/media-placeholder";
+import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 import {
@@ -125,13 +125,14 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
               <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />
             </div>
           ) : (
-            <Image
+            <ProtectedImage
               src={article.cover}
               alt={`${article.title.zh} ${article.title.en}`}
               width={1600}
               height={1000}
               priority
               unoptimized
+              wrapperClassName="block"
               className="aspect-[1.55/1] h-full w-full object-cover"
             />
           )}

@@ -31,6 +31,8 @@ export async function SiteHeader() {
               alt={siteConfig.siteName.zh}
               width={240}
               height={240}
+              draggable="false"
+              data-protect="true"
               className="h-auto w-[28px] flex-none opacity-90 md:w-[31px] lg:w-[33px] xl:w-[37px] 2xl:w-[39px]"
             />
             <span className="grid min-w-0 gap-0.5">
