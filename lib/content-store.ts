@@ -55,7 +55,7 @@ export const editableSections: Array<{
   {
     key: "homeContent",
     title: bt("首页内容", "Homepage"),
-    description: bt("维护首页主视觉、专题、精选作品、收藏方向与专业信任。", "Maintain the homepage hero, focus area, featured works, collecting directions, and trust module."),
+    description: bt("维护首页主视觉、近期展览、精选作品与联系入口。", "Maintain the homepage hero, current exhibition, selected works, and contact entry."),
   },
   {
     key: "artworks",

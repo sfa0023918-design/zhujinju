@@ -25,14 +25,6 @@ export function getSiteConfigReminders(config: SiteConfigContent): EditorReminde
     reminders.push({ field: "siteName.en", section: "branding", message: "建议填写品牌英文名" });
   }
 
-  if (!hasText(config.homeIntro.zh)) {
-    reminders.push({ field: "homeIntro.zh", section: "branding", message: "建议补充首页短介绍（中文）" });
-  }
-
-  if (!hasText(config.homeIntro.en)) {
-    reminders.push({ field: "homeIntro.en", section: "branding", message: "建议补充首页短介绍（英文）" });
-  }
-
   if (!hasText(config.about.title.zh)) {
     reminders.push({ field: "about.title.zh", section: "about", message: "建议填写 About 标题" });
   }
@@ -57,10 +49,6 @@ export function getSiteConfigReminders(config: SiteConfigContent): EditorReminde
     reminders.push({ field: "contact.wechat", section: "contact", message: "建议填写微信" });
   }
 
-  if (!hasBilingualText(config.footer.intro)) {
-    reminders.push({ field: "footer.intro.zh", section: "footer", message: "建议补充页脚简介" });
-  }
-
   if (!hasBilingualText(config.title)) {
     reminders.push({ field: "title.zh", section: "branding", message: "建议填写 SEO 标题" });
   }
@@ -83,28 +71,12 @@ export function getHomeContentReminders(value: HomeContentEditorValue): EditorRe
     reminders.push({ field: "homeContent.heroTitle.zh", section: "hero", message: "建议填写 Hero 中文主标题" });
   }
 
-  if (!hasText(value.homeContent.heroSubtitle.en)) {
-    reminders.push({ field: "homeContent.heroSubtitle.en", section: "hero", message: "建议补充 Hero 英文副标题" });
-  }
-
   if (!hasText(value.homeContent.focusCurrent.eyebrow.zh)) {
     reminders.push({ field: "homeContent.focusCurrent.eyebrow.zh", section: "focus", message: "建议填写当前专题标题" });
   }
 
-  if (!hasText(value.homeContent.focusCurrent.description.zh)) {
-    reminders.push({ field: "homeContent.focusCurrent.description.zh", section: "focus", message: "建议补充当前专题时间或地点说明" });
-  }
-
   if (!value.featuredArtworkIds.length) {
     reminders.push({ field: "featuredArtworkIds", section: "selectedWorks", message: "建议至少选择一件精选作品" });
-  }
-
-  if (!value.collectingDirections.length || value.collectingDirections.every((item) => !hasBilingualText(item.name))) {
-    reminders.push({ field: "collectingDirections", section: "directions", message: "建议补充收藏方向" });
-  }
-
-  if (!value.operationalFacts.length || value.operationalFacts.every((item) => !hasBilingualText(item.title) && !hasBilingualText(item.value))) {
-    reminders.push({ field: "operationalFacts", section: "trust", message: "建议补充专业信任条目" });
   }
 
   return reminders;

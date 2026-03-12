@@ -57,7 +57,7 @@ export function ArtworkCard({
                 mode="inline"
                 className="text-[var(--muted)]"
                 zhClassName="text-[0.6rem] tracking-[0.08em]"
-                enClassName="text-[0.38rem] uppercase tracking-[0.16em] text-[var(--accent)]/36"
+                enClassName="text-[0.38rem] uppercase tracking-[0.16em] text-[var(--accent)]/82"
               />
               <StatusPill status={artwork.status} variant="fine" />
             </div>
@@ -65,7 +65,7 @@ export function ArtworkCard({
               <p className="font-serif text-[1.16rem] leading-[1.08] tracking-[-0.026em] text-[var(--ink)] md:text-[1.28rem]">
                 {artwork.title.zh}
               </p>
-              <p className="text-[0.44rem] uppercase tracking-[0.16em] text-[var(--accent)]/30">
+              <p className="text-[0.44rem] uppercase tracking-[0.16em] text-[var(--accent)]/82">
                 {artwork.title.en}
               </p>
             </div>
@@ -104,7 +104,7 @@ export function ArtworkCard({
                 mode="inline"
                 className="text-[var(--muted)]"
                 zhClassName="text-[0.72rem] tracking-[0.08em]"
-                enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/60"
+                enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/82"
               />
               <StatusPill status={artwork.status} />
             </div>
@@ -112,7 +112,7 @@ export function ArtworkCard({
               <p className="font-serif text-[1.38rem] leading-[1.08] tracking-[-0.03em] text-[var(--ink)] md:text-[1.58rem]">
                 {artwork.title.zh}
               </p>
-              <p className="mt-1.5 text-[0.52rem] uppercase tracking-[0.16em] text-[var(--accent)]/56 md:text-[0.56rem]">
+              <p className="mt-1.5 text-[0.52rem] uppercase tracking-[0.16em] text-[var(--accent)]/82 md:text-[0.56rem]">
                 {artwork.title.en}
               </p>
             </div>
@@ -151,7 +151,7 @@ export function ArtworkCard({
                 mode="inline"
                 className="text-[var(--accent)]"
                 zhClassName="text-[0.7rem] tracking-[0.14em]"
-                enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/62"
+                enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/82"
               />
               <StatusPill status={artwork.status} />
             </div>
@@ -161,7 +161,7 @@ export function ArtworkCard({
                 text={artwork.title}
                 className="font-serif text-[var(--ink)]"
                 zhClassName="block text-[1.56rem] leading-[1.08] tracking-[-0.028em] md:text-[2rem]"
-                enClassName="mt-1.5 block font-sans text-[0.58rem] uppercase tracking-[0.16em] text-[var(--accent)]/62"
+                enClassName="mt-1.5 block font-sans text-[0.58rem] uppercase tracking-[0.16em] text-[var(--accent)]/82"
               />
               <BilingualText
                 as="p"
@@ -169,7 +169,7 @@ export function ArtworkCard({
                 mode="inline"
                 className="mt-2 text-[var(--muted)]"
                 zhClassName="text-[0.92rem] leading-7"
-                enClassName="text-[0.64rem] leading-6 text-[var(--accent)]/62"
+                enClassName="text-[0.64rem] leading-6 text-[var(--accent)]/82"
               />
             </div>
             <p className="max-w-xl text-[0.92rem] leading-7 text-[var(--muted)]">
@@ -193,7 +193,7 @@ export function ArtworkCard({
                   mode="inline"
                   className="block"
                   zhClassName="block"
-                  enClassName="text-[0.66rem] leading-6 text-[var(--accent)]/75"
+                  enClassName="text-[0.66rem] leading-6 text-[var(--accent)]/82"
                 />
               </div>
             ))}

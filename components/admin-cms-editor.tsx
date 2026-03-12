@@ -1420,7 +1420,7 @@ function SiteSettingsEditor({
       </div>
       <ReminderSummary title="当前还有一些建议补充项" reminders={reminders} sectionLabels={sectionLabels} />
       <div className="grid gap-6">
-        <SectionBlock id="section-branding" title="品牌与 SEO" description="网站名称、首页短介绍与搜索展示信息共用这一组内容。" reminders={sectionReminders.branding}>
+        <SectionBlock id="section-branding" title="品牌与 SEO" description="网站名称、首页主视觉与搜索展示信息共用这一组内容。" reminders={sectionReminders.branding}>
           <div className="grid gap-4">
             <BilingualInput label="品牌名称" value={draft.siteConfig.siteName} onChange={(next) => update((value) => { value.siteConfig.siteName = next; })} fieldKeys={{ zh: "siteName.zh", en: "siteName.en" }} />
             <AdminMediaField
@@ -1436,7 +1436,6 @@ function SiteSettingsEditor({
               recommendedSize="1600 × 1080 像素以上，横图"
             />
             <BilingualInput label="首页主视觉替代文字" value={draft.brandIntroHeroAlt} onChange={(next) => update((value) => { value.brandIntroHeroAlt = next; })} fieldKeys={{ zh: "brandIntro.heroAlt.zh", en: "brandIntro.heroAlt.en" }} />
-            <BilingualTextarea label="首页短介绍" value={draft.siteConfig.homeIntro} onChange={(next) => update((value) => { value.siteConfig.homeIntro = next; })} rows={4} fieldKeys={{ zh: "homeIntro.zh", en: "homeIntro.en" }} />
             <div className="space-y-4 border-t border-[var(--line)] pt-6">
               <div className="space-y-1">
                 <p className="text-[0.7rem] tracking-[0.16em] text-[var(--accent)]/88">藏品浏览页</p>
@@ -1520,7 +1519,6 @@ function SiteSettingsEditor({
             <TextField label="WhatsApp" value={draft.siteConfig.contact.whatsapp} onChange={(next) => update((value) => { value.siteConfig.contact.whatsapp = next; })} fieldKey="contact.whatsapp" />
             <TextField label="微信" value={draft.siteConfig.contact.wechat} onChange={(next) => update((value) => { value.siteConfig.contact.wechat = next; })} fieldKey="contact.wechat" />
             <TextField label="Instagram" value={draft.siteConfig.contact.instagram} onChange={(next) => update((value) => { value.siteConfig.contact.instagram = next; })} />
-            <TextField label="PDF 索取邮箱" type="email" value={draft.siteConfig.contact.pdfRequest} onChange={(next) => update((value) => { value.siteConfig.contact.pdfRequest = next; })} />
           </div>
           <div className="grid gap-4">
             <BilingualInput label="城市与空间说明" value={draft.siteConfig.contact.address} onChange={(next) => update((value) => { value.siteConfig.contact.address = next; })} />
@@ -1544,10 +1542,8 @@ function SiteSettingsEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock id="section-footer" title="页脚" description="页脚简介、预约说明和页脚标签统一在这里维护。" reminders={sectionReminders.footer}>
+        <SectionBlock id="section-footer" title="页脚" description="页脚标签与导航入口统一在这里维护。" reminders={sectionReminders.footer}>
           <div className="grid gap-4">
-            <BilingualTextarea label="页脚简介" value={draft.siteConfig.footer.intro} onChange={(next) => update((value) => { value.siteConfig.footer.intro = next; })} rows={4} fieldKeys={{ zh: "footer.intro.zh", en: "footer.intro.en" }} />
-            <BilingualInput label="预约说明" value={draft.siteConfig.footer.appointment} onChange={(next) => update((value) => { value.siteConfig.footer.appointment = next; })} />
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <BilingualInput label="版权标签" value={draft.siteConfig.footer.copyrightLabel} onChange={(next) => update((value) => { value.siteConfig.footer.copyrightLabel = next; })} />
               <BilingualInput label="联系标题" value={draft.siteConfig.footer.contactHeading} onChange={(next) => update((value) => { value.siteConfig.footer.contactHeading = next; })} />
@@ -1555,7 +1551,6 @@ function SiteSettingsEditor({
               <BilingualInput label="藏品链接名称" value={draft.siteConfig.footer.collectionLink} onChange={(next) => update((value) => { value.siteConfig.footer.collectionLink = next; })} />
               <BilingualInput label="展览链接名称" value={draft.siteConfig.footer.exhibitionsLink} onChange={(next) => update((value) => { value.siteConfig.footer.exhibitionsLink = next; })} />
               <BilingualInput label="文章链接名称" value={draft.siteConfig.footer.journalLink} onChange={(next) => update((value) => { value.siteConfig.footer.journalLink = next; })} />
-              <BilingualInput label="PDF 标签" value={draft.siteConfig.footer.pdfRequestLabel} onChange={(next) => update((value) => { value.siteConfig.footer.pdfRequestLabel = next; })} />
               <BilingualInput label="Instagram 标签" value={draft.siteConfig.footer.instagramLabel} onChange={(next) => update((value) => { value.siteConfig.footer.instagramLabel = next; })} />
               <BilingualInput label="微信标签" value={draft.siteConfig.footer.wechatLabel} onChange={(next) => update((value) => { value.siteConfig.footer.wechatLabel = next; })} />
             </div>
@@ -1587,15 +1582,11 @@ function HomeContentEditor({
     hero: "Hero",
     focus: "当前专题",
     selectedWorks: "精选作品",
-    directions: "收藏方向",
-    trust: "专业信任",
   } satisfies Record<string, string>;
   const sectionReminders = {
     hero: reminders.filter((item) => item.section === "hero").map((item) => item.message),
     focus: reminders.filter((item) => item.section === "focus").map((item) => item.message),
     selectedWorks: reminders.filter((item) => item.section === "selectedWorks").map((item) => item.message),
-    directions: reminders.filter((item) => item.section === "directions").map((item) => item.message),
-    trust: reminders.filter((item) => item.section === "trust").map((item) => item.message),
   };
   const syncState = useWebsiteSyncStatus({
     target: { section: "homeContent" },
@@ -1634,12 +1625,10 @@ function HomeContentEditor({
       <ReminderSummary title="当前还有一些建议补充项" reminders={reminders} sectionLabels={sectionLabels} />
 
       <div className="grid gap-6">
-        <SectionBlock id="section-hero" title="Hero" description="首页首屏的主标题、副标题和按钮文案。" reminders={sectionReminders.hero}>
+        <SectionBlock id="section-hero" title="Hero" description="首页首屏当前仍显示的眉题、主标题和按钮文案。" reminders={sectionReminders.hero}>
           <div className="grid gap-4">
             <BilingualInput label="页眉标签" value={draft.homeContent.heroEyebrow} onChange={(next) => update((value) => { value.homeContent.heroEyebrow = next; })} />
             <BilingualInput label="主标题" value={draft.homeContent.heroTitle} onChange={(next) => update((value) => { value.homeContent.heroTitle = next; })} fieldKeys={{ zh: "homeContent.heroTitle.zh", en: "homeContent.heroTitle.en" }} />
-            <BilingualTextarea label="副标题" value={draft.homeContent.heroSubtitle} onChange={(next) => update((value) => { value.homeContent.heroSubtitle = next; })} rows={3} fieldKeys={{ zh: "homeContent.heroSubtitle.zh", en: "homeContent.heroSubtitle.en" }} />
-            <BilingualTextarea label="首页短介绍" value={draft.intro} onChange={(next) => update((value) => { value.intro = next; })} rows={4} />
             <div className="grid gap-4 md:grid-cols-2">
               <BilingualInput label="主按钮" value={draft.homeContent.heroPrimaryAction} onChange={(next) => update((value) => { value.homeContent.heroPrimaryAction = next; })} />
               <BilingualInput label="副按钮" value={draft.homeContent.heroSecondaryAction} onChange={(next) => update((value) => { value.homeContent.heroSecondaryAction = next; })} />
@@ -1647,27 +1636,19 @@ function HomeContentEditor({
           </div>
         </SectionBlock>
 
-        <SectionBlock id="section-focus" title="当前专题" description="控制首页第二屏的专题区文案。" reminders={sectionReminders.focus}>
+        <SectionBlock id="section-focus" title="当前专题" description="控制首页近期展览区当前仍显示的标签与入口按钮。" reminders={sectionReminders.focus}>
           <div className="grid gap-4 md:grid-cols-2">
-            <BilingualTextarea label="当前专题标签与说明" value={draft.homeContent.focusCurrent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusCurrent.eyebrow = next; })} rows={2} fieldKeys={{ zh: "homeContent.focusCurrent.eyebrow.zh", en: "homeContent.focusCurrent.eyebrow.en" }} />
-            <BilingualTextarea label="近期展览标签与说明" value={draft.homeContent.focusRecent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusRecent.eyebrow = next; })} rows={2} />
+            <BilingualInput label="当前专题标签" value={draft.homeContent.focusCurrent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusCurrent.eyebrow = next; })} fieldKeys={{ zh: "homeContent.focusCurrent.eyebrow.zh", en: "homeContent.focusCurrent.eyebrow.en" }} />
+            <BilingualInput label="近期展览标签" value={draft.homeContent.focusRecent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusRecent.eyebrow = next; })} />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <BilingualTextarea label="当前专题说明" value={draft.homeContent.focusCurrent.description} onChange={(next) => update((value) => { value.homeContent.focusCurrent.description = next; })} rows={4} fieldKeys={{ zh: "homeContent.focusCurrent.description.zh", en: "homeContent.focusCurrent.description.en" }} />
-            <BilingualTextarea label="近期展览说明" value={draft.homeContent.focusRecent.description} onChange={(next) => update((value) => { value.homeContent.focusRecent.description = next; })} rows={4} />
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <BilingualInput label="重点作品计数单位" value={draft.homeContent.focusSummaryLine.highlightUnit} onChange={(next) => update((value) => { value.homeContent.focusSummaryLine.highlightUnit = next; })} />
-            <BilingualInput label="图录页数字段单位" value={draft.homeContent.focusSummaryLine.catalogueUnit} onChange={(next) => update((value) => { value.homeContent.focusSummaryLine.catalogueUnit = next; })} />
             <BilingualInput label="专题按钮" value={draft.homeContent.focusAction} onChange={(next) => update((value) => { value.homeContent.focusAction = next; })} />
           </div>
         </SectionBlock>
 
-        <SectionBlock id="section-selectedWorks" title="精选作品" description="控制精选作品区标题，并选择哪些藏品出现在首页。" reminders={sectionReminders.selectedWorks}>
+        <SectionBlock id="section-selectedWorks" title="精选作品" description="控制精选作品区当前仍显示的标题，并选择哪些藏品出现在首页。" reminders={sectionReminders.selectedWorks}>
           <div className="grid gap-4">
-            <BilingualInput label="区块标签" value={draft.homeContent.selectedWorks.eyebrow} onChange={(next) => update((value) => { value.homeContent.selectedWorks.eyebrow = next; })} />
-            <BilingualInput label="区块标题" value={draft.homeContent.selectedWorks.title} onChange={(next) => update((value) => { value.homeContent.selectedWorks.title = next; })} />
-            <BilingualTextarea label="区块说明" value={draft.homeContent.selectedWorks.description} onChange={(next) => update((value) => { value.homeContent.selectedWorks.description = next; })} rows={4} />
+            <BilingualInput label="区块标题" value={draft.homeContent.selectedWorks.eyebrow} onChange={(next) => update((value) => { value.homeContent.selectedWorks.eyebrow = next; })} />
             <RelationChecklist
               label="首页精选作品"
               options={artworkOptions}
@@ -1679,73 +1660,6 @@ function HomeContentEditor({
               })}
               fieldKey="featuredArtworkIds"
             />
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-directions" title="收藏方向" description="维护首页收藏方向区块标题与具体条目。" reminders={sectionReminders.directions}>
-          <div className="grid gap-4">
-            <BilingualInput label="区块标签" value={draft.homeContent.collectingDirections.eyebrow} onChange={(next) => update((value) => { value.homeContent.collectingDirections.eyebrow = next; })} />
-            <BilingualInput label="区块标题" value={draft.homeContent.collectingDirections.title} onChange={(next) => update((value) => { value.homeContent.collectingDirections.title = next; })} />
-            <BilingualTextarea label="区块说明" value={draft.homeContent.collectingDirections.description} onChange={(next) => update((value) => { value.homeContent.collectingDirections.description = next; })} rows={4} />
-            <div data-field-key="operationalFacts" className="grid gap-4">
-              {draft.collectingDirections.map((direction, index) => (
-                <div key={`direction-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label>{`收藏方向 ${index + 1}`}</Label>
-                    <button
-                      type="button"
-                      onClick={() => update((value) => { value.collectingDirections = removeArrayItem(value.collectingDirections, index); })}
-                      className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
-                    >
-                      删除
-                    </button>
-                  </div>
-                  <BilingualInput label="名称" value={direction.name} onChange={(next) => update((value) => { value.collectingDirections = updateArrayItem(value.collectingDirections, index, (item) => { item.name = next; }); })} />
-                  <BilingualTextarea label="说明" value={direction.description} onChange={(next) => update((value) => { value.collectingDirections = updateArrayItem(value.collectingDirections, index, (item) => { item.description = next; }); })} rows={4} />
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => update((value) => { value.collectingDirections = [...value.collectingDirections, { name: emptyBilingual(), description: emptyBilingual() }]; })}
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-              >
-                新增收藏方向
-              </button>
-            </div>
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-trust" title="专业信任" description="维护首页专业信任区标题与数据条目。" reminders={sectionReminders.trust}>
-          <div className="grid gap-4">
-            <BilingualInput label="区块标签" value={draft.homeContent.operationalFacts.eyebrow} onChange={(next) => update((value) => { value.homeContent.operationalFacts.eyebrow = next; })} />
-            <BilingualInput label="区块标题" value={draft.homeContent.operationalFacts.title} onChange={(next) => update((value) => { value.homeContent.operationalFacts.title = next; })} />
-            <BilingualTextarea label="区块说明" value={draft.homeContent.operationalFacts.description} onChange={(next) => update((value) => { value.homeContent.operationalFacts.description = next; })} rows={4} />
-            <div className="grid gap-4">
-              {draft.operationalFacts.map((fact, index) => (
-                <div key={`fact-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label>{`专业信任 ${index + 1}`}</Label>
-                    <button
-                      type="button"
-                      onClick={() => update((value) => { value.operationalFacts = removeArrayItem(value.operationalFacts, index); })}
-                      className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
-                    >
-                      删除
-                    </button>
-                  </div>
-                  <BilingualInput label="标题" value={fact.title} onChange={(next) => update((value) => { value.operationalFacts = updateArrayItem(value.operationalFacts, index, (item) => { item.title = next; }); })} />
-                  <BilingualInput label="数字或字段值" value={fact.value} onChange={(next) => update((value) => { value.operationalFacts = updateArrayItem(value.operationalFacts, index, (item) => { item.value = next; }); })} />
-                  <BilingualTextarea label="说明" value={fact.description} onChange={(next) => update((value) => { value.operationalFacts = updateArrayItem(value.operationalFacts, index, (item) => { item.description = next; }); })} rows={4} />
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => update((value) => { value.operationalFacts = [...value.operationalFacts, { title: emptyBilingual(), value: emptyBilingual(), description: emptyBilingual() }]; })}
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-              >
-                新增专业信任条目
-              </button>
-            </div>
           </div>
         </SectionBlock>
       </div>

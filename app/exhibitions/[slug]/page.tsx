@@ -87,65 +87,65 @@ export default async function ExhibitionDetailPage({
 
   return (
     <>
-      <section className="mx-auto grid w-full max-w-[1480px] gap-5 px-5 py-6 md:px-8 md:py-7 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:px-10 lg:py-8">
-        <div className="space-y-6">
-          <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
-            <ActionLabel text={detailCopy.backAction} align="start" />
-          </Link>
-          <div className="space-y-3.5">
-            <BilingualText
-              as="p"
-              text={exhibition.subtitle}
-              mode="inline"
-              className="text-[var(--accent)]"
-              zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
-            />
-            <BilingualText
-              as="h1"
-              text={exhibition.title}
-              className="max-w-5xl font-serif text-[var(--ink)]"
-              zhClassName={detailHeadingZhClass}
-              enClassName={detailHeadingEnClass}
-            />
+      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+          <div className="space-y-6">
+            <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
+              <ActionLabel text={detailCopy.backAction} align="start" />
+            </Link>
+            <div className="space-y-3.5">
+              <BilingualText
+                as="p"
+                text={exhibition.subtitle}
+                mode="inline"
+                className="text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.22em]"
+                enClassName="text-[0.5rem] uppercase tracking-[0.18em]"
+              />
+              <BilingualText
+                as="h1"
+                text={exhibition.title}
+                className="max-w-5xl font-serif text-[var(--ink)]"
+                zhClassName={detailHeadingZhClass}
+                enClassName={detailHeadingEnClass}
+              />
+            </div>
+          </div>
+          <div className="space-y-3.5 border-t border-[var(--line)] pt-4 text-[0.9rem] leading-7 text-[var(--muted)] md:space-y-3 lg:pt-0">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-[var(--line)]/62 pb-3 text-[0.84rem] leading-7 text-[var(--muted)]/92">
+              <BilingualText
+                as="span"
+                text={exhibition.period}
+                mode="inline"
+                className="inline-flex"
+                zhClassName="text-[0.86rem]"
+                enClassName="text-[0.66rem] uppercase tracking-[0.12em] text-[var(--accent)]/72"
+              />
+              <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
+              <BilingualText
+                as="span"
+                text={exhibition.venue}
+                mode="inline"
+                className="inline-flex"
+                zhClassName="text-[0.86rem]"
+                enClassName="text-[0.66rem] uppercase tracking-[0.12em] text-[var(--accent)]/72"
+              />
+            </div>
+            <div className="space-y-2.5 border-t border-[var(--line)]/65 pt-3">
+              <InfoFact label={detailCopy.summaryLine.highlightUnit} value={{ zh: `${featuredWorksCount} 件`, en: `${featuredWorksCount} works` }} />
+              <InfoFact label={detailCopy.summaryLine.catalogueUnit} value={{ zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` }} />
+              {getPrimaryText(catalogueTitle) ? <InfoFact label={catalogueTitleLabel} value={catalogueTitle} /> : null}
+            </div>
           </div>
         </div>
-        <div className="space-y-3.5 border-t border-[var(--line)] pt-4 text-[0.9rem] leading-7 text-[var(--muted)] md:space-y-3 lg:pt-0">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-[var(--line)]/62 pb-3 text-[0.84rem] leading-7 text-[var(--muted)]/92">
-            <BilingualText
-              as="span"
-              text={exhibition.period}
-              mode="inline"
-              className="inline-flex"
-              zhClassName="text-[0.86rem]"
-              enClassName="text-[0.66rem] uppercase tracking-[0.12em] text-[var(--accent)]/72"
-            />
-            <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
-            <BilingualText
-              as="span"
-              text={exhibition.venue}
-              mode="inline"
-              className="inline-flex"
-              zhClassName="text-[0.86rem]"
-              enClassName="text-[0.66rem] uppercase tracking-[0.12em] text-[var(--accent)]/72"
-            />
-          </div>
-          <div className="space-y-2.5 border-t border-[var(--line)]/65 pt-3">
-            <InfoFact label={detailCopy.summaryLine.highlightUnit} value={{ zh: `${featuredWorksCount} 件`, en: `${featuredWorksCount} works` }} />
-            <InfoFact label={detailCopy.summaryLine.catalogueUnit} value={{ zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` }} />
-            {getPrimaryText(catalogueTitle) ? <InfoFact label={catalogueTitleLabel} value={catalogueTitle} /> : null}
-          </div>
-        </div>
-      </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-12 md:px-8 md:pb-16 lg:px-10 lg:pb-18">
-        <div className="relative overflow-hidden border border-[var(--line)]/65 bg-[var(--surface-strong)]">
+        <div className="mt-8 border border-[var(--line)]/65 bg-[var(--surface-strong)]">
           {exhibition.cover.startsWith("/api/placeholder/") ? (
             <div className="flex min-h-[220px] items-center justify-center px-4 py-4 md:min-h-[260px] md:px-6 md:py-5 lg:min-h-[300px] lg:px-8 lg:py-6">
               <MediaPlaceholder eyebrow="Exhibition Image" title={exhibition.title.zh} />
             </div>
           ) : (
-            <div className="flex items-center justify-center px-4 py-4 md:px-6 md:py-5 lg:px-8 lg:py-6">
+            <div className="flex items-center justify-center px-3 py-3 md:px-5 md:py-4 lg:px-6 lg:py-5">
               <Image
                 src={exhibition.cover}
                 alt={`${exhibition.title.zh} ${exhibition.title.en}`}
@@ -153,7 +153,7 @@ export default async function ExhibitionDetailPage({
                 height={1100}
                 priority
                 unoptimized
-                className="h-auto w-auto max-h-[320px] max-w-full object-contain md:max-h-[420px] lg:max-h-[540px]"
+                className="h-auto w-full max-w-full object-contain md:max-h-[56vh] lg:max-h-[62vh]"
               />
             </div>
           )}

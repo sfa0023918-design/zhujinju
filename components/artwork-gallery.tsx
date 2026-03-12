@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { withImageVersion } from "@/lib/image-url";
 
@@ -22,6 +23,7 @@ export function ArtworkGallery({
 }: ArtworkGalleryProps) {
   const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const detailImages = useMemo(() => {
     const seen = new Set<string>();
 
@@ -38,6 +40,10 @@ export function ArtworkGallery({
   }, [gallery, primaryImage]);
   const thumbnailImages = useMemo(() => [primaryImage, ...detailImages], [detailImages, primaryImage]);
   const [activeImage, setActiveImage] = useState(primaryImage);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     setActiveImage(primaryImage);
@@ -226,18 +232,20 @@ export function ArtworkGallery({
         </div>
       </div>
 
-      {isLightboxOpen && canOpenLightbox ? (
+      {isMounted && isLightboxOpen && canOpenLightbox
+        ? createPortal(
         <div
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-[rgba(12,10,8,0.9)] px-4 py-6 backdrop-blur-[1px] md:px-8 md:py-8"
+          className="fixed inset-0 z-[120] isolate px-4 py-4 md:px-8 md:py-6"
           role="dialog"
           aria-modal="true"
           onClick={() => setIsLightboxOpen(false)}
         >
+          <div className="absolute inset-0 z-0 bg-[rgba(12,10,8,0.9)] backdrop-blur-[1px]" />
           <div
-            className="relative flex h-full w-full max-w-[1380px] flex-col justify-center"
+            className="relative z-10 mx-auto flex h-full w-full max-w-[1380px] flex-col"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="mb-3 flex items-center justify-between text-[var(--surface)]/88">
+            <div className="sticky top-0 z-20 mb-3 flex items-center justify-between border-b border-[rgba(244,239,232,0.12)] bg-[rgba(12,10,8,0.72)] py-2 text-[var(--surface)]/88 backdrop-blur-[6px]">
               <div className="min-h-6 text-[0.8rem] tracking-[0.08em]">
                 {thumbnailImages.length > 1 ? `${activeImageIndex + 1} / ${thumbnailImages.length}` : null}
               </div>
@@ -249,40 +257,44 @@ export function ArtworkGallery({
                 关闭
               </button>
             </div>
-            <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] px-4 py-4 md:px-6 md:py-6">
+            <div className="relative z-20 min-h-[calc(100vh-7.5rem)] flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] md:min-h-[calc(100vh-9rem)]">
               {thumbnailImages.length > 1 ? (
                 <>
                   <button
                     type="button"
                     onClick={() => stepLightboxImage("prev")}
-                    className="absolute left-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer select-none border border-[rgba(244,239,232,0.18)] px-3 py-2 text-[0.72rem] text-[var(--surface)]/82 transition-colors hover:text-[var(--surface)]"
+                    className="absolute left-3 top-1/2 z-30 -translate-y-1/2 cursor-pointer select-none border border-[rgba(244,239,232,0.18)] bg-[rgba(12,10,8,0.38)] px-3 py-2 text-[0.72rem] text-[var(--surface)]/82 transition-colors hover:text-[var(--surface)]"
                   >
                     上一张
                   </button>
                   <button
                     type="button"
                     onClick={() => stepLightboxImage("next")}
-                    className="absolute right-3 top-1/2 z-10 -translate-y-1/2 cursor-pointer select-none border border-[rgba(244,239,232,0.18)] px-3 py-2 text-[0.72rem] text-[var(--surface)]/82 transition-colors hover:text-[var(--surface)]"
+                    className="absolute right-3 top-1/2 z-30 -translate-y-1/2 cursor-pointer select-none border border-[rgba(244,239,232,0.18)] bg-[rgba(12,10,8,0.38)] px-3 py-2 text-[0.72rem] text-[var(--surface)]/82 transition-colors hover:text-[var(--surface)]"
                   >
                     下一张
                   </button>
                 </>
               ) : null}
-              <Image
-                src={activeImageSrc}
-                alt={title}
-                width={1600}
-                height={2000}
-                unoptimized
-                draggable={false}
-                data-protect="true"
-                onContextMenu={(event) => event.preventDefault()}
-                onDragStart={(event) => event.preventDefault()}
-                className="max-h-full max-w-full object-contain object-center"
-              />
+              <div className="relative z-20 flex h-full min-h-full overflow-auto px-3 py-3 md:px-6 md:py-6">
+                <div className="flex min-h-[calc(100vh-9rem)] w-full items-center justify-center md:min-h-[calc(100vh-11rem)]">
+                  <Image
+                    src={activeImageSrc}
+                    alt={title}
+                    width={1600}
+                    height={2000}
+                    unoptimized
+                    draggable={false}
+                    data-protect="true"
+                    onContextMenu={(event) => event.preventDefault()}
+                    onDragStart={(event) => event.preventDefault()}
+                    className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
+                  />
+                </div>
+              </div>
             </div>
             {thumbnailImages.length > 1 ? (
-              <div className="mt-3 flex justify-center gap-2 overflow-x-auto pb-1">
+              <div className="relative z-20 mt-3 flex justify-center gap-2 overflow-x-auto pb-1">
                 {thumbnailImages.map((image, index) => {
                   const active = image === activeImage;
                   return (
@@ -301,7 +313,10 @@ export function ArtworkGallery({
             ) : null}
           </div>
         </div>
-      ) : null}
+          ,
+          document.body,
+        )
+        : null}
     </>
   );
 }

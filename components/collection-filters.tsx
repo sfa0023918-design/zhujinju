@@ -196,7 +196,7 @@ export function CollectionFilters({
                     mode="inline"
                     className="block text-[var(--accent)]"
                     zhClassName="text-[0.5rem] tracking-[0.12em]"
-                    enClassName="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/34"
+                    enClassName="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/82"
                   />
                   <BilingualText
                     as="span"
@@ -206,8 +206,8 @@ export function CollectionFilters({
                     zhClassName={isOpen || isActive ? "text-[0.72rem] text-[var(--ink)]" : "text-[0.72rem]"}
                     enClassName={
                       isOpen || isActive
-                        ? "text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/52"
-                        : "text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/34"
+                        ? "text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/88"
+                        : "text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/82"
                     }
                   />
                 </div>
@@ -235,7 +235,7 @@ export function CollectionFilters({
                       }`}
                     >
                       <span className="text-[0.74rem]">{options.all.zh}</span>
-                      <span className="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/36">
+                      <span className="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/82">
                         {options.all.en}
                       </span>
                     </Link>
@@ -254,7 +254,7 @@ export function CollectionFilters({
                         }`}
                       >
                         <span className="text-[0.74rem] leading-6">{option.label.zh}</span>
-                        <span className="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/36">
+                        <span className="text-[0.38rem] uppercase tracking-[0.13em] text-[var(--accent)]/82">
                           {option.label.en}
                         </span>
                       </Link>
@@ -271,7 +271,7 @@ export function CollectionFilters({
           className="inline-flex min-h-[2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/52 px-2.75 py-[0.32rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)]"
         >
           <span className="text-[0.66rem]">{labels.reset.zh}</span>
-          <span className="ml-1 text-[0.38rem] uppercase tracking-[0.14em] text-[var(--accent)]/40">
+          <span className="ml-1 text-[0.38rem] uppercase tracking-[0.14em] text-[var(--accent)]/82">
             {labels.reset.en}
           </span>
         </Link>
@@ -316,7 +316,7 @@ export function CollectionFilters({
                   <span className="text-[0.72rem]">{field.label.zh}</span>
                   <span
                     className={`text-[0.46rem] uppercase tracking-[0.14em] ${
-                      isActive || isOpen ? "text-[var(--accent)]/56" : "text-[var(--accent)]/42"
+                      isActive || isOpen ? "text-[var(--accent)]/88" : "text-[var(--accent)]/82"
                     }`}
                   >
                     {currentLabel.zh}
@@ -339,7 +339,7 @@ export function CollectionFilters({
                           }`}
                       >
                         <span className="text-[0.82rem]">{options.all.zh}</span>
-                        <span className="text-[0.44rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">
+                        <span className="text-[0.44rem] uppercase tracking-[0.14em] text-[var(--accent)]/82">
                           {options.all.en}
                         </span>
                       </Link>
@@ -358,7 +358,7 @@ export function CollectionFilters({
                           }`}
                         >
                           <span className="text-[0.82rem]">{option.label.zh}</span>
-                          <span className="text-[0.44rem] uppercase tracking-[0.14em] text-[var(--accent)]/42">
+                          <span className="text-[0.44rem] uppercase tracking-[0.14em] text-[var(--accent)]/82">
                             {option.label.en}
                           </span>
                         </Link>

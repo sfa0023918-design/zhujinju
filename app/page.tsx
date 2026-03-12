@@ -3,30 +3,33 @@ import Link from "next/link";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
-import { BilingualProse } from "@/components/bilingual-prose";
-import { CollectingDirectionsGrid, OperationalFactsGrid } from "@/components/homepage-info-panels";
 import { ArtworkCard } from "@/components/artwork-card";
 import {
   getCurrentExhibition,
   getFeaturedArtworks,
+  getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
+function getExhibitionYear(period: string) {
+  const match = period.match(/\b(19|20)\d{2}\b/);
+  return match?.[0] ?? period.split(/[.\-/]/)[0]?.trim() ?? "";
+}
+
 export default async function HomePage() {
   const content = await loadSiteContent();
-  const { brandIntro, collectingDirections, operationalFacts, homeContent, siteConfig } = content;
+  const { brandIntro, homeContent } = content;
   const currentExhibition = getCurrentExhibition(content);
   const featuredArtworks = getFeaturedArtworks(content);
+  const exhibitionCatalogueItems = getPublicExhibitions(content).slice(0, 3);
+  const singleExhibition = exhibitionCatalogueItems.length === 1 ? exhibitionCatalogueItems[0] : null;
+  const exhibitionArchiveCopy = {
+    eyebrow: { zh: "展览", en: "Exhibitions" },
+    title: { zh: "展览记录", en: "Exhibition Archive" },
+  };
   const focusCopy = currentExhibition?.current ? homeContent.focusCurrent : homeContent.focusRecent;
-  const contactItems = [
-    { label: "Email", value: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` },
-    { label: "WeChat", value: siteConfig.contact.wechat },
-    { label: "Phone", value: siteConfig.contact.phone },
-    { label: "Instagram", value: siteConfig.contact.instagram },
-  ];
-  const contactRows = [contactItems.slice(0, 2), contactItems.slice(2, 4)].filter((row) => row.length > 0);
 
   return (
     <>
@@ -57,13 +60,7 @@ export default async function HomePage() {
                 <h1 className="max-w-[9ch] font-serif text-[clamp(3.625rem,6vw,4.875rem)] leading-[0.98] tracking-[-0.05em] text-[var(--ink)]">
                   {homeContent.heroTitle.zh}
                 </h1>
-                <p className="max-w-[32rem] text-[0.88rem] uppercase tracking-[0.18em] text-[var(--accent)]/58 md:text-[clamp(1rem,1.4vw,1.125rem)]">
-                  {homeContent.heroSubtitle.en}
-                </p>
               </div>
-              <p className="max-w-[26ch] text-[1.05rem] leading-[1.95] text-[var(--muted)] md:text-[clamp(1.125rem,1.45vw,1.25rem)]">
-                {homeContent.heroSubtitle.zh}
-              </p>
             </div>
             <div className="flex flex-wrap gap-3 border-t border-[var(--line)] pt-5">
               <Link
@@ -79,21 +76,6 @@ export default async function HomePage() {
                 <ActionLabel text={homeContent.heroSecondaryAction} />
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-8 md:px-8 md:py-9 lg:px-10 lg:py-10">
-        <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,520px)] lg:gap-7">
-          <p className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">
-            品牌简介
-            <span className="mx-[0.45em] opacity-40">·</span>
-            <span className="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72">
-              Introduction
-            </span>
-          </p>
-          <div className="space-y-3">
-            <BilingualProse content={siteConfig.homeIntro} variant="body" className="max-w-[30rem]" />
           </div>
         </div>
       </section>
@@ -124,22 +106,11 @@ export default async function HomePage() {
                 <p className="font-serif text-[clamp(2.56rem,4.45vw,3.56rem)] leading-[0.98] tracking-[-0.04em] text-[var(--ink)]">
                   {currentExhibition.title.zh}
                 </p>
-                <p className="text-[0.58rem] uppercase tracking-[0.18em] text-[var(--accent)]/58 md:text-[0.64rem]">
-                  {currentExhibition.title.en}
-                </p>
               </div>
               <div className="grid gap-2 border-y border-[var(--line)] py-3.5 text-[0.92rem] leading-7 text-[var(--muted)]">
                 <p>{currentExhibition.period.zh}</p>
                 <p>{currentExhibition.venue.zh}</p>
-                <p className="text-[0.86rem] text-[var(--accent)]/88">
-                  {currentExhibition.highlightCount} 件重点作品 · {currentExhibition.cataloguePages} 页图录
-                </p>
               </div>
-              <BilingualProse
-                content={currentExhibition.curatorialLead}
-                variant="secondary"
-                className="max-w-[26rem]"
-              />
               <Link href={`/exhibitions/${currentExhibition.slug}`} className="inline-flex text-[var(--ink)]">
                 <ActionLabel text={homeContent.focusAction} align="start" />
               </Link>
@@ -150,22 +121,14 @@ export default async function HomePage() {
 
       <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.58fr)] lg:items-end lg:gap-8">
-          <div className="space-y-3">
-            <BilingualText
-              as="p"
-              text={homeContent.selectedWorks.eyebrow}
-              mode="inline"
-              className="text-[var(--accent)]"
-              zhClassName="text-[0.76rem] tracking-[0.18em]"
-              enClassName="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72"
-            />
-            <h2 className="max-w-[11ch] font-serif text-[clamp(2.625rem,4.2vw,3.5rem)] leading-[1] tracking-[-0.04em] text-[var(--ink)]">
-              {homeContent.selectedWorks.title.zh}
+          <div className="space-y-2">
+            <h2 className="font-serif text-[clamp(2rem,3vw,2.5rem)] leading-[1.02] tracking-[-0.035em] text-[var(--ink)]">
+              {homeContent.selectedWorks.eyebrow.zh}
             </h2>
+            <p className="text-[0.58rem] uppercase tracking-[0.18em] text-[var(--accent)]/64 md:text-[0.62rem]">
+              {homeContent.selectedWorks.eyebrow.en}
+            </p>
           </div>
-          <p className="max-w-[20rem] text-[0.88rem] leading-7 text-[var(--muted)]">
-            {homeContent.selectedWorks.description.zh}
-          </p>
         </div>
         <div className="mt-9 grid gap-7 sm:grid-cols-2 xl:grid-cols-4">
           {featuredArtworks.slice(0, 4).map((artwork, index) => (
@@ -179,47 +142,83 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-8 md:py-14 lg:px-10 lg:py-16">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] lg:items-start">
+      {exhibitionCatalogueItems.length ? (
+        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
           <div className="space-y-3">
             <BilingualText
               as="p"
-              text={homeContent.collectingDirections.eyebrow}
+              text={exhibitionArchiveCopy.eyebrow}
               mode="inline"
               className="text-[var(--accent)]"
               zhClassName="text-[0.76rem] tracking-[0.18em]"
               enClassName="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72"
             />
-            <h2 className="font-serif text-[clamp(24px,2.4vw,32px)] leading-[1.08] tracking-[-0.034em] text-[var(--ink)]">
-              {homeContent.collectingDirections.title.zh}
+            <h2 className="font-serif text-[clamp(2.4rem,4vw,3.3rem)] leading-[1] tracking-[-0.04em] text-[var(--ink)]">
+              {exhibitionArchiveCopy.title.zh}
             </h2>
           </div>
-          <CollectingDirectionsGrid items={collectingDirections} />
-        </div>
-      </section>
+          {singleExhibition ? (
+            <div className="mt-7 max-w-[980px]">
+              <Link
+                href={`/exhibitions/${singleExhibition.slug}`}
+                className="group grid gap-3 md:grid-cols-[minmax(0,0.94fr)_minmax(220px,0.34fr)] md:items-start md:gap-5"
+              >
+                <div className="relative max-w-[860px] overflow-hidden bg-[var(--surface-strong)]">
+                  <Image
+                    src={singleExhibition.cover}
+                    alt={`${singleExhibition.title.zh} ${singleExhibition.title.en}`}
+                    width={1200}
+                    height={1200}
+                    unoptimized
+                    priority
+                    className="aspect-[1.06/1] w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
+                  />
+                </div>
+                <div className="space-y-1.5 pt-0.5 md:max-w-[220px] md:pt-1">
+                  <p className="font-serif text-[1.06rem] leading-[1.45] text-[var(--ink)]">
+                    {singleExhibition.title.zh}
+                  </p>
+                  <p className="text-[0.72rem] tracking-[0.12em] text-[var(--accent)]/76">
+                    {getExhibitionYear(singleExhibition.period.zh || singleExhibition.period.en)}
+                    <span className="px-2 text-[var(--accent)]/38">·</span>
+                    {singleExhibition.venue.zh || singleExhibition.venue.en}
+                  </p>
+                </div>
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-9 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+              {exhibitionCatalogueItems.map((item, index) => (
+                <Link key={item.slug} href={`/exhibitions/${item.slug}`} className="group block">
+                  <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+                    <Image
+                      src={item.cover}
+                      alt={`${item.title.zh} ${item.title.en}`}
+                      width={1200}
+                      height={1200}
+                      unoptimized
+                      className="aspect-[1.06/1] w-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
+                      priority={index === 0}
+                    />
+                  </div>
+                  <div className="space-y-1.5 pt-3.5">
+                    <p className="font-serif text-[1.06rem] leading-[1.45] text-[var(--ink)]">{item.title.zh}</p>
+                    <p className="text-[0.72rem] tracking-[0.12em] text-[var(--accent)]/76">
+                      {getExhibitionYear(item.period.zh || item.period.en)}
+                      <span className="px-2 text-[var(--accent)]/38">·</span>
+                      {item.venue.zh || item.venue.en}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      ) : null}
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-12 md:px-8 md:py-14 lg:px-10 lg:py-16">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.76fr)_minmax(0,1.24fr)] lg:items-start">
-          <div className="space-y-3">
-            <BilingualText
-              as="p"
-              text={homeContent.operationalFacts.eyebrow}
-              mode="inline"
-              className="text-[var(--accent)]"
-              zhClassName="text-[0.76rem] tracking-[0.18em]"
-              enClassName="text-[0.52rem] uppercase tracking-[0.2em] text-[var(--accent)]/72"
-            />
-            <h2 className="font-serif text-[clamp(24px,2.4vw,32px)] leading-[1.08] tracking-[-0.034em] text-[var(--ink)]">
-              {homeContent.operationalFacts.title.zh}
-            </h2>
-          </div>
-          <OperationalFactsGrid items={operationalFacts} />
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-8">
-          <div className="space-y-3.5">
+      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-10 md:px-8 md:py-11 lg:px-10 lg:py-12">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
             <BilingualText
               as="p"
               text={homeContent.contact.eyebrow}
@@ -228,54 +227,10 @@ export default async function HomePage() {
               zhClassName="text-[0.76rem] tracking-[0.18em]"
               enClassName="text-[0.52rem] uppercase tracking-[0.18em] text-[var(--accent)]/72"
             />
-            <h2 className="max-w-[8.2ch] font-serif text-[clamp(24px,2.4vw,32px)] leading-[1.08] tracking-[-0.034em] text-[var(--ink)]">
-              {homeContent.contact.title.zh}
-            </h2>
-            <p className="max-w-[27rem] text-[15px] leading-[1.82] text-[var(--muted)]/88">
-              {homeContent.contact.description.zh}
-            </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Link href="/contact" className="inline-flex text-[var(--ink)]">
-                <ActionLabel text={homeContent.contactPrimaryAction} align="start" />
-              </Link>
-              <Link href="/journal" className="inline-flex text-[var(--muted)] hover:text-[var(--ink)]">
-                <ActionLabel text={homeContent.contactSecondaryAction} align="start" />
-              </Link>
-            </div>
           </div>
-          <div className="border-t border-[var(--line)]/75">
-            {contactRows.map((row, rowIndex) => (
-              <div
-                key={`row-${rowIndex}`}
-                className={`grid sm:grid-cols-2 ${rowIndex > 0 ? "border-t border-[var(--line)]/70" : ""}`}
-              >
-                {row.map((item, itemIndex) => (
-                  <div
-                    key={item.label}
-                    className={`px-1 py-3.5 sm:px-4 ${itemIndex > 0 ? "sm:border-l sm:border-[var(--line)]/70" : ""}`}
-                  >
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]/32">{item.label}</p>
-                    {item.href ? (
-                      <a
-                        href={item.href}
-                        className="mt-2 block text-[0.9rem] leading-7 text-[var(--ink)] transition-colors hover:text-[var(--accent)]"
-                      >
-                        {item.value}
-                      </a>
-                    ) : (
-                      <p className="mt-2 text-[0.9rem] leading-7 text-[var(--ink)]">{item.value}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ))}
-            <div className="border-t border-[var(--line)]/70 px-1 py-3.5 sm:px-4">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--accent)]/32">Appointment</p>
-              <p className="mt-2 text-[0.88rem] leading-6.5 text-[var(--ink)]">{siteConfig.contact.address.zh}</p>
-              <p className="mt-1.5 text-[15px] leading-[1.8] text-[var(--muted)]/86">{siteConfig.contact.replyWindow.zh}</p>
-              <p className="mt-1 text-[15px] leading-[1.8] text-[var(--muted)]/86">{siteConfig.contact.collaborationNote.zh}</p>
-            </div>
-          </div>
+          <Link href="/contact" className="inline-flex text-[var(--ink)]">
+            <ActionLabel text={homeContent.contactPrimaryAction} align="start" />
+          </Link>
         </div>
       </section>
     </>
