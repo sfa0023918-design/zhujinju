@@ -109,14 +109,14 @@ export function ArtworkGallery({
     categoryHint.includes("painting");
   const isVeryTall = naturalRatio !== null && naturalRatio < 0.78;
   const desktopContainerClass = isPaintingLike || isVeryTall
-    ? "lg:min-h-[48rem] lg:items-start lg:px-1 lg:py-1"
-    : "lg:min-h-[41rem] lg:items-start lg:px-1 lg:py-1";
+    ? "lg:min-h-[47rem] lg:items-start lg:justify-center"
+    : "lg:min-h-[40rem] lg:items-start lg:justify-center";
   const desktopFrameClass = isPaintingLike || isVeryTall
-    ? "lg:flex lg:w-full lg:justify-center"
-    : "lg:flex lg:w-full lg:justify-center";
+    ? "lg:inline-flex lg:w-auto lg:max-w-full lg:justify-center"
+    : "lg:inline-flex lg:w-auto lg:max-w-full lg:justify-center";
   const desktopImageClass = isPaintingLike || isVeryTall
     ? "lg:h-auto lg:w-auto lg:min-w-[34rem] lg:max-h-[84vh] lg:max-w-[46rem] lg:object-contain lg:object-top xl:min-w-[38rem] xl:max-w-[50rem]"
-    : "lg:h-auto lg:w-full lg:max-h-[78vh] lg:max-w-[54rem] lg:object-contain lg:object-top";
+    : "lg:h-auto lg:w-auto lg:max-h-[78vh] lg:max-w-[54rem] lg:object-contain lg:object-top";
 
   const canOpenLightbox = !isActivePlaceholder;
 
@@ -135,7 +135,7 @@ export function ArtworkGallery({
   return (
     <>
       <div
-        className={`grid gap-5 lg:items-start lg:gap-6 ${
+        className={`grid gap-5 lg:items-start lg:gap-4 xl:gap-5 ${
           hasMultipleImages ? "lg:grid-cols-[72px_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"
         }`}
       >
@@ -185,7 +185,7 @@ export function ArtworkGallery({
           </div>
         ) : null}
         <div className={`order-1 min-w-0 grid gap-3.5 ${hasMultipleImages ? "" : "lg:justify-items-center"}`}>
-          <div className={`relative overflow-hidden bg-[var(--surface-strong)] lg:flex lg:overflow-visible ${desktopContainerClass}`}>
+          <div className={`relative overflow-hidden bg-transparent lg:flex lg:overflow-visible ${desktopContainerClass}`}>
             {isActivePlaceholder ? (
               <div className="aspect-[4/5] lg:flex lg:min-h-full lg:w-full lg:items-start lg:justify-center">
                 <MediaPlaceholder eyebrow="Artwork Image" title={title} />
@@ -194,7 +194,7 @@ export function ArtworkGallery({
               <button
                 type="button"
                 onClick={() => setIsLightboxOpen(true)}
-                className={`block w-full cursor-zoom-in ${desktopFrameClass}`}
+                className={`block w-full cursor-zoom-in lg:w-auto lg:max-w-full ${desktopFrameClass}`}
                 data-protect-wrap="true"
               >
                 <ProtectedImage
@@ -204,7 +204,7 @@ export function ArtworkGallery({
                   height={1500}
                   priority
                   unoptimized
-                  wrapperClassName="block"
+                  wrapperClassName="block lg:w-auto"
                   onLoad={(event) => {
                     const target = event.currentTarget;
                     if (target.naturalWidth > 0 && target.naturalHeight > 0) {
@@ -282,7 +282,7 @@ export function ArtworkGallery({
                     width={1600}
                     height={2000}
                     unoptimized
-                    wrapperClassName="block"
+                    wrapperClassName="inline-block !h-auto !w-auto"
                     className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
                   />
                 </div>
