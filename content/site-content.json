@@ -2777,59 +2777,61 @@
     },
     {
       "slug": "exhibition-1773399222802",
-      "publicationStatus": "draft",
+      "publicationStatus": "published",
       "title": {
-        "zh": "",
-        "en": ""
+        "zh": "竹瑾居｜喜马拉雅艺术 2023年",
+        "en": "Zhu Jin Ju | Himalayan Art 2023"
       },
       "subtitle": {
         "zh": "",
         "en": ""
       },
       "period": {
-        "zh": "",
-        "en": ""
+        "zh": "2023.10.31-2023.11.5",
+        "en": "October 31 – November 5, 2023"
       },
       "venue": {
-        "zh": "",
-        "en": ""
+        "zh": "北京嘉德艺术中心",
+        "en": "Guardian Art Center, Beijing"
       },
       "intro": {
-        "zh": "",
-        "en": ""
+        "zh": "原始 、壮阔 、苍茫 、野性 、韧劲……",
+        "en": "Primal, Majestic, Boundless, Untamed, Resilient..."
       },
       "description": [
         {
-          "zh": "",
-          "en": ""
+          "zh": "绵延的喜马拉雅山脉既是俯视众生的存在 ，也是诸 多世界性的宗教 、艺术的源头 ！ 纯净的雪域高原滋养着 让我着迷的人文 、艺术 ，每当想起那些奔放不羁的线 条 、炽热绚烂的色彩 ，总会让我们明白人与自然的和谐 共生 、秩序与自由的博弈 、平衡 ！由同样元素构成的大千世界 ，在那里却 分 外 地 线 条 分 明 、色 彩 澄 净 ！ 更 重 要 的 是 ，如此美妙的雪域高原 、阳光之城背后所蕴 藏的是有关生命的感性 ，有关世界的哲思 ！ 在这个层面上 ，这片土地对所有人都不陌 生 ，能给所有人带来那种回归本真 、内省自身 的熟悉感 ；在这里 ，我们和天地间的一切产 生了联系 ，自然和文化 、物质和精神形成了融 合——也只有如此才能产生令人惊叹的美 感 ，才能诞生震憾人心的视觉冲击 ；在灵性 和本性的底色之上 ，浓墨重彩的涂抹着一种 原始的精神之美；与内心深处的质朴情感共 振出了真我意识 ... 这一切使得这里的每一个 角落都浩翰连宇 ，每一寸土地都神秘珍贵 。以文载道 ，以美化人 ！ 文化初始 ，从象征性符号到具象人物 雕塑的出现 ，人们探寻着对美的理想表达 。文明的碰撞 、思 想的沉淀 ，产生了对世界的笃定 ，发展出了文化上的自信 。 喜马拉雅山脉周边的不同地区尝试着用不同的雕塑语言 、形 态表达着他们的情感和故事 ，丰富的艺术形式无不展示着他 们的才华和审美感知 ，并在相互碰撞之间产生了震憾世界的 作品 。",
+          "en": "The Himalayas, which roll ridge upon ridge, tower over all creatures like a divinity who bestowed upon humanity many of the religions and arts now practised worldwide. The pristine snow-covered plateau is home to charming cultures and arts characterized by unre\u0002strained lines and bright color, which are evidence of the harmonious co-existence of human and nature and the dynamic balance of order and freedom.It is extraordinary that the Himalayas with the same composition of chemical ele\u0002ments as the rest of world have such clarity and purity! More importantly, this snowy place bathed in sunshine can inspire the sensibility of life and reflection of the world. In this sense, there is no stranger on this land, where even newcomers feel at home as they restore their real selves and turn their thoughts inward. As the line blurs be\u0002tween nature and culture as well as the ob\u0002jective reality and the mental world, one feels connected with everything on earth, his or her breath taken away and vision struck by the beauty of nature. Here the primitive beauty of spirit is mixed with human vitality and nature and interacts with one’s simple feelings deep down to raise awareness of the “authentic self” . All of these factors make every corner of this land a precious and mysterious universe. Culture is intended to drive truths and beauty to en\u0002lighten people. Since the emergence of culture, humans have tried to express beauty in many ways, from symbolic signs to figure statues. With the collision of civilizations and accumulation of wisdom, they finally gained a foothold in the world and developed confidence in their own cultures. In different areas around the Himalayas, people use differ\u0002ent forms and “languages” of sculpture to express their emotions and tell their stories. While competing with each other, the rich forms of art—the crystallization of the peo\u0002ple’s talent and aesthetics—have given rise to marvelous works that astound the world."
         }
       ],
       "highlightArtworkSlugs": [],
-      "highlightCount": 0,
-      "featuredWorksCount": 0,
+      "highlightCount": 28,
+      "featuredWorksCount": 28,
       "catalogueTitle": {
-        "zh": "",
-        "en": ""
+        "zh": "竹瑾居｜喜马拉雅艺术 2023 展览图录",
+        "en": "Zhujinju: Himalayan Art | 2023 Exhibition Catalogue"
       },
       "catalogueIntro": {
-        "zh": "",
-        "en": ""
+        "zh": "收录 28 件重点作品，附策展前言、作品页与图像索引。",
+        "en": "Featuring 28 highlights, including curatorial preface, catalogue entries, and image index."
       },
-      "cataloguePages": 0,
-      "cataloguePageCount": 0,
+      "cataloguePages": 136,
+      "cataloguePageCount": 136,
       "catalogueNote": {
-        "zh": "",
-        "en": ""
+        "zh": "收录 28 件重点作品，附策展前言、作品页与图像索引。",
+        "en": "Featuring 28 highlights, including curatorial preface, catalogue entries, and image index."
       },
       "curatorialLead": {
-        "zh": "",
-        "en": ""
+        "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
+        "en": "Rather than an accumulation of categories, the exhibition fosters a comparative dialogue between the works."
       },
       "curatorialNote": {
-        "zh": "",
-        "en": ""
+        "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
+        "en": "Rather than an accumulation of categories, the exhibition fosters a comparative dialogue between the works."
       },
-      "relatedArticleSlugs": [],
+      "relatedArticleSlugs": [
+        "why-exhibitions-matter"
+      ],
       "cover": "/uploads/exhibitions/1773399259638-3f8c00bf945a9cef403cf6714abb4a45.jpg",
       "current": false
     }
