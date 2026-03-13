@@ -242,6 +242,8 @@ function normalizeHomeContentDraft(value: HomeContentEditorValue) {
   next.homeContent.operationalFacts.eyebrow = normalizeBilingualText(next.homeContent.operationalFacts.eyebrow);
   next.homeContent.operationalFacts.title = normalizeBilingualText(next.homeContent.operationalFacts.title);
   next.homeContent.operationalFacts.description = normalizeBilingualText(next.homeContent.operationalFacts.description, "long");
+  next.homeContent.selectedArtworkIds = (next.homeContent.selectedArtworkIds ?? []).map((id) => normalizeLineText(id)).filter(Boolean);
+  next.featuredArtworkIds = next.featuredArtworkIds.map((id) => normalizeLineText(id)).filter(Boolean);
   next.collectingDirections = next.collectingDirections.map((item) => ({
     ...item,
     name: normalizeBilingualText(item.name),
@@ -1408,6 +1410,8 @@ function ListSidebar<T>({
   draggedIndex?: number | null;
   onDragIndexChange?: (index: number | null) => void;
 }) {
+  const listRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <div data-field-key="gallery" className="space-y-4">
       {heading || summary ? (
@@ -1444,7 +1448,27 @@ function ListSidebar<T>({
           新增
         </button>
       </div>
-      <div className={`grid gap-2 border border-[var(--line)] bg-[var(--surface)] p-3 ${listClassName ?? ""}`}>
+      <div
+        ref={listRef}
+        className={`grid gap-2 border border-[var(--line)] bg-[var(--surface)] p-3 ${listClassName ?? ""}`}
+        onDragOver={(event) => {
+          if (!onReorder || !listRef.current) {
+            return;
+          }
+
+          event.preventDefault();
+
+          const rect = listRef.current.getBoundingClientRect();
+          const edgeThreshold = 72;
+          const scrollStep = 28;
+
+          if (event.clientY < rect.top + edgeThreshold) {
+            listRef.current.scrollTop -= scrollStep;
+          } else if (event.clientY > rect.bottom - edgeThreshold) {
+            listRef.current.scrollTop += scrollStep;
+          }
+        }}
+      >
         {items.length ? (
           items.map((item, index) => (
             <button

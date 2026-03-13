@@ -1,15 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="markContour" x1="20" y1="14" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A58F78"/>
+      <stop offset="1" stop-color="#766150"/>
+    </linearGradient>
+    <linearGradient id="markAxis" x1="21" y1="20" x2="43" y2="43" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#37312D"/>
+      <stop offset="1" stop-color="#161311"/>
+    </linearGradient>
+    <linearGradient id="markAccent" x1="28" y1="28" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A96F5D"/>
+      <stop offset="1" stop-color="#6B4338"/>
+    </linearGradient>
+    <linearGradient id="markCore" x1="30" y1="30" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#574E47"/>
+      <stop offset="1" stop-color="#100E0D"/>
+    </linearGradient>
+  </defs>
+
   <g transform="translate(32 32)">
-    <g stroke="#14110F" stroke-width="3.2" stroke-linecap="round" opacity="0.96">
-      <path d="M-22 -1.5C-16 -5 -9 -5 -4 -1.5"/>
-      <path d="M-22 1.5C-16 5 -9 5 -4 1.5"/>
-      <path d="M22 -1.5C16 -5 9 -5 4 -1.5"/>
-      <path d="M22 1.5C16 5 9 5 4 1.5"/>
-      <path d="M-1.5 -22C-5 -16 -5 -9 -1.5 -4"/>
-      <path d="M1.5 -22C5 -16 5 -9 1.5 -4"/>
-      <path d="M-1.5 22C-5 16 -5 9 -1.5 4"/>
-      <path d="M1.5 22C5 16 5 9 1.5 4"/>
+    <g stroke="url(#markContour)" stroke-width="1.85" stroke-linecap="round" opacity="0.99">
+      <path d="M-20 -1.4C-14.8 -4.6 -8.8 -4.9 -4.2 -1.4"/>
+      <path d="M-20 1.4C-14.8 4.6 -8.8 4.9 -4.2 1.4"/>
+      <path d="M20 -1.4C14.8 -4.6 8.8 -4.9 4.2 -1.4"/>
+      <path d="M20 1.4C14.8 4.6 8.8 4.9 4.2 1.4"/>
+      <path d="M-1.4 -20C-4.6 -14.8 -4.9 -8.8 -1.4 -4.2"/>
+      <path d="M1.4 -20C4.6 -14.8 4.9 -8.8 1.4 -4.2"/>
+      <path d="M-1.4 20C-4.6 14.8 -4.9 8.8 -1.4 4.2"/>
+      <path d="M1.4 20C4.6 14.8 4.9 8.8 1.4 4.2"/>
     </g>
-    <rect x="-3.4" y="-3.4" width="6.8" height="6.8" rx="1.4" transform="rotate(45)" fill="#14110F"/>
+    <g stroke="url(#markAxis)" stroke-width="1.55" stroke-linecap="round" opacity="0.96">
+      <path d="M-12 -12.4L-5.6 -6"/>
+      <path d="M5.6 6L12 12.4"/>
+      <path d="M12 -12.4L5.6 -6"/>
+      <path d="M-5.6 6L-12 12.4"/>
+    </g>
+    <g stroke="url(#markAccent)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.98">
+      <path d="M-3.2 -1.5C-2.8 -2.7 -1.9 -3.5 -0.8 -4"/>
+      <path d="M1.5 -3.2C2.7 -2.8 3.5 -1.9 4 -0.8"/>
+      <path d="M3.2 1.5C2.8 2.7 1.9 3.5 0.8 4"/>
+      <path d="M-1.5 3.2C-2.7 2.8 -3.5 1.9 -4 0.8"/>
+    </g>
   </g>
+
+  <rect x="29.9" y="29.9" width="4.2" height="4.2" rx="0.82" transform="rotate(45 32 32)" fill="url(#markCore)"/>
 </svg>

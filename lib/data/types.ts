@@ -201,6 +201,7 @@ export type HomeContent = {
   contact: PageIntroCopy;
   contactPrimaryAction: BilingualText;
   contactSecondaryAction: BilingualText;
+  selectedArtworkIds?: string[];
 };
 
 export type BrandIntroContent = {

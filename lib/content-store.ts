@@ -325,13 +325,26 @@ function getFeaturedArtworkIds(artworks: Artwork[]) {
   return artworks.filter((artwork) => artwork.featured).map((artwork) => getArtworkId(artwork));
 }
 
+function getNormalizedSelectedArtworkIds(homeContent: SiteContent["homeContent"], artworks: Artwork[]) {
+  const fallbackIds = getFeaturedArtworkIds(artworks);
+  const rawIds = Array.isArray(homeContent?.selectedArtworkIds) ? homeContent.selectedArtworkIds : fallbackIds;
+  const featuredIdSet = new Set(fallbackIds);
+  const normalized = rawIds.filter((id, index) => id && rawIds.indexOf(id) === index && featuredIdSet.has(id));
+  const remaining = fallbackIds.filter((id) => !normalized.includes(id));
+
+  return [...normalized, ...remaining];
+}
+
 function buildHomeContentEditorValue(content: SiteContent): HomeContentEditorValue {
   return {
     intro: content.siteConfig.homeIntro,
-    homeContent: content.homeContent,
+    homeContent: {
+      ...content.homeContent,
+      selectedArtworkIds: getNormalizedSelectedArtworkIds(content.homeContent, content.artworks),
+    },
     collectingDirections: content.collectingDirections,
     operationalFacts: content.operationalFacts,
-    featuredArtworkIds: getFeaturedArtworkIds(content.artworks),
+    featuredArtworkIds: getNormalizedSelectedArtworkIds(content.homeContent, content.artworks),
   };
 }
 
@@ -368,7 +381,10 @@ function applyHomeContentEditorValue(content: SiteContent, nextValue: HomeConten
       ...content.siteConfig,
       homeIntro: nextValue.intro,
     },
-    homeContent: nextValue.homeContent,
+    homeContent: {
+      ...nextValue.homeContent,
+      selectedArtworkIds: nextValue.featuredArtworkIds,
+    },
     collectingDirections: nextValue.collectingDirections,
     operationalFacts: nextValue.operationalFacts,
     artworks: content.artworks.map((artwork) => ({
@@ -1165,7 +1181,15 @@ function getUniqueBilingual(items: BilingualText[]) {
 }
 
 export function getFeaturedArtworks(content: SiteContent) {
-  return getPublicArtworks(content).filter((artwork) => artwork.featured);
+  const publicFeaturedArtworks = getPublicArtworks(content).filter((artwork) => artwork.featured);
+  const artworksById = new Map(publicFeaturedArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
+  const orderedIds = getNormalizedSelectedArtworkIds(content.homeContent, content.artworks);
+  const ordered = orderedIds
+    .map((id) => artworksById.get(id))
+    .filter((artwork): artwork is Artwork => Boolean(artwork));
+  const remaining = publicFeaturedArtworks.filter((artwork) => !orderedIds.includes(getArtworkId(artwork)));
+
+  return [...ordered, ...remaining];
 }
 
 export function getCurrentExhibition(content: SiteContent) {

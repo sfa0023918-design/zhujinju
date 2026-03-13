@@ -1,77 +1,65 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 120" fill="none">
   <defs>
-    <linearGradient id="contourStroke" x1="72" y1="56" x2="168" y2="182" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D2C6B8"/>
-      <stop offset="0.55" stop-color="#A69787"/>
-      <stop offset="1" stop-color="#75675B"/>
+    <linearGradient id="markContour" x1="72" y1="56" x2="168" y2="182" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A58F78"/>
+      <stop offset="1" stop-color="#766150"/>
     </linearGradient>
-    <linearGradient id="axisStroke" x1="82" y1="80" x2="158" y2="158" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2A231F"/>
-      <stop offset="0.55" stop-color="#14110F"/>
-      <stop offset="1" stop-color="#6D6156"/>
+    <linearGradient id="markAxis" x1="82" y1="80" x2="158" y2="158" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#37312D"/>
+      <stop offset="1" stop-color="#161311"/>
     </linearGradient>
-    <linearGradient id="hairStroke" x1="78" y1="76" x2="162" y2="164" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#E3D9CC"/>
-      <stop offset="1" stop-color="#BDB0A0"/>
+    <linearGradient id="markAccent" x1="109" y1="109" x2="131" y2="131" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A96F5D"/>
+      <stop offset="1" stop-color="#6B4338"/>
     </linearGradient>
-    <linearGradient id="accentStroke" x1="109" y1="109" x2="131" y2="131" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#BE8A76"/>
-      <stop offset="1" stop-color="#8D5F51"/>
-    </linearGradient>
-    <linearGradient id="coreFill" x1="116" y1="116" x2="124" y2="124" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#978470"/>
-      <stop offset="1" stop-color="#211A16"/>
+    <linearGradient id="markCore" x1="116" y1="116" x2="124" y2="124" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#574E47"/>
+      <stop offset="1" stop-color="#100E0D"/>
     </linearGradient>
     <style>
       .cn {
-        fill: #14110F;
+        fill: #171311;
         font-family: "Songti SC", "Noto Serif CJK SC", serif;
         font-size: 30px;
-        letter-spacing: 0.24em;
+        letter-spacing: 0.12em;
       }
       .en {
-        fill: #64594F;
+        fill: #8B755F;
         font-family: "Helvetica Neue", Arial, sans-serif;
-        font-size: 10px;
-        letter-spacing: 0.28em;
+        font-size: 11.5px;
+        letter-spacing: 0.19em;
       }
     </style>
   </defs>
 
-  <g transform="translate(10 10) scale(0.42)">
+  <g transform="translate(8 19) scale(0.22)">
     <g transform="translate(120 120)">
-      <g stroke="url(#contourStroke)" stroke-width="3.8" stroke-linecap="round" opacity="0.95">
-        <path d="M-80 -5C-60 -17 -36 -18 -16 -5"/>
-        <path d="M-80 5C-60 17 -36 18 -16 5"/>
-        <path d="M80 -5C60 -17 36 -18 16 -5"/>
-        <path d="M80 5C60 17 36 18 16 5"/>
-        <path d="M-5 -80C-17 -60 -18 -36 -5 -16"/>
-        <path d="M5 -80C17 -60 18 -36 5 -16"/>
-        <path d="M-5 80C-17 60 -18 36 -5 16"/>
-        <path d="M5 80C17 60 18 36 5 16"/>
+      <g stroke="url(#markContour)" stroke-width="4.35" stroke-linecap="round" opacity="0.99">
+        <path d="M-78 -5C-58 -16 -35 -17 -16 -5"/>
+        <path d="M-78 5C-58 16 -35 17 -16 5"/>
+        <path d="M78 -5C58 -16 35 -17 16 -5"/>
+        <path d="M78 5C58 16 35 17 16 5"/>
+        <path d="M-5 -78C-16 -58 -17 -35 -5 -16"/>
+        <path d="M5 -78C16 -58 17 -35 5 -16"/>
+        <path d="M-5 78C-16 58 -17 35 -5 16"/>
+        <path d="M5 78C16 58 17 35 5 16"/>
       </g>
-      <g stroke="url(#axisStroke)" stroke-width="3" stroke-linecap="round" opacity="0.82">
-        <path d="M-50 -52L-22 -24"/>
-        <path d="M22 24L50 52"/>
-        <path d="M50 -52L22 -24"/>
-        <path d="M-22 24L-50 52"/>
+      <g stroke="url(#markAxis)" stroke-width="3.5" stroke-linecap="round" opacity="0.96">
+        <path d="M-48 -50L-22 -24"/>
+        <path d="M22 24L48 50"/>
+        <path d="M48 -50L22 -24"/>
+        <path d="M-22 24L-48 50"/>
       </g>
-      <g stroke="url(#hairStroke)" stroke-width="1.05" stroke-linecap="round" opacity="0.42">
-        <path d="M-42 -60L-12 -30"/>
-        <path d="M12 30L42 60"/>
-        <path d="M42 -60L12 -30"/>
-        <path d="M-12 30L-42 60"/>
-      </g>
-      <g stroke="url(#accentStroke)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+      <g stroke="url(#markAccent)" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round" opacity="0.97">
         <path d="M-8 -4C-7 -7 -5 -9 -2 -10"/>
         <path d="M4 -8C7 -7 9 -5 10 -2"/>
         <path d="M8 4C7 7 5 9 2 10"/>
         <path d="M-4 8C-7 7 -9 5 -10 2"/>
       </g>
     </g>
-    <rect x="116.4" y="116.4" width="7.2" height="7.2" rx="1.5" transform="rotate(45 120 120)" fill="url(#coreFill)" opacity="0.94"/>
+    <rect x="116.2" y="116.2" width="7.6" height="7.6" rx="1.45" transform="rotate(45 120 120)" fill="url(#markCore)"/>
   </g>
 
-  <text class="cn" x="122" y="49">竹瑾居</text>
-  <text class="en" x="122" y="72">ZHUJINJU | HIMALAYAN ART AND ASIAN ANTIQUITIES</text>
+  <text class="cn" x="92" y="44">竹瑾居</text>
+  <text class="en" x="92" y="76">HIMALAYAN ART AND ASIAN ANTIQUITIES</text>
 </svg>

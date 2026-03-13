@@ -19,7 +19,7 @@ export default async function HomePage() {
   const featuredArtworks = getFeaturedArtworks(content);
   const focusCopy = currentExhibition?.current ? homeContent.focusCurrent : homeContent.focusRecent;
   const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
-  const worksSectionCopy = { zh: "作品集", en: "Portfolio" };
+  const worksSectionCopy = { zh: "部分藏品赏析", en: "Selected Highlights" };
 
   return (
     <>
