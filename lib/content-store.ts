@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
+import { getArticleBodyParagraphs, normalizeArticleContentBlocks } from "./article-content";
 import { bt } from "./bilingual";
 import { articles as defaultArticles } from "./data/articles";
 import { artworks as defaultArtworks } from "./data/artworks";
@@ -238,6 +239,12 @@ function createArticleDraftRecord(): Article {
     date: new Date().toISOString().slice(0, 10),
     excerpt: bt("", ""),
     body: [bt("", "")],
+    contentBlocks: [
+      {
+        type: "paragraph",
+        content: bt("", ""),
+      },
+    ],
     keywords: [bt("", "")],
     relatedArtworkSlugs: [],
     relatedExhibitionSlugs: [],
@@ -1112,6 +1119,8 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
     articles: content.articles.map((article) => ({
       ...article,
       publicationStatus: article.publicationStatus ?? "published",
+      contentBlocks: normalizeArticleContentBlocks(article.contentBlocks, article.body),
+      body: getArticleBodyParagraphs(article.contentBlocks, article.body),
     })),
   };
 }

@@ -2,10 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
+import {
+  createArticleImageBlock,
+  createArticleImagePairBlock,
+  createArticleParagraphBlock,
+  getArticleBodyParagraphs,
+  normalizeArticleContentBlocks,
+} from "@/lib/article-content";
 import type {
   Article,
+  ArticleContentBlock,
   Artwork,
   ArtworkStatus,
   BilingualText,
@@ -316,7 +324,8 @@ function normalizeArticleDraft(value: Article) {
   next.author = normalizeBilingualText(next.author);
   next.cover = normalizeLineText(next.cover);
   next.excerpt = normalizeBilingualText(next.excerpt, "long");
-  next.body = (next.body ?? []).map((item) => normalizeBilingualText(item, "long"));
+  next.contentBlocks = normalizeArticleContentBlocks(next.contentBlocks, next.body);
+  next.body = getArticleBodyParagraphs(next.contentBlocks, next.body);
   next.keywords = (next.keywords ?? []).map((item) => normalizeBilingualText(item));
   return next;
 }
@@ -1068,6 +1077,248 @@ function BilingualTextarea({
   );
 }
 
+function ArticleInlineImageField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const inputId = useId();
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setUploading(true);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "articles/references");
+
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const { payload, raw } = await readAdminUploadResponse(response);
+
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error ?? (raw.trim() || "图片上传失败。"));
+      }
+
+      onChange(payload.url);
+      setMessage("插图已上传。保存当前文章后前台会显示。");
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "图片上传失败。");
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  return (
+    <div className="grid gap-3 border border-[var(--line)] bg-[var(--surface)] p-4">
+      <div className="flex items-center justify-between gap-4">
+        <Label>{label}</Label>
+        <div className="flex flex-wrap items-center justify-end gap-3 text-xs tracking-[0.12em] text-[var(--accent)]">
+          <label htmlFor={inputId} className="cursor-pointer transition-colors hover:text-[var(--ink)]">
+            {uploading ? "上传中..." : "上传图片"}
+          </label>
+          {value.trim() ? (
+            <button
+              type="button"
+              onClick={() => {
+                onChange("");
+                setMessage("插图已移除。");
+                setError(null);
+              }}
+              className="transition-colors hover:text-[var(--ink)]"
+            >
+              移除
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <input
+        id={inputId}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(event) => void handleFileChange(event)}
+      />
+      <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]">
+        <div className="relative overflow-hidden border border-[var(--line)]/60 bg-[var(--surface-strong)]">
+          {value.trim() ? (
+            <Image
+              src={value}
+              alt={label}
+              width={1200}
+              height={900}
+              unoptimized
+              className="aspect-[4/3] h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex aspect-[4/3] items-center justify-center text-[0.68rem] tracking-[0.14em] text-[var(--accent)]/56">
+              暂无插图
+            </div>
+          )}
+        </div>
+        <label className="grid gap-2">
+          <span className="text-xs uppercase tracking-[0.14em] text-[var(--accent)]">Image Path</span>
+          <input
+            type="text"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            className="w-full border border-[var(--line)] bg-white/60 px-3 py-3 text-sm leading-7 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+          />
+        </label>
+      </div>
+      {message ? <p className="text-sm leading-7 text-[var(--muted)]">{message}</p> : null}
+      {error ? <p className="text-sm leading-7 text-[#8e4e3b]">{error}</p> : null}
+    </div>
+  );
+}
+
+function ArticleContentBlockEditor({
+  block,
+  index,
+  total,
+  onChange,
+  onMove,
+  onRemove,
+}: {
+  block: ArticleContentBlock;
+  index: number;
+  total: number;
+  onChange: (updater: (block: ArticleContentBlock) => ArticleContentBlock) => void;
+  onMove: (direction: "up" | "down") => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="space-y-4 border border-[var(--line)]/68 bg-white/32 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm tracking-[0.04em] text-[var(--ink)]">
+          {block.type === "paragraph" ? `正文段落 ${index + 1}` : block.type === "image" ? `插图 ${index + 1}` : `双图组 ${index + 1}`}
+        </p>
+        <div className="flex flex-wrap items-center gap-3 text-xs tracking-[0.12em] text-[var(--accent)]">
+          <button type="button" onClick={() => onMove("up")} disabled={index === 0} className="transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-35">上移</button>
+          <button type="button" onClick={() => onMove("down")} disabled={index === total - 1} className="transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-35">下移</button>
+          <button type="button" onClick={onRemove} className="transition-colors hover:text-[var(--ink)]">删除</button>
+        </div>
+      </div>
+
+      {block.type === "paragraph" ? (
+        <BilingualTextarea
+          label="正文"
+          value={block.content}
+          onChange={(next) =>
+            onChange((current) => ({
+              ...(current as typeof block),
+              content: next,
+            }))
+          }
+          rows={5}
+        />
+      ) : null}
+
+      {block.type === "image" ? (
+        <div className="grid gap-4">
+          <ArticleInlineImageField
+            label="插图"
+            value={block.image}
+            onChange={(next) =>
+              onChange((current) => ({
+                ...(current as typeof block),
+                image: next,
+              }))
+            }
+          />
+          <div className="grid gap-4 md:grid-cols-[180px_minmax(0,1fr)]">
+            <label className="grid gap-2">
+              <span className="text-xs uppercase tracking-[0.14em] text-[var(--accent)]">Layout</span>
+              <select
+                value={block.layout ?? "wide"}
+                onChange={(event) =>
+                  onChange((current) => ({
+                    ...(current as typeof block),
+                    layout: event.target.value === "inline" ? "inline" : "wide",
+                  }))
+                }
+                className="w-full border border-[var(--line)] bg-white/60 px-3 py-3 text-sm leading-7 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+              >
+                <option value="wide">宽图</option>
+                <option value="inline">窄图</option>
+              </select>
+            </label>
+          </div>
+          <BilingualTextarea
+            label="图注"
+            value={block.caption}
+            onChange={(next) =>
+              onChange((current) => ({
+                ...(current as typeof block),
+                caption: next,
+              }))
+            }
+            rows={3}
+          />
+        </div>
+      ) : null}
+
+      {block.type === "imagePair" ? (
+        <div className="grid gap-4">
+          {block.items.map((item, itemIndex) => (
+            <div key={`pair-item-${itemIndex}`} className="grid gap-4 border border-[var(--line)]/54 bg-[var(--surface)]/46 p-4">
+              <ArticleInlineImageField
+                label={`图片 ${itemIndex + 1}`}
+                value={item.image}
+                onChange={(next) =>
+                  onChange((current) => {
+                    const currentBlock = current as typeof block;
+                    const items = cloneValue(currentBlock.items);
+                    items[itemIndex].image = next;
+                    return {
+                      ...currentBlock,
+                      items,
+                    };
+                  })
+                }
+              />
+              <BilingualTextarea
+                label={`图注 ${itemIndex + 1}`}
+                value={item.caption}
+                onChange={(next) =>
+                  onChange((current) => {
+                    const currentBlock = current as typeof block;
+                    const items = cloneValue(currentBlock.items);
+                    items[itemIndex].caption = next;
+                    return {
+                      ...currentBlock,
+                      items,
+                    };
+                  })
+                }
+                rows={3}
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function RelationChecklist({
   label,
   options,
@@ -1130,6 +1381,13 @@ function ListSidebar<T>({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
+  heading,
+  summary,
+  getItemKey,
+  listClassName,
+  onReorder,
+  draggedIndex,
+  onDragIndexChange,
 }: {
   items: T[];
   selectedIndex: number;
@@ -1142,9 +1400,22 @@ function ListSidebar<T>({
   onSearchChange?: (value: string) => void;
   statusFilter?: string;
   onStatusFilterChange?: (value: string) => void;
+  heading?: string;
+  summary?: string;
+  getItemKey?: (item: T, index: number) => string;
+  listClassName?: string;
+  onReorder?: (fromIndex: number, toIndex: number) => void;
+  draggedIndex?: number | null;
+  onDragIndexChange?: (index: number | null) => void;
 }) {
   return (
     <div data-field-key="gallery" className="space-y-4">
+      {heading || summary ? (
+        <div className="space-y-1">
+          {heading ? <p className="text-sm tracking-[0.04em] text-[var(--ink)]">{heading}</p> : null}
+          {summary ? <p className="text-sm leading-7 text-[var(--muted)]">{summary}</p> : null}
+        </div>
+      ) : null}
       <div className="grid gap-3 border border-[var(--line)] bg-[var(--surface)] p-4">
         {onSearchChange ? (
           <input
@@ -1173,20 +1444,41 @@ function ListSidebar<T>({
           新增
         </button>
       </div>
-      <div className="grid gap-2 border border-[var(--line)] bg-[var(--surface)] p-3">
+      <div className={`grid gap-2 border border-[var(--line)] bg-[var(--surface)] p-3 ${listClassName ?? ""}`}>
         {items.length ? (
           items.map((item, index) => (
             <button
-              key={`${renderTitle(item, index)}-${index}`}
+              key={getItemKey ? getItemKey(item, index) : `${renderTitle(item, index)}-${index}`}
               type="button"
               onClick={() => onSelect(index)}
+              draggable={Boolean(onReorder && onDragIndexChange)}
+              onDragStart={() => onDragIndexChange?.(index)}
+              onDragEnd={() => onDragIndexChange?.(null)}
+              onDragOver={(event) => {
+                if (onReorder) {
+                  event.preventDefault();
+                }
+              }}
+              onDrop={() => {
+                const nextDraggedIndex = draggedIndex;
+
+                if (onReorder && typeof nextDraggedIndex === "number" && nextDraggedIndex !== index) {
+                  onReorder(nextDraggedIndex, index);
+                }
+                onDragIndexChange?.(null);
+              }}
               className={`grid gap-1 border px-4 py-3 text-left ${
                 index === selectedIndex
                   ? "border-[var(--line-strong)] bg-[var(--surface-strong)]"
                   : "border-[var(--line)] bg-white/40"
-              }`}
+              } ${draggedIndex === index ? "opacity-55" : ""}`}
             >
-              <p className="text-sm leading-6 text-[var(--ink)]">{renderTitle(item, index)}</p>
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm leading-6 text-[var(--ink)]">{renderTitle(item, index)}</p>
+                {onReorder ? (
+                  <span className="text-[11px] tracking-[0.14em] text-[var(--accent)]/72">拖动排序</span>
+                ) : null}
+              </div>
               {renderMeta ? <p className="text-xs leading-5 text-[var(--muted)]">{renderMeta(item, index)}</p> : null}
               {renderWarnings ? (
                 <div className="flex flex-wrap gap-1 pt-1">
@@ -1956,6 +2248,7 @@ function ArtworkEditor({
   const [statusFilter, setStatusFilter] = useState(initialStatusFilter ?? "all");
   const [saveState, setSaveState] = useState<SaveState>({ phase: "idle" });
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
+  const [draggedArtworkIndex, setDraggedArtworkIndex] = useState<number | null>(null);
   const requestRef = useRef(0);
   const sectionLabels = {
     basic: "基础信息",
@@ -2262,6 +2555,54 @@ function ArtworkEditor({
     }
   }
 
+  async function reorderArtworkByFilteredIndex(fromFilteredIndex: number, toFilteredIndex: number) {
+    const fromArtwork = filteredArtworks[fromFilteredIndex];
+    const toArtwork = filteredArtworks[toFilteredIndex];
+
+    if (!fromArtwork || !toArtwork) {
+      setDraggedArtworkIndex(null);
+      return;
+    }
+
+    const fromIndex = artworks.findIndex((artwork) => getArtworkId(artwork) === getArtworkId(fromArtwork));
+    const toIndex = artworks.findIndex((artwork) => getArtworkId(artwork) === getArtworkId(toArtwork));
+
+    if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) {
+      setDraggedArtworkIndex(null);
+      return;
+    }
+
+    const previousArtworks = cloneValue(artworks);
+    const nextArtworks = moveArrayItem(artworks, fromIndex, toIndex);
+    const orderedIds = nextArtworks.map((artwork) => getArtworkId(artwork));
+
+    setArtworks(nextArtworks);
+    setSelectedId(getArtworkId(fromArtwork));
+    setDraggedArtworkIndex(null);
+    setSaveState({ phase: "saving", message: "正在更新排序..." });
+
+    try {
+      const payload = await requestJson<{ artworks: Artwork[]; message?: string }>("/api/admin/artworks/reorder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ artworkIds: orderedIds }),
+      });
+
+      setArtworks(payload.artworks);
+      setPersisted(payload.artworks);
+      setSaveState({ phase: "saved", message: payload.message ?? "排序已更新。" });
+    } catch (error) {
+      setArtworks(previousArtworks);
+      setDraggedArtworkIndex(null);
+      setSaveState({
+        phase: "error",
+        message: error instanceof Error ? error.message : "更新排序失败。",
+      });
+    }
+  }
+
   async function saveCurrentArtwork(nextStatus: PublicationStatus) {
     if (!selectedArtwork) {
       return;
@@ -2335,7 +2676,7 @@ function ArtworkEditor({
       <ValidationSummary issues={validationIssues} sectionLabels={sectionLabels} />
 
       <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
-        <aside>
+        <aside className="xl:sticky xl:top-6 xl:self-start">
           <ListSidebar
             items={filteredArtworks}
             selectedIndex={Math.max(0, filteredArtworks.findIndex((item) => getArtworkId(item) === selectedId))}
@@ -2348,6 +2689,13 @@ function ArtworkEditor({
             onSearchChange={setSearch}
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
+            heading={`藏品 ${artworks.length}`}
+            summary={search.trim() || statusFilter !== "all" ? `当前显示 ${filteredArtworks.length} 件，可直接拖动左侧条目调整排序。` : "左侧列表固定滚动；可直接拖动条目调整前台与后台的显示顺序。"}
+            getItemKey={(artwork) => getArtworkId(artwork)}
+            listClassName="max-h-[68vh] overflow-y-auto"
+            onReorder={(fromIndex, toIndex) => void reorderArtworkByFilteredIndex(fromIndex, toIndex)}
+            draggedIndex={draggedArtworkIndex}
+            onDragIndexChange={setDraggedArtworkIndex}
           />
         </aside>
 
@@ -2915,6 +3263,15 @@ function ArticlesEditor({
     });
   }
 
+  function updateContentBlocks(recipe: (blocks: ArticleContentBlock[]) => ArticleContentBlock[]) {
+    update((items) => {
+      const currentBlocks = normalizeArticleContentBlocks(items[selectedIndex].contentBlocks, items[selectedIndex].body);
+      const nextBlocks = normalizeArticleContentBlocks(recipe(currentBlocks), items[selectedIndex].body);
+      items[selectedIndex].contentBlocks = nextBlocks;
+      items[selectedIndex].body = getArticleBodyParagraphs(nextBlocks, items[selectedIndex].body);
+    });
+  }
+
   async function createArticleDraftRemote() {
     setSaveState({ phase: "creating", message: "正在创建文章草稿..." });
 
@@ -3131,10 +3488,59 @@ function ArticlesEditor({
             </SectionBlock>
             <SectionBlock id="section-body" title="正文与关键词" issues={sectionIssues.body}>
               <div data-field-key="body" className="grid gap-4">
-                {article.body.map((paragraph, index) => (
-                  <BilingualTextarea key={`article-body-${index}`} label={`正文 ${index + 1}`} value={paragraph} onChange={(next) => update((items) => { items[selectedIndex].body = updateArrayItem(items[selectedIndex].body, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} rows={5} fieldKeys={{ zh: `body.${index}.zh`, en: `body.${index}.en` }} />
+                <div className="space-y-2">
+                  <p className="text-sm leading-7 text-[var(--muted)]">正文默认支持段落；如需参考图，可在任意位置插入单图或双图。没有插图时，前台会保持当前文章格式。</p>
+                </div>
+                {normalizeArticleContentBlocks(article.contentBlocks, article.body).map((block, index, blocks) => (
+                  <ArticleContentBlockEditor
+                    key={`article-content-block-${index}`}
+                    block={block}
+                    index={index}
+                    total={blocks.length}
+                    onChange={(updater) =>
+                      updateContentBlocks((currentBlocks) =>
+                        updateArrayItem(currentBlocks, index, (currentBlock) => Object.assign(currentBlock, updater(currentBlock))),
+                      )
+                    }
+                    onMove={(direction) =>
+                      updateContentBlocks((currentBlocks) =>
+                        moveArrayItem(currentBlocks, index, direction === "up" ? index - 1 : index + 1),
+                      )
+                    }
+                    onRemove={() =>
+                      updateContentBlocks((currentBlocks) => {
+                        const nextBlocks = removeArrayItem(currentBlocks, index);
+                        return nextBlocks.length ? nextBlocks : [createArticleParagraphBlock()];
+                      })
+                    }
+                  />
                 ))}
-                <button data-field-key="body.add" type="button" onClick={() => update((items) => { items[selectedIndex].body = [...items[selectedIndex].body, emptyBilingual()]; })} className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]">新增正文段落</button>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    data-field-key="body.addParagraph"
+                    type="button"
+                    onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleParagraphBlock()])}
+                    className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                  >
+                    新增正文段落
+                  </button>
+                  <button
+                    data-field-key="body.addImage"
+                    type="button"
+                    onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImageBlock()])}
+                    className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                  >
+                    新增单图
+                  </button>
+                  <button
+                    data-field-key="body.addImagePair"
+                    type="button"
+                    onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImagePairBlock()])}
+                    className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                  >
+                    新增双图
+                  </button>
+                </div>
                 {article.keywords.map((keyword, index) => (
                   <BilingualInput key={`article-keyword-${index}`} label={`关键词 ${index + 1}`} value={keyword} onChange={(next) => update((items) => { items[selectedIndex].keywords = updateArrayItem(items[selectedIndex].keywords, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} />
                 ))}

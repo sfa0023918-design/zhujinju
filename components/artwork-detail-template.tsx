@@ -10,6 +10,7 @@ import type {
   PageCopyContent,
   SiteConfigContent,
 } from "@/lib/site-data";
+import { getArtworkStatusText } from "@/lib/bilingual";
 
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
@@ -193,6 +194,7 @@ export function ArtworkInquiry({
   locale,
 }: ArtworkInquiryProps) {
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
+  const isSold = artwork.status === "sold";
   const supportItems = artwork.inquirySupport.filter(hasText);
   const contactRows = [
     { label: "Email", value: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` },
@@ -209,20 +211,32 @@ export function ArtworkInquiry({
 
   return (
     <div className="space-y-3.5 border-t border-[var(--line)]/34 pt-5">
-      <Link
-        href={inquiryHref}
-        className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line-strong)]/62 px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
-      >
-        <BilingualText
-          as="span"
-          text={detailCopy.inquireAction}
-          className="flex flex-col items-center text-center"
-          zhClassName="text-sm leading-none tracking-[0.01em]"
-          enClassName="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--accent)]/78 leading-[1.45]"
-        />
-      </Link>
+      {isSold ? (
+        <div className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line)]/58 px-5 text-[var(--muted)]">
+          <BilingualText
+            as="span"
+            text={getArtworkStatusText(artwork.status)}
+            className="flex flex-col items-center text-center"
+            zhClassName="text-sm leading-none tracking-[0.01em]"
+            enClassName="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--accent)]/72 leading-[1.45]"
+          />
+        </div>
+      ) : (
+        <Link
+          href={inquiryHref}
+          className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line-strong)]/62 px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+        >
+          <BilingualText
+            as="span"
+            text={detailCopy.inquireAction}
+            className="flex flex-col items-center text-center"
+            zhClassName="text-sm leading-none tracking-[0.01em]"
+            enClassName="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--accent)]/78 leading-[1.45]"
+          />
+        </Link>
+      )}
 
-      {supportItems.length ? (
+      {!isSold && supportItems.length ? (
         <div className="flex flex-wrap gap-2">
           {supportItems.map((item) => (
             <Link

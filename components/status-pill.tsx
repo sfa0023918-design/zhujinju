@@ -17,8 +17,8 @@ const statusClassMap: Record<ArtworkStatus, string> = {
 export function StatusPill({ status, variant = "default" }: StatusPillProps) {
   const baseClassName =
     variant === "fine"
-      ? "inline-flex items-center rounded-full border px-[0.34rem] py-[0.06rem]"
-      : "inline-flex items-center rounded-full border px-2.5 py-[0.22rem]";
+      ? "inline-flex shrink-0 items-center rounded-full border px-[0.34rem] py-[0.06rem] whitespace-nowrap"
+      : "inline-flex shrink-0 items-center rounded-full border px-2.5 py-[0.22rem] whitespace-nowrap";
   const zhClassName = variant === "fine" ? "text-[0.48rem] tracking-[0.14em]" : "text-[0.64rem] tracking-[0.16em]";
   const enClassName =
     variant === "fine"

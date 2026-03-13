@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
+import { ArticleReadingContent } from "@/components/article-reading-content";
 import { BilingualText } from "@/components/bilingual-text";
-import { BilingualReadingPanel } from "@/components/bilingual-prose";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
+import { getRenderableArticleContentBlocks } from "@/lib/article-content";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticleBySlug,
@@ -69,7 +70,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedExhibitions = getExhibitionsBySlugs(content, article.relatedExhibitionSlugs);
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
-  const articleBodyLabel = { zh: "正文", en: "Essay" };
+  const renderableBlocks = getRenderableArticleContentBlocks(article);
   const detailHeadingZhClass =
     "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
   const detailHeadingEnClass =
@@ -138,24 +139,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           )}
         </div>
 
-        <div className="mt-10 max-w-[42rem]">
-          <BilingualReadingPanel
-            sections={[
-              {
-                key: "excerpt",
-                content: article.excerpt,
-                variant: "lead",
-              },
-              {
-                key: "body",
-                label: articleBodyLabel,
-                content: article.body,
-                variant: "body",
-              },
-            ]}
-            defaultLocale="zh"
-          />
-        </div>
+        <ArticleReadingContent className="mt-10" excerpt={article.excerpt} blocks={renderableBlocks} />
 
         {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (
           <section className="mt-16 grid gap-10 border-t border-[var(--line)] pt-8 md:grid-cols-2">

@@ -1,5 +1,10 @@
 export type {
   Article,
+  ArticleContentBlock,
+  ArticleImageBlock,
+  ArticleImagePairBlock,
+  ArticleImagePairItem,
+  ArticleParagraphBlock,
   Artwork,
   ArtworkStatus,
   BilingualText,

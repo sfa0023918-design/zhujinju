@@ -1,3 +1,4 @@
+import { articleHasBodyContent } from "./article-content";
 import type { Article, Artwork, BilingualText, Exhibition } from "./data/types";
 
 const UNTITLED_ARTWORK_TITLES = new Set(["未命名藏品", "Untitled Artwork"]);
@@ -204,7 +205,7 @@ export function getArticlePublicationIssues(article: Article, articles: Article[
     addIssue(issues, { field: "excerpt.zh", section: "basic", message: "请填写摘要。", level: "error" });
   }
 
-  if (!article.body.some((paragraph) => getPrimaryText(paragraph))) {
+  if (!articleHasBodyContent(article)) {
     addIssue(issues, { field: "body.0.zh", section: "body", message: "请填写正文主体。", level: "error" });
   }
 

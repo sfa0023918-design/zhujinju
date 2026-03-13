@@ -85,11 +85,41 @@ export type Article = {
   date: string;
   excerpt: BilingualText;
   body: BilingualText[];
+  contentBlocks?: ArticleContentBlock[];
   keywords: BilingualText[];
   relatedArtworkSlugs: string[];
   relatedExhibitionSlugs: string[];
   cover: string;
 };
+
+export type ArticleImageLayout = "inline" | "wide";
+
+export type ArticleParagraphBlock = {
+  type: "paragraph";
+  content: BilingualText;
+};
+
+export type ArticleImageBlock = {
+  type: "image";
+  image: string;
+  caption: BilingualText;
+  layout?: ArticleImageLayout;
+};
+
+export type ArticleImagePairItem = {
+  image: string;
+  caption: BilingualText;
+};
+
+export type ArticleImagePairBlock = {
+  type: "imagePair";
+  items: ArticleImagePairItem[];
+};
+
+export type ArticleContentBlock =
+  | ArticleParagraphBlock
+  | ArticleImageBlock
+  | ArticleImagePairBlock;
 
 export type ContactDetails = {
   email: string;
