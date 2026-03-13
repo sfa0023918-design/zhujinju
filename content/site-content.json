@@ -4334,7 +4334,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773427304674-391b2ab2c46aecfae12b743a2629012a.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773427308849-6f1873239ab4b7417db35a60e2c2644d.jpg"
+      ],
       "featured": false
     }
   ],
