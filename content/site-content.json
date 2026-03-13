@@ -2137,6 +2137,64 @@
         "zh": "展览不追求门类堆叠，而是让作品之间形成可比较的观看关系。",
         "en": "The exhibition avoids category accumulation and instead lets works form a comparable field of looking."
       }
+    },
+    {
+      "slug": "exhibition-1773394358822",
+      "publicationStatus": "draft",
+      "title": {
+        "zh": "",
+        "en": ""
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "",
+        "en": ""
+      },
+      "venue": {
+        "zh": "",
+        "en": ""
+      },
+      "intro": {
+        "zh": "",
+        "en": ""
+      },
+      "description": [
+        {
+          "zh": "",
+          "en": ""
+        }
+      ],
+      "highlightArtworkSlugs": [],
+      "highlightCount": 0,
+      "featuredWorksCount": 0,
+      "catalogueTitle": {
+        "zh": "",
+        "en": ""
+      },
+      "catalogueIntro": {
+        "zh": "",
+        "en": ""
+      },
+      "cataloguePages": 0,
+      "cataloguePageCount": 0,
+      "catalogueNote": {
+        "zh": "",
+        "en": ""
+      },
+      "curatorialLead": {
+        "zh": "",
+        "en": ""
+      },
+      "curatorialNote": {
+        "zh": "",
+        "en": ""
+      },
+      "relatedArticleSlugs": [],
+      "cover": "",
+      "current": false
     }
   ],
   "articles": [
