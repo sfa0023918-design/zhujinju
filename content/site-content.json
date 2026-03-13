@@ -2334,7 +2334,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773396578121-72金刚萨垛-正-1.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg"
+      ],
       "featured": false
     }
   ],
