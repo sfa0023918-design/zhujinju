@@ -3249,7 +3249,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773413981363-未命名-2-2.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773413987278-未命名-3.jpg"
+      ],
       "featured": false
     }
   ],
