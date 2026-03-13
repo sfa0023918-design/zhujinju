@@ -1217,7 +1217,9 @@
           "en": "Catalogue pages available on request"
         }
       ],
-      "relatedArticleSlugs": [],
+      "relatedArticleSlugs": [
+        "why-exhibitions-matter"
+      ],
       "relatedExhibitionSlugs": [
         "exhibition-1773399222802"
       ],
