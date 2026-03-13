@@ -2774,6 +2774,64 @@
       ],
       "cover": "/uploads/exhibitions/1773394368070-02c77f458e841cac23d362b3a6d62233.jpg",
       "current": false
+    },
+    {
+      "slug": "exhibition-1773399222802",
+      "publicationStatus": "draft",
+      "title": {
+        "zh": "",
+        "en": ""
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "",
+        "en": ""
+      },
+      "venue": {
+        "zh": "",
+        "en": ""
+      },
+      "intro": {
+        "zh": "",
+        "en": ""
+      },
+      "description": [
+        {
+          "zh": "",
+          "en": ""
+        }
+      ],
+      "highlightArtworkSlugs": [],
+      "highlightCount": 0,
+      "featuredWorksCount": 0,
+      "catalogueTitle": {
+        "zh": "",
+        "en": ""
+      },
+      "catalogueIntro": {
+        "zh": "",
+        "en": ""
+      },
+      "cataloguePages": 0,
+      "cataloguePageCount": 0,
+      "catalogueNote": {
+        "zh": "",
+        "en": ""
+      },
+      "curatorialLead": {
+        "zh": "",
+        "en": ""
+      },
+      "curatorialNote": {
+        "zh": "",
+        "en": ""
+      },
+      "relatedArticleSlugs": [],
+      "cover": "",
+      "current": false
     }
   ],
   "articles": [
