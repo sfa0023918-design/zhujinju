@@ -3590,7 +3590,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
+      ],
       "featured": false
     }
   ],
