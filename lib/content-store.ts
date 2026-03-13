@@ -19,6 +19,7 @@ import type {
   Exhibition,
   HomeContent,
   HomeContentEditorValue,
+  OperationalFact,
   PublicationStatus,
   SiteContent,
   SiteConfigContent,
@@ -1233,6 +1234,79 @@ export function getPublicArticles(content: SiteContent) {
       publicationStatus: article.publicationStatus ?? "published",
     }))
     .filter((article) => isPublished(article.publicationStatus));
+}
+
+function hasCatalogueData(exhibition: Exhibition) {
+  return Boolean(
+    exhibition.catalogueTitle.zh.trim() ||
+      exhibition.catalogueTitle.en.trim() ||
+      exhibition.catalogueIntro.zh.trim() ||
+      exhibition.catalogueIntro.en.trim() ||
+      exhibition.cataloguePages > 0 ||
+      (exhibition.cataloguePageCount ?? 0) > 0,
+  );
+}
+
+function pluralize(count: number, singular: string, plural: string) {
+  return count === 1 ? singular : plural;
+}
+
+function getAutoOperationalValue(kind: "exhibitions" | "catalogues" | "articles", content: SiteContent) {
+  if (kind === "exhibitions") {
+    const count = getPublicExhibitions(content).length;
+    return {
+      zh: `${count} 项专题展览`,
+      en: `${count} ${pluralize(count, "exhibition", "exhibitions")}`,
+    };
+  }
+
+  if (kind === "catalogues") {
+    const count = getPublicExhibitions(content).filter(hasCatalogueData).length;
+    return {
+      zh: `${count} 册研究图录`,
+      en: `${count} ${pluralize(count, "catalogue", "catalogues")}`,
+    };
+  }
+
+  const count = getPublicArticles(content).length;
+  return {
+    zh: `${count} 篇公开文章`,
+    en: `${count} published ${pluralize(count, "text", "texts")}`,
+  };
+}
+
+function resolveOperationalFactKind(fact: OperationalFact) {
+  const zh = fact.title.zh.trim();
+  const en = fact.title.en.trim().toLowerCase();
+
+  if (zh === "展览数量" || en === "exhibitions") {
+    return "exhibitions" as const;
+  }
+
+  if (zh === "图录数量" || en === "catalogues") {
+    return "catalogues" as const;
+  }
+
+  if (zh === "研究文章" || en === "research writing") {
+    return "articles" as const;
+  }
+
+  return null;
+}
+
+export function getOperationalFacts(content: SiteContent) {
+  return content.operationalFacts.map((fact) => {
+    const kind = resolveOperationalFactKind(fact);
+
+    if (!kind) {
+      return fact;
+    }
+
+    return {
+      ...fact,
+      value: getAutoOperationalValue(kind, content),
+    };
+  });
 }
 
 export function getArtworkBySlug(content: SiteContent, slug: string, options?: { includeDrafts?: boolean }) {

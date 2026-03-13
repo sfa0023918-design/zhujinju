@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 import { getAdminSession } from "@/lib/admin-auth";
 import { reorderArtworkRecords } from "@/lib/site-data";
+
+function revalidateAdminArtworkViews() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/content/artworks");
+  revalidatePath("/admin/content/homeContent");
+}
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -18,6 +25,7 @@ export async function POST(request: Request) {
     }
 
     const result = await reorderArtworkRecords(body.artworkIds, session.email);
+    revalidateAdminArtworkViews();
 
     return NextResponse.json({
       artworks: result.artworks,

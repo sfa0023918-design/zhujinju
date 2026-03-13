@@ -52,6 +52,7 @@ export {
   getFeaturedArtworks,
   getFilterOptions,
   getFilteredArtworks,
+  getOperationalFacts,
   getHighlightedArtworks,
   getPublicArticles,
   getPublicArtworks,

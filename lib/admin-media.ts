@@ -74,6 +74,6 @@ export async function uploadAdminImage(file: File, folder: string, actor: string
   return {
     url: publicUrl,
     fileName,
-    message: "图片已上传。保存当前内容后，网站会在下一次部署完成后显示新图片。",
+    message: "图片已上传并写入当前内容。前台需等待正式站完成同步后显示，通常需要 1-3 分钟，请勿重复上传同一张图。",
   };
 }

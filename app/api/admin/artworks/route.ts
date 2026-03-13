@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 import { getAdminSession } from "@/lib/admin-auth";
 import { createArtworkDraft, duplicateArtworkRecord } from "@/lib/site-data";
+
+function revalidateAdminArtworkViews() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/content/artworks");
+  revalidatePath("/admin/content/homeContent");
+}
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -20,6 +27,8 @@ export async function POST(request: Request) {
     const result = body.sourceId?.trim()
       ? await duplicateArtworkRecord(body.sourceId.trim(), session.email)
       : await createArtworkDraft(session.email);
+
+    revalidateAdminArtworkViews();
 
     return NextResponse.json({
       artwork: result.artwork,

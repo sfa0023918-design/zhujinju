@@ -3,7 +3,7 @@ import { BilingualProse } from "@/components/bilingual-prose";
 import { EditorialPageHero } from "@/components/editorial-page-hero";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { loadSiteContent } from "@/lib/site-data";
+import { getOperationalFacts, loadSiteContent } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,9 @@ export async function generateMetadata() {
 }
 
 export default async function AboutPage() {
-  const { operationalFacts, siteConfig } = await loadSiteContent();
+  const content = await loadSiteContent();
+  const { siteConfig } = content;
+  const operationalFacts = getOperationalFacts(content);
   const methodEyebrow = bt("方法与判断", "Method & Judgement");
 
   return (

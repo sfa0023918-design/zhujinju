@@ -4,6 +4,8 @@ import { AdminShell } from "@/components/admin-shell";
 import { AdminCmsEditor } from "@/components/admin-cms-editor";
 import { editableSections, getEditableSectionValue, readSiteContentFresh } from "@/lib/site-data";
 
+export const dynamic = "force-dynamic";
+
 type AdminSectionPageProps = {
   params: Promise<{
     section: string;

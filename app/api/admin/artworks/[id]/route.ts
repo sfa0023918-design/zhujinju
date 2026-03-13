@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 import { getAdminSession } from "@/lib/admin-auth";
 import type { Artwork } from "@/lib/site-data";
 import { ContentValidationError, deleteArtworkRecord, saveArtworkRecord } from "@/lib/site-data";
+
+function revalidateAdminArtworkViews() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/content/artworks");
+  revalidatePath("/admin/content/homeContent");
+}
 
 type ArtworkRouteProps = {
   params: Promise<{
@@ -27,6 +34,7 @@ export async function PATCH(request: Request, { params }: ArtworkRouteProps) {
     }
 
     const result = await saveArtworkRecord(id, body.artwork, session.email);
+    revalidateAdminArtworkViews();
 
     return NextResponse.json({
       artwork: result.artwork,
@@ -55,6 +63,7 @@ export async function DELETE(_request: Request, { params }: ArtworkRouteProps) {
 
   try {
     const result = await deleteArtworkRecord(id, session.email);
+    revalidateAdminArtworkViews();
 
     return NextResponse.json({
       artworks: result.artworks,

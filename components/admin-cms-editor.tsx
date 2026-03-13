@@ -521,7 +521,10 @@ function useWebsiteSyncStatus({
       setSyncState((current) => ({
         ...current,
         phase: attempt === 0 ? "waiting" : "publishing",
-        message: attempt === 0 ? "内容已保存，正在等待网站同步。" : "网站正在同步最新内容。",
+        message:
+          attempt === 0
+            ? "内容已保存，正在等待正式站同步。图片类变更通常需要 1-3 分钟。"
+            : "正式站正在同步最新内容。若刚上传图片，请稍等片刻再刷新前台。",
         hasPendingChanges: true,
         publicImpact: true,
       }));
@@ -572,7 +575,7 @@ function useWebsiteSyncStatus({
           setSyncState((current) => ({
             ...current,
             phase: "error",
-            message: "内容已保存，但网站暂未完成同步。",
+            message: "内容已保存，但正式站暂未完成同步。通常是部署仍在排队，请稍后刷新前台，不必重复上传。",
             hasPendingChanges: true,
             publicImpact: true,
           }));

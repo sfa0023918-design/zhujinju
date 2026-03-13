@@ -341,11 +341,11 @@ export function AdminMediaField({
       onPersisted?.(payload.url);
       setMessage(
         payload.saved
-          ? payload.message ?? "图片已上传并同步当前内容。"
+          ? payload.message ?? "图片已上传并写入当前内容。前台需等待正式站完成同步后显示，通常需要 1-3 分钟。"
           : autoSaveAfterUpload
           ? prepared.transformed
-            ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存。"
-            : "图片已上传，系统正在自动保存。"
+            ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存。保存后仍需等待正式站同步完成，前台才会显示。"
+            : "图片已上传，系统正在自动保存。保存后仍需等待正式站同步完成，前台才会显示。"
           : prepared.transformed
             ? "图片已自动裁切并压缩为网站适用尺寸。"
             : payload.message ?? "图片上传成功。",
@@ -400,7 +400,7 @@ export function AdminMediaField({
 
       setLastPersistedValue(nextValue);
       onPersisted?.(nextValue);
-      setMessage(payload.message ?? "图片字段已更新。");
+      setMessage(payload.message ?? "图片字段已更新。前台仍需等待正式站同步完成后显示。");
     } catch (persistError) {
       const message = persistError instanceof Error ? persistError.message : "图片字段保存失败。";
       setError(message);
