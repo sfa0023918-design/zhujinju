@@ -4233,7 +4233,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773427060195-9cbc87467d1a41681217a2b82be5a27f.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg"
+      ],
       "featured": false
     }
   ],
