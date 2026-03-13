@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { HistoryBackLink } from "@/components/history-back-link";
 import { ArtworkCard } from "@/components/artwork-card";
 import { ExhibitionDetailReading } from "@/components/exhibition-detail-reading";
 import { MediaPlaceholder } from "@/components/media-placeholder";
@@ -90,9 +91,9 @@ export default async function ExhibitionDetailPage({
       <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
           <div className="space-y-6">
-            <Link href="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
+            <HistoryBackLink fallbackHref="/exhibitions" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
               <ActionLabel text={detailCopy.backAction} align="start" />
-            </Link>
+            </HistoryBackLink>
             <div className="space-y-3.5">
               <BilingualText
                 as="p"

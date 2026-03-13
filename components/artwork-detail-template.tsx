@@ -16,6 +16,7 @@ import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
 import { BilingualProse, BilingualReadingPanel, getLocalizedText, type ReadingLocale } from "./bilingual-prose";
 import { BilingualText } from "./bilingual-text";
+import { HistoryBackLink } from "./history-back-link";
 import { StatusPill } from "./status-pill";
 
 type ArtworkDetailCopy = PageCopyContent["artworkDetail"];
@@ -290,8 +291,8 @@ export function ArtworkInquiry({
             </p>
           ) : null}
 
-          <Link
-            href="/collection"
+          <HistoryBackLink
+            fallbackHref="/collection"
             className="inline-flex items-center text-[0.72rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
           >
             <BilingualText
@@ -301,7 +302,7 @@ export function ArtworkInquiry({
               zhClassName="text-[0.8rem] leading-none tracking-[0.01em]"
               enClassName="mt-1 text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
             />
-          </Link>
+          </HistoryBackLink>
         </div>
       ) : null}
     </div>

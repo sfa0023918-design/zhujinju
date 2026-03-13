@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ActionLabel } from "@/components/action-label";
 import { ArticleReadingContent } from "@/components/article-reading-content";
 import { BilingualText } from "@/components/bilingual-text";
+import { HistoryBackLink } from "@/components/history-back-link";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
@@ -79,9 +80,9 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   return (
     <>
       <section className="mx-auto w-full max-w-[1120px] px-5 py-7 md:px-8 md:py-8 lg:px-10 lg:py-10">
-        <Link href="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
+        <HistoryBackLink fallbackHref="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
           <ActionLabel text={detailCopy.backAction} align="start" />
-        </Link>
+        </HistoryBackLink>
       </section>
 
       <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-8 md:pb-24 lg:px-10 lg:pb-28">
