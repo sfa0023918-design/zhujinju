@@ -3316,7 +3316,9 @@
         "exhibition-1773399222802"
       ],
       "image": "/uploads/artworks/1773415131729-7ef763fe5fe7ad5098a3326ca8ecc80a.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773415239435-c9a9d6fd9617a20b4687cf620f9b6aba.jpg"
+      ],
       "featured": false
     }
   ],
