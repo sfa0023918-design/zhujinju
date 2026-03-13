@@ -3148,7 +3148,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773413527560-2880fafe737f655606f15d7d40aaac32.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773413533800-未命名-1.jpg"
+      ],
       "featured": false
     }
   ],
