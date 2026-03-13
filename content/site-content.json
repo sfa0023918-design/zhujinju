@@ -2706,7 +2706,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773408754115-库奇哈尔宝冠释迦-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773408759092-库奇哈尔宝冠释迦-左.jpg"
+      ],
       "featured": false
     }
   ],
