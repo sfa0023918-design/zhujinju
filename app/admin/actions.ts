@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { clearAdminSession, createAdminSession, requireAdminSession, verifyAdminLogin } from "@/lib/admin-auth";
+import { revalidatePublicSite } from "@/lib/public-site-revalidate";
 import { editableSections, saveSiteSection } from "@/lib/site-data";
 
 export type AdminActionState = {
@@ -53,13 +53,7 @@ export async function saveAdminSection(
     const parsed = JSON.parse(raw);
     await saveSiteSection(section as (typeof editableSections)[number]["key"], parsed, session.email);
 
-    revalidatePath("/", "layout");
-    revalidatePath("/admin");
-    revalidatePath("/collection");
-    revalidatePath("/exhibitions");
-    revalidatePath("/journal");
-    revalidatePath("/about");
-    revalidatePath("/contact");
+    revalidatePublicSite();
 
     return { success: "内容已保存。Vercel 将自动重新部署正式站点。" };
   } catch (error) {

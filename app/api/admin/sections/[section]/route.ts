@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/admin-auth";
+import { revalidatePublicSite } from "@/lib/public-site-revalidate";
 import {
   ContentValidationError,
   createArticleDraft,
@@ -44,6 +45,7 @@ export async function PATCH(request: Request, { params }: SectionRouteProps) {
     }
 
     const nextContent = await saveSiteSection(sectionMeta.key, body.value as never, session.email);
+    revalidatePublicSite();
 
     return NextResponse.json({
       section: sectionMeta.key,
@@ -89,6 +91,7 @@ export async function POST(request: Request, { params }: SectionRouteProps) {
         action === "duplicate" && body.slug?.trim()
           ? await duplicateExhibitionRecord(body.slug.trim(), session.email)
           : await createExhibitionDraft(session.email);
+      revalidatePublicSite();
 
       return NextResponse.json({
         section,
@@ -105,6 +108,7 @@ export async function POST(request: Request, { params }: SectionRouteProps) {
       action === "duplicate" && body.slug?.trim()
         ? await duplicateArticleRecord(body.slug.trim(), session.email)
         : await createArticleDraft(session.email);
+    revalidatePublicSite();
 
     return NextResponse.json({
       section,
@@ -150,6 +154,7 @@ export async function DELETE(request: Request, { params }: SectionRouteProps) {
 
     if (section === "exhibitions") {
       const result = await deleteExhibitionRecord(body.slug.trim(), session.email);
+      revalidatePublicSite();
 
       return NextResponse.json({
         section,
@@ -159,6 +164,7 @@ export async function DELETE(request: Request, { params }: SectionRouteProps) {
     }
 
     const result = await deleteArticleRecord(body.slug.trim(), session.email);
+    revalidatePublicSite();
 
     return NextResponse.json({
       section,

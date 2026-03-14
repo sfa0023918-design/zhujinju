@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/admin-auth";
 import { saveArtworkMediaField, saveRecordMediaField } from "@/lib/content-store";
+import { revalidatePublicSite } from "@/lib/public-site-revalidate";
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
           galleryIndex: body.targetField === "gallery" && typeof body.targetIndex === "number" ? body.targetIndex : undefined,
         },
       );
+      revalidatePublicSite();
 
       return NextResponse.json({
         saved: true,
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
         String(body.value ?? ""),
         session.email,
       );
+      revalidatePublicSite();
 
       return NextResponse.json({
         saved: true,

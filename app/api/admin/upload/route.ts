@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
 import { assertMediaTargetExists, saveArtworkMediaField, saveRecordMediaField } from "@/lib/content-store";
 import { uploadAdminImage } from "@/lib/admin-media";
+import { revalidatePublicSite } from "@/lib/public-site-revalidate";
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
       await saveArtworkMediaField(targetId, targetField, result.url, session.email, {
         galleryIndex: targetField === "gallery" && targetIndexRaw ? Number(targetIndexRaw) : undefined,
       });
+      revalidatePublicSite();
 
       return NextResponse.json({
         ...result,
@@ -48,6 +50,7 @@ export async function POST(request: Request) {
 
     if ((targetSection === "exhibitions" || targetSection === "articles") && targetId && targetField === "cover") {
       await saveRecordMediaField(targetSection, targetId, "cover", result.url, session.email);
+      revalidatePublicSite();
 
       return NextResponse.json({
         ...result,

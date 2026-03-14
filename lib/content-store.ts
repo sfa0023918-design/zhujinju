@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
+import { unstable_cache } from "next/cache";
 
 import { getArticleBodyParagraphs, normalizeArticleContentBlocks } from "./article-content";
 import { bt } from "./bilingual";
@@ -27,6 +28,7 @@ import type {
 } from "./data/types";
 import { getRepoUtf8File, hasGitHubRepoConfig, putRepoUtf8File } from "./github-repo";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "./publication-validation";
+import { getSiteContentTag } from "./public-site-revalidate";
 import { siteConfig as defaultSiteConfig } from "./site-config";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -120,9 +122,14 @@ async function readBestAvailableContentFile() {
   return await readLocalContentFile();
 }
 
+const loadCachedSiteContent = unstable_cache(
+  async () => normalizeSiteContent((await readBestAvailableContentFile()) ?? getDefaultSiteContent()),
+  ["site-content"],
+  { tags: [getSiteContentTag()] },
+);
+
 export async function loadSiteContent(): Promise<SiteContent> {
-  const content = await readBestAvailableContentFile();
-  return normalizeSiteContent(content ?? getDefaultSiteContent());
+  return await loadCachedSiteContent();
 }
 
 export async function readSiteContentFresh() {

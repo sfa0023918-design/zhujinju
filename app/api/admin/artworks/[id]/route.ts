@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { getAdminSession } from "@/lib/admin-auth";
+import { revalidatePublicSite } from "@/lib/public-site-revalidate";
 import type { Artwork } from "@/lib/site-data";
 import { ContentValidationError, deleteArtworkRecord, saveArtworkRecord } from "@/lib/site-data";
 
 function revalidateAdminArtworkViews() {
+  revalidatePublicSite();
   revalidatePath("/admin");
   revalidatePath("/admin/content/artworks");
   revalidatePath("/admin/content/homeContent");
