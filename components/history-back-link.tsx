@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
 
+import { getPreviousInternalRoute, markBackTarget } from "./internal-route-history";
+
 type HistoryBackLinkProps = {
   fallbackHref: string;
   className?: string;
@@ -39,20 +41,11 @@ export function HistoryBackLink({
 
         event.preventDefault();
 
-        const hasHistory = typeof window !== "undefined" && window.history.length > 1;
-        const referrer = typeof document !== "undefined" ? document.referrer : "";
+        const previousInternalRoute = getPreviousInternalRoute();
 
-        let isSameOriginReferrer = false;
-        if (typeof window !== "undefined" && referrer) {
-          try {
-            isSameOriginReferrer = new URL(referrer).origin === window.location.origin;
-          } catch {
-            isSameOriginReferrer = false;
-          }
-        }
-
-        if (hasHistory && isSameOriginReferrer) {
-          router.back();
+        if (previousInternalRoute) {
+          markBackTarget(previousInternalRoute);
+          router.push(previousInternalRoute);
           return;
         }
 

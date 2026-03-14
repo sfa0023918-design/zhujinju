@@ -1,5 +1,6 @@
 import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
+import { InternalRouteHistory } from "@/components/internal-route-history";
 
 import "./globals.css";
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="font-sans">
+        <InternalRouteHistory />
         <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)]">{children}</div>
       </body>
     </html>
