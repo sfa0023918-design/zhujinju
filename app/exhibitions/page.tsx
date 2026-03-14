@@ -125,14 +125,16 @@ export default async function ExhibitionsPage() {
               </Link>
               <div className="flex flex-col justify-between gap-4">
                 <div className="space-y-3.5">
-                  <BilingualText
-                    as="p"
-                    text={exhibition.subtitle}
-                    mode="inline"
-                    className="text-[var(--accent)]"
-                    zhClassName="text-[0.7rem] tracking-[0.2em]"
-                    enClassName="text-[0.5rem] uppercase tracking-[0.16em] text-[var(--accent)]/64"
-                  />
+                  {exhibition.subtitle.zh.trim() || exhibition.subtitle.en.trim() ? (
+                    <BilingualText
+                      as="p"
+                      text={exhibition.subtitle}
+                      mode="inline"
+                      className="text-[var(--accent)]"
+                      zhClassName="text-[0.7rem] tracking-[0.2em]"
+                      enClassName="text-[0.5rem] uppercase tracking-[0.16em] text-[var(--accent)]/64"
+                    />
+                  ) : null}
                   <div>
                     <BilingualText
                       as="h2"

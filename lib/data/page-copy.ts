@@ -144,7 +144,7 @@ export const pageCopy = {
         "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment.",
       ),
     },
-    appointmentLine: bt("By appointment in Chengdu.", "By appointment in Chengdu."),
+    appointmentLine: bt("成都会面采用预约制。", "By appointment in Chengdu."),
     cooperationLine: bt(
       "借展、研究合作、图录交换与机构看件，请在留言中说明机构名称、时间安排与需求方向。",
       "For loans, research collaboration, catalogue exchange, and institutional viewings, please include your institution, schedule, and requirements.",

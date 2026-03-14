@@ -119,6 +119,7 @@ export function FooterSocialLinks({ platforms, wechatQrSrc, wechatLabel }: Foote
                 alt="竹瑾居微信二维码"
                 width={720}
                 height={960}
+                unoptimized
                 className="h-auto w-full object-contain"
                 priority={false}
               />
