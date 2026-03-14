@@ -1,5 +1,6 @@
 import { BilingualText } from "@/components/bilingual-text";
 import { ExpandableBilingualCopy } from "@/components/expandable-bilingual-copy";
+import { ProtectedImage } from "@/components/protected-image";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { getOperationalFacts, loadSiteContent } from "@/lib/site-data";
@@ -20,6 +21,7 @@ export default async function AboutPage() {
   const { siteConfig } = content;
   const operationalFacts = getOperationalFacts(content);
   const methodEyebrow = bt("竹瑾居的理念", "The Philosophy of Zhu Jin Ju");
+  const aboutSpaceImage = "/uploads/branding/about-space-entrance.jpg";
   const aboutHeroText = bt(
     "竹瑾居创立于2016年，位于中国成都，是一家专注于喜马拉雅艺术的研究与交流空间。我们持续关注喜马拉雅艺术品的历史脉络、文化语境、审美精神与收藏价值，致力于为藏家提供兼具学术视野、审美判断与专业信赖的观察角度。",
     "Founded in 2016 and based in Chengdu, China, Zhu Jin Ju is a space for the research and exchange of Himalayan art. We continue to attend to the historical lineages, cultural contexts, aesthetic spirit, and collecting value of Himalayan works, offering collectors a perspective grounded in scholarship, connoisseurship, and professional trust.",
@@ -28,7 +30,7 @@ export default async function AboutPage() {
   return (
     <>
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-8 pt-9 md:px-8 md:pb-9 md:pt-10 lg:px-10 lg:pb-10 lg:pt-12">
-        <div className="border-b border-[var(--line)]/80 pb-8 lg:grid lg:grid-cols-[minmax(0,0.62fr)_minmax(320px,0.38fr)] lg:items-end lg:gap-10 lg:pb-10">
+        <div className="border-b border-[var(--line)]/80 pb-8 lg:grid lg:grid-cols-[minmax(220px,0.32fr)_minmax(190px,0.26fr)_minmax(320px,0.42fr)] lg:items-start lg:gap-10 lg:pb-10 xl:grid-cols-[minmax(240px,0.34fr)_minmax(220px,0.24fr)_minmax(340px,0.42fr)]">
           <div className="space-y-4">
             <BilingualText
               as="p"
@@ -45,6 +47,20 @@ export default async function AboutPage() {
               zhClassName="block text-[clamp(2.45rem,3.7vw,3.45rem)] leading-[1.03] tracking-[-0.045em]"
               enClassName="mt-3 block text-[0.74rem] uppercase tracking-[0.2em] text-[var(--accent)]/62"
             />
+          </div>
+          <div className="mt-6 lg:mt-0">
+            <div className="relative mx-auto w-full max-w-[16rem] lg:max-w-[15rem] xl:max-w-[17rem]">
+              <ProtectedImage
+                src={aboutSpaceImage}
+                alt="竹瑾居艺术空间门头"
+                width={3362}
+                height={4934}
+                priority
+                unoptimized
+                wrapperClassName="block"
+                className="h-auto w-full object-contain"
+              />
+            </div>
           </div>
           <div className="mt-5 max-w-[30rem] border-t border-[var(--line)]/70 pt-4 lg:mt-0 lg:max-w-[25rem] lg:border-t-0 lg:pt-0">
             <ExpandableBilingualCopy
