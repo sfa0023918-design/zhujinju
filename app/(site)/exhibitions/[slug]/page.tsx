@@ -6,6 +6,7 @@ import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { HistoryBackLink } from "@/components/history-back-link";
 import { ArtworkCard } from "@/components/artwork-card";
+import { ExhibitionCatalogueViewer } from "@/components/exhibition-catalogue-viewer";
 import { ExhibitionDetailReading } from "@/components/exhibition-detail-reading";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
@@ -80,6 +81,7 @@ export default async function ExhibitionDetailPage({
     "mt-2.5 block max-w-[28rem] font-sans text-[0.72rem] uppercase tracking-[0.16em] leading-[1.46] text-[var(--accent)]/78 md:text-[0.76rem]";
   const featuredWorksCount = exhibition.featuredWorksCount ?? exhibition.highlightCount ?? highlightArtworks.length;
   const cataloguePageCount = exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0;
+  const cataloguePageImages = exhibition.cataloguePageImages?.filter(Boolean) ?? [];
   const catalogueTitle = exhibition.catalogueTitle;
   const catalogueNote = exhibition.catalogueNote ?? exhibition.catalogueIntro;
   const curatorialNote = exhibition.curatorialNote ?? exhibition.curatorialLead;
@@ -135,6 +137,14 @@ export default async function ExhibitionDetailPage({
               <InfoFact label={detailCopy.summaryLine.catalogueUnit} value={{ zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` }} />
               {getPrimaryText(catalogueTitle) ? <InfoFact label={catalogueTitleLabel} value={catalogueTitle} /> : null}
             </div>
+            {cataloguePageImages.length > 0 ? (
+              <Link
+                href="#catalogue"
+                className="inline-flex items-center rounded-full border border-[var(--line-strong)]/38 px-4 py-2 text-[0.76rem] tracking-[0.12em] text-[var(--ink)] transition-colors hover:border-[var(--line-strong)]/72 hover:bg-white/60"
+              >
+                查看电子图录 / View Catalogue
+              </Link>
+            ) : null}
           </div>
         </div>
 
@@ -159,6 +169,16 @@ export default async function ExhibitionDetailPage({
           )}
         </div>
       </section>
+
+      {cataloguePageImages.length > 0 ? (
+        <section id="catalogue" className="mx-auto w-full max-w-[1480px] scroll-mt-24 px-5 pb-4 md:px-8 md:pb-6 lg:px-10 lg:pb-8">
+          <ExhibitionCatalogueViewer
+            title={catalogueTitle}
+            note={catalogueNote}
+            pages={cataloguePageImages}
+          />
+        </section>
+      ) : null}
 
       <ExhibitionDetailReading
         introLabel={exhibitionTextLabel}

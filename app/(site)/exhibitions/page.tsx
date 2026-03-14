@@ -19,28 +19,6 @@ export async function generateMetadata() {
   });
 }
 
-function ExhibitionFact({
-  label,
-  value,
-}: {
-  label: { zh: string; en: string };
-  value: string;
-}) {
-  return (
-    <div className="space-y-2 border-l border-[var(--line)]/70 pl-4 first:border-l-0 first:pl-0 md:min-h-[72px]">
-      <BilingualText
-        as="p"
-        text={label}
-        mode="inline"
-        className="text-[var(--accent)]"
-        zhClassName="text-[11px] tracking-[0.16em]"
-        enClassName="text-[0.5rem] uppercase tracking-[0.16em] text-[var(--accent)]/65"
-      />
-      <p className="text-[0.96rem] leading-7 text-[var(--ink)]">{value}</p>
-    </div>
-  );
-}
-
 function ExhibitionCover({
   cover,
   title,
@@ -171,36 +149,8 @@ export default async function ExhibitionsPage() {
                     enClassName="hidden"
                   />
                 </div>
-                <div className="space-y-3.5 border-t border-[var(--line)]/68 pt-4 text-sm leading-7 text-[var(--muted)]">
-                  <div className="grid gap-3 border-b border-[var(--line)]/65 pb-3 md:grid-cols-3">
-                    <ExhibitionFact
-                      label={cardLabels.highlightWorks}
-                      value={`${exhibition.highlightCount} 件`}
-                    />
-                    <ExhibitionFact
-                      label={cardLabels.cataloguePages}
-                      value={`${exhibition.cataloguePages} 页`}
-                    />
-                    <ExhibitionFact
-                      label={cardLabels.catalogueTitle}
-                      value={exhibition.catalogueTitle.zh}
-                    />
-                  </div>
-                  <p className="max-w-[30ch] text-[0.88rem] leading-7 text-[var(--muted)]/92">
-                    {exhibition.curatorialLead.zh}
-                  </p>
-                  <div className="space-y-1.5 border-t border-[var(--line)]/62 pt-3.5">
-                    <BilingualText
-                      as="p"
-                      text={exhibition.catalogueTitle}
-                      mode="inline"
-                      className="block"
-                      zhClassName="block text-[0.86rem] text-[var(--ink)]"
-                      enClassName="text-[0.58rem] uppercase tracking-[0.14em] text-[var(--accent)]/64"
-                    />
-                    <p className="max-w-[30ch] text-[0.86rem] leading-7 text-[var(--muted)]/92">{exhibition.catalogueIntro.zh}</p>
-                  </div>
-                  <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex border-t border-[var(--line)]/62 pt-3 text-[var(--ink)]">
+                <div className="border-t border-[var(--line)]/68 pt-4">
+                  <Link href={`/exhibitions/${exhibition.slug}`} className="inline-flex text-[var(--ink)]">
                     <ActionLabel text={cardLabels.viewAction} align="start" />
                   </Link>
                 </div>

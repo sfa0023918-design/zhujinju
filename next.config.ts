@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
         pathname: "/api/placeholder/**",
         search: "?kind=portrait",
       },
+      {
+        pathname: "/uploads/**",
+      },
     ],
   },
   async redirects() {
@@ -29,6 +32,10 @@ const nextConfig: NextConfig = {
         basePath: false,
       },
     ];
+  },
+  outputFileTracingExcludes: {
+    "/api/admin/sync-status": ["./public/uploads/**/*"],
+    "/api/admin/upload": ["./public/uploads/**/*"],
   },
 };
 

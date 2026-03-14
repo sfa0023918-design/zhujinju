@@ -10,7 +10,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "audit:artworks": "node scripts/audit-artwork-sync.mjs"
+    "audit:artworks": "node scripts/audit-artwork-sync.mjs",
+    "catalogue:pages": "node scripts/pdf-to-catalogue-pages.mjs"
   },
   "dependencies": {
     "next": "^15.3.0",

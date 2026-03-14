@@ -67,6 +67,7 @@ export type Exhibition = {
   catalogueIntro: BilingualText;
   cataloguePages: number;
   cataloguePageCount?: number;
+  cataloguePageImages?: string[];
   catalogueNote?: BilingualText;
   curatorialLead: BilingualText;
   curatorialNote?: BilingualText;

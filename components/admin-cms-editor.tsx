@@ -311,6 +311,7 @@ function normalizeExhibitionDraft(value: Exhibition) {
   next.catalogueTitle = normalizeBilingualText(next.catalogueTitle);
   next.catalogueIntro = normalizeBilingualText(next.catalogueIntro, "long");
   next.catalogueNote = normalizeBilingualText(next.catalogueNote ?? next.catalogueIntro, "long");
+  next.cataloguePageImages = (next.cataloguePageImages ?? []).map((item) => normalizeLineText(item)).filter(Boolean);
   next.featuredWorksCount = Number((next.featuredWorksCount ?? next.highlightCount ?? next.highlightArtworkSlugs.length) || 0);
   next.cataloguePageCount = Number(next.cataloguePageCount ?? next.cataloguePages ?? 0);
   return next;
@@ -3216,6 +3217,18 @@ function ExhibitionsEditor({
               <div className="grid gap-4">
                 <BilingualInput label="图录标题" value={exhibition.catalogueTitle} onChange={(next) => update((items) => { items[selectedIndex].catalogueTitle = next; })} />
                 <BilingualTextarea label="图录说明" value={exhibition.catalogueNote ?? exhibition.catalogueIntro} onChange={(next) => update((items) => { items[selectedIndex].catalogueNote = next; items[selectedIndex].catalogueIntro = next; })} rows={4} />
+                <TextAreaField
+                  label="图录页图片"
+                  value={(exhibition.cataloguePageImages ?? []).join("\n")}
+                  onChange={(next) => update((items) => {
+                    items[selectedIndex].cataloguePageImages = next
+                      .split("\n")
+                      .map((item) => item.trim())
+                      .filter(Boolean);
+                  })}
+                  rows={6}
+                  fieldKey="cataloguePageImages"
+                />
                 <BilingualTextarea label="策展说明" value={exhibition.curatorialNote ?? exhibition.curatorialLead} onChange={(next) => update((items) => { items[selectedIndex].curatorialNote = next; items[selectedIndex].curatorialLead = next; })} rows={4} />
                 <RelationChecklist fieldKey="highlightArtworkSlugs" label="重点作品" options={artworkOptions} selected={exhibition.highlightArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].highlightArtworkSlugs; items[selectedIndex].highlightArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
                 <RelationChecklist label="相关文章" options={articleOptions} selected={exhibition.relatedArticleSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].relatedArticleSlugs; items[selectedIndex].relatedArticleSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />

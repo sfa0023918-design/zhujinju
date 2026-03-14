@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { getAdminSession, isAdminConfigured } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = buildMetadata({
   title: "内容后台登录",
   description: "竹瑾居内容后台登录页面。",

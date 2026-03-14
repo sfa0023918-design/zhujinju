@@ -111,6 +111,12 @@ async function readGitHubContentFile() {
 }
 
 async function readBestAvailableContentFile() {
+  const local = await readLocalContentFile();
+
+  if (local) {
+    return local;
+  }
+
   if (hasGitHubRepoConfig()) {
     const remote = await readGitHubContentFile();
 
@@ -119,16 +125,26 @@ async function readBestAvailableContentFile() {
     }
   }
 
-  return await readLocalContentFile();
+  return null;
 }
 
 const loadCachedSiteContent = unstable_cache(
   async () => normalizeSiteContent((await readBestAvailableContentFile()) ?? getDefaultSiteContent()),
-  ["site-content"],
+  ["site-content-v2"],
   { tags: [getSiteContentTag()] },
 );
 
 export async function loadSiteContent(): Promise<SiteContent> {
+  const local = await readLocalContentFile();
+
+  if (local) {
+    return normalizeSiteContent(local);
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return await readSiteContentFresh();
+  }
+
   return await loadCachedSiteContent();
 }
 
@@ -227,6 +243,7 @@ function createExhibitionDraftRecord(): Exhibition {
     catalogueIntro: bt("", ""),
     cataloguePages: 0,
     cataloguePageCount: 0,
+    cataloguePageImages: [],
     catalogueNote: bt("", ""),
     curatorialLead: bt("", ""),
     curatorialNote: bt("", ""),
@@ -1137,6 +1154,7 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
       publicationStatus: exhibition.publicationStatus ?? "published",
       featuredWorksCount: exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length,
       cataloguePageCount: exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0,
+      cataloguePageImages: normalizeExhibitionCataloguePages(exhibition.cataloguePageImages),
       catalogueNote: exhibition.catalogueNote ?? exhibition.catalogueIntro ?? bt("", ""),
       curatorialNote: exhibition.curatorialNote ?? exhibition.curatorialLead ?? bt("", ""),
     })),
@@ -1174,6 +1192,23 @@ function normalizeArtworkGallery(gallery: string[] | undefined, primaryImage: st
     seen.add(image);
     return true;
   });
+}
+
+function normalizeExhibitionCataloguePages(pages: string[] | undefined) {
+  const trimmed = (pages ?? []).map((page) => page.trim());
+  let lastFilledIndex = -1;
+
+  trimmed.forEach((page, index) => {
+    if (page) {
+      lastFilledIndex = index;
+    }
+  });
+
+  if (lastFilledIndex < 0) {
+    return [];
+  }
+
+  return trimmed.slice(0, lastFilledIndex + 1);
 }
 
 function getUniqueBilingual(items: BilingualText[]) {

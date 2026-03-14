@@ -1,6 +1,4 @@
 import { createHash } from "crypto";
-import { access } from "fs/promises";
-import path from "path";
 
 import type { EditableSectionKey, SiteContent } from "./data/types";
 
@@ -24,22 +22,32 @@ function createSignature(value: unknown) {
   return createHash("sha1").update(JSON.stringify(value)).digest("hex").slice(0, 12);
 }
 
-function toUploadFilePath(url: string) {
+const canCheckLocalUploadAssets =
+  process.env.NODE_ENV !== "production" && !process.env.VERCEL;
+
+async function toUploadFilePath(url: string) {
   if (!url.startsWith("/uploads/")) {
     return null;
   }
+
+  const path = await import("path");
 
   return path.join(process.cwd(), "public", url.replace(/^\/+/, ""));
 }
 
 async function assetExists(url: string) {
-  const filePath = toUploadFilePath(url);
+  if (!canCheckLocalUploadAssets) {
+    return true;
+  }
+
+  const filePath = await toUploadFilePath(url);
 
   if (!filePath) {
     return true;
   }
 
   try {
+    const { access } = await import("fs/promises");
     await access(filePath);
     return true;
   } catch {
@@ -124,7 +132,8 @@ export async function buildSiteSyncSnapshot(content: SiteContent, target: SyncTa
 
   if (target.section === "exhibitions") {
     const exhibitions = publishedExhibitions(content);
-    const missingAssetCount = await countMissingAssets(exhibitions.map((item) => item.cover).filter((url) => url.startsWith("/uploads/")));
+    const exhibitionAssets = exhibitions.flatMap((item) => [item.cover, ...(item.cataloguePageImages ?? [])]);
+    const missingAssetCount = await countMissingAssets(exhibitionAssets.filter((url) => url.startsWith("/uploads/")));
 
     return {
       target,
