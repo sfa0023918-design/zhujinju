@@ -46,19 +46,28 @@ function FooterSocialIcon({ platform }: { platform: "douyin" | "xiaohongshu" | "
   );
 }
 
+type FooterPlatform = {
+  key: "douyin" | "xiaohongshu" | "video" | "youtube" | "instagram";
+  label: string;
+  href?: string;
+};
+
 export async function SiteFooter() {
   const { siteConfig } = await loadSiteContent();
   const year = new Date().getFullYear();
   const normalizedPhone = siteConfig.contact.phone.trim();
   const normalizedWhatsapp = siteConfig.contact.whatsapp.trim();
+  const instagramHref = siteConfig.contact.instagram.startsWith("http")
+    ? siteConfig.contact.instagram
+    : `https://instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}`;
   const showWhatsApp = normalizedWhatsapp && normalizedWhatsapp !== normalizedPhone;
-  const footerPlatforms = [
+  const footerPlatforms: FooterPlatform[] = [
     { key: "douyin", label: "抖音" },
     { key: "xiaohongshu", label: "小红书" },
     { key: "video", label: "微信视频号" },
     { key: "youtube", label: "YouTube" },
-    { key: "instagram", label: "Instagram" },
-  ] as const;
+    { key: "instagram", label: "Instagram", href: instagramHref },
+  ];
 
   return (
     <footer className="border-t border-[var(--line)]/68">
@@ -106,14 +115,28 @@ export async function SiteFooter() {
           </div>
           <div className="flex flex-wrap items-center gap-3.5 pt-1">
             {footerPlatforms.map((platform) => (
-              <span
-                key={platform.key}
-                aria-label={platform.label}
-                title={platform.label}
-                className="inline-flex h-7 w-7 items-center justify-center"
-              >
-                <FooterSocialIcon platform={platform.key} />
-              </span>
+              platform.href ? (
+                <a
+                  key={platform.key}
+                  href={platform.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={platform.label}
+                  title={platform.label}
+                  className="inline-flex h-7 w-7 items-center justify-center transition-colors hover:text-[var(--ink)]"
+                >
+                  <FooterSocialIcon platform={platform.key} />
+                </a>
+              ) : (
+                <span
+                  key={platform.key}
+                  aria-label={platform.label}
+                  title={platform.label}
+                  className="inline-flex h-7 w-7 items-center justify-center"
+                >
+                  <FooterSocialIcon platform={platform.key} />
+                </span>
+              )
             ))}
           </div>
         </div>
