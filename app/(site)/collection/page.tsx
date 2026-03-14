@@ -5,8 +5,6 @@ import { buildMetadata } from "@/lib/metadata";
 import { bt } from "@/lib/bilingual";
 import { getFilterOptions, getFilteredArtworks, getPublicArtworks, loadSiteContent } from "@/lib/site-data";
 
-export const dynamic = "force-dynamic";
-
 type CollectionPageProps = {
   searchParams?: Promise<{
     category?: string;

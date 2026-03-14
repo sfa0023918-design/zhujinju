@@ -14,14 +14,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-zhujinju-pathname", request.nextUrl.pathname);
-
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return NextResponse.next();
 }
 
 export const config = {

@@ -8,8 +8,6 @@ import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
 
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
 

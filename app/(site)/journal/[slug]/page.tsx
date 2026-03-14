@@ -18,8 +18,6 @@ import {
   loadSiteContent,
 } from "@/lib/site-data";
 
-export const dynamic = "force-dynamic";
-
 type ArticleDetailPageProps = {
   params: Promise<{
     slug: string;

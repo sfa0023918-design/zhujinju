@@ -1,13 +1,7 @@
-import { headers } from "next/headers";
-
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
 
 import "./globals.css";
-
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   const { siteConfig } = await loadSiteContent();
@@ -35,18 +29,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerStore = await headers();
-  const pathname = headerStore.get("x-zhujinju-pathname") ?? "";
-  const isAdminRoute = pathname.startsWith("/admin");
-
   return (
     <html lang="zh-CN">
       <body className="font-sans">
-        <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)]">
-          {isAdminRoute ? null : <SiteHeader />}
-          <main className="site-fade-in">{children}</main>
-          {isAdminRoute ? null : <SiteFooter />}
-        </div>
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)]">{children}</div>
       </body>
     </html>
   );

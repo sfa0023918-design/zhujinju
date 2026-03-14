@@ -5,8 +5,6 @@ import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
 
-export const dynamic = "force-dynamic";
-
 type ContactPageProps = {
   searchParams?: Promise<{
     artwork?: string;

@@ -12,8 +12,6 @@ import {
   loadSiteContent,
 } from "@/lib/site-data";
 
-export const dynamic = "force-dynamic";
-
 type ArtworkDetailPageProps = {
   params: Promise<{
     slug: string;
