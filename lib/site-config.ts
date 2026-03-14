@@ -79,7 +79,7 @@ export const siteConfig: SiteConfigContent = {
     phone: "+86 21 5466 2187",
     wechat: "zhujinju_shanghai",
     whatsapp: "+86 139 1806 2742",
-    instagram: "@zhujinju_art",
+    instagram: "@zhujinju_arts",
     pdfRequest: "catalogue@zhujinju.com",
     address: bt("中国成都 · 预约制空间", "Chengdu, China · By Appointment"),
     replyWindow: bt("作品咨询通常于 24 小时内回复。", "Artwork inquiries are usually answered within 24 hours."),

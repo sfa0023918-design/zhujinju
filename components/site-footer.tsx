@@ -59,11 +59,13 @@ export async function SiteFooter() {
   const normalizedWhatsapp = siteConfig.contact.whatsapp.trim();
   const instagramHref = siteConfig.contact.instagram.startsWith("http")
     ? siteConfig.contact.instagram
-    : `https://instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}`;
+    : `https://www.instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}/`;
+  const douyinHref = "https://v.douyin.com/YbUx9r1vtZo/";
+  const xiaohongshuHref = "https://xhslink.com/m/9oVMiPqVb3P";
   const showWhatsApp = normalizedWhatsapp && normalizedWhatsapp !== normalizedPhone;
   const footerPlatforms: FooterPlatform[] = [
-    { key: "douyin", label: "抖音" },
-    { key: "xiaohongshu", label: "小红书" },
+    { key: "douyin", label: "抖音", href: douyinHref },
+    { key: "xiaohongshu", label: "小红书", href: xiaohongshuHref },
     { key: "video", label: "微信视频号" },
     { key: "youtube", label: "YouTube" },
     { key: "instagram", label: "Instagram", href: instagramHref },
