@@ -710,7 +710,8 @@
         "detail": "/uploads/artworks/1773136626491-236ae4493d409e6577bc2306f5388780.jpg",
         "width": 1200,
         "height": 1500
-      }
+      },
+      "galleryAssets": []
     },
     {
       "id": "artwork_bb32d185-8cfe-4df7-a73b-239f36b3cffa",
@@ -1918,7 +1919,8 @@
         "detail": "/uploads/artworks/1773397657892-宝生佛唐卡.jpg",
         "width": 1200,
         "height": 1500
-      }
+      },
+      "galleryAssets": []
     },
     {
       "id": "artwork_b16971c7-28bf-4601-9c5d-641398b39c50",
@@ -2780,7 +2782,8 @@
         "detail": "/uploads/artworks/1773416956423-智慧空行母.jpg",
         "width": 1200,
         "height": 1500
-      }
+      },
+      "galleryAssets": []
     },
     {
       "id": "artwork_ef11d050-db36-4d6d-9ea2-7a973ff47043",
@@ -3806,8 +3809,8 @@
         "en": "Schist"
       },
       "category": {
-        "zh": "石雕",
-        "en": "Stone Sculpture"
+        "zh": "犍陀罗",
+        "en": "Gandhara"
       },
       "dimensions": {
         "zh": "高：126cm",
