@@ -14,12 +14,13 @@ export async function SiteFooter() {
     : `https://www.instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}/`;
   const douyinHref = "https://v.douyin.com/YbUx9r1vtZo/";
   const xiaohongshuHref = "https://xhslink.com/m/9oVMiPqVb3P";
+  const youtubeHref = "https://youtube.com/channel/UCMF53nCKLqokRaTcF2HdRig?si=YIq1Uo7nXFk-BBIZ";
   const showWhatsApp = normalizedWhatsapp && normalizedWhatsapp !== normalizedPhone;
   const footerPlatforms: FooterPlatform[] = [
     { key: "douyin", label: "抖音", href: douyinHref },
     { key: "xiaohongshu", label: "小红书", href: xiaohongshuHref },
     { key: "wechat", label: "微信" },
-    { key: "youtube", label: "YouTube" },
+    { key: "youtube", label: "YouTube", href: youtubeHref },
     { key: "instagram", label: "Instagram", href: instagramHref },
   ];
 
