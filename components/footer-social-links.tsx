@@ -9,9 +9,10 @@ import { FooterSocialIcon } from "./footer-social-icon";
 type FooterSocialLinksProps = {
   platforms: FooterPlatform[];
   wechatQrSrc: string;
+  wechatLabel: string;
 };
 
-export function FooterSocialLinks({ platforms, wechatQrSrc }: FooterSocialLinksProps) {
+export function FooterSocialLinks({ platforms, wechatQrSrc, wechatLabel }: FooterSocialLinksProps) {
   const [isWechatOpen, setIsWechatOpen] = useState(false);
   const dialogId = useId();
 
@@ -123,7 +124,7 @@ export function FooterSocialLinks({ platforms, wechatQrSrc }: FooterSocialLinksP
               />
             </div>
             <p className="mt-3 text-[0.78rem] leading-[1.7] text-[var(--muted)]">
-              扫描二维码即可添加微信。 Scan the code to add Zhu Jin Ju on WeChat.
+              扫描二维码即可添加微信，账号显示为“{wechatLabel}”。 Scan the code to add Zhu Jin Ju on WeChat.
             </p>
           </div>
         </div>

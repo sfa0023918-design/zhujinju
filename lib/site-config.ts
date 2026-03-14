@@ -77,7 +77,7 @@ export const siteConfig: SiteConfigContent = {
   contact: {
     email: "contact@zhujinju.com",
     phone: "+86 21 5466 2187",
-    wechat: "zhujinju_shanghai",
+    wechat: "竹瑾居 张弥",
     whatsapp: "+86 139 1806 2742",
     instagram: "@zhujinju_arts",
     pdfRequest: "catalogue@zhujinju.com",

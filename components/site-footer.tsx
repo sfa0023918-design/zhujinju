@@ -68,7 +68,11 @@ export async function SiteFooter() {
             <p className="text-[0.8rem] leading-[1.55] text-[var(--muted)]">成都市青羊区草堂东路88号</p>
             <p className="text-[0.8rem] leading-[1.55] text-[var(--muted)]">邮编 610000</p>
           </div>
-          <FooterSocialLinks platforms={footerPlatforms} wechatQrSrc="/contact/wechat-qr.jpg" />
+          <FooterSocialLinks
+            platforms={footerPlatforms}
+            wechatQrSrc="/contact/wechat-qr.jpg"
+            wechatLabel={siteConfig.contact.wechat}
+          />
         </div>
       </div>
     </footer>
