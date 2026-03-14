@@ -36,8 +36,8 @@ export async function SiteFooter() {
             as="p"
             text={siteConfig.siteName}
             className="flex flex-col gap-1 text-[var(--ink)]"
-            zhClassName="text-[0.76rem] tracking-[0.18em]"
-            enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/52"
+            zhClassName="text-[0.84rem] tracking-[0.18em]"
+            enClassName="text-[0.53rem] uppercase tracking-[0.16em] text-[var(--accent)]/68"
           />
           <p className="text-[0.76rem] leading-[1.55] text-[var(--muted)]/78">
             {siteConfig.footer.copyrightLabel.zh} © {year} {siteConfig.siteName.zh} {siteConfig.siteName.en}

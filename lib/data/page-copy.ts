@@ -110,24 +110,24 @@ export const pageCopy = {
       eyebrow: bt("关于", "About"),
       title: bt("关于竹瑾居", "About Zhu Jin Ju"),
       description: bt(
-        "竹瑾居是一家专注于喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术的品牌，服务对象包括藏家、博物馆、机构、策展人与研究者。",
-        "Zhu Jin Ju is dedicated to Himalayan art, Tibetan Buddhist art, and related Asian antiquities, serving collectors, museums, institutions, curators, and researchers.",
+        "竹瑾居创立于2016年，位于中国成都，是一家专注于喜马拉雅艺术的研究与交流空间。我们持续关注喜马拉雅艺术品的历史脉络、文化语境、审美精神与收藏价值，致力于为藏家提供兼具学术视野、审美判断与专业信赖的观察角度。",
+        "Founded in 2016 and based in Chengdu, China, Zhu Jin Ju is a space for the research and exchange of Himalayan art. We continue to attend to the historical lineages, cultural contexts, aesthetic spirit, and collecting value of Himalayan works, offering collectors a perspective grounded in scholarship, connoisseurship, and professional trust.",
       ),
-      aside: bt(
-        "我们相信，真正可靠的古代艺术网站，不应以话术主导，而应以判断、结构与节制建立信任。",
-        "A reliable site for historical art should be led not by rhetoric, but by judgement, structure, and restraint.",
-      ),
+      aside: bt("", ""),
     },
     position: {
-      eyebrow: bt("定位", "Position"),
-      title: bt("工作围绕收藏、研究、展览与图录展开。", "The Work Is Structured Around Collecting, Research, Exhibitions, and Catalogues."),
+      eyebrow: bt("竹瑾居的理念", "The Philosophy of Zhu Jin Ju"),
+      title: bt(
+        "竹瑾居以研究与眼光为基础，建立对作品更深的理解。",
+        "Zhu Jin Ju builds a deeper understanding of each work through research and connoisseurship.",
+      ),
       paragraphTwo: bt(
-        "我们不以“海量上新”定义专业，也不将古代艺术处理为泛化的装饰品类。每一次展示、每一件作品与每一段文字，都应指向更准确的观看。",
-        "We do not define professionalism by constant new arrivals, nor reduce historical art to generalized decoration. Each display, object, and paragraph should lead to a more precise way of looking.",
+        "对竹瑾居而言，喜马拉雅艺术从来不只是一个“门类”或“标签”。每一件作品的背后，都连接着复杂而深远的历史线索、文化传统与精神世界；与此同时，我们始终珍视对作品本体的真实理解，也重视艺术经验在当代语境中的重新展开。",
+        "For Zhu Jin Ju, Himalayan art has never been merely a category or a label. Behind each work lies a complex and far-reaching web of historical clues, cultural traditions, and spiritual worlds; at the same time, we remain committed to a truthful understanding of the object itself, while also valuing the renewed unfolding of artistic experience in the contemporary context.",
       ),
       paragraphThree: bt(
-        "对竹瑾居而言，品牌并不独立于学术判断之外；网站、展览与图录，本身就是专业工作持续公开的一部分。",
-        "For Zhu Jin Ju, the brand is not separate from scholarly judgement; the website, exhibitions, and catalogues are themselves part of making that work public.",
+        "竹瑾居的空间实践主要围绕学术研究与展览展开，并持续以自媒体的方式策划、录制一系列与喜马拉雅艺术相关的视频、访谈与人物对谈。我们希望通过更具开放性的传播方式，将这一领域中的文化内涵、美学经验与人物视角传递给更多真正关心它的人。\n\n我们相信，真正有价值的收藏，建立在理解之上；真正可靠的眼光，来自长期的研究、经验的积累，以及对审美与专业的共同坚持。竹瑾居愿以此为基础，与藏家一同进入喜马拉雅艺术更深处的世界。",
+        "The practice of Zhu Jin Ju is centered on scholarly research and exhibitions, while also continuing to plan and produce a series of videos, interviews, and conversations related to Himalayan art through self-directed media. Through a more open mode of communication, we hope to bring the cultural depth, aesthetic experience, and human perspectives of this field to more people who genuinely care about it.\n\nWe believe that meaningful collecting is built upon understanding, and that reliable judgement comes from long-term research, accumulated experience, and a shared commitment to aesthetics and professional rigor. On this basis, Zhu Jin Ju hopes to accompany collectors into the deeper world of Himalayan art.",
       ),
     },
   },
