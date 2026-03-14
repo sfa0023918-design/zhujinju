@@ -134,6 +134,22 @@
 - `OPENAI_TRANSLATION_MODEL`
   - 这项可选，不填时默认使用 `gpt-5-mini`
 
+如果你希望官网联系表单真的发到你的邮箱，还需要补这 3 个环境变量：
+
+- `RESEND_API_KEY`
+- `INQUIRY_FROM_EMAIL`
+- `INQUIRY_TO_EMAIL`
+
+建议填写方式：
+
+- `INQUIRY_FROM_EMAIL`
+  - 例如：`Zhu Jin Ju <noreply@zhujinju.com>`
+  - 注意：这个邮箱域名需要先在 Resend 里验证
+- `INQUIRY_TO_EMAIL`
+  - 例如：`contact@zhujinju.com`
+  - 如果你想同时发给两个人，可以写成：
+    `contact@zhujinju.com,another@yourdomain.com`
+
 ### 4. 开始第一次部署
 
 点击 `Deploy`

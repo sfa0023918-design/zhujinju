@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -27,10 +27,14 @@ type ContactFormProps = {
 };
 
 export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [submittedAt, setSubmittedAt] = useState(() => Date.now().toString());
 
   async function handleSubmit(formData: FormData) {
     setStatus("submitting");
+    setErrorMessage("");
 
     const payload = {
       name: formData.get("name"),
@@ -39,6 +43,8 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
       identity: formData.get("identity"),
       artwork: formData.get("artwork"),
       message: formData.get("message"),
+      website: formData.get("website"),
+      submittedAt: formData.get("submittedAt"),
     };
 
     try {
@@ -49,13 +55,24 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
         },
         body: JSON.stringify(payload),
       });
+      const result = (await response.json().catch(() => null)) as { error?: string } | null;
 
       if (!response.ok) {
-        throw new Error("Request failed");
+        throw new Error(result?.error || "Request failed");
       }
 
+      formRef.current?.reset();
+      const artworkField = formRef.current?.elements.namedItem("artwork");
+
+      if (artworkField instanceof HTMLInputElement && initialArtwork) {
+        artworkField.value = initialArtwork;
+      }
+
+      setSubmittedAt(Date.now().toString());
       setStatus("success");
-    } catch {
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "提交失败，请稍后再试。");
+      setSubmittedAt(Date.now().toString());
       setStatus("error");
     }
   }
@@ -75,9 +92,20 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
 
   return (
     <form
+      ref={formRef}
       action={handleSubmit}
       className="space-y-4 border border-[var(--line)]/75 bg-[var(--surface)] px-5 py-5 md:px-7 md:py-6"
     >
+      <input type="hidden" name="submittedAt" value={submittedAt} />
+      <label className="hidden" aria-hidden="true">
+        Website
+        <input
+          tabIndex={-1}
+          autoComplete="off"
+          name="website"
+          className="hidden"
+        />
+      </label>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="grid gap-2 text-sm text-[var(--muted)]">
           <BilingualText
@@ -197,6 +225,9 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
           enClassName="text-[11px] leading-5 text-[var(--accent)]/72"
         />
       </div>
+      {status === "error" && errorMessage ? (
+        <p className="text-sm leading-6 text-[var(--accent)]">{errorMessage}</p>
+      ) : null}
     </form>
   );
 }

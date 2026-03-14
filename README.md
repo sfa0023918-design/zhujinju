@@ -66,7 +66,7 @@ DEPLOY_CN.md        中文部署文档
 - 展览与图录、文章、关于、联系
 - 可替换的占位图片方案
 - sitemap、robots、Open Graph、favicon
-- 联系表单演示接口
+- 联系表单邮件投递接口（需配置 Resend 环境变量）
 - `/admin` 内容后台
 - `content/site-content.json` 内容源
 
@@ -81,6 +81,7 @@ DEPLOY_CN.md        中文部署文档
 ## 注意事项
 
 - 当前图片为稳定占位图，适合结构验证与部署演示，不代表最终作品图。
-- 当前联系表单仍为本地演示接口，后续建议接入企业邮箱、表单服务或 CRM。
+- 联系表单需配置 `RESEND_API_KEY`、`INQUIRY_FROM_EMAIL`、`INQUIRY_TO_EMAIL` 后才会真正投递邮件。
+- 联系表单已包含基础防刷：隐藏蜜罐字段、最短提交间隔、按 IP 的简单限流。
 - 线上后台保存依赖 GitHub 写回变量，建议为 `GITHUB_CONTENTS_TOKEN` 使用单仓库、最小权限的 Fine-grained Token。
 - Vercel 部署说明请查看 `DEPLOY_CN.md`。
