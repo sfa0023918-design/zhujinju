@@ -210,13 +210,10 @@ export const pageCopy = {
       eyebrow: bt("展览与图录", "Exhibitions"),
       title: bt("展览与图录", "Exhibitions & Catalogues"),
       description: bt(
-        "持续做展览与图录，不是附加动作，而是竹瑾居专业工作本身。页面将展览项目与图录内容并置，以展示研究输出的连续性。",
-        "Exhibitions and catalogues are not supplementary gestures but part of the core practice itself. This page places both together to show continuity in research output.",
+        "持续做展览与图录，不是附加动作，而是竹瑾居专业工作本身。",
+        "Exhibitions and catalogues are not supplementary gestures but part of the core practice itself.",
       ),
-      aside: bt(
-        "展览条目同步整理重点作品、图录页数与策展前言，便于藏家、机构与研究者快速建立阅读线索。",
-        "Each exhibition entry includes highlighted works, catalogue pagination, and a curatorial lead to give collectors and researchers a clear line of reading.",
-      ),
+      aside: bt("", ""),
     },
     cardLabels: {
       highlightWorks: bt("重点作品", "Highlighted Works"),
@@ -243,13 +240,10 @@ export const pageCopy = {
       eyebrow: bt("文章", "Journal"),
       title: bt("文章", "Journal"),
       description: bt(
-        "用于发布研究短文、展览札记与市场观察。整体样式更接近艺廊 journal，而非资讯门户。",
-        "A space for short research writing, exhibition notes, and market observations, conceived more as a gallery journal than a news portal.",
+        "用于发布研究短文、展览札记与市场观察。",
+        "A space for short research writing, exhibition notes, and market observations.",
       ),
-      aside: bt(
-        "栏目按观看方法、作品判断与策展工作展开，使文章、展览与藏品之间可以互相参照。",
-        "Texts are organized around ways of looking, object judgement, and curatorial practice so that articles, exhibitions, and works can be read in relation.",
-      ),
+      aside: bt("", ""),
     },
     readAction: bt("阅读全文", "Read Article"),
   },

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
 import { InternalRouteHistory } from "@/components/internal-route-history";
@@ -33,7 +35,9 @@ export default async function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="font-sans">
-        <InternalRouteHistory />
+        <Suspense fallback={null}>
+          <InternalRouteHistory />
+        </Suspense>
         <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)]">{children}</div>
       </body>
     </html>

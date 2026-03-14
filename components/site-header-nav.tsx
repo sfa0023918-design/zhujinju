@@ -41,9 +41,9 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
         aria-expanded={open}
         aria-controls="site-mobile-nav"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex min-h-10 cursor-pointer select-none items-center rounded-full border border-[var(--line)]/70 px-3 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)] lg:hidden"
+        className="relative z-[60] inline-flex min-h-10 cursor-pointer select-none items-center rounded-full border border-[var(--line)]/70 px-3 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)] lg:hidden"
       >
-        <span className="text-[0.72rem] tracking-[0.08em]">导航</span>
+        <span className="text-[0.72rem] tracking-[0.08em]">{open ? "关闭" : "导航"}</span>
       </button>
 
       <nav

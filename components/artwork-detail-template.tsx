@@ -11,6 +11,7 @@ import type {
   SiteConfigContent,
 } from "@/lib/site-data";
 import { getArtworkStatusText } from "@/lib/bilingual";
+import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
 
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
@@ -197,10 +198,12 @@ export function ArtworkInquiry({
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
   const isSold = artwork.status === "sold";
   const supportItems = artwork.inquirySupport.filter(hasText);
+  const whatsappValue = siteConfig.contact.whatsapp.trim() || siteConfig.contact.phone.trim();
   const contactRows = [
     { label: "Email", value: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` },
     { label: "WeChat", value: siteConfig.contact.wechat },
-    { label: "Phone", value: siteConfig.contact.phone },
+    { label: "Phone", value: siteConfig.contact.phone, href: getTelHref(siteConfig.contact.phone) ?? undefined },
+    { label: "WhatsApp", value: whatsappValue, href: getWhatsAppHref(whatsappValue) ?? undefined },
     {
       label: "Instagram",
       value: siteConfig.contact.instagram,

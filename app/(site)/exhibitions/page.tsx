@@ -76,7 +76,6 @@ export default async function ExhibitionsPage() {
   const exhibitions = getPublicExhibitions(content);
   const { pageCopy } = content;
   const cardLabels = pageCopy.exhibitions.cardLabels;
-  const heroAside = pageCopy.exhibitions.hero.aside?.zh ?? pageCopy.exhibitions.hero.description.en;
 
   return (
     <>
@@ -99,11 +98,14 @@ export default async function ExhibitionsPage() {
               enClassName="mt-2.5 block text-[0.72rem] uppercase tracking-[0.2em] text-[var(--accent)]/58"
             />
           </div>
-          <div className="mt-4 max-w-[26rem] space-y-2 border-t border-[var(--line)]/70 pt-3 lg:mt-0 lg:max-w-[23rem] lg:border-t-0 lg:pt-0">
-            <p className="max-w-[23ch] text-[0.92rem] leading-7 text-[var(--muted)]">
-              {pageCopy.exhibitions.hero.description.zh}
-            </p>
-            <p className="max-w-[27ch] text-[0.86rem] leading-6 text-[var(--muted)]/88">{heroAside}</p>
+          <div className="mt-4 max-w-[26rem] border-t border-[var(--line)]/70 pt-3 lg:mt-0 lg:max-w-[23rem] lg:border-t-0 lg:pt-0">
+            <BilingualText
+              as="div"
+              text={pageCopy.exhibitions.hero.description}
+              className="max-w-[25ch] text-[var(--muted)]"
+              zhClassName="block text-[0.92rem] leading-7"
+              enClassName="mt-2 block text-[0.64rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/64"
+            />
           </div>
         </div>
       </section>

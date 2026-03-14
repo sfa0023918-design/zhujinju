@@ -54,7 +54,6 @@ export default async function JournalPage() {
   const articles = getPublicArticles(content);
   const { pageCopy } = content;
   const readAction = pageCopy.journal.readAction;
-  const heroAside = pageCopy.journal.hero.aside?.zh ?? pageCopy.journal.hero.description.en;
 
   return (
     <>
@@ -77,11 +76,14 @@ export default async function JournalPage() {
               enClassName="mt-2 block text-[0.68rem] uppercase tracking-[0.16em] text-[var(--accent)]/58"
             />
           </div>
-          <div className="mt-4 max-w-[26rem] space-y-2 border-t border-[var(--line)]/70 pt-3 lg:mt-0 lg:max-w-[22rem] lg:border-t-0 lg:pt-0">
-            <p className="max-w-[22ch] text-[0.9rem] leading-7 text-[var(--muted)]">
-              {pageCopy.journal.hero.description.zh}
-            </p>
-            <p className="max-w-[28ch] text-[0.84rem] leading-6 text-[var(--muted)]/88">{heroAside}</p>
+          <div className="mt-4 max-w-[26rem] border-t border-[var(--line)]/70 pt-3 lg:mt-0 lg:max-w-[22rem] lg:border-t-0 lg:pt-0">
+            <BilingualText
+              as="div"
+              text={pageCopy.journal.hero.description}
+              className="max-w-[24ch] text-[var(--muted)]"
+              zhClassName="block text-[0.9rem] leading-7"
+              enClassName="mt-2 block text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/64"
+            />
           </div>
         </div>
       </section>

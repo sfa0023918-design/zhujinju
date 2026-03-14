@@ -2,6 +2,7 @@ import { BilingualText } from "@/components/bilingual-text";
 import { ContactForm } from "@/components/contact-form";
 import { EditorialPageHero } from "@/components/editorial-page-hero";
 import { bt } from "@/lib/bilingual";
+import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
 import { buildMetadata } from "@/lib/metadata";
 import { loadSiteContent } from "@/lib/site-data";
 
@@ -26,6 +27,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   const params = (await searchParams) ?? {};
   const { siteConfig, pageCopy } = await loadSiteContent();
   const labels = siteConfig.contactPage.infoLabels;
+  const phoneHref = getTelHref(siteConfig.contact.phone);
+  const whatsappValue = siteConfig.contact.whatsapp.trim() || siteConfig.contact.phone.trim();
+  const whatsappHref = getWhatsAppHref(whatsappValue);
 
   return (
     <>
@@ -69,9 +73,17 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
               zhClassName="text-[0.7rem] tracking-[0.2em]"
               enClassName="text-[0.48rem] uppercase tracking-[0.14em] text-[var(--accent)]/62"
             />
-            <p className="text-[0.96rem] text-[var(--muted)]">{siteConfig.contact.phone}</p>
-            {siteConfig.contact.whatsapp !== siteConfig.contact.phone ? (
-              <p className="text-[0.96rem] text-[var(--muted)]">{siteConfig.contact.whatsapp}</p>
+            {phoneHref ? (
+              <a href={phoneHref} className="block text-[0.96rem] text-[var(--muted)]">
+                {siteConfig.contact.phone}
+              </a>
+            ) : (
+              <p className="text-[0.96rem] text-[var(--muted)]">{siteConfig.contact.phone}</p>
+            )}
+            {whatsappHref ? (
+              <a href={whatsappHref} className="block text-[0.96rem] text-[var(--muted)]">
+                WhatsApp: {whatsappValue}
+              </a>
             ) : null}
           </div>
           <div className="border-t border-[var(--line)]/80 pt-4">

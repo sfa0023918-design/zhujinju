@@ -1,4 +1,5 @@
 import { loadSiteContent } from "@/lib/site-data";
+import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
 
 import { BilingualText } from "./bilingual-text";
 import { FooterSocialLinks } from "./footer-social-links";
@@ -9,13 +10,16 @@ export async function SiteFooter() {
   const year = new Date().getFullYear();
   const normalizedPhone = siteConfig.contact.phone.trim();
   const normalizedWhatsapp = siteConfig.contact.whatsapp.trim();
+  const phoneHref = getTelHref(normalizedPhone);
+  const whatsappValue = normalizedWhatsapp || normalizedPhone;
+  const whatsappHref = getWhatsAppHref(whatsappValue);
   const instagramHref = siteConfig.contact.instagram.startsWith("http")
     ? siteConfig.contact.instagram
     : `https://www.instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}/`;
   const douyinHref = "https://v.douyin.com/YbUx9r1vtZo/";
   const xiaohongshuHref = "https://xhslink.com/m/9oVMiPqVb3P";
   const youtubeHref = "https://youtube.com/channel/UCMF53nCKLqokRaTcF2HdRig?si=YIq1Uo7nXFk-BBIZ";
-  const showWhatsApp = normalizedWhatsapp && normalizedWhatsapp !== normalizedPhone;
+  const showWhatsApp = Boolean(whatsappHref);
   const footerPlatforms: FooterPlatform[] = [
     { key: "douyin", label: "抖音", href: douyinHref },
     { key: "xiaohongshu", label: "小红书", href: xiaohongshuHref },
@@ -51,8 +55,18 @@ export async function SiteFooter() {
           <a className="block text-[0.8rem] leading-[1.55]" href={`mailto:${siteConfig.contact.email}`}>
             {siteConfig.contact.email}
           </a>
-          <p className="text-[0.8rem] leading-[1.55]">{siteConfig.contact.phone}</p>
-          {showWhatsApp ? <p className="text-[0.8rem] leading-[1.55]">{siteConfig.contact.whatsapp}</p> : null}
+          {phoneHref ? (
+            <a className="block text-[0.8rem] leading-[1.55]" href={phoneHref}>
+              {siteConfig.contact.phone}
+            </a>
+          ) : (
+            <p className="text-[0.8rem] leading-[1.55]">{siteConfig.contact.phone}</p>
+          )}
+          {showWhatsApp ? (
+            <a className="block text-[0.8rem] leading-[1.55]" href={whatsappHref ?? undefined}>
+              WhatsApp: {whatsappValue}
+            </a>
+          ) : null}
           <p className="text-[0.8rem] leading-[1.55]">WeChat: {siteConfig.contact.wechat}</p>
           <p className="text-[0.8rem] leading-[1.55]">Instagram: {siteConfig.contact.instagram}</p>
         </div>

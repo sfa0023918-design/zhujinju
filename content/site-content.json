@@ -30,21 +30,21 @@
         "en": "About Zhu Jin Ju"
       },
       "subtitle": {
-        "zh": "工作围绕收藏、研究、展览与图录展开。",
-        "en": "The Work Is Structured Around Collecting, Research, Exhibitions, and Catalogues."
+        "zh": "竹瑾居以研究与眼光为基础，建立对作品更深的理解。",
+        "en": "Zhu Jin Ju builds a deeper understanding of each work through research and connoisseurship."
       },
       "body": [
         {
-          "zh": "我们以作品本体为起点，在图像学、风格学、材质工艺与流传脉络之间建立判断，并通过展览、图录与研究文字持续公开这些判断。",
-          "en": "We begin with the object itself, building judgement through iconography, style, material, craftsmanship, and provenance, and making that judgement public through exhibitions, catalogues, and research writing."
+          "zh": "对竹瑾居而言，喜马拉雅艺术从来不只是一个“门类”或“标签”。每一件作品的背后，都连接着复杂而深远的历史线索、文化传统与精神世界；与此同时，我们始终珍视对作品本体的真实理解，也重视艺术经验在当代语境中的重新展开。",
+          "en": "For Zhu Jin Ju, Himalayan art has never been merely a category or a label. Behind each work lies a complex and far-reaching web of historical clues, cultural traditions, and spiritual worlds; at the same time, we remain committed to a truthful understanding of the object itself, while also valuing the renewed unfolding of artistic experience in the contemporary context."
         },
         {
-          "zh": "我们不以“海量上新”定义专业，也不将古代艺术处理为泛化的装饰品类。每一次展示、每一件作品与每一段文字，都应指向更准确的观看。",
-          "en": "We do not define professionalism by constant new arrivals, nor reduce historical art to generalized decoration. Each display, object, and paragraph should lead to a more precise way of looking."
+          "zh": "竹瑾居的空间实践主要围绕学术研究与展览展开，并持续以自媒体的方式策划、录制一系列与喜马拉雅艺术相关的视频、访谈与人物对谈。我们希望通过更具开放性的传播方式，将这一领域中的文化内涵、美学经验与人物视角传递给更多真正关心它的人。",
+          "en": "The practice of Zhu Jin Ju is centered on scholarly research and exhibitions, while also continuing to plan and produce a series of videos, interviews, and conversations related to Himalayan art through self-directed media. Through a more open mode of communication, we hope to bring the cultural depth, aesthetic experience, and human perspectives of this field to more people who genuinely care about it."
         },
         {
-          "zh": "对竹瑾居而言，品牌并不独立于学术判断之外；网站、展览与图录，本身就是专业工作持续公开的一部分。",
-          "en": "For Zhu Jin Ju, the brand is not separate from scholarly judgement; the website, exhibitions, and catalogues are themselves part of making that work public."
+          "zh": "我们相信，真正有价值的收藏，建立在理解之上；真正可靠的眼光，来自长期的研究、经验的积累，以及对审美与专业的共同坚持。竹瑾居愿以此为基础，与藏家一同进入喜马拉雅艺术更深处的世界。",
+          "en": "We believe that meaningful collecting is built upon understanding, and that reliable judgement comes from long-term research, accumulated experience, and a shared commitment to aesthetics and professional rigor. On this basis, Zhu Jin Ju hopes to accompany collectors into the deeper world of Himalayan art."
         }
       ]
     },
@@ -613,12 +613,12 @@
           "en": "Exhibitions & Catalogues"
         },
         "description": {
-          "zh": "持续做展览与图录，不是附加动作，而是竹瑾居专业工作本身。页面将展览项目与图录内容并置，以展示研究输出的连续性。",
-          "en": "Exhibitions and catalogues are not supplementary gestures but part of the core practice itself. This page places both together to show continuity in research output."
+          "zh": "持续做展览与图录，不是附加动作，而是竹瑾居专业工作本身。",
+          "en": "Exhibitions and catalogues are not supplementary gestures but part of the core practice itself."
         },
         "aside": {
-          "zh": "展览条目同步整理重点作品、图录页数与策展前言，便于藏家、机构与研究者快速建立阅读线索。",
-          "en": "Each exhibition entry includes highlighted works, catalogue pagination, and a curatorial lead to give collectors and researchers a clear line of reading."
+          "zh": "",
+          "en": ""
         }
       },
       "cardLabels": {
@@ -691,12 +691,12 @@
           "en": "Journal"
         },
         "description": {
-          "zh": "用于发布研究短文、展览札记与市场观察。整体样式更接近艺廊 journal，而非资讯门户。",
-          "en": "A space for short research writing, exhibition notes, and market observations, conceived more as a gallery journal than a news portal."
+          "zh": "用于发布研究短文、展览札记与市场观察。",
+          "en": "A space for short research writing, exhibition notes, and market observations."
         },
         "aside": {
-          "zh": "栏目按观看方法、作品判断与策展工作展开，使文章、展览与藏品之间可以互相参照。",
-          "en": "Texts are organized around ways of looking, object judgement, and curatorial practice so that articles, exhibitions, and works can be read in relation."
+          "zh": "",
+          "en": ""
         }
       },
       "readAction": {
