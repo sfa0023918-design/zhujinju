@@ -8,6 +8,7 @@ import {
   getArticlesBySlugs,
   getArtworkBySlug,
   getExhibitionsBySlugs,
+  getPublicArtworks,
   getRelatedArtworks,
   loadSiteContent,
 } from "@/lib/site-data";
@@ -20,6 +21,14 @@ type ArtworkDetailPageProps = {
     preview?: string;
   }>;
 };
+
+export async function generateStaticParams() {
+  const content = await loadSiteContent();
+
+  return getPublicArtworks(content).map((artwork) => ({
+    slug: artwork.slug,
+  }));
+}
 
 export async function generateMetadata({
   params,

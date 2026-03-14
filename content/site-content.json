@@ -133,7 +133,33 @@
         "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
         "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg"
       ],
-      "featured": true
+      "featured": true,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "card": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "hero": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "detail": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "card": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "hero": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "detail": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg",
+          "card": "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg",
+          "hero": "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg",
+          "detail": "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_aa279e48-2e25-4aaf-a625-ead566669988",
@@ -240,7 +266,33 @@
         "/uploads/artworks/1773408759092-库奇哈尔宝冠释迦-左.jpg",
         "/uploads/artworks/1773408768027-库奇哈尔宝冠释迦-右.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773408754115-库奇哈尔宝冠释迦-正.jpg",
+        "card": "/uploads/artworks/1773408754115-库奇哈尔宝冠释迦-正.jpg",
+        "hero": "/uploads/artworks/1773408754115-库奇哈尔宝冠释迦-正.jpg",
+        "detail": "/uploads/artworks/1773408754115-库奇哈尔宝冠释迦-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773408759092-库奇哈尔宝冠释迦-左.jpg",
+          "card": "/uploads/artworks/1773408759092-库奇哈尔宝冠释迦-左.jpg",
+          "hero": "/uploads/artworks/1773408759092-库奇哈尔宝冠释迦-左.jpg",
+          "detail": "/uploads/artworks/1773408759092-库奇哈尔宝冠释迦-左.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773408768027-库奇哈尔宝冠释迦-右.jpg",
+          "card": "/uploads/artworks/1773408768027-库奇哈尔宝冠释迦-右.jpg",
+          "hero": "/uploads/artworks/1773408768027-库奇哈尔宝冠释迦-右.jpg",
+          "detail": "/uploads/artworks/1773408768027-库奇哈尔宝冠释迦-右.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_25ba9111-3962-4ac7-b88e-504ae7ba047b",
@@ -347,7 +399,33 @@
         "/uploads/artworks/1773409479223-808039dd706033f3f5fe943670e39d88.jpg",
         "/uploads/artworks/1773409503893-365317dfa6aa5c3ba5f34e1c713213b5.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773409473171-f1641630c4b30ae88bb8d5012659989a.jpg",
+        "card": "/uploads/artworks/1773409473171-f1641630c4b30ae88bb8d5012659989a.jpg",
+        "hero": "/uploads/artworks/1773409473171-f1641630c4b30ae88bb8d5012659989a.jpg",
+        "detail": "/uploads/artworks/1773409473171-f1641630c4b30ae88bb8d5012659989a.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773409479223-808039dd706033f3f5fe943670e39d88.jpg",
+          "card": "/uploads/artworks/1773409479223-808039dd706033f3f5fe943670e39d88.jpg",
+          "hero": "/uploads/artworks/1773409479223-808039dd706033f3f5fe943670e39d88.jpg",
+          "detail": "/uploads/artworks/1773409479223-808039dd706033f3f5fe943670e39d88.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773409503893-365317dfa6aa5c3ba5f34e1c713213b5.jpg",
+          "card": "/uploads/artworks/1773409503893-365317dfa6aa5c3ba5f34e1c713213b5.jpg",
+          "hero": "/uploads/artworks/1773409503893-365317dfa6aa5c3ba5f34e1c713213b5.jpg",
+          "detail": "/uploads/artworks/1773409503893-365317dfa6aa5c3ba5f34e1c713213b5.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_a7be079d-98c1-4bb7-9d41-2e91ab302328",
@@ -455,7 +533,33 @@
         "/uploads/artworks/1773059376623-50帝释天-侧.jpg",
         "/uploads/artworks/1773059388376-47帝释天-特.jpg"
       ],
-      "featured": true
+      "featured": true,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
+        "card": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
+        "hero": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
+        "detail": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773059376623-50帝释天-侧.jpg",
+          "card": "/uploads/artworks/1773059376623-50帝释天-侧.jpg",
+          "hero": "/uploads/artworks/1773059376623-50帝释天-侧.jpg",
+          "detail": "/uploads/artworks/1773059376623-50帝释天-侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773059388376-47帝释天-特.jpg",
+          "card": "/uploads/artworks/1773059388376-47帝释天-特.jpg",
+          "hero": "/uploads/artworks/1773059388376-47帝释天-特.jpg",
+          "detail": "/uploads/artworks/1773059388376-47帝释天-特.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_4b97b29a-b96b-47e4-a860-490bc721804d",
@@ -598,7 +702,15 @@
       ],
       "image": "/uploads/artworks/1773136626491-236ae4493d409e6577bc2306f5388780.jpg",
       "gallery": [],
-      "featured": true
+      "featured": true,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773136626491-236ae4493d409e6577bc2306f5388780.jpg",
+        "card": "/uploads/artworks/1773136626491-236ae4493d409e6577bc2306f5388780.jpg",
+        "hero": "/uploads/artworks/1773136626491-236ae4493d409e6577bc2306f5388780.jpg",
+        "detail": "/uploads/artworks/1773136626491-236ae4493d409e6577bc2306f5388780.jpg",
+        "width": 1200,
+        "height": 1500
+      }
     },
     {
       "id": "artwork_bb32d185-8cfe-4df7-a73b-239f36b3cffa",
@@ -717,7 +829,33 @@
         "/uploads/artworks/1773202166808-l1001089.jpg",
         "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773202158809-58西藏释迦牟尼-正.jpg",
+        "card": "/uploads/artworks/1773202158809-58西藏释迦牟尼-正.jpg",
+        "hero": "/uploads/artworks/1773202158809-58西藏释迦牟尼-正.jpg",
+        "detail": "/uploads/artworks/1773202158809-58西藏释迦牟尼-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773202166808-l1001089.jpg",
+          "card": "/uploads/artworks/1773202166808-l1001089.jpg",
+          "hero": "/uploads/artworks/1773202166808-l1001089.jpg",
+          "detail": "/uploads/artworks/1773202166808-l1001089.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg",
+          "card": "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg",
+          "hero": "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg",
+          "detail": "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_edbea557-00d5-43a9-8d0b-ec1630f13553",
@@ -819,7 +957,41 @@
         "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
         "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773133562827-41尼泊尔释迦牟尼-正.jpg",
+        "card": "/uploads/artworks/1773133562827-41尼泊尔释迦牟尼-正.jpg",
+        "hero": "/uploads/artworks/1773133562827-41尼泊尔释迦牟尼-正.jpg",
+        "detail": "/uploads/artworks/1773133562827-41尼泊尔释迦牟尼-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773133574827-43尼泊尔释迦牟尼-右侧.jpg",
+          "card": "/uploads/artworks/1773133574827-43尼泊尔释迦牟尼-右侧.jpg",
+          "hero": "/uploads/artworks/1773133574827-43尼泊尔释迦牟尼-右侧.jpg",
+          "detail": "/uploads/artworks/1773133574827-43尼泊尔释迦牟尼-右侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
+          "card": "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
+          "hero": "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
+          "detail": "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg",
+          "card": "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg",
+          "hero": "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg",
+          "detail": "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_1ca16c9c-abf7-48c8-95a4-a2a063f1fd59",
@@ -920,7 +1092,33 @@
         "/uploads/artworks/1773146992939-l1000792.jpg",
         "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "card": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "hero": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "detail": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "card": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "hero": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "detail": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
+          "card": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
+          "hero": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
+          "detail": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_69d12b1d-f511-4b9f-8132-bd4d8d8e7d96",
@@ -1028,7 +1226,33 @@
         "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg",
         "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773396578121-72金刚萨垛-正-1.jpg",
+        "card": "/uploads/artworks/1773396578121-72金刚萨垛-正-1.jpg",
+        "hero": "/uploads/artworks/1773396578121-72金刚萨垛-正-1.jpg",
+        "detail": "/uploads/artworks/1773396578121-72金刚萨垛-正-1.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg",
+          "card": "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg",
+          "hero": "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg",
+          "detail": "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "card": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "hero": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "detail": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_2f2ecffa-8d50-4838-a28e-eb92b9fdb779",
@@ -1129,7 +1353,33 @@
         "/uploads/artworks/1773412989098-未命名-2.jpg",
         "/uploads/artworks/1773412805579-未命名-4.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773412792328-未命名-1.jpg",
+        "card": "/uploads/artworks/1773412792328-未命名-1.jpg",
+        "hero": "/uploads/artworks/1773412792328-未命名-1.jpg",
+        "detail": "/uploads/artworks/1773412792328-未命名-1.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773412989098-未命名-2.jpg",
+          "card": "/uploads/artworks/1773412989098-未命名-2.jpg",
+          "hero": "/uploads/artworks/1773412989098-未命名-2.jpg",
+          "detail": "/uploads/artworks/1773412989098-未命名-2.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773412805579-未命名-4.jpg",
+          "card": "/uploads/artworks/1773412805579-未命名-4.jpg",
+          "hero": "/uploads/artworks/1773412805579-未命名-4.jpg",
+          "detail": "/uploads/artworks/1773412805579-未命名-4.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_cbdee93c-924e-4ad6-bbe0-a4d410c81f17",
@@ -1229,7 +1479,25 @@
       "gallery": [
         "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
+        "card": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
+        "hero": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
+        "detail": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
+          "card": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
+          "hero": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
+          "detail": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_aab8bebf-0903-472b-99e2-eb1554d69e42",
@@ -1337,7 +1605,33 @@
         "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
         "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "card": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "hero": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "detail": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "card": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "hero": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "detail": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "card": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "hero": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "detail": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_75aa789a-fe7e-4669-866c-565a9caa379f",
@@ -1473,7 +1767,33 @@
         "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
         "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
+        "card": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
+        "hero": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
+        "detail": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
+          "card": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
+          "hero": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
+          "detail": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "card": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "hero": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "detail": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_2b94b89e-5c4a-43d5-8ceb-b767dbeee710",
@@ -1590,7 +1910,15 @@
       ],
       "image": "/uploads/artworks/1773397657892-宝生佛唐卡.jpg",
       "gallery": [],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773397657892-宝生佛唐卡.jpg",
+        "card": "/uploads/artworks/1773397657892-宝生佛唐卡.jpg",
+        "hero": "/uploads/artworks/1773397657892-宝生佛唐卡.jpg",
+        "detail": "/uploads/artworks/1773397657892-宝生佛唐卡.jpg",
+        "width": 1200,
+        "height": 1500
+      }
     },
     {
       "id": "artwork_b16971c7-28bf-4601-9c5d-641398b39c50",
@@ -1737,7 +2065,25 @@
       "gallery": [
         "/uploads/artworks/1773398360711-尼泊尔佛塔-侧.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773398357065-a858811107573178fa79cb1815b1c0fc.jpg",
+        "card": "/uploads/artworks/1773398357065-a858811107573178fa79cb1815b1c0fc.jpg",
+        "hero": "/uploads/artworks/1773398357065-a858811107573178fa79cb1815b1c0fc.jpg",
+        "detail": "/uploads/artworks/1773398357065-a858811107573178fa79cb1815b1c0fc.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773398360711-尼泊尔佛塔-侧.jpg",
+          "card": "/uploads/artworks/1773398360711-尼泊尔佛塔-侧.jpg",
+          "hero": "/uploads/artworks/1773398360711-尼泊尔佛塔-侧.jpg",
+          "detail": "/uploads/artworks/1773398360711-尼泊尔佛塔-侧.jpg",
+          "width": 1199,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_1a009018-8383-4699-b780-3b21cecc6d97",
@@ -1875,7 +2221,33 @@
         "/uploads/artworks/1773229997976-88上师像-左.jpg",
         "/uploads/artworks/1773230006378-87上师像-特.jpg"
       ],
-      "featured": true
+      "featured": true,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773229993893-89上师像-正.jpg",
+        "card": "/uploads/artworks/1773229993893-89上师像-正.jpg",
+        "hero": "/uploads/artworks/1773229993893-89上师像-正.jpg",
+        "detail": "/uploads/artworks/1773229993893-89上师像-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773229997976-88上师像-左.jpg",
+          "card": "/uploads/artworks/1773229997976-88上师像-左.jpg",
+          "hero": "/uploads/artworks/1773229997976-88上师像-左.jpg",
+          "detail": "/uploads/artworks/1773229997976-88上师像-左.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773230006378-87上师像-特.jpg",
+          "card": "/uploads/artworks/1773230006378-87上师像-特.jpg",
+          "hero": "/uploads/artworks/1773230006378-87上师像-特.jpg",
+          "detail": "/uploads/artworks/1773230006378-87上师像-特.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_e45dee53-57bd-4464-a6c9-83845f80a496",
@@ -1998,7 +2370,33 @@
         "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
         "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773411709369-6eeed500398dad93dca3161c3b80b1ad.jpg",
+        "card": "/uploads/artworks/1773411709369-6eeed500398dad93dca3161c3b80b1ad.jpg",
+        "hero": "/uploads/artworks/1773411709369-6eeed500398dad93dca3161c3b80b1ad.jpg",
+        "detail": "/uploads/artworks/1773411709369-6eeed500398dad93dca3161c3b80b1ad.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
+          "card": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
+          "hero": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
+          "detail": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
+          "card": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
+          "hero": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
+          "detail": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_e5cf77fa-eaf7-4b84-b089-bbc2b164af21",
@@ -2098,7 +2496,25 @@
       "gallery": [
         "/uploads/artworks/1773396978027-103石雕噶举上师像-右.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773395411673-105石雕噶举上师像-正.jpg",
+        "card": "/uploads/artworks/1773395411673-105石雕噶举上师像-正.jpg",
+        "hero": "/uploads/artworks/1773395411673-105石雕噶举上师像-正.jpg",
+        "detail": "/uploads/artworks/1773395411673-105石雕噶举上师像-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773396978027-103石雕噶举上师像-右.jpg",
+          "card": "/uploads/artworks/1773396978027-103石雕噶举上师像-右.jpg",
+          "hero": "/uploads/artworks/1773396978027-103石雕噶举上师像-右.jpg",
+          "detail": "/uploads/artworks/1773396978027-103石雕噶举上师像-右.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_d390e885-2a84-439e-aa79-666e5e3fe057",
@@ -2198,7 +2614,25 @@
       "gallery": [
         "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "card": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "hero": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "detail": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "card": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "hero": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "detail": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_84d0fc88-8edc-4478-8073-cfefa9c09d6c",
@@ -2338,7 +2772,15 @@
       ],
       "image": "/uploads/artworks/1773416956423-智慧空行母.jpg",
       "gallery": [],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773416956423-智慧空行母.jpg",
+        "card": "/uploads/artworks/1773416956423-智慧空行母.jpg",
+        "hero": "/uploads/artworks/1773416956423-智慧空行母.jpg",
+        "detail": "/uploads/artworks/1773416956423-智慧空行母.jpg",
+        "width": 1200,
+        "height": 1500
+      }
     },
     {
       "id": "artwork_ef11d050-db36-4d6d-9ea2-7a973ff47043",
@@ -2438,7 +2880,25 @@
       "gallery": [
         "/uploads/artworks/1773414483456-未命名-1-22-56-25.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773413527560-2880fafe737f655606f15d7d40aaac32.jpg",
+        "card": "/uploads/artworks/1773413527560-2880fafe737f655606f15d7d40aaac32.jpg",
+        "hero": "/uploads/artworks/1773413527560-2880fafe737f655606f15d7d40aaac32.jpg",
+        "detail": "/uploads/artworks/1773413527560-2880fafe737f655606f15d7d40aaac32.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773414483456-未命名-1-22-56-25.jpg",
+          "card": "/uploads/artworks/1773414483456-未命名-1-22-56-25.jpg",
+          "hero": "/uploads/artworks/1773414483456-未命名-1-22-56-25.jpg",
+          "detail": "/uploads/artworks/1773414483456-未命名-1-22-56-25.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_37f3a045-ac79-4ac2-8665-ba179814dcfd",
@@ -2538,7 +2998,25 @@
       "gallery": [
         "/uploads/artworks/1773424569682-d573f94e9fddd3f022ed190e5f367106.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773423970008-6f1a75bb02e173b06d9dd9f261666c04.jpg",
+        "card": "/uploads/artworks/1773423970008-6f1a75bb02e173b06d9dd9f261666c04.jpg",
+        "hero": "/uploads/artworks/1773423970008-6f1a75bb02e173b06d9dd9f261666c04.jpg",
+        "detail": "/uploads/artworks/1773423970008-6f1a75bb02e173b06d9dd9f261666c04.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773424569682-d573f94e9fddd3f022ed190e5f367106.jpg",
+          "card": "/uploads/artworks/1773424569682-d573f94e9fddd3f022ed190e5f367106.jpg",
+          "hero": "/uploads/artworks/1773424569682-d573f94e9fddd3f022ed190e5f367106.jpg",
+          "detail": "/uploads/artworks/1773424569682-d573f94e9fddd3f022ed190e5f367106.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_2c964f41-a3ce-4ae4-bae7-73c01a2fecef",
@@ -2651,7 +3129,25 @@
       "gallery": [
         "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "card": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "hero": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "detail": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "card": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "hero": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "detail": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_9e253a88-873d-4541-98ee-f8e67068e85e",
@@ -2751,7 +3247,25 @@
       "gallery": [
         "/uploads/artworks/1773396873679-109小黄财神-右.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773395807186-108小黄财神-正.jpg",
+        "card": "/uploads/artworks/1773395807186-108小黄财神-正.jpg",
+        "hero": "/uploads/artworks/1773395807186-108小黄财神-正.jpg",
+        "detail": "/uploads/artworks/1773395807186-108小黄财神-正.jpg",
+        "width": 1190,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773396873679-109小黄财神-右.jpg",
+          "card": "/uploads/artworks/1773396873679-109小黄财神-右.jpg",
+          "hero": "/uploads/artworks/1773396873679-109小黄财神-右.jpg",
+          "detail": "/uploads/artworks/1773396873679-109小黄财神-右.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_51ec318c-fc66-4d37-a4c5-648743e6e540",
@@ -2852,7 +3366,33 @@
         "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
         "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
+        "card": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
+        "hero": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
+        "detail": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "card": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "hero": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "detail": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
+          "card": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
+          "hero": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
+          "detail": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_98d16b42-7664-4dd3-8a57-1994f65f0054",
@@ -2965,7 +3505,25 @@
       "gallery": [
         "/uploads/artworks/1773425942912-5dff8dc1b31c9775ae92484f9c4a6b65.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773425939247-780add0680826276bdeb12c2f634ae23.jpg",
+        "card": "/uploads/artworks/1773425939247-780add0680826276bdeb12c2f634ae23.jpg",
+        "hero": "/uploads/artworks/1773425939247-780add0680826276bdeb12c2f634ae23.jpg",
+        "detail": "/uploads/artworks/1773425939247-780add0680826276bdeb12c2f634ae23.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773425942912-5dff8dc1b31c9775ae92484f9c4a6b65.jpg",
+          "card": "/uploads/artworks/1773425942912-5dff8dc1b31c9775ae92484f9c4a6b65.jpg",
+          "hero": "/uploads/artworks/1773425942912-5dff8dc1b31c9775ae92484f9c4a6b65.jpg",
+          "detail": "/uploads/artworks/1773425942912-5dff8dc1b31c9775ae92484f9c4a6b65.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_cbbab22c-0ba9-4c6c-a065-a8cf90f4eb0b",
@@ -3065,7 +3623,25 @@
       "gallery": [
         "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773424878938-95ab4325afd262208648782a54a91077.jpg",
+        "card": "/uploads/artworks/1773424878938-95ab4325afd262208648782a54a91077.jpg",
+        "hero": "/uploads/artworks/1773424878938-95ab4325afd262208648782a54a91077.jpg",
+        "detail": "/uploads/artworks/1773424878938-95ab4325afd262208648782a54a91077.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
+          "card": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
+          "hero": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
+          "detail": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
+          "width": 960,
+          "height": 1200
+        }
+      ]
     },
     {
       "id": "artwork_e666f216-3525-45e0-a863-3ff4c1d1a1c7",
@@ -3173,7 +3749,33 @@
         "/uploads/artworks/1773426288293-fb4df08c8af7b7c360aa516b698f0724.jpg",
         "/uploads/artworks/1773426294919-bd00a0488cf182363032a9a12a64f105.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773426282550-5d044cefe0335651f135e841dcf619ab.jpg",
+        "card": "/uploads/artworks/1773426282550-5d044cefe0335651f135e841dcf619ab.jpg",
+        "hero": "/uploads/artworks/1773426282550-5d044cefe0335651f135e841dcf619ab.jpg",
+        "detail": "/uploads/artworks/1773426282550-5d044cefe0335651f135e841dcf619ab.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773426288293-fb4df08c8af7b7c360aa516b698f0724.jpg",
+          "card": "/uploads/artworks/1773426288293-fb4df08c8af7b7c360aa516b698f0724.jpg",
+          "hero": "/uploads/artworks/1773426288293-fb4df08c8af7b7c360aa516b698f0724.jpg",
+          "detail": "/uploads/artworks/1773426288293-fb4df08c8af7b7c360aa516b698f0724.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773426294919-bd00a0488cf182363032a9a12a64f105.jpg",
+          "card": "/uploads/artworks/1773426294919-bd00a0488cf182363032a9a12a64f105.jpg",
+          "hero": "/uploads/artworks/1773426294919-bd00a0488cf182363032a9a12a64f105.jpg",
+          "detail": "/uploads/artworks/1773426294919-bd00a0488cf182363032a9a12a64f105.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_9fafd095-7b40-4899-8061-e5628b4c05fe",
@@ -3281,7 +3883,33 @@
         "/uploads/artworks/1773426728648-f94e5e38e6df889cd5e0f8506ef27295.jpg",
         "/uploads/artworks/1773426736627-98a688c47b8470019bdfcf4f39401729.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773426722816-8de7f4d71b3ce6e19b1b6f545e9dc0ea.jpg",
+        "card": "/uploads/artworks/1773426722816-8de7f4d71b3ce6e19b1b6f545e9dc0ea.jpg",
+        "hero": "/uploads/artworks/1773426722816-8de7f4d71b3ce6e19b1b6f545e9dc0ea.jpg",
+        "detail": "/uploads/artworks/1773426722816-8de7f4d71b3ce6e19b1b6f545e9dc0ea.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773426728648-f94e5e38e6df889cd5e0f8506ef27295.jpg",
+          "card": "/uploads/artworks/1773426728648-f94e5e38e6df889cd5e0f8506ef27295.jpg",
+          "hero": "/uploads/artworks/1773426728648-f94e5e38e6df889cd5e0f8506ef27295.jpg",
+          "detail": "/uploads/artworks/1773426728648-f94e5e38e6df889cd5e0f8506ef27295.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773426736627-98a688c47b8470019bdfcf4f39401729.jpg",
+          "card": "/uploads/artworks/1773426736627-98a688c47b8470019bdfcf4f39401729.jpg",
+          "hero": "/uploads/artworks/1773426736627-98a688c47b8470019bdfcf4f39401729.jpg",
+          "detail": "/uploads/artworks/1773426736627-98a688c47b8470019bdfcf4f39401729.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_ca169d15-a0b1-4077-b36e-fb08a3da7d49",
@@ -3382,7 +4010,33 @@
         "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg",
         "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773427060195-9cbc87467d1a41681217a2b82be5a27f.jpg",
+        "card": "/uploads/artworks/1773427060195-9cbc87467d1a41681217a2b82be5a27f.jpg",
+        "hero": "/uploads/artworks/1773427060195-9cbc87467d1a41681217a2b82be5a27f.jpg",
+        "detail": "/uploads/artworks/1773427060195-9cbc87467d1a41681217a2b82be5a27f.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg",
+          "card": "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg",
+          "hero": "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg",
+          "detail": "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg",
+          "width": 1200,
+          "height": 1500
+        },
+        {
+          "original": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "card": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "hero": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "detail": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_4eaf2315-6845-42c6-9a5a-b144c42c1c6a",
@@ -3482,7 +4136,25 @@
       "gallery": [
         "/uploads/artworks/1773427308849-6f1873239ab4b7417db35a60e2c2644d.jpg"
       ],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773427304674-391b2ab2c46aecfae12b743a2629012a.jpg",
+        "card": "/uploads/artworks/1773427304674-391b2ab2c46aecfae12b743a2629012a.jpg",
+        "hero": "/uploads/artworks/1773427304674-391b2ab2c46aecfae12b743a2629012a.jpg",
+        "detail": "/uploads/artworks/1773427304674-391b2ab2c46aecfae12b743a2629012a.jpg",
+        "width": 1178,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773427308849-6f1873239ab4b7417db35a60e2c2644d.jpg",
+          "card": "/uploads/artworks/1773427308849-6f1873239ab4b7417db35a60e2c2644d.jpg",
+          "hero": "/uploads/artworks/1773427308849-6f1873239ab4b7417db35a60e2c2644d.jpg",
+          "detail": "/uploads/artworks/1773427308849-6f1873239ab4b7417db35a60e2c2644d.jpg",
+          "width": 1178,
+          "height": 1500
+        }
+      ]
     }
   ],
   "exhibitions": [
@@ -3666,7 +4338,15 @@
         "/uploads/catalogues/silent-radiance/page-104.jpg",
         "/uploads/catalogues/silent-radiance/page-105.jpg",
         "/uploads/catalogues/silent-radiance/page-106.jpg"
-      ]
+      ],
+      "coverAsset": {
+        "original": "/uploads/exhibitions/1773131800503-微信图片-20260310163557-19-129.jpg",
+        "card": "/uploads/exhibitions/1773131800503-微信图片-20260310163557-19-129-card.jpg",
+        "hero": "/uploads/exhibitions/1773131800503-微信图片-20260310163557-19-129.jpg",
+        "detail": "/uploads/exhibitions/1773131800503-微信图片-20260310163557-19-129.jpg",
+        "width": 1600,
+        "height": 1000
+      }
     },
     {
       "slug": "exhibition-1773394358822",
@@ -3827,7 +4507,15 @@
         "/uploads/catalogues/exhibition-1773394358822/page-093.jpg",
         "/uploads/catalogues/exhibition-1773394358822/page-094.jpg",
         "/uploads/catalogues/exhibition-1773394358822/page-095.jpg"
-      ]
+      ],
+      "coverAsset": {
+        "original": "/uploads/exhibitions/1773394368070-02c77f458e841cac23d362b3a6d62233.jpg",
+        "card": "/uploads/exhibitions/1773394368070-02c77f458e841cac23d362b3a6d62233-card.jpg",
+        "hero": "/uploads/exhibitions/1773394368070-02c77f458e841cac23d362b3a6d62233.jpg",
+        "detail": "/uploads/exhibitions/1773394368070-02c77f458e841cac23d362b3a6d62233.jpg",
+        "width": 1600,
+        "height": 1000
+      }
     },
     {
       "slug": "exhibition-1773399222802",
@@ -4022,7 +4710,15 @@
         "/uploads/catalogues/exhibition-1773399222802/page-128.jpg",
         "/uploads/catalogues/exhibition-1773399222802/page-129.jpg",
         "/uploads/catalogues/exhibition-1773399222802/page-130.jpg"
-      ]
+      ],
+      "coverAsset": {
+        "original": "/uploads/exhibitions/1773399259638-3f8c00bf945a9cef403cf6714abb4a45.jpg",
+        "card": "/uploads/exhibitions/1773399259638-3f8c00bf945a9cef403cf6714abb4a45-card.jpg",
+        "hero": "/uploads/exhibitions/1773399259638-3f8c00bf945a9cef403cf6714abb4a45.jpg",
+        "detail": "/uploads/exhibitions/1773399259638-3f8c00bf945a9cef403cf6714abb4a45.jpg",
+        "width": 1600,
+        "height": 1000
+      }
     }
   ],
   "articles": [
@@ -4114,7 +4810,15 @@
             "en": "Zhu Jin Ju treats exhibitions and catalogues as central to its practice because they directly determine whether professional judgement can be preserved and transmitted over time."
           }
         }
-      ]
+      ],
+      "coverAsset": {
+        "original": "/uploads/articles/1773416480920-img-1030.jpg",
+        "card": "/uploads/articles/1773416480920-img-1030-card.jpg",
+        "hero": "/uploads/articles/1773416480920-img-1030.jpg",
+        "detail": "/uploads/articles/1773416480920-img-1030.jpg",
+        "width": 1400,
+        "height": 900
+      }
     }
   ]
 }

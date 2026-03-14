@@ -5,7 +5,9 @@ import { BilingualText } from "@/components/bilingual-text";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { bt } from "@/lib/bilingual";
+import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
+import type { ImageAsset } from "@/lib/site-data";
 import { getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
 
 export async function generateMetadata() {
@@ -21,12 +23,15 @@ export async function generateMetadata() {
 
 function ExhibitionCover({
   cover,
+  coverAsset,
   title,
 }: {
   cover: string;
+  coverAsset?: ImageAsset;
   title: { zh: string; en: string };
 }) {
-  const isPlaceholder = cover.startsWith("/api/placeholder/");
+  const cardImage = coverAsset?.card ?? cover;
+  const isPlaceholder = cardImage.startsWith("/api/placeholder/");
 
   if (isPlaceholder) {
     return (
@@ -38,11 +43,12 @@ function ExhibitionCover({
 
   return (
     <ProtectedImage
-      src={cover}
+      src={withImageVersion(cardImage)}
       alt={`${title.zh} ${title.en}`}
       width={1600}
       height={1000}
-      unoptimized
+      quality={84}
+      sizes="(min-width: 1024px) 52vw, 100vw"
       wrapperClassName="block"
       className="aspect-[1.18/1] h-full w-full object-cover"
     />
@@ -99,7 +105,11 @@ export default async function ExhibitionsPage() {
                 href={`/exhibitions/${exhibition.slug}`}
                 className="relative overflow-hidden bg-[var(--surface-strong)]"
               >
-                <ExhibitionCover cover={exhibition.cover} title={exhibition.title} />
+                <ExhibitionCover
+                  cover={exhibition.cover}
+                  coverAsset={exhibition.coverAsset}
+                  title={exhibition.title}
+                />
               </Link>
               <div className="flex flex-col justify-between gap-4">
                 <div className="space-y-3.5">

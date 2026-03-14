@@ -24,6 +24,17 @@ export type PublicationReference = {
   note?: BilingualText;
 };
 
+export type ImageAsset = {
+  original: string;
+  card?: string;
+  hero?: string;
+  detail?: string;
+  screen?: string;
+  hd?: string;
+  width?: number;
+  height?: number;
+};
+
 export type Artwork = {
   id?: string;
   slug: string;
@@ -47,7 +58,9 @@ export type Artwork = {
   relatedArticleSlugs: string[];
   relatedExhibitionSlugs: string[];
   image: string;
+  imageAsset?: ImageAsset;
   gallery?: string[];
+  galleryAssets?: Array<ImageAsset | null>;
   featured?: boolean;
 };
 
@@ -73,6 +86,7 @@ export type Exhibition = {
   curatorialNote?: BilingualText;
   relatedArticleSlugs: string[];
   cover: string;
+  coverAsset?: ImageAsset;
   current?: boolean;
 };
 
@@ -91,6 +105,7 @@ export type Article = {
   relatedArtworkSlugs: string[];
   relatedExhibitionSlugs: string[];
   cover: string;
+  coverAsset?: ImageAsset;
 };
 
 export type ArticleImageLayout = "inline" | "wide";

@@ -69,12 +69,38 @@ export async function readAdminUploadResponse(response: Response) {
 
   try {
     return {
-      payload: JSON.parse(raw) as { url?: string; message?: string; error?: string; saved?: boolean },
+      payload: JSON.parse(raw) as {
+        url?: string;
+        message?: string;
+        error?: string;
+        saved?: boolean;
+        asset?: {
+          original?: string;
+          card?: string;
+          hero?: string;
+          detail?: string;
+          width?: number;
+          height?: number;
+        };
+      },
       raw,
     };
   } catch {
     return {
-      payload: {} as { url?: string; message?: string; error?: string; saved?: boolean },
+      payload: {} as {
+        url?: string;
+        message?: string;
+        error?: string;
+        saved?: boolean;
+        asset?: {
+          original?: string;
+          card?: string;
+          hero?: string;
+          detail?: string;
+          width?: number;
+          height?: number;
+        };
+      },
       raw,
     };
   }
@@ -122,6 +148,8 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
       file,
       previewUrl: createObjectUrl(file),
       transformed: false,
+      width: image.width,
+      height: image.height,
       details: {
         cropped: false,
         resized: false,
@@ -158,6 +186,8 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
   const qualitySteps = [0.92, 0.86, 0.8, 0.74, 0.68];
   let bestBlob: Blob | null = null;
   let bestPreviewUrl: string | null = null;
+  let bestWidth = exportWidth;
+  let bestHeight = exportHeight;
 
   for (let resizeRound = 0; resizeRound < 4; resizeRound += 1) {
     canvas.width = exportWidth;
@@ -175,6 +205,8 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
       }
 
       bestBlob = blob;
+      bestWidth = exportWidth;
+      bestHeight = exportHeight;
 
       if (blob.size <= SAFE_UPLOAD_BYTES) {
         if (bestPreviewUrl?.startsWith("blob:")) {
@@ -188,6 +220,8 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
           }),
           previewUrl: createObjectUrl(blob),
           transformed: true,
+          width: exportWidth,
+          height: exportHeight,
           details: {
             cropped: needsCropping,
             resized: needsResizing || resizeRound > 0,
@@ -217,6 +251,8 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
       }),
       previewUrl: bestPreviewUrl ?? createObjectUrl(bestBlob),
       transformed: true,
+      width: bestWidth,
+      height: bestHeight,
       details: {
         cropped: true,
         resized: true,
@@ -226,6 +262,44 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
   }
 
   throw new Error("系统已经自动裁切和压缩，但图片仍然过大。请换一张更清晰但尺寸更适中的图片，或先裁掉多余背景后再上传。");
+}
+
+async function createAdminUploadVariant(file: File, maxWidth: number) {
+  const image = await loadImage(file);
+
+  if (image.width <= maxWidth) {
+    return null;
+  }
+
+  const nextWidth = maxWidth;
+  const nextHeight = Math.max(1, Math.round((image.height * nextWidth) / image.width));
+  const outputType = getTargetOutputType(file);
+  const outputExtension = outputType === "image/webp" ? "webp" : "jpg";
+  const normalizedName = file.name.replace(/\.[^.]+$/, "") || "upload";
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("当前浏览器无法处理图片，请更换一张图片后再试。");
+  }
+
+  canvas.width = nextWidth;
+  canvas.height = nextHeight;
+  context.clearRect(0, 0, nextWidth, nextHeight);
+  context.drawImage(image, 0, 0, nextWidth, nextHeight);
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, outputType, 0.84);
+  });
+
+  if (!blob) {
+    throw new Error("系统未能生成网站展示图，请重试一次。");
+  }
+
+  return new File([blob], `${normalizedName}-card.${outputExtension}`, {
+    type: blob.type,
+    lastModified: Date.now(),
+  });
 }
 
 export function AdminMediaField({
@@ -307,11 +381,17 @@ export function AdminMediaField({
       }
 
       const prepared = await prepareAdminImageUpload(file, outputSize);
+      const cardVariant = await createAdminUploadVariant(prepared.file, 900);
       replaceLocalPreview(prepared.previewUrl);
 
       const formData = new FormData();
       formData.append("file", prepared.file);
+      if (cardVariant) {
+        formData.append("variantCard", cardVariant);
+      }
       formData.append("folder", folder);
+      formData.append("assetWidth", String(prepared.width));
+      formData.append("assetHeight", String(prepared.height));
       if (saveTarget) {
         formData.append("targetSection", saveTarget.section);
         formData.append("targetId", saveTarget.id);

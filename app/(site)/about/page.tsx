@@ -21,7 +21,7 @@ export default async function AboutPage() {
   const { siteConfig } = content;
   const operationalFacts = getOperationalFacts(content);
   const methodEyebrow = bt("竹瑾居的理念", "The Philosophy of Zhu Jin Ju");
-  const aboutSpaceImage = "/uploads/branding/about-space-entrance.jpg";
+  const aboutSpaceImage = "/uploads/branding/about-space-entrance-web.jpg";
   const aboutHeroText = bt(
     "竹瑾居创立于2016年，位于中国成都，是一家专注于喜马拉雅艺术的研究与交流空间。我们持续关注喜马拉雅艺术品的历史脉络、文化语境、审美精神与收藏价值，致力于为藏家提供兼具学术视野、审美判断与专业信赖的观察角度。",
     "Founded in 2016 and based in Chengdu, China, Zhu Jin Ju is a space for the research and exchange of Himalayan art. We continue to attend to the historical lineages, cultural contexts, aesthetic spirit, and collecting value of Himalayan works, offering collectors a perspective grounded in scholarship, connoisseurship, and professional trust.",
@@ -53,10 +53,11 @@ export default async function AboutPage() {
               <ProtectedImage
                 src={aboutSpaceImage}
                 alt="竹瑾居艺术空间门头"
-                width={3362}
-                height={4934}
+                width={960}
+                height={1409}
                 priority
-                unoptimized
+                quality={86}
+                sizes="(min-width: 1280px) 272px, (min-width: 1024px) 240px, 70vw"
                 wrapperClassName="block"
                 className="h-auto w-full object-contain"
               />

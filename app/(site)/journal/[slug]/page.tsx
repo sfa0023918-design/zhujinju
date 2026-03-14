@@ -15,6 +15,7 @@ import {
   getArticleBySlug,
   getExhibitionsBySlugs,
   getHighlightedArtworks,
+  getPublicArticles,
   loadSiteContent,
 } from "@/lib/site-data";
 
@@ -26,6 +27,14 @@ type ArticleDetailPageProps = {
     preview?: string;
   }>;
 };
+
+export async function generateStaticParams() {
+  const content = await loadSiteContent();
+
+  return getPublicArticles(content).map((article) => ({
+    slug: article.slug,
+  }));
+}
 
 export async function generateMetadata({
   params,

@@ -19,6 +19,7 @@ import type {
   EditableSectionKey,
   Exhibition,
   HomeContent,
+  ImageAsset,
   OperationalFact,
   PublicationStatus,
   SiteContent,
@@ -100,6 +101,10 @@ async function readGitHubContentFile() {
   }
 }
 
+function shouldPreferRemoteContent() {
+  return process.env.NODE_ENV === "production" && hasGitHubRepoConfig();
+}
+
 function toPersistedSiteContent(content: SiteContent): PersistedSiteContent {
   return {
     artworks: content.artworks,
@@ -108,14 +113,24 @@ function toPersistedSiteContent(content: SiteContent): PersistedSiteContent {
   };
 }
 
-async function readBestAvailableContentFile() {
+async function readBestAvailableContentFile(options?: { preferRemote?: boolean }) {
+  const preferRemote = options?.preferRemote ?? shouldPreferRemoteContent();
+
+  if (preferRemote) {
+    const remote = await readGitHubContentFile();
+
+    if (remote) {
+      return remote;
+    }
+  }
+
   const local = await readLocalContentFile();
 
   if (local) {
     return local;
   }
 
-  if (hasGitHubRepoConfig()) {
+  if (!preferRemote && hasGitHubRepoConfig()) {
     const remote = await readGitHubContentFile();
 
     if (remote) {
@@ -127,27 +142,26 @@ async function readBestAvailableContentFile() {
 }
 
 const loadCachedSiteContent = unstable_cache(
-  async () => normalizeSiteContent((await readBestAvailableContentFile()) ?? getDefaultSiteContent()),
-  ["site-content-v2"],
+  async () =>
+    normalizeSiteContent(
+      (await readBestAvailableContentFile({ preferRemote: true })) ?? getDefaultSiteContent(),
+    ),
+  ["site-content-v3"],
   { tags: [getSiteContentTag()] },
 );
 
 export async function loadSiteContent(): Promise<SiteContent> {
-  const local = await readLocalContentFile();
-
-  if (local) {
-    return normalizeSiteContent(local);
+  if (process.env.NODE_ENV === "production") {
+    return await loadCachedSiteContent();
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    return await readSiteContentFresh();
-  }
-
-  return await loadCachedSiteContent();
+  return await readSiteContentFresh();
 }
 
 export async function readSiteContentFresh() {
-  return normalizeSiteContent((await readBestAvailableContentFile()) ?? getDefaultSiteContent());
+  return normalizeSiteContent(
+    (await readBestAvailableContentFile({ preferRemote: shouldPreferRemoteContent() })) ?? getDefaultSiteContent(),
+  );
 }
 
 export async function writeLocalContentFile(content: SiteContent) {
@@ -358,6 +372,45 @@ function getNormalizedSelectedArtworkIds(homeContent: SiteContent["homeContent"]
   return [...normalized, ...remaining];
 }
 
+function trimImageUrl(value?: string | null) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeImageAsset(asset?: ImageAsset | null, fallbackUrl?: string) {
+  const original = trimImageUrl(asset?.original) || trimImageUrl(fallbackUrl);
+
+  if (!original) {
+    return undefined;
+  }
+
+  return {
+    original,
+    card: trimImageUrl(asset?.card) || undefined,
+    hero: trimImageUrl(asset?.hero) || undefined,
+    detail: trimImageUrl(asset?.detail) || undefined,
+    screen: trimImageUrl(asset?.screen) || undefined,
+    hd: trimImageUrl(asset?.hd) || undefined,
+    width: typeof asset?.width === "number" && asset.width > 0 ? asset.width : undefined,
+    height: typeof asset?.height === "number" && asset.height > 0 ? asset.height : undefined,
+  } satisfies ImageAsset;
+}
+
+function resolveImageUrl(value: string | undefined, asset?: ImageAsset | null) {
+  return trimImageUrl(value) || trimImageUrl(asset?.original);
+}
+
+function normalizeImageAssetList(assets: Array<ImageAsset | null> | undefined, fallbackUrls: string[] | undefined) {
+  const maxLength = Math.max(assets?.length ?? 0, fallbackUrls?.length ?? 0);
+
+  if (maxLength === 0) {
+    return [];
+  }
+
+  return Array.from({ length: maxLength }, (_, index) =>
+    normalizeImageAsset(assets?.[index] ?? undefined, fallbackUrls?.[index]) ?? null,
+  );
+}
+
 export function getEditableSectionValue<K extends EditableSectionKey>(
   content: SiteContent,
   section: K,
@@ -378,10 +431,15 @@ export async function saveSiteSection(
   validateSectionBeforeSave(section, nextValue);
   const nextContent = normalizeSiteContent({
     ...current,
-    [section]:
+    [section]: (
       section === "artworks"
         ? mergeArtworkSection(current.artworks, nextValue as Artwork[])
-        : nextValue,
+        : section === "exhibitions"
+          ? mergeExhibitionSection(current.exhibitions, nextValue as Exhibition[])
+          : section === "articles"
+            ? mergeArticleSection(current.articles, nextValue as Article[])
+            : nextValue
+    ),
   } as SiteContent);
 
   await persistSiteContent(nextContent, `Update ${section} from admin by ${actor}`);
@@ -404,7 +462,45 @@ function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[]
     return {
       ...artwork,
       image: current.image,
+      imageAsset: current.imageAsset,
       gallery: current.gallery,
+      galleryAssets: current.galleryAssets,
+    };
+  });
+}
+
+function mergeExhibitionSection(currentExhibitions: Exhibition[], nextExhibitions: Exhibition[]) {
+  const currentBySlug = new Map(currentExhibitions.map((exhibition) => [exhibition.slug, exhibition]));
+
+  return nextExhibitions.map((exhibition) => {
+    const current = currentBySlug.get(exhibition.slug);
+
+    if (!current) {
+      return exhibition;
+    }
+
+    return {
+      ...exhibition,
+      cover: current.cover,
+      coverAsset: current.coverAsset,
+    };
+  });
+}
+
+function mergeArticleSection(currentArticles: Article[], nextArticles: Article[]) {
+  const currentBySlug = new Map(currentArticles.map((article) => [article.slug, article]));
+
+  return nextArticles.map((article) => {
+    const current = currentBySlug.get(article.slug);
+
+    if (!current) {
+      return article;
+    }
+
+    return {
+      ...article,
+      cover: current.cover,
+      coverAsset: current.coverAsset,
     };
   });
 }
@@ -640,7 +736,7 @@ export async function saveArtworkMediaField(
   field: "image" | "gallery",
   value: string,
   actor: string,
-  options?: { galleryIndex?: number },
+  options?: { galleryIndex?: number; asset?: ImageAsset },
 ) {
   const current = await readSiteContentFresh();
   const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
@@ -654,11 +750,15 @@ export async function saveArtworkMediaField(
 
   if (field === "image") {
     artwork.image = value.trim();
+    artwork.imageAsset = normalizeImageAsset(options?.asset, artwork.image);
   } else {
     const slotIndex = options?.galleryIndex ?? 0;
     const gallery = [...(artwork.gallery ?? [])];
+    const galleryAssets = [...(artwork.galleryAssets ?? [])];
     gallery[slotIndex] = value.trim();
+    galleryAssets[slotIndex] = normalizeImageAsset(options?.asset, value.trim()) ?? null;
     artwork.gallery = gallery;
+    artwork.galleryAssets = galleryAssets;
   }
 
   const normalized = normalizeSiteContent(nextContent);
@@ -704,6 +804,7 @@ export async function saveRecordMediaField(
   field: "cover",
   value: string,
   actor: string,
+  options?: { asset?: ImageAsset },
 ) {
   const current = await readSiteContentFresh();
   const nextContent = normalizeSiteContent(structuredClone(current));
@@ -716,6 +817,7 @@ export async function saveRecordMediaField(
     }
 
     nextContent.exhibitions[recordIndex].cover = value.trim();
+    nextContent.exhibitions[recordIndex].coverAsset = normalizeImageAsset(options?.asset, value.trim());
     await persistSiteContent(nextContent, `Update exhibition media from admin by ${actor}`);
 
     return {
@@ -731,6 +833,7 @@ export async function saveRecordMediaField(
   }
 
   nextContent.articles[recordIndex].cover = value.trim();
+  nextContent.articles[recordIndex].coverAsset = normalizeImageAsset(options?.asset, value.trim());
   await persistSiteContent(nextContent, `Update article media from admin by ${actor}`);
 
   return {
@@ -749,32 +852,56 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
     brandIntro: structuredClone(defaultBrandIntro),
     collectingDirections: structuredClone(defaultCollectingDirections),
     operationalFacts: structuredClone(defaultOperationalFacts),
-    artworks: (content.artworks ?? []).map((artwork) => ({
-      ...artwork,
-      id: getArtworkId(artwork),
-      publicationStatus: artwork.publicationStatus ?? "published",
-      gallery: normalizeArtworkGallery(artwork.gallery, artwork.image),
-    })),
-    exhibitions: (content.exhibitions ?? []).map((exhibition) => ({
-      ...exhibition,
-      publicationStatus: exhibition.publicationStatus ?? "published",
-      featuredWorksCount: exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length,
-      cataloguePageCount: exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0,
-      cataloguePageImages: normalizeExhibitionCataloguePages(exhibition.cataloguePageImages),
-      catalogueNote: exhibition.catalogueNote ?? exhibition.catalogueIntro ?? bt("", ""),
-      curatorialNote: exhibition.curatorialNote ?? exhibition.curatorialLead ?? bt("", ""),
-    })),
-    articles: (content.articles ?? []).map((article) => ({
-      ...article,
-      publicationStatus: article.publicationStatus ?? "published",
-      contentBlocks: normalizeArticleContentBlocks(article.contentBlocks, article.body),
-      body: getArticleBodyParagraphs(article.contentBlocks, article.body),
-    })),
+    artworks: (content.artworks ?? []).map((artwork) => {
+      const imageAsset = normalizeImageAsset(artwork.imageAsset, artwork.image);
+      const image = resolveImageUrl(artwork.image, imageAsset);
+
+      return {
+        ...artwork,
+        id: getArtworkId(artwork),
+        publicationStatus: artwork.publicationStatus ?? "published",
+        image,
+        imageAsset,
+        gallery: normalizeArtworkGallery(artwork.gallery, image, artwork.galleryAssets),
+        galleryAssets: normalizeImageAssetList(artwork.galleryAssets, artwork.gallery),
+      };
+    }),
+    exhibitions: (content.exhibitions ?? []).map((exhibition) => {
+      const coverAsset = normalizeImageAsset(exhibition.coverAsset, exhibition.cover);
+
+      return {
+        ...exhibition,
+        publicationStatus: exhibition.publicationStatus ?? "published",
+        cover: resolveImageUrl(exhibition.cover, coverAsset),
+        coverAsset,
+        featuredWorksCount: exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length,
+        cataloguePageCount: exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0,
+        cataloguePageImages: normalizeExhibitionCataloguePages(exhibition.cataloguePageImages),
+        catalogueNote: exhibition.catalogueNote ?? exhibition.catalogueIntro ?? bt("", ""),
+        curatorialNote: exhibition.curatorialNote ?? exhibition.curatorialLead ?? bt("", ""),
+      };
+    }),
+    articles: (content.articles ?? []).map((article) => {
+      const coverAsset = normalizeImageAsset(article.coverAsset, article.cover);
+
+      return {
+        ...article,
+        publicationStatus: article.publicationStatus ?? "published",
+        cover: resolveImageUrl(article.cover, coverAsset),
+        coverAsset,
+        contentBlocks: normalizeArticleContentBlocks(article.contentBlocks, article.body),
+        body: getArticleBodyParagraphs(article.contentBlocks, article.body),
+      };
+    }),
   };
 }
 
-function normalizeArtworkGallery(gallery: string[] | undefined, primaryImage: string) {
-  const trimmed = (gallery ?? []).map((image) => image.trim());
+function normalizeArtworkGallery(
+  gallery: string[] | undefined,
+  primaryImage: string,
+  galleryAssets?: Array<ImageAsset | null>,
+) {
+  const trimmed = (gallery ?? []).map((image, index) => trimImageUrl(image) || trimImageUrl(galleryAssets?.[index]?.original));
   let lastFilledIndex = -1;
 
   trimmed.forEach((image, index) => {

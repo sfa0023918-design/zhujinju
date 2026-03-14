@@ -15,11 +15,14 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file");
+    const variantCard = formData.get("variantCard");
     const folder = String(formData.get("folder") ?? "misc");
     const targetSection = String(formData.get("targetSection") ?? "");
     const targetId = String(formData.get("targetId") ?? "");
     const targetField = String(formData.get("targetField") ?? "");
     const targetIndexRaw = String(formData.get("targetIndex") ?? "");
+    const assetWidth = Number(formData.get("assetWidth") ?? 0);
+    const assetHeight = Number(formData.get("assetHeight") ?? 0);
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "未检测到上传文件。" }, { status: 400 });
@@ -33,11 +36,23 @@ export async function POST(request: Request) {
       await assertMediaTargetExists(targetSection, targetId);
     }
 
-    const result = await uploadAdminImage(file, folder, session.email);
+    const result = await uploadAdminImage(
+      file,
+      folder,
+      session.email,
+      {
+        card: variantCard instanceof File ? variantCard : null,
+      },
+      {
+        width: assetWidth > 0 ? assetWidth : undefined,
+        height: assetHeight > 0 ? assetHeight : undefined,
+      },
+    );
 
     if (targetSection === "artworks" && targetId && (targetField === "image" || targetField === "gallery")) {
       await saveArtworkMediaField(targetId, targetField, result.url, session.email, {
         galleryIndex: targetField === "gallery" && targetIndexRaw ? Number(targetIndexRaw) : undefined,
+        asset: result.asset,
       });
       revalidatePublicSite();
 
@@ -49,7 +64,9 @@ export async function POST(request: Request) {
     }
 
     if ((targetSection === "exhibitions" || targetSection === "articles") && targetId && targetField === "cover") {
-      await saveRecordMediaField(targetSection, targetId, "cover", result.url, session.email);
+      await saveRecordMediaField(targetSection, targetId, "cover", result.url, session.email, {
+        asset: result.asset,
+      });
       revalidatePublicSite();
 
       return NextResponse.json({

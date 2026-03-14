@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import type { ImageAsset } from "./data/types";
 import { putRepoBinaryFile } from "./github-repo";
 
 const PUBLIC_DIR = path.join(process.cwd(), "public");
@@ -52,13 +53,13 @@ function assertImageFile(file: File) {
   }
 }
 
-export async function uploadAdminImage(file: File, folder: string, actor: string) {
-  assertImageFile(file);
-
+async function saveUploadedImage(
+  file: File,
+  folder: string,
+  actor: string,
+  fileName: string,
+) {
   const sanitizedFolder = sanitizeFolder(folder) || "misc";
-  const ext = getExtension(file);
-  const baseName = slugifyFilePart(path.basename(file.name, path.extname(file.name)));
-  const fileName = `${Date.now()}-${baseName}${ext}`;
   const repoPath = path.posix.join("public", "uploads", sanitizedFolder, fileName);
   const publicUrl = path.posix.join("/uploads", sanitizedFolder, fileName);
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -71,9 +72,50 @@ export async function uploadAdminImage(file: File, folder: string, actor: string
 
   await putRepoBinaryFile(repoPath, buffer, `Upload ${repoPath} from admin by ${actor}`);
 
+  return publicUrl;
+}
+
+type UploadAdminImageVariants = {
+  card?: File | null;
+};
+
+type UploadAdminImageOptions = {
+  width?: number;
+  height?: number;
+};
+
+export async function uploadAdminImage(
+  file: File,
+  folder: string,
+  actor: string,
+  variants?: UploadAdminImageVariants,
+  options?: UploadAdminImageOptions,
+) {
+  assertImageFile(file);
+  if (variants?.card) {
+    assertImageFile(variants.card);
+  }
+
+  const ext = getExtension(file);
+  const baseName = slugifyFilePart(path.basename(file.name, path.extname(file.name)));
+  const baseFileName = `${Date.now()}-${baseName}`;
+  const originalUrl = await saveUploadedImage(file, folder, actor, `${baseFileName}${ext}`);
+  const cardUrl = variants?.card
+    ? await saveUploadedImage(variants.card, folder, actor, `${baseFileName}-card${getExtension(variants.card)}`)
+    : undefined;
+  const asset: ImageAsset = {
+    original: originalUrl,
+    card: cardUrl ?? originalUrl,
+    detail: originalUrl,
+    hero: originalUrl,
+    width: options?.width,
+    height: options?.height,
+  };
+
   return {
-    url: publicUrl,
-    fileName,
+    url: originalUrl,
+    fileName: `${baseFileName}${ext}`,
+    asset,
     message: "图片已上传并写入当前内容。前台需等待正式站完成同步后显示，通常需要 1-3 分钟，请勿重复上传同一张图。",
   };
 }

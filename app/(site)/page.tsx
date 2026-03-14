@@ -14,6 +14,9 @@ export default async function HomePage() {
   const content = await loadSiteContent();
   const { brandIntro, homeContent } = content;
   const currentExhibition = getCurrentExhibition(content);
+  const currentExhibitionImage = currentExhibition
+    ? currentExhibition.coverAsset?.card ?? currentExhibition.cover
+    : "";
   const featuredArtworks = getFeaturedArtworks(content);
   const focusCopy = currentExhibition?.current ? homeContent.focusCurrent : homeContent.focusRecent;
   const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
@@ -30,7 +33,8 @@ export default async function HomePage() {
               width={1600}
               height={1080}
               priority
-              unoptimized
+              quality={85}
+              sizes="(min-width: 1280px) 60vw, (min-width: 1024px) 58vw, 100vw"
               wrapperClassName="block"
               className="aspect-[1.08/1] w-full object-cover md:aspect-[1.18/1] lg:aspect-[1.24/1] xl:aspect-[1.3/1]"
             />
@@ -77,11 +81,12 @@ export default async function HomePage() {
           <div className="grid gap-7 lg:grid-cols-[minmax(0,1.04fr)_minmax(320px,0.76fr)] lg:items-start lg:gap-10">
             <div className="relative overflow-hidden bg-[var(--surface-strong)]">
               <ProtectedImage
-                src={currentExhibition.cover}
+                src={currentExhibitionImage}
                 alt={`${currentExhibition.title.zh} ${currentExhibition.title.en}`}
                 width={1600}
                 height={1000}
-                unoptimized
+                quality={84}
+                sizes="(min-width: 1280px) 52vw, (min-width: 1024px) 50vw, 100vw"
                 wrapperClassName="block"
                 className="aspect-[1.42/1] h-full w-full object-cover"
               />

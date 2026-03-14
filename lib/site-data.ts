@@ -15,6 +15,7 @@ export type {
   EditableSectionValueMap,
   Exhibition,
   HomeContent,
+  ImageAsset,
   OperationalFact,
   PageCopyContent,
   PageHeroCopy,

@@ -26,7 +26,14 @@ export function ArtworkCard({
   priority = false,
   variant = "editorial",
 }: ArtworkCardProps) {
-  const isPlaceholderImage = !artwork.image || artwork.image.startsWith("/api/placeholder/");
+  const cardImage = artwork.imageAsset?.card ?? artwork.image;
+  const isPlaceholderImage = !cardImage || cardImage.startsWith("/api/placeholder/");
+  const imageSizes =
+    variant === "catalogue"
+      ? "(min-width: 1280px) 18vw, (min-width: 768px) 24vw, 46vw"
+      : variant === "compact"
+        ? "(min-width: 1280px) 22vw, (min-width: 640px) 44vw, 92vw"
+        : "(min-width: 768px) 44vw, 92vw";
 
   if (variant === "catalogue") {
     return (
@@ -39,12 +46,13 @@ export function ArtworkCard({
               </div>
             ) : (
               <ProtectedImage
-                src={withImageVersion(artwork.image)}
+                src={withImageVersion(cardImage)}
                 alt={`${artwork.title.zh} ${artwork.title.en}`}
                 width={900}
                 height={1200}
                 priority={priority}
-                unoptimized
+                quality={82}
+                sizes={imageSizes}
                 wrapperClassName="block"
                 className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.004]"
               />
@@ -87,12 +95,13 @@ export function ArtworkCard({
               </div>
             ) : (
               <ProtectedImage
-                src={withImageVersion(artwork.image)}
+                src={withImageVersion(cardImage)}
                 alt={`${artwork.title.zh} ${artwork.title.en}`}
                 width={900}
                 height={1200}
                 priority={priority}
-                unoptimized
+                quality={82}
+                sizes={imageSizes}
                 wrapperClassName="block"
                 className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.012]"
               />
@@ -134,12 +143,13 @@ export function ArtworkCard({
             </div>
           ) : (
             <ProtectedImage
-              src={withImageVersion(artwork.image)}
+              src={withImageVersion(cardImage)}
               alt={`${artwork.title.zh} ${artwork.title.en}`}
               width={900}
               height={1200}
               priority={priority}
-              unoptimized
+              quality={84}
+              sizes={imageSizes}
               wrapperClassName="block"
               className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.008]"
             />

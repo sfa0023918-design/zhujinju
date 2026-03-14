@@ -16,6 +16,7 @@ import {
   getArticlesBySlugs,
   getExhibitionBySlug,
   getHighlightedArtworks,
+  getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
 
@@ -27,6 +28,14 @@ type ExhibitionDetailPageProps = {
     preview?: string;
   }>;
 };
+
+export async function generateStaticParams() {
+  const content = await loadSiteContent();
+
+  return getPublicExhibitions(content).map((exhibition) => ({
+    slug: exhibition.slug,
+  }));
+}
 
 export async function generateMetadata({
   params,
