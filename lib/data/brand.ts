@@ -1,7 +1,7 @@
 import { bt } from "../bilingual";
 
 export const brandIntro = {
-  heroImage: "/api/placeholder/home-hero?kind=landscape",
+  heroImage: "/uploads/branding/1773327119404-l1009945.jpg",
   heroAlt: bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
   statement: bt(
     "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
@@ -29,10 +29,10 @@ export const brandIntro = {
 
 export const collectingDirections = [
   {
-    name: bt("铜造像", "Bronze Sculpture"),
+    name: bt("造像", "Figure"),
     description: bt(
-      "聚焦十三至十八世纪西藏、尼泊尔与相关区域的金铜佛教造像。",
-      "Focused on gilt and copper alloy Buddhist sculpture from Tibet, Nepal, and related regions between the 13th and 18th centuries."
+      "聚焦早期西藏、尼泊尔、印度与相关区域的佛教造像。",
+      "Focusing on early Buddhist sculpture from Tibet, Nepal, India, and related regions."
     ),
   },
   {
@@ -68,7 +68,7 @@ export const collectingDirections = [
 export const operationalFacts = [
   {
     title: bt("展览数量", "Exhibitions"),
-    value: bt("2 项专题展览", "2 exhibitions"),
+    value: bt("4 项专题展览", "4 exhibitions"),
     description: bt(
       "已公开的展览项目围绕观看方式、材质判断与作品比较展开。",
       "Published exhibition projects structured around ways of seeing, material judgement, and comparison."
@@ -76,7 +76,7 @@ export const operationalFacts = [
   },
   {
     title: bt("图录数量", "Catalogues"),
-    value: bt("2 册研究图录", "2 catalogues"),
+    value: bt("4册研究图录", "4 catalogues"),
     description: bt(
       "图录以作品信息、页码索引与研究摘要构成稳定的引用基础。",
       "Catalogues provide stable reference through object entries, pagination, and research summaries."
@@ -84,7 +84,7 @@ export const operationalFacts = [
   },
   {
     title: bt("研究文章", "Research Writing"),
-    value: bt("3 篇公开文章", "3 published articles"),
+    value: bt("1 篇公开文章", "1 published text"),
     description: bt(
       "围绕观看方法、展览方法与市场判断持续发布研究与札记。",
       "Research notes continue to address methods of looking, exhibition practice, and market judgement."
@@ -100,7 +100,7 @@ export const operationalFacts = [
   },
   {
     title: bt("成都预约制空间", "By Appointment in Chengdu"),
-    value: bt("成都 · 预约制会面", "Chengdu appointment space"),
+    value: bt("成都· 预约制会面", "Chengdu appointment space"),
     description: bt(
       "以预约制接待作品查看、借展洽谈、研究交流与图录交换。",
       "Meetings are arranged by appointment for viewings, loan discussion, research exchange, and catalogue requests."

@@ -19,12 +19,10 @@ import type {
   EditableSectionKey,
   Exhibition,
   HomeContent,
-  HomeContentEditorValue,
   OperationalFact,
   PublicationStatus,
   SiteContent,
   SiteConfigContent,
-  SiteConfigEditorValue,
 } from "./data/types";
 import { getRepoUtf8File, hasGitHubRepoConfig, putRepoUtf8File } from "./github-repo";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "./publication-validation";
@@ -35,6 +33,8 @@ const CONTENT_DIR = path.join(process.cwd(), "content");
 const CONTENT_FILE_PATH = path.join(CONTENT_DIR, "site-content.json");
 const CONTENT_REPO_PATH = "content/site-content.json";
 import type { ValidationIssue } from "./publication-validation";
+
+type PersistedSiteContent = Pick<SiteContent, "artworks" | "exhibitions" | "articles">;
 
 export class ContentValidationError extends Error {
   issues: ValidationIssue[];
@@ -51,16 +51,6 @@ export const editableSections: Array<{
   title: BilingualText;
   description: BilingualText;
 }> = [
-  {
-    key: "siteConfig",
-    title: bt("站点设置", "Site Settings"),
-    description: bt("统一维护品牌、关于、联系、页脚与 SEO 基础信息。", "Maintain brand, about, contact, footer, and SEO basics in one place."),
-  },
-  {
-    key: "homeContent",
-    title: bt("首页内容", "Homepage"),
-    description: bt("维护首页主视觉、近期展览、精选作品与联系入口。", "Maintain the homepage hero, current exhibition, selected works, and contact entry."),
-  },
   {
     key: "artworks",
     title: bt("藏品", "Artworks"),
@@ -95,7 +85,7 @@ export function getDefaultSiteContent(): SiteContent {
 async function readLocalContentFile() {
   try {
     const raw = await fs.readFile(CONTENT_FILE_PATH, "utf8");
-    return JSON.parse(raw) as SiteContent;
+    return JSON.parse(raw) as Partial<SiteContent>;
   } catch {
     return null;
   }
@@ -104,10 +94,18 @@ async function readLocalContentFile() {
 async function readGitHubContentFile() {
   try {
     const raw = await getRepoUtf8File(CONTENT_REPO_PATH);
-    return raw ? (JSON.parse(raw) as SiteContent) : null;
+    return raw ? (JSON.parse(raw) as Partial<SiteContent>) : null;
   } catch {
     return null;
   }
+}
+
+function toPersistedSiteContent(content: SiteContent): PersistedSiteContent {
+  return {
+    artworks: content.artworks,
+    exhibitions: content.exhibitions,
+    articles: content.articles,
+  };
 }
 
 async function readBestAvailableContentFile() {
@@ -154,7 +152,7 @@ export async function readSiteContentFresh() {
 
 export async function writeLocalContentFile(content: SiteContent) {
   await fs.mkdir(CONTENT_DIR, { recursive: true });
-  await fs.writeFile(CONTENT_FILE_PATH, `${JSON.stringify(content, null, 2)}\n`, "utf8");
+  await fs.writeFile(CONTENT_FILE_PATH, `${JSON.stringify(toPersistedSiteContent(content), null, 2)}\n`, "utf8");
 }
 
 function canWriteLocalContentFile() {
@@ -164,7 +162,7 @@ function canWriteLocalContentFile() {
 async function pushContentToGitHub(content: SiteContent, message: string) {
   await putRepoUtf8File(
     CONTENT_REPO_PATH,
-    `${JSON.stringify(content, null, 2)}\n`,
+    `${JSON.stringify(toPersistedSiteContent(content), null, 2)}\n`,
     message,
   );
 }
@@ -360,82 +358,11 @@ function getNormalizedSelectedArtworkIds(homeContent: SiteContent["homeContent"]
   return [...normalized, ...remaining];
 }
 
-function buildHomeContentEditorValue(content: SiteContent): HomeContentEditorValue {
-  return {
-    intro: content.siteConfig.homeIntro,
-    homeContent: {
-      ...content.homeContent,
-      selectedArtworkIds: getNormalizedSelectedArtworkIds(content.homeContent, content.artworks),
-    },
-    collectingDirections: content.collectingDirections,
-    operationalFacts: content.operationalFacts,
-    featuredArtworkIds: getNormalizedSelectedArtworkIds(content.homeContent, content.artworks),
-  };
-}
-
-function buildSiteConfigEditorValue(content: SiteContent): SiteConfigEditorValue {
-  return {
-    siteConfig: content.siteConfig,
-    brandIntroHeroImage: content.brandIntro.heroImage ?? "",
-    brandIntroHeroAlt: content.brandIntro.heroAlt ?? bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
-    collectionHero: structuredClone(content.pageCopy.collection.hero),
-  };
-}
-
 export function getEditableSectionValue<K extends EditableSectionKey>(
   content: SiteContent,
   section: K,
 ): EditableSectionValueMap[K] {
-  if (section === "siteConfig") {
-    return buildSiteConfigEditorValue(content) as EditableSectionValueMap[K];
-  }
-
-  if (section === "homeContent") {
-    return buildHomeContentEditorValue(content) as EditableSectionValueMap[K];
-  }
-
   return content[section] as unknown as EditableSectionValueMap[K];
-}
-
-function applyHomeContentEditorValue(content: SiteContent, nextValue: HomeContentEditorValue) {
-  const featuredIds = new Set(nextValue.featuredArtworkIds);
-
-  return normalizeSiteContent({
-    ...content,
-    siteConfig: {
-      ...content.siteConfig,
-      homeIntro: nextValue.intro,
-    },
-    homeContent: {
-      ...nextValue.homeContent,
-      selectedArtworkIds: nextValue.featuredArtworkIds,
-    },
-    collectingDirections: nextValue.collectingDirections,
-    operationalFacts: nextValue.operationalFacts,
-    artworks: content.artworks.map((artwork) => ({
-      ...artwork,
-      featured: featuredIds.has(getArtworkId(artwork)),
-    })),
-  });
-}
-
-function applySiteConfigEditorValue(content: SiteContent, nextValue: SiteConfigEditorValue) {
-  return normalizeSiteContent({
-    ...content,
-    siteConfig: nextValue.siteConfig,
-    brandIntro: {
-      ...content.brandIntro,
-      heroImage: nextValue.brandIntroHeroImage.trim(),
-      heroAlt: nextValue.brandIntroHeroAlt,
-    },
-    pageCopy: {
-      ...content.pageCopy,
-      collection: {
-        ...content.pageCopy.collection,
-        hero: structuredClone(nextValue.collectionHero),
-      },
-    },
-  });
 }
 
 function findArtworkIndexById(artworks: Artwork[], artworkId: string) {
@@ -449,18 +376,13 @@ export async function saveSiteSection(
 ) {
   const current = await readSiteContentFresh();
   validateSectionBeforeSave(section, nextValue);
-  const nextContent =
-    section === "siteConfig"
-      ? applySiteConfigEditorValue(current, nextValue as SiteConfigEditorValue)
-      : section === "homeContent"
-      ? applyHomeContentEditorValue(current, nextValue as HomeContentEditorValue)
-      : normalizeSiteContent({
-          ...current,
-          [section]:
-            section === "artworks"
-              ? mergeArtworkSection(current.artworks, nextValue as Artwork[])
-              : nextValue,
-        } as SiteContent);
+  const nextContent = normalizeSiteContent({
+    ...current,
+    [section]:
+      section === "artworks"
+        ? mergeArtworkSection(current.artworks, nextValue as Artwork[])
+        : nextValue,
+  } as SiteContent);
 
   await persistSiteContent(nextContent, `Update ${section} from admin by ${actor}`);
 
@@ -817,339 +739,23 @@ export async function saveRecordMediaField(
   };
 }
 
-function normalizeSiteContent(content: SiteContent): SiteContent {
+function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
   return {
     ...content,
-    siteConfig: {
-      ...structuredClone(defaultSiteConfig),
-      ...content.siteConfig,
-      homeIntro:
-        content.siteConfig?.homeIntro ??
-        content.brandIntro?.statement ??
-        structuredClone(defaultSiteConfig.homeIntro),
-      about: {
-        ...structuredClone(defaultSiteConfig.about),
-        ...content.siteConfig?.about,
-        eyebrow:
-          content.siteConfig?.about?.eyebrow ??
-          content.pageCopy?.about?.hero?.eyebrow ??
-          structuredClone(defaultSiteConfig.about.eyebrow),
-        title:
-          content.siteConfig?.about?.title ??
-          content.pageCopy?.about?.hero?.title ??
-          structuredClone(defaultSiteConfig.about.title),
-        subtitle:
-          content.siteConfig?.about?.subtitle ??
-          content.pageCopy?.about?.position?.title ??
-          structuredClone(defaultSiteConfig.about.subtitle),
-        body:
-          content.siteConfig?.about?.body ??
-          [
-            content.brandIntro?.about ?? structuredClone(defaultSiteConfig.about.body[0]),
-            content.pageCopy?.about?.position?.paragraphTwo ?? structuredClone(defaultSiteConfig.about.body[1]),
-            content.pageCopy?.about?.position?.paragraphThree ?? structuredClone(defaultSiteConfig.about.body[2]),
-          ],
-      },
-      contactPage: {
-        ...structuredClone(defaultSiteConfig.contactPage),
-        ...content.siteConfig?.contactPage,
-        eyebrow:
-          content.siteConfig?.contactPage?.eyebrow ??
-          content.pageCopy?.contact?.hero?.eyebrow ??
-          structuredClone(defaultSiteConfig.contactPage.eyebrow),
-        title:
-          content.siteConfig?.contactPage?.title ??
-          content.pageCopy?.contact?.hero?.title ??
-          structuredClone(defaultSiteConfig.contactPage.title),
-        description:
-          content.siteConfig?.contactPage?.description ??
-          content.pageCopy?.contact?.hero?.description ??
-          structuredClone(defaultSiteConfig.contactPage.description),
-        aside:
-          content.siteConfig?.contactPage?.aside ??
-          content.pageCopy?.contact?.hero?.aside ??
-          structuredClone(defaultSiteConfig.contactPage.aside),
-        infoLabels: {
-          ...structuredClone(defaultSiteConfig.contactPage.infoLabels),
-          ...content.siteConfig?.contactPage?.infoLabels,
-          ...content.pageCopy?.contact?.infoLabels,
-        },
-      },
-      footer: {
-        ...structuredClone(defaultSiteConfig.footer),
-        ...content.siteConfig?.footer,
-        intro:
-          content.siteConfig?.footer?.intro ??
-          content.pageCopy?.siteChrome?.footer?.intro ??
-          structuredClone(defaultSiteConfig.footer.intro),
-        appointment:
-          content.siteConfig?.footer?.appointment ??
-          content.pageCopy?.siteChrome?.footer?.appointment ??
-          structuredClone(defaultSiteConfig.footer.appointment),
-        copyrightLabel:
-          content.siteConfig?.footer?.copyrightLabel ??
-          content.pageCopy?.siteChrome?.footer?.copyrightLabel ??
-          structuredClone(defaultSiteConfig.footer.copyrightLabel),
-        contactHeading:
-          content.siteConfig?.footer?.contactHeading ??
-          content.pageCopy?.siteChrome?.footer?.contactHeading ??
-          structuredClone(defaultSiteConfig.footer.contactHeading),
-        informationHeading:
-          content.siteConfig?.footer?.informationHeading ??
-          content.pageCopy?.siteChrome?.footer?.informationHeading ??
-          structuredClone(defaultSiteConfig.footer.informationHeading),
-        collectionLink:
-          content.siteConfig?.footer?.collectionLink ??
-          content.pageCopy?.siteChrome?.footer?.collectionLink ??
-          structuredClone(defaultSiteConfig.footer.collectionLink),
-        exhibitionsLink:
-          content.siteConfig?.footer?.exhibitionsLink ??
-          content.pageCopy?.siteChrome?.footer?.exhibitionsLink ??
-          structuredClone(defaultSiteConfig.footer.exhibitionsLink),
-        journalLink:
-          content.siteConfig?.footer?.journalLink ??
-          content.pageCopy?.siteChrome?.footer?.journalLink ??
-          structuredClone(defaultSiteConfig.footer.journalLink),
-        pdfRequestLabel:
-          content.siteConfig?.footer?.pdfRequestLabel ??
-          content.pageCopy?.siteChrome?.footer?.pdfRequestLabel ??
-          structuredClone(defaultSiteConfig.footer.pdfRequestLabel),
-        instagramLabel:
-          content.siteConfig?.footer?.instagramLabel ??
-          content.pageCopy?.siteChrome?.footer?.instagramLabel ??
-          structuredClone(defaultSiteConfig.footer.instagramLabel),
-        wechatLabel:
-          content.siteConfig?.footer?.wechatLabel ??
-          content.pageCopy?.siteChrome?.footer?.wechatLabel ??
-          structuredClone(defaultSiteConfig.footer.wechatLabel),
-      },
-      contact: {
-        ...structuredClone(defaultSiteConfig.contact),
-        ...content.siteConfig?.contact,
-        address:
-          content.siteConfig?.contact?.address ??
-          structuredClone(defaultSiteConfig.contact.address),
-        replyWindow:
-          content.siteConfig?.contact?.replyWindow ??
-          structuredClone(defaultSiteConfig.contact.replyWindow),
-        collaborationNote:
-          content.siteConfig?.contact?.collaborationNote ??
-          structuredClone(defaultSiteConfig.contact.collaborationNote),
-        appointmentNote:
-          content.siteConfig?.contact?.appointmentNote ??
-          content.pageCopy?.contact?.appointmentLine ??
-          structuredClone(defaultSiteConfig.contact.appointmentNote),
-      },
-    },
-    homeContent: {
-      ...structuredClone(defaultHomeContent),
-      ...content.homeContent,
-      heroEyebrow:
-        content.homeContent?.heroEyebrow ??
-        content.pageCopy?.home?.heroEyebrow ??
-        structuredClone(defaultHomeContent.heroEyebrow),
-      heroTitle:
-        content.homeContent?.heroTitle ??
-        content.pageCopy?.home?.heroTitle ??
-        structuredClone(defaultHomeContent.heroTitle),
-      heroSubtitle:
-        content.homeContent?.heroSubtitle ??
-        structuredClone(defaultHomeContent.heroSubtitle),
-      heroPrimaryAction:
-        content.homeContent?.heroPrimaryAction ??
-        content.pageCopy?.home?.heroPrimaryAction ??
-        structuredClone(defaultHomeContent.heroPrimaryAction),
-      heroSecondaryAction:
-        content.homeContent?.heroSecondaryAction ??
-        content.pageCopy?.home?.heroSecondaryAction ??
-        structuredClone(defaultHomeContent.heroSecondaryAction),
-      focusCurrent: {
-        ...structuredClone(defaultHomeContent.focusCurrent),
-        ...content.pageCopy?.home?.focusCurrent,
-        ...content.homeContent?.focusCurrent,
-      },
-      focusRecent: {
-        ...structuredClone(defaultHomeContent.focusRecent),
-        ...content.pageCopy?.home?.focusRecent,
-        ...content.homeContent?.focusRecent,
-      },
-      focusSummaryLine: {
-        ...structuredClone(defaultHomeContent.focusSummaryLine),
-        ...content.pageCopy?.home?.focusSummaryLine,
-        ...content.homeContent?.focusSummaryLine,
-      },
-      focusAction:
-        content.homeContent?.focusAction ??
-        content.pageCopy?.home?.focusAction ??
-        structuredClone(defaultHomeContent.focusAction),
-      selectedWorks: {
-        ...structuredClone(defaultHomeContent.selectedWorks),
-        ...content.pageCopy?.home?.selectedWorks,
-        ...content.homeContent?.selectedWorks,
-      },
-      collectingDirections: {
-        ...structuredClone(defaultHomeContent.collectingDirections),
-        ...content.pageCopy?.home?.collectingDirections,
-        ...content.homeContent?.collectingDirections,
-      },
-      operationalFacts: {
-        ...structuredClone(defaultHomeContent.operationalFacts),
-        ...content.pageCopy?.home?.operationalFacts,
-        ...content.homeContent?.operationalFacts,
-      },
-      contact: {
-        ...structuredClone(defaultHomeContent.contact),
-        ...content.pageCopy?.home?.contact,
-        ...content.homeContent?.contact,
-      },
-      contactPrimaryAction:
-        content.homeContent?.contactPrimaryAction ??
-        content.pageCopy?.home?.contactPrimaryAction ??
-        structuredClone(defaultHomeContent.contactPrimaryAction),
-      contactSecondaryAction:
-        content.homeContent?.contactSecondaryAction ??
-        content.pageCopy?.home?.contactSecondaryAction ??
-        structuredClone(defaultHomeContent.contactSecondaryAction),
-    },
-    pageCopy: {
-      ...structuredClone(defaultPageCopy),
-      ...content.pageCopy,
-      siteChrome: {
-        ...structuredClone(defaultPageCopy.siteChrome),
-        ...content.pageCopy?.siteChrome,
-        footer: {
-          ...structuredClone(defaultPageCopy.siteChrome.footer),
-          ...content.pageCopy?.siteChrome?.footer,
-        },
-        contactForm: {
-          ...structuredClone(defaultPageCopy.siteChrome.contactForm),
-          ...content.pageCopy?.siteChrome?.contactForm,
-          roleOptions:
-            content.pageCopy?.siteChrome?.contactForm?.roleOptions ??
-            structuredClone(defaultPageCopy.siteChrome.contactForm.roleOptions),
-        },
-      },
-      home: {
-        ...structuredClone(defaultPageCopy.home),
-        ...content.pageCopy?.home,
-        focusCurrent: {
-          ...structuredClone(defaultPageCopy.home.focusCurrent),
-          ...content.pageCopy?.home?.focusCurrent,
-        },
-        focusRecent: {
-          ...structuredClone(defaultPageCopy.home.focusRecent),
-          ...content.pageCopy?.home?.focusRecent,
-        },
-        focusSummaryLine: {
-          ...structuredClone(defaultPageCopy.home.focusSummaryLine),
-          ...content.pageCopy?.home?.focusSummaryLine,
-        },
-        selectedWorks: {
-          ...structuredClone(defaultPageCopy.home.selectedWorks),
-          ...content.pageCopy?.home?.selectedWorks,
-        },
-        collectingDirections: {
-          ...structuredClone(defaultPageCopy.home.collectingDirections),
-          ...content.pageCopy?.home?.collectingDirections,
-        },
-        operationalFacts: {
-          ...structuredClone(defaultPageCopy.home.operationalFacts),
-          ...content.pageCopy?.home?.operationalFacts,
-        },
-        contact: {
-          ...structuredClone(defaultPageCopy.home.contact),
-          ...content.pageCopy?.home?.contact,
-        },
-      },
-      about: {
-        ...structuredClone(defaultPageCopy.about),
-        ...content.pageCopy?.about,
-        hero: {
-          ...structuredClone(defaultPageCopy.about.hero),
-          ...content.pageCopy?.about?.hero,
-        },
-        position: {
-          ...structuredClone(defaultPageCopy.about.position),
-          ...content.pageCopy?.about?.position,
-        },
-      },
-      contact: {
-        ...structuredClone(defaultPageCopy.contact),
-        ...content.pageCopy?.contact,
-        hero: {
-          ...structuredClone(defaultPageCopy.contact.hero),
-          ...content.pageCopy?.contact?.hero,
-        },
-        infoLabels: {
-          ...structuredClone(defaultPageCopy.contact.infoLabels),
-          ...content.pageCopy?.contact?.infoLabels,
-        },
-      },
-      collection: {
-        ...structuredClone(defaultPageCopy.collection),
-        ...content.pageCopy?.collection,
-        hero: {
-          ...structuredClone(defaultPageCopy.collection.hero),
-          ...content.pageCopy?.collection?.hero,
-        },
-        filters: {
-          ...structuredClone(defaultPageCopy.collection.filters),
-          ...content.pageCopy?.collection?.filters,
-        },
-      },
-      artworkDetail: {
-        ...structuredClone(defaultPageCopy.artworkDetail),
-        ...content.pageCopy?.artworkDetail,
-        fieldLabels: {
-          ...structuredClone(defaultPageCopy.artworkDetail.fieldLabels),
-          ...content.pageCopy?.artworkDetail?.fieldLabels,
-        },
-      },
-      exhibitions: {
-        ...structuredClone(defaultPageCopy.exhibitions),
-        ...content.pageCopy?.exhibitions,
-        hero: {
-          ...structuredClone(defaultPageCopy.exhibitions.hero),
-          ...content.pageCopy?.exhibitions?.hero,
-        },
-        cardLabels: {
-          ...structuredClone(defaultPageCopy.exhibitions.cardLabels),
-          ...content.pageCopy?.exhibitions?.cardLabels,
-        },
-      },
-      exhibitionDetail: {
-        ...structuredClone(defaultPageCopy.exhibitionDetail),
-        ...content.pageCopy?.exhibitionDetail,
-        summaryLine: {
-          ...structuredClone(defaultPageCopy.exhibitionDetail.summaryLine),
-          ...content.pageCopy?.exhibitionDetail?.summaryLine,
-        },
-      },
-      journal: {
-        ...structuredClone(defaultPageCopy.journal),
-        ...content.pageCopy?.journal,
-        hero: {
-          ...structuredClone(defaultPageCopy.journal.hero),
-          ...content.pageCopy?.journal?.hero,
-        },
-      },
-      articleDetail: {
-        ...structuredClone(defaultPageCopy.articleDetail),
-        ...content.pageCopy?.articleDetail,
-      },
-    },
-    brandIntro: {
-      ...content.brandIntro,
-      heroImage: content.brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape",
-      heroAlt: content.brandIntro.heroAlt ?? bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
-    },
-    artworks: content.artworks.map((artwork) => ({
+    // Static brand and page copy now come from code so admin saves cannot roll them back.
+    siteConfig: structuredClone(defaultSiteConfig),
+    homeContent: structuredClone(defaultHomeContent),
+    pageCopy: structuredClone(defaultPageCopy),
+    brandIntro: structuredClone(defaultBrandIntro),
+    collectingDirections: structuredClone(defaultCollectingDirections),
+    operationalFacts: structuredClone(defaultOperationalFacts),
+    artworks: (content.artworks ?? []).map((artwork) => ({
       ...artwork,
       id: getArtworkId(artwork),
       publicationStatus: artwork.publicationStatus ?? "published",
       gallery: normalizeArtworkGallery(artwork.gallery, artwork.image),
     })),
-    exhibitions: content.exhibitions.map((exhibition) => ({
+    exhibitions: (content.exhibitions ?? []).map((exhibition) => ({
       ...exhibition,
       publicationStatus: exhibition.publicationStatus ?? "published",
       featuredWorksCount: exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length,
@@ -1158,7 +764,7 @@ function normalizeSiteContent(content: SiteContent): SiteContent {
       catalogueNote: exhibition.catalogueNote ?? exhibition.catalogueIntro ?? bt("", ""),
       curatorialNote: exhibition.curatorialNote ?? exhibition.curatorialLead ?? bt("", ""),
     })),
-    articles: content.articles.map((article) => ({
+    articles: (content.articles ?? []).map((article) => ({
       ...article,
       publicationStatus: article.publicationStatus ?? "published",
       contentBlocks: normalizeArticleContentBlocks(article.contentBlocks, article.body),

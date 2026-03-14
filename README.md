@@ -57,6 +57,7 @@ lib/
 public/             预留静态资源目录
 README.md           项目说明
 DEPLOY_CN.md        中文部署文档
+MAINTENANCE_CN.md   后续维护说明
 .env.example        环境变量示例
 ```
 
@@ -85,3 +86,4 @@ DEPLOY_CN.md        中文部署文档
 - 联系表单已包含基础防刷：隐藏蜜罐字段、最短提交间隔、按 IP 的简单限流。
 - 线上后台保存依赖 GitHub 写回变量，建议为 `GITHUB_CONTENTS_TOKEN` 使用单仓库、最小权限的 Fine-grained Token。
 - Vercel 部署说明请查看 `DEPLOY_CN.md`。
+- 日常维护分工请查看 `MAINTENANCE_CN.md`。

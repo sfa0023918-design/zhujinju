@@ -396,30 +396,11 @@ export type SiteContent = {
 };
 
 export type EditableSectionKey =
-  | "siteConfig"
-  | "homeContent"
   | "artworks"
   | "exhibitions"
   | "articles";
 
-export type HomeContentEditorValue = {
-  intro: BilingualText;
-  homeContent: HomeContent;
-  collectingDirections: CollectingDirection[];
-  operationalFacts: OperationalFact[];
-  featuredArtworkIds: string[];
-};
-
-export type SiteConfigEditorValue = {
-  siteConfig: SiteConfigContent;
-  brandIntroHeroImage: string;
-  brandIntroHeroAlt: BilingualText;
-  collectionHero: PageHeroCopy;
-};
-
 export type EditableSectionValueMap = {
-  siteConfig: SiteConfigEditorValue;
-  homeContent: HomeContentEditorValue;
   artworks: Artwork[];
   exhibitions: Exhibition[];
   articles: Article[];

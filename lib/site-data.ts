@@ -15,7 +15,6 @@ export type {
   EditableSectionValueMap,
   Exhibition,
   HomeContent,
-  HomeContentEditorValue,
   OperationalFact,
   PageCopyContent,
   PageHeroCopy,
@@ -24,7 +23,6 @@ export type {
   PublicationReference,
   PublicationStatus,
   SiteConfigContent,
-  SiteConfigEditorValue,
   SiteContent,
 } from "./data/types";
 

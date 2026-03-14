@@ -6,7 +6,7 @@ export const homeContent: HomeContent = {
   heroTitle: bt("让作品先说话。", "Let the Work Speak First."),
   heroSubtitle: bt(
     "以作品、展览、图录与研究建立长期判断。",
-    "A long view built through objects, exhibitions, catalogues, and research."
+    "Building long-term discernment through works, exhibitions, catalogues, and research."
   ),
   heroPrimaryAction: bt("浏览藏品", "Browse Collection"),
   heroSecondaryAction: bt("查看展览与图录", "View Exhibitions"),
@@ -33,8 +33,8 @@ export const homeContent: HomeContent = {
     eyebrow: bt("精选作品", "Selected Works"),
     title: bt("以作品为核心组织观看顺序", "A Viewing Order Built Around the Object"),
     description: bt(
-      "优先呈现具有风格代表性、可比较性与观看张力的作品，版式始终服务于图像与器物本体。",
-      "Works of stylistic weight, comparative value, and visual tension are foregrounded, with the layout kept in service of the object."
+      "优先呈现具有风格代表性、可比较性与观看张力的作品。",
+      "Prioritize works that are stylistically representative, comparable, and visually compelling."
     ),
   },
   collectingDirections: {

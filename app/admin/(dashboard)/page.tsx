@@ -1,7 +1,6 @@
 import { AdminNavLink } from "@/components/admin-nav-link";
 import { AdminShell } from "@/components/admin-shell";
-import { editableSections, getEditableSectionValue, getPublicArticles, getPublicArtworks, getPublicExhibitions, readSiteContentFresh } from "@/lib/site-data";
-import { getHomeContentReminders, getSiteConfigReminders } from "@/lib/admin-reminders";
+import { editableSections, getPublicArticles, getPublicArtworks, getPublicExhibitions, readSiteContentFresh } from "@/lib/site-data";
 
 const UNTITLED_ARTWORK_TITLES = new Set(["", "未命名藏品", "Untitled Artwork"]);
 
@@ -40,26 +39,14 @@ export default async function AdminDashboardPage() {
     const endDate = parseExhibitionEndDate(exhibition.period.zh || exhibition.period.en);
     return Boolean(endDate && endDate < today);
   }).length;
-  const missingContactItems = [
-    !content.siteConfig.contact.email.trim() ? "邮箱" : null,
-    !content.siteConfig.contact.phone.trim() ? "电话" : null,
-    !content.siteConfig.contact.wechat.trim() ? "微信" : null,
-    !content.siteConfig.contact.instagram.trim() ? "Instagram" : null,
-  ].filter((item): item is string => Boolean(item));
-  const siteConfigReminders = getSiteConfigReminders(content.siteConfig);
-  const homeContentReminders = getHomeContentReminders(getEditableSectionValue(content, "homeContent"));
-  const firstMissingContactField =
-    (!content.siteConfig.contact.email.trim() && "contact.email") ||
-    (!content.siteConfig.contact.phone.trim() && !content.siteConfig.contact.whatsapp.trim() && "contact.phone") ||
-    (!content.siteConfig.contact.wechat.trim() && "contact.wechat") ||
-    (!content.siteConfig.contact.instagram.trim() && "contact.instagram") ||
-    siteConfigReminders[0]?.field;
+  const currentExhibitionCount = content.exhibitions.filter((exhibition) => exhibition.current).length;
+  const featuredArtworkCount = content.artworks.filter((artwork) => artwork.featured).length;
 
   const overview = [
     { label: "藏品", value: `${publishedArtworks} / ${content.artworks.length}` },
     { label: "展览", value: `${publishedExhibitions} / ${content.exhibitions.length}` },
     { label: "文章", value: `${publishedArticles} / ${content.articles.length}` },
-    { label: "首页模块", value: 4 },
+    { label: "精选藏品", value: String(featuredArtworkCount) },
   ];
   const healthChecks = [
     {
@@ -78,25 +65,13 @@ export default async function AdminDashboardPage() {
       label: "已过期专题",
       value: String(expiredCurrentExhibitionCount),
       note: "当前专题已过结束日期",
-      href: "/admin/content/homeContent?focus=homeContent.focusCurrent.description.zh",
+      href: "/admin/content/exhibitions",
     },
     {
-      label: "联系方式缺项",
-      value: String(missingContactItems.length),
-      note: missingContactItems.length ? missingContactItems.join("、") : "当前完整",
-      href: `/admin/content/siteConfig${firstMissingContactField ? `?focus=${encodeURIComponent(firstMissingContactField)}` : ""}`,
-    },
-    {
-      label: "站点设置缺项",
-      value: String(siteConfigReminders.length),
-      note: siteConfigReminders.length ? siteConfigReminders.slice(0, 2).map((item) => item.message).join("、") : "当前完整",
-      href: `/admin/content/siteConfig${siteConfigReminders[0] ? `?focus=${encodeURIComponent(siteConfigReminders[0].field)}` : ""}`,
-    },
-    {
-      label: "首页内容缺项",
-      value: String(homeContentReminders.length),
-      note: homeContentReminders.length ? homeContentReminders.slice(0, 2).map((item) => item.message).join("、") : "当前完整",
-      href: `/admin/content/homeContent${homeContentReminders[0] ? `?focus=${encodeURIComponent(homeContentReminders[0].field)}` : ""}`,
+      label: "当前专题数量",
+      value: String(currentExhibitionCount),
+      note: currentExhibitionCount === 1 ? "当前设置正常" : "建议只保留一个当前专题",
+      href: "/admin/content/exhibitions",
     },
   ];
 
@@ -115,7 +90,7 @@ export default async function AdminDashboardPage() {
             轻量 CMS
           </h1>
           <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-            这里保留六个最常用的后台入口。品牌、关于、联系、页脚与 SEO 集中放在站点设置；首页内容单独维护；藏品、展览与文章各自独立管理。
+            这里仅保留三个常用后台入口。品牌、首页、关于、联系、页脚与 SEO 已固定为代码定稿；后台只负责藏品、展览与文章这三类高频内容。
           </p>
         </div>
 
@@ -130,7 +105,7 @@ export default async function AdminDashboardPage() {
           </div>
           <div>
             <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">内容结构</p>
-            <p className="mt-3 text-sm leading-7 text-[var(--muted)]">首页、关于、联系、页脚的重复字段已经收口，减少多处维护带来的错漏。</p>
+            <p className="mt-3 text-sm leading-7 text-[var(--muted)]">前台定稿文案已回到代码管理，后台只保留会频繁新增与更新的内容入口。</p>
           </div>
         </div>
 

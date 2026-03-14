@@ -10,7 +10,6 @@ function revalidateAdminArtworkViews() {
   revalidatePublicSite();
   revalidatePath("/admin");
   revalidatePath("/admin/content/artworks");
-  revalidatePath("/admin/content/homeContent");
 }
 
 type ArtworkRouteProps = {

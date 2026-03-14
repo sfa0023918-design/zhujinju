@@ -16,8 +16,8 @@ export const siteConfig: SiteConfigContent = {
   locale: "zh_CN",
   ogImagePath: "/opengraph-image",
   homeIntro: bt(
-    "竹瑾居专注于喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究支撑长期判断。",
-    "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, grounding long-term judgement in objects, exhibitions, catalogues, and research."
+    "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
+    "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their visual connections with the ancient arts of Asia, with work centered on collecting, research, exhibitions, and catalogues."
   ),
   about: {
     eyebrow: bt("关于", "About"),
@@ -45,11 +45,11 @@ export const siteConfig: SiteConfigContent = {
     eyebrow: bt("联系", "Contact"),
     title: bt("联系", "Contact"),
     description: bt(
-      "欢迎藏家、机构、策展人与研究者联系。竹瑾居以作品咨询、借展洽谈、研究合作与图录交换为主要联络方向。",
+      "欢迎藏家、机构、策展人与我们联系。竹瑾居以作品咨询、借展洽谈、研究合作与图录交换为主要联络方向。",
       "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange."
     ),
     aside: bt(
-      "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排看件与研究交流。",
+      "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排与我们看件。",
       "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment."
     ),
     infoLabels: {
@@ -76,18 +76,21 @@ export const siteConfig: SiteConfigContent = {
   },
   contact: {
     email: "contact@zhujinju.com",
-    phone: "+86 21 5466 2187",
+    phone: "+86 188 0738 1234",
     wechat: "竹瑾居 张弥",
-    whatsapp: "+86 139 1806 2742",
+    whatsapp: "+86 188 0738 1234",
     instagram: "@zhujinju_arts",
-    pdfRequest: "catalogue@zhujinju.com",
-    address: bt("中国成都 · 预约制空间", "Chengdu, China · By Appointment"),
-    replyWindow: bt("作品咨询通常于 24 小时内回复。", "Artwork inquiries are usually answered within 24 hours."),
-    collaborationNote: bt(
-      "可联系借展、研究合作、图录交换与机构预约看件。",
-      "Loans, research collaboration, catalogue exchange, and institutional viewings may be arranged."
+    pdfRequest: "contact@zhujinju.com",
+    address: bt("中国成都·竹瑾居艺术空间", "Chengdu, China · By Appointment"),
+    replyWindow: bt(
+      "地址：成都市青羊区草堂东路88号竹瑾居艺术空间",
+      "Address: Zhu Jin Ju Art Space, No. 88 Caotang East Road, Qingyang District, Chengdu"
     ),
-    appointmentNote: bt("By appointment in Chengdu.", "By appointment in Chengdu."),
+    collaborationNote: bt(
+      "咨询通常于 24 小时内回复。可联系借展、研究合作、图录交换与我们预约看件。",
+      "Inquiries are typically answered within 24 hours. We welcome requests regarding exhibition loans, research collaborations, catalogue exchange, and private viewings by appointment."
+    ),
+    appointmentNote: bt("成都会面采用预约制。", "By appointment in Chengdu."),
   },
 };
 

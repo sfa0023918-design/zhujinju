@@ -160,8 +160,8 @@ export const pageCopy = {
       eyebrow: bt("藏品", "Collection"),
       title: bt("藏品浏览", "Browse the Collection"),
       description: bt(
-        "按品类、地区、年代与材质筛选，建立更清晰的作品观看路径。列表以作品信息为中心，避免电商化排列。",
-        "Filter by category, region, period, and material to build a clearer viewing path. The listing remains object-centered rather than retail-oriented.",
+        "按品类、地区、年代与材质筛选，建立更清晰的作品观看路径。",
+        "Filter by category, region, period, and material for a more streamlined viewing experience.",
       ),
       aside: bt(
         "字段沿用古董商与研究型图录常见的信息结构，便于从作品浏览直接进入深入比较与询洽。",

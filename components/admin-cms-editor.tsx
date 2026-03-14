@@ -17,22 +17,16 @@ import type {
   Artwork,
   ArtworkStatus,
   BilingualText,
-  CollectingDirection,
   EditableSectionKey,
   EditableSectionValueMap,
   Exhibition,
-  HomeContentEditorValue,
-  OperationalFact,
   ProvenanceEntry,
   PublicationReference,
   PublicationStatus,
-  SiteConfigContent,
-  SiteConfigEditorValue,
   SiteContent,
 } from "@/lib/site-data";
 import type { ValidationIssue } from "@/lib/publication-validation";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "@/lib/publication-validation";
-import { getHomeContentReminders, getSiteConfigReminders, type EditorReminder } from "@/lib/admin-reminders";
 
 import { AdminMediaField, prepareAdminImageUpload, readAdminUploadResponse } from "./admin-media-field";
 
@@ -68,8 +62,6 @@ class AdminValidationError extends Error {
 type SyncPhase = "waiting" | "publishing" | "live" | "error";
 
 type SyncTarget =
-  | { section: "siteConfig" }
-  | { section: "homeContent" }
   | { section: "artworks"; id: string }
   | { section: "exhibitions" }
   | { section: "articles" };
@@ -178,84 +170,6 @@ function normalizeBilingualText(value: BilingualText, mode: "line" | "long" = "l
     zh: mode === "long" ? normalizeLongText(value.zh) : normalizeLineText(value.zh),
     en: mode === "long" ? normalizeLongText(value.en) : normalizeLineText(value.en),
   };
-}
-
-function normalizeSiteConfigDraft(value: SiteConfigEditorValue) {
-  const next = cloneValue(value);
-  next.siteConfig.siteName = normalizeBilingualText(next.siteConfig.siteName);
-  next.siteConfig.homeIntro = normalizeBilingualText(next.siteConfig.homeIntro, "long");
-  next.siteConfig.title = normalizeBilingualText(next.siteConfig.title);
-  next.siteConfig.description = normalizeBilingualText(next.siteConfig.description, "long");
-  next.siteConfig.about.eyebrow = normalizeBilingualText(next.siteConfig.about.eyebrow);
-  next.siteConfig.about.title = normalizeBilingualText(next.siteConfig.about.title);
-  next.siteConfig.about.subtitle = normalizeBilingualText(next.siteConfig.about.subtitle, "long");
-  next.siteConfig.about.body = next.siteConfig.about.body.map((paragraph) => normalizeBilingualText(paragraph, "long"));
-  next.siteConfig.contact.address = normalizeBilingualText(next.siteConfig.contact.address);
-  next.siteConfig.contact.appointmentNote = normalizeBilingualText(next.siteConfig.contact.appointmentNote, "long");
-  next.siteConfig.contact.replyWindow = normalizeBilingualText(next.siteConfig.contact.replyWindow, "long");
-  next.siteConfig.contact.collaborationNote = normalizeBilingualText(next.siteConfig.contact.collaborationNote, "long");
-  next.siteConfig.contactPage.eyebrow = normalizeBilingualText(next.siteConfig.contactPage.eyebrow);
-  next.siteConfig.contactPage.title = normalizeBilingualText(next.siteConfig.contactPage.title);
-  next.siteConfig.contactPage.description = normalizeBilingualText(next.siteConfig.contactPage.description, "long");
-  next.siteConfig.contactPage.aside = normalizeBilingualText(next.siteConfig.contactPage.aside, "long");
-  next.siteConfig.footer.intro = normalizeBilingualText(next.siteConfig.footer.intro, "long");
-  next.siteConfig.footer.appointment = normalizeBilingualText(next.siteConfig.footer.appointment);
-  next.siteConfig.defaultDomain = normalizeLineText(next.siteConfig.defaultDomain);
-  next.siteConfig.ogImagePath = normalizeLineText(next.siteConfig.ogImagePath);
-  next.siteConfig.protocol = normalizeLineText(next.siteConfig.protocol) as SiteConfigContent["protocol"];
-  next.siteConfig.locale = normalizeLineText(next.siteConfig.locale);
-  next.siteConfig.contact.email = normalizeLineText(next.siteConfig.contact.email);
-  next.siteConfig.contact.phone = normalizeLineText(next.siteConfig.contact.phone);
-  next.siteConfig.contact.whatsapp = normalizeLineText(next.siteConfig.contact.whatsapp);
-  next.siteConfig.contact.wechat = normalizeLineText(next.siteConfig.contact.wechat);
-  next.siteConfig.contact.instagram = normalizeLineText(next.siteConfig.contact.instagram);
-  next.siteConfig.contact.pdfRequest = normalizeLineText(next.siteConfig.contact.pdfRequest);
-  next.brandIntroHeroImage = normalizeLineText(next.brandIntroHeroImage);
-  next.brandIntroHeroAlt = normalizeBilingualText(next.brandIntroHeroAlt);
-  next.collectionHero.eyebrow = normalizeBilingualText(next.collectionHero.eyebrow);
-  next.collectionHero.title = normalizeBilingualText(next.collectionHero.title);
-  next.collectionHero.description = normalizeBilingualText(next.collectionHero.description, "long");
-  return next;
-}
-
-function normalizeHomeContentDraft(value: HomeContentEditorValue) {
-  const next = cloneValue(value);
-  next.intro = normalizeBilingualText(next.intro, "long");
-  next.homeContent.heroEyebrow = normalizeBilingualText(next.homeContent.heroEyebrow);
-  next.homeContent.heroTitle = normalizeBilingualText(next.homeContent.heroTitle);
-  next.homeContent.heroSubtitle = normalizeBilingualText(next.homeContent.heroSubtitle, "long");
-  next.homeContent.heroPrimaryAction = normalizeBilingualText(next.homeContent.heroPrimaryAction);
-  next.homeContent.heroSecondaryAction = normalizeBilingualText(next.homeContent.heroSecondaryAction);
-  next.homeContent.focusCurrent.eyebrow = normalizeBilingualText(next.homeContent.focusCurrent.eyebrow, "long");
-  next.homeContent.focusRecent.eyebrow = normalizeBilingualText(next.homeContent.focusRecent.eyebrow, "long");
-  next.homeContent.focusCurrent.description = normalizeBilingualText(next.homeContent.focusCurrent.description, "long");
-  next.homeContent.focusRecent.description = normalizeBilingualText(next.homeContent.focusRecent.description, "long");
-  next.homeContent.focusSummaryLine.highlightUnit = normalizeBilingualText(next.homeContent.focusSummaryLine.highlightUnit);
-  next.homeContent.focusSummaryLine.catalogueUnit = normalizeBilingualText(next.homeContent.focusSummaryLine.catalogueUnit);
-  next.homeContent.focusAction = normalizeBilingualText(next.homeContent.focusAction);
-  next.homeContent.selectedWorks.eyebrow = normalizeBilingualText(next.homeContent.selectedWorks.eyebrow);
-  next.homeContent.selectedWorks.title = normalizeBilingualText(next.homeContent.selectedWorks.title);
-  next.homeContent.selectedWorks.description = normalizeBilingualText(next.homeContent.selectedWorks.description, "long");
-  next.homeContent.collectingDirections.eyebrow = normalizeBilingualText(next.homeContent.collectingDirections.eyebrow);
-  next.homeContent.collectingDirections.title = normalizeBilingualText(next.homeContent.collectingDirections.title);
-  next.homeContent.collectingDirections.description = normalizeBilingualText(next.homeContent.collectingDirections.description, "long");
-  next.homeContent.operationalFacts.eyebrow = normalizeBilingualText(next.homeContent.operationalFacts.eyebrow);
-  next.homeContent.operationalFacts.title = normalizeBilingualText(next.homeContent.operationalFacts.title);
-  next.homeContent.operationalFacts.description = normalizeBilingualText(next.homeContent.operationalFacts.description, "long");
-  next.homeContent.selectedArtworkIds = (next.homeContent.selectedArtworkIds ?? []).map((id) => normalizeLineText(id)).filter(Boolean);
-  next.featuredArtworkIds = next.featuredArtworkIds.map((id) => normalizeLineText(id)).filter(Boolean);
-  next.collectingDirections = next.collectingDirections.map((item) => ({
-    ...item,
-    name: normalizeBilingualText(item.name),
-    description: normalizeBilingualText(item.description, "long"),
-  }));
-  next.operationalFacts = next.operationalFacts.map((item) => ({
-    ...item,
-    title: normalizeBilingualText(item.title),
-    value: normalizeBilingualText(item.value),
-    description: normalizeBilingualText(item.description, "long"),
-  }));
-  return next;
 }
 
 function normalizeArtworkDraft(value: Artwork) {
@@ -685,7 +599,7 @@ function ValidationSummary({
   issues,
   sectionLabels,
 }: {
-  issues: Array<ValidationIssue | EditorReminder>;
+  issues: ValidationIssue[];
   sectionLabels: Record<string, string>;
 }) {
   const blocking = issues.filter((issue) => ("level" in issue ? issue.level === "error" : true));
@@ -715,42 +629,6 @@ function ValidationSummary({
             </button>
           );
         })}
-      </div>
-    </div>
-  );
-}
-
-function ReminderSummary({
-  title,
-  reminders,
-  sectionLabels,
-}: {
-  title: string;
-  reminders: EditorReminder[];
-  sectionLabels: Record<string, string>;
-}) {
-  if (!reminders.length) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-3 border border-[var(--line)] bg-white/30 p-4">
-      <p className="text-sm leading-7 text-[var(--muted)]">
-        {`${title}：当前还有 ${reminders.length} 项建议补充内容。`}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {reminders.map((reminder) => (
-          <button
-            key={`${reminder.section}-${reminder.field}`}
-            type="button"
-            onClick={() => {
-              locateFieldTarget(reminder.field, reminder.section);
-            }}
-            className="border border-[var(--line)] px-3 py-1.5 text-xs leading-5 text-[var(--accent)] transition-colors hover:bg-[var(--surface-strong)]"
-          >
-            {`${sectionLabels[reminder.section] ?? reminder.section} · ${reminder.message}`}
-          </button>
-        ))}
       </div>
     </div>
   );
@@ -1681,312 +1559,6 @@ function useAutosaveSection<T>(
   };
 }
 
-function SiteSettingsEditor({
-  title,
-  description,
-  initialValue,
-  initialFocus,
-}: {
-  title: string;
-  description: string;
-  initialValue: SiteConfigEditorValue;
-  initialFocus?: string;
-}) {
-  const { draft, persisted, setDraft, saveNow, saveState, isDirty } = useAutosaveSection("siteConfig", initialValue, {
-    prepare: normalizeSiteConfigDraft,
-  });
-  const reminders = useMemo(() => getSiteConfigReminders(draft.siteConfig), [draft]);
-  const sectionLabels = {
-    branding: "品牌与 SEO",
-    about: "关于页面",
-    contact: "联系方式",
-    contactPage: "联系页文案",
-    footer: "页脚",
-  } satisfies Record<string, string>;
-  const sectionReminders = {
-    branding: reminders.filter((item) => item.section === "branding").map((item) => item.message),
-    about: reminders.filter((item) => item.section === "about").map((item) => item.message),
-    contact: reminders.filter((item) => item.section === "contact").map((item) => item.message),
-    contactPage: reminders.filter((item) => item.section === "contactPage").map((item) => item.message),
-    footer: reminders.filter((item) => item.section === "footer").map((item) => item.message),
-  };
-  const syncState = useWebsiteSyncStatus({
-    target: { section: "siteConfig" },
-    changeToken: JSON.stringify(persisted),
-    hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
-  });
-
-  useInitialFieldFocus(initialFocus);
-
-  function update(recipe: (value: SiteConfigEditorValue) => void) {
-    setDraft((current) => {
-      const next = cloneValue(current);
-      recipe(next);
-      return next;
-    });
-  }
-
-  return (
-    <div className="space-y-6">
-      <StatusBar
-        title={title}
-        state={saveState}
-        sync={syncState}
-        isDirty={isDirty}
-        actions={<ToolbarButton onClick={() => void saveNow(draft, "manual")}>保存更改</ToolbarButton>}
-      />
-      <div className="space-y-3 border-b border-[var(--line)] pb-6">
-        <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
-      </div>
-      <ReminderSummary title="当前还有一些建议补充项" reminders={reminders} sectionLabels={sectionLabels} />
-      <div className="grid gap-6">
-        <SectionBlock id="section-branding" title="品牌与 SEO" description="网站名称、首页主视觉与搜索展示信息共用这一组内容。" reminders={sectionReminders.branding}>
-          <div className="grid gap-4">
-            <BilingualInput label="品牌名称" value={draft.siteConfig.siteName} onChange={(next) => update((value) => { value.siteConfig.siteName = next; })} fieldKeys={{ zh: "siteName.zh", en: "siteName.en" }} />
-            <AdminMediaField
-              anchorKey="brandIntro.heroImage"
-              label="首页主视觉"
-              note="对应首页首屏左侧主图。上传后点击“保存更改”，前台才会更新。"
-              folder="branding"
-              value={draft.brandIntroHeroImage}
-              onChange={(next) => update((value) => { value.brandIntroHeroImage = next; })}
-              autoSaveAfterUpload={false}
-              previewRatio="landscape"
-              recommendedUse="首页 Hero 主图"
-              recommendedSize="1600 × 1080 像素以上，横图"
-            />
-            <BilingualInput label="首页主视觉替代文字" value={draft.brandIntroHeroAlt} onChange={(next) => update((value) => { value.brandIntroHeroAlt = next; })} fieldKeys={{ zh: "brandIntro.heroAlt.zh", en: "brandIntro.heroAlt.en" }} />
-            <div className="space-y-4 border-t border-[var(--line)] pt-6">
-              <div className="space-y-1">
-                <p className="text-[0.7rem] tracking-[0.16em] text-[var(--accent)]/88">藏品浏览页</p>
-                <p className="text-sm leading-7 text-[var(--muted)]">维护 collection 页面顶部的眉题、标题和说明文案。</p>
-              </div>
-              <BilingualInput
-                label="页头眉题"
-                value={draft.collectionHero.eyebrow}
-                onChange={(next) => update((value) => { value.collectionHero.eyebrow = next; })}
-                fieldKeys={{ zh: "collection.hero.eyebrow.zh", en: "collection.hero.eyebrow.en" }}
-              />
-              <BilingualInput
-                label="页头标题"
-                value={draft.collectionHero.title}
-                onChange={(next) => update((value) => { value.collectionHero.title = next; })}
-                fieldKeys={{ zh: "collection.hero.title.zh", en: "collection.hero.title.en" }}
-              />
-              <BilingualTextarea
-                label="页头说明"
-                value={draft.collectionHero.description}
-                onChange={(next) => update((value) => { value.collectionHero.description = next; })}
-                rows={4}
-                fieldKeys={{ zh: "collection.hero.description.zh", en: "collection.hero.description.en" }}
-              />
-            </div>
-            <BilingualInput label="浏览器标题" value={draft.siteConfig.title} onChange={(next) => update((value) => { value.siteConfig.title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
-            <BilingualTextarea label="站点描述" value={draft.siteConfig.description} onChange={(next) => update((value) => { value.siteConfig.description = next; })} rows={4} fieldKeys={{ zh: "description.zh", en: "description.en" }} />
-            <div className="grid gap-4 md:grid-cols-2">
-              <TextField label="主域名" value={draft.siteConfig.defaultDomain} onChange={(next) => update((value) => { value.siteConfig.defaultDomain = next; })} fieldKey="defaultDomain" />
-              <TextField label="Open Graph 图片路径" value={draft.siteConfig.ogImagePath} onChange={(next) => update((value) => { value.siteConfig.ogImagePath = next; })} />
-              <TextField label="协议" value={draft.siteConfig.protocol} onChange={(next) => update((value) => { value.siteConfig.protocol = next as SiteConfigContent["protocol"]; })} />
-              <TextField label="语言地区" value={draft.siteConfig.locale} onChange={(next) => update((value) => { value.siteConfig.locale = next; })} />
-            </div>
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-about" title="关于页面" description="关于页主标题、副标题和正文统一在这里维护。" reminders={sectionReminders.about}>
-          <div className="grid gap-4">
-            <BilingualInput label="页眉标签" value={draft.siteConfig.about.eyebrow} onChange={(next) => update((value) => { value.siteConfig.about.eyebrow = next; })} />
-            <BilingualInput label="About 标题" value={draft.siteConfig.about.title} onChange={(next) => update((value) => { value.siteConfig.about.title = next; })} fieldKeys={{ zh: "about.title.zh", en: "about.title.en" }} />
-            <BilingualTextarea label="About 副标题" value={draft.siteConfig.about.subtitle} onChange={(next) => update((value) => { value.siteConfig.about.subtitle = next; })} rows={3} fieldKeys={{ zh: "about.subtitle.zh", en: "about.subtitle.en" }} />
-            <div data-field-key="collectingDirections" className="grid gap-4">
-              {draft.siteConfig.about.body.map((paragraph, index) => (
-                <div key={`about-body-${index}`} className="space-y-3 border border-[var(--line)] bg-white/40 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label>{`正文 ${index + 1}`}</Label>
-                    {draft.siteConfig.about.body.length > 1 ? (
-                      <button
-                        type="button"
-                        onClick={() => update((value) => { value.siteConfig.about.body = removeArrayItem(value.siteConfig.about.body, index); })}
-                        className="text-xs tracking-[0.14em] text-[var(--muted)] transition-colors hover:text-[#8e4e3b]"
-                      >
-                        删除
-                      </button>
-                    ) : null}
-                  </div>
-                  <BilingualTextarea
-                    label={`段落 ${index + 1}`}
-                    value={paragraph}
-                    onChange={(next) => update((value) => { value.siteConfig.about.body = updateArrayItem(value.siteConfig.about.body, index, (item) => { item.zh = next.zh; item.en = next.en; }); })}
-                    rows={5}
-                    fieldKeys={{ zh: `about.body.${index}.zh`, en: `about.body.${index}.en` }}
-                  />
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => update((value) => { value.siteConfig.about.body = [...value.siteConfig.about.body, emptyBilingual()]; })}
-                className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-              >
-                新增正文段落
-              </button>
-            </div>
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-contact" title="联系方式" description="联系页、页脚和网站联系入口共用这里的联系方式。" reminders={sectionReminders.contact}>
-          <div className="grid gap-4 md:grid-cols-2">
-            <TextField label="邮箱" type="email" value={draft.siteConfig.contact.email} onChange={(next) => update((value) => { value.siteConfig.contact.email = next; })} fieldKey="contact.email" />
-            <TextField label="电话" value={draft.siteConfig.contact.phone} onChange={(next) => update((value) => { value.siteConfig.contact.phone = next; })} fieldKey="contact.phone" />
-            <TextField label="WhatsApp" value={draft.siteConfig.contact.whatsapp} onChange={(next) => update((value) => { value.siteConfig.contact.whatsapp = next; })} fieldKey="contact.whatsapp" />
-            <TextField label="微信" value={draft.siteConfig.contact.wechat} onChange={(next) => update((value) => { value.siteConfig.contact.wechat = next; })} fieldKey="contact.wechat" />
-            <TextField label="Instagram" value={draft.siteConfig.contact.instagram} onChange={(next) => update((value) => { value.siteConfig.contact.instagram = next; })} />
-          </div>
-          <div className="grid gap-4">
-            <BilingualInput label="城市与空间说明" value={draft.siteConfig.contact.address} onChange={(next) => update((value) => { value.siteConfig.contact.address = next; })} />
-            <BilingualTextarea label="预约说明" value={draft.siteConfig.contact.appointmentNote} onChange={(next) => update((value) => { value.siteConfig.contact.appointmentNote = next; })} rows={3} />
-            <BilingualTextarea label="回复时间" value={draft.siteConfig.contact.replyWindow} onChange={(next) => update((value) => { value.siteConfig.contact.replyWindow = next; })} rows={3} />
-            <BilingualTextarea label="合作与借展说明" value={draft.siteConfig.contact.collaborationNote} onChange={(next) => update((value) => { value.siteConfig.contact.collaborationNote = next; })} rows={3} />
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-contactPage" title="联系页文案" description="联系页页头与联系方式标签统一维护。" reminders={sectionReminders.contactPage}>
-          <div className="grid gap-4">
-            <BilingualInput label="页眉标签" value={draft.siteConfig.contactPage.eyebrow} onChange={(next) => update((value) => { value.siteConfig.contactPage.eyebrow = next; })} />
-            <BilingualInput label="联系页标题" value={draft.siteConfig.contactPage.title} onChange={(next) => update((value) => { value.siteConfig.contactPage.title = next; })} />
-            <BilingualTextarea label="联系页说明" value={draft.siteConfig.contactPage.description} onChange={(next) => update((value) => { value.siteConfig.contactPage.description = next; })} rows={4} />
-            <BilingualTextarea label="联系页右侧辅助说明" value={draft.siteConfig.contactPage.aside} onChange={(next) => update((value) => { value.siteConfig.contactPage.aside = next; })} rows={4} />
-            <div className="grid gap-4 md:grid-cols-3">
-              <BilingualInput label="邮箱标签" value={draft.siteConfig.contactPage.infoLabels.email} onChange={(next) => update((value) => { value.siteConfig.contactPage.infoLabels.email = next; })} />
-              <BilingualInput label="微信标签" value={draft.siteConfig.contactPage.infoLabels.wechat} onChange={(next) => update((value) => { value.siteConfig.contactPage.infoLabels.wechat = next; })} />
-              <BilingualInput label="电话 / WhatsApp 标签" value={draft.siteConfig.contactPage.infoLabels.phoneWhatsapp} onChange={(next) => update((value) => { value.siteConfig.contactPage.infoLabels.phoneWhatsapp = next; })} />
-            </div>
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-footer" title="页脚" description="页脚标签与导航入口统一在这里维护。" reminders={sectionReminders.footer}>
-          <div className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <BilingualInput label="版权标签" value={draft.siteConfig.footer.copyrightLabel} onChange={(next) => update((value) => { value.siteConfig.footer.copyrightLabel = next; })} />
-              <BilingualInput label="联系标题" value={draft.siteConfig.footer.contactHeading} onChange={(next) => update((value) => { value.siteConfig.footer.contactHeading = next; })} />
-              <BilingualInput label="信息标题" value={draft.siteConfig.footer.informationHeading} onChange={(next) => update((value) => { value.siteConfig.footer.informationHeading = next; })} />
-              <BilingualInput label="藏品链接名称" value={draft.siteConfig.footer.collectionLink} onChange={(next) => update((value) => { value.siteConfig.footer.collectionLink = next; })} />
-              <BilingualInput label="展览链接名称" value={draft.siteConfig.footer.exhibitionsLink} onChange={(next) => update((value) => { value.siteConfig.footer.exhibitionsLink = next; })} />
-              <BilingualInput label="文章链接名称" value={draft.siteConfig.footer.journalLink} onChange={(next) => update((value) => { value.siteConfig.footer.journalLink = next; })} />
-              <BilingualInput label="Instagram 标签" value={draft.siteConfig.footer.instagramLabel} onChange={(next) => update((value) => { value.siteConfig.footer.instagramLabel = next; })} />
-              <BilingualInput label="微信标签" value={draft.siteConfig.footer.wechatLabel} onChange={(next) => update((value) => { value.siteConfig.footer.wechatLabel = next; })} />
-            </div>
-          </div>
-        </SectionBlock>
-      </div>
-    </div>
-  );
-}
-
-function HomeContentEditor({
-  title,
-  description,
-  initialValue,
-  content,
-  initialFocus,
-}: {
-  title: string;
-  description: string;
-  initialValue: HomeContentEditorValue;
-  content: SiteContent;
-  initialFocus?: string;
-}) {
-  const { draft, persisted, setDraft, saveNow, saveState, isDirty } = useAutosaveSection("homeContent", initialValue, {
-    prepare: normalizeHomeContentDraft,
-  });
-  const reminders = useMemo(() => getHomeContentReminders(draft), [draft]);
-  const sectionLabels = {
-    hero: "Hero",
-    focus: "当前专题",
-    selectedWorks: "精选作品",
-  } satisfies Record<string, string>;
-  const sectionReminders = {
-    hero: reminders.filter((item) => item.section === "hero").map((item) => item.message),
-    focus: reminders.filter((item) => item.section === "focus").map((item) => item.message),
-    selectedWorks: reminders.filter((item) => item.section === "selectedWorks").map((item) => item.message),
-  };
-  const syncState = useWebsiteSyncStatus({
-    target: { section: "homeContent" },
-    changeToken: JSON.stringify(persisted),
-    hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
-  });
-
-  useInitialFieldFocus(initialFocus);
-
-  function update(recipe: (value: HomeContentEditorValue) => void) {
-    setDraft((current) => {
-      const next = cloneValue(current);
-      recipe(next);
-      return next;
-    });
-  }
-
-  const artworkOptions = content.artworks.map((artwork) => ({
-    value: getArtworkId(artwork),
-    title: artwork.title.zh || artwork.slug,
-    note: artwork.period.zh || artwork.category.zh,
-  }));
-
-  return (
-    <div className="space-y-6">
-      <StatusBar
-        title={title}
-        state={saveState}
-        sync={syncState}
-        isDirty={isDirty}
-        actions={<ToolbarButton onClick={() => void saveNow(draft, "manual")}>保存更改</ToolbarButton>}
-      />
-      <div className="space-y-3 border-b border-[var(--line)] pb-6">
-        <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
-      </div>
-      <ReminderSummary title="当前还有一些建议补充项" reminders={reminders} sectionLabels={sectionLabels} />
-
-      <div className="grid gap-6">
-        <SectionBlock id="section-hero" title="Hero" description="首页首屏当前仍显示的眉题、主标题和按钮文案。" reminders={sectionReminders.hero}>
-          <div className="grid gap-4">
-            <BilingualInput label="页眉标签" value={draft.homeContent.heroEyebrow} onChange={(next) => update((value) => { value.homeContent.heroEyebrow = next; })} />
-            <BilingualInput label="主标题" value={draft.homeContent.heroTitle} onChange={(next) => update((value) => { value.homeContent.heroTitle = next; })} fieldKeys={{ zh: "homeContent.heroTitle.zh", en: "homeContent.heroTitle.en" }} />
-            <div className="grid gap-4 md:grid-cols-2">
-              <BilingualInput label="主按钮" value={draft.homeContent.heroPrimaryAction} onChange={(next) => update((value) => { value.homeContent.heroPrimaryAction = next; })} />
-              <BilingualInput label="副按钮" value={draft.homeContent.heroSecondaryAction} onChange={(next) => update((value) => { value.homeContent.heroSecondaryAction = next; })} />
-            </div>
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-focus" title="当前专题" description="控制首页近期展览区当前仍显示的标签与入口按钮。" reminders={sectionReminders.focus}>
-          <div className="grid gap-4 md:grid-cols-2">
-            <BilingualInput label="当前专题标签" value={draft.homeContent.focusCurrent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusCurrent.eyebrow = next; })} fieldKeys={{ zh: "homeContent.focusCurrent.eyebrow.zh", en: "homeContent.focusCurrent.eyebrow.en" }} />
-            <BilingualInput label="近期展览标签" value={draft.homeContent.focusRecent.eyebrow} onChange={(next) => update((value) => { value.homeContent.focusRecent.eyebrow = next; })} />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <BilingualInput label="专题按钮" value={draft.homeContent.focusAction} onChange={(next) => update((value) => { value.homeContent.focusAction = next; })} />
-          </div>
-        </SectionBlock>
-
-        <SectionBlock id="section-selectedWorks" title="精选作品" description="控制精选作品区当前仍显示的标题，并选择哪些藏品出现在首页。" reminders={sectionReminders.selectedWorks}>
-          <div className="grid gap-4">
-            <BilingualInput label="区块标题" value={draft.homeContent.selectedWorks.eyebrow} onChange={(next) => update((value) => { value.homeContent.selectedWorks.eyebrow = next; })} />
-            <RelationChecklist
-              label="首页精选作品"
-              options={artworkOptions}
-              selected={draft.featuredArtworkIds}
-              onToggle={(value) => update((next) => {
-                next.featuredArtworkIds = next.featuredArtworkIds.includes(value)
-                  ? next.featuredArtworkIds.filter((item) => item !== value)
-                  : [...next.featuredArtworkIds, value];
-              })}
-              fieldKey="featuredArtworkIds"
-            />
-          </div>
-        </SectionBlock>
-      </div>
-    </div>
-  );
-}
-
 function ArtworkDetailGalleryGrid({
   artwork,
   onChangeGallery,
@@ -2249,6 +1821,7 @@ function ArtworkDetailGalleryGrid({
     </div>
   );
 }
+
 
 function ArtworkEditor({
   title,
@@ -2932,6 +2505,7 @@ function ArtworkEditor({
   );
 }
 
+
 function ExhibitionsEditor({
   title,
   description,
@@ -3601,14 +3175,6 @@ function ArticlesEditor({
 }
 
 export function AdminCmsEditor(props: AdminCmsEditorProps) {
-  if (props.section === "siteConfig") {
-    return <SiteSettingsEditor title={props.title} description={props.description} initialValue={props.initialValue as SiteConfigEditorValue} initialFocus={props.initialFocus} />;
-  }
-
-  if (props.section === "homeContent") {
-    return <HomeContentEditor title={props.title} description={props.description} initialValue={props.initialValue as HomeContentEditorValue} content={props.content} initialFocus={props.initialFocus} />;
-  }
-
   if (props.section === "artworks") {
     return <ArtworkEditor title={props.title} description={props.description} initialValue={props.initialValue as Artwork[]} content={props.content} autoCreate={props.autoCreate} initialSearch={props.initialSearch} initialStatusFilter={props.initialStatusFilter} initialFocus={props.initialFocus} />;
   }

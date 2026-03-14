@@ -3,8 +3,6 @@ import { createHash } from "crypto";
 import type { EditableSectionKey, SiteContent } from "./data/types";
 
 type SyncTarget =
-  | { section: "siteConfig" }
-  | { section: "homeContent" }
   | { section: "artworks"; id: string }
   | { section: "exhibitions" }
   | { section: "articles" };
@@ -74,34 +72,6 @@ function publishedArticles(content: SiteContent) {
 }
 
 export async function buildSiteSyncSnapshot(content: SiteContent, target: SyncTarget): Promise<SiteSyncSnapshot> {
-  if (target.section === "siteConfig") {
-    return {
-      target,
-      signature: createSignature(content.siteConfig),
-      ready: true,
-      publicImpact: true,
-      missingAssetCount: 0,
-      message: "网站已显示最新站点信息。",
-    };
-  }
-
-  if (target.section === "homeContent") {
-    const featured = publishedArtworks(content).filter((artwork) => artwork.featured).map((artwork) => artwork.slug);
-    return {
-      target,
-      signature: createSignature({
-        homeContent: content.homeContent,
-        collectingDirections: content.collectingDirections,
-        operationalFacts: content.operationalFacts,
-        featured,
-      }),
-      ready: true,
-      publicImpact: true,
-      missingAssetCount: 0,
-      message: "首页已显示最新内容。",
-    };
-  }
-
   if (target.section === "artworks") {
     const artwork = content.artworks.find((item) => (item.id?.trim() || item.slug) === target.id);
 
@@ -159,7 +129,7 @@ export async function buildSiteSyncSnapshot(content: SiteContent, target: SyncTa
 }
 
 export function buildSyncTarget(section: EditableSectionKey, options?: { id?: string }) {
-  if (section === "siteConfig" || section === "homeContent" || section === "exhibitions" || section === "articles") {
+  if (section === "exhibitions" || section === "articles") {
     return { section } as SyncTarget;
   }
 
