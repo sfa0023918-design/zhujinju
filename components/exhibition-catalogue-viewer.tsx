@@ -13,6 +13,7 @@ type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
   note: BilingualValue;
   pages: string[];
+  viewMode?: "single-pages" | "spread-images";
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -33,12 +34,15 @@ export function ExhibitionCatalogueViewer({
   title,
   note,
   pages,
+  viewMode = "single-pages",
 }: ExhibitionCatalogueViewerProps) {
   const cataloguePages = pages.filter(Boolean);
   const [isDesktop, setIsDesktop] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const totalPages = cataloguePages.length;
+  const showsSpreadImage = viewMode === "spread-images";
+  const usesDesktopPairing = isDesktop && !showsSpreadImage;
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_BREAKPOINT);
@@ -59,24 +63,30 @@ export function ExhibitionCatalogueViewer({
       }
 
       return isDesktop
-        ? getDesktopStartIndex(previous, totalPages)
+        ? showsSpreadImage
+          ? clamp(previous, 0, totalPages - 1)
+          : getDesktopStartIndex(previous, totalPages)
         : clamp(previous, 0, totalPages - 1);
     });
-  }, [isDesktop, totalPages]);
+  }, [isDesktop, showsSpreadImage, totalPages]);
 
   if (!totalPages) {
     return null;
   }
 
-  const visiblePages = isDesktop
+  const visiblePages = usesDesktopPairing
     ? [cataloguePages[currentIndex] ?? null, cataloguePages[currentIndex + 1] ?? null]
     : [cataloguePages[currentIndex] ?? null];
   const canGoPrevious = currentIndex > 0;
-  const canGoNext = isDesktop ? currentIndex + 2 < totalPages : currentIndex + 1 < totalPages;
-  const currentLabel = isDesktop
+  const canGoNext = usesDesktopPairing ? currentIndex + 2 < totalPages : currentIndex + 1 < totalPages;
+  const currentLabel = usesDesktopPairing
     ? `${currentIndex + 1}${cataloguePages[currentIndex + 1] ? ` - ${currentIndex + 2}` : ""}`
     : `${currentIndex + 1}`;
-  const readingModeLabel = isDesktop ? "双页展开 / Spread View" : "单页阅读 / Single Page";
+  const readingModeLabel = showsSpreadImage
+    ? "跨页图版 / Spread Plate"
+    : isDesktop
+      ? "双页展开 / Spread View"
+      : "单页阅读 / Single Page";
   const visiblePageNumbers = visiblePages
     .map((page, index) => (page ? currentIndex + index + 1 : null))
     .filter((pageNumber): pageNumber is number => pageNumber !== null);
@@ -89,7 +99,9 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
-    setCurrentIndex(isDesktop ? getDesktopStartIndex(index, totalPages) : clamp(index, 0, totalPages - 1));
+    setCurrentIndex(
+      usesDesktopPairing ? getDesktopStartIndex(index, totalPages) : clamp(index, 0, totalPages - 1),
+    );
   }
 
   function goPrevious() {
@@ -97,7 +109,7 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
-    setCurrentIndex((previous) => (isDesktop ? Math.max(0, previous - 2) : Math.max(0, previous - 1)));
+    setCurrentIndex((previous) => (usesDesktopPairing ? Math.max(0, previous - 2) : Math.max(0, previous - 1)));
   }
 
   function goNext() {
@@ -106,7 +118,7 @@ export function ExhibitionCatalogueViewer({
     }
 
     setCurrentIndex((previous) => {
-      if (isDesktop) {
+      if (usesDesktopPairing) {
         return getDesktopStartIndex(Math.min(totalPages - 1, previous + 2), totalPages);
       }
 
@@ -121,7 +133,7 @@ export function ExhibitionCatalogueViewer({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.68rem] tracking-[0.22em] text-[var(--accent)]/74">
             <span>电子图录 / DIGITAL CATALOGUE</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
-            <span>Plate Count · {totalPages}</span>
+            <span>{showsSpreadImage ? `Spread Count · ${totalPages}` : `Plate Count · ${totalPages}`}</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
             <span>{readingModeLabel}</span>
           </div>
@@ -165,7 +177,9 @@ export function ExhibitionCatalogueViewer({
 
         <div className="relative mb-5 flex flex-col gap-3 border-b border-[var(--line)]/62 pb-4 text-[0.72rem] tracking-[0.18em] text-[var(--accent)]/82 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span>第 {currentLabel} 页 / 共 {totalPages} 页</span>
+            <span>
+              {showsSpreadImage ? `第 ${currentLabel} 幅 / 共 ${totalPages} 幅` : `第 ${currentLabel} 页 / 共 ${totalPages} 页`}
+            </span>
             <span className="h-px w-6 bg-[var(--line-strong)]/26" aria-hidden="true" />
             <span>当前展开 / {stageSummary}</span>
           </div>
@@ -218,20 +232,23 @@ export function ExhibitionCatalogueViewer({
           >
             <div className="pointer-events-none absolute inset-x-[11%] -bottom-3 h-12 rounded-full bg-[rgba(93,71,45,0.08)] blur-2xl" />
             <div
-              key={`${isDesktop ? "spread" : "single"}-${currentIndex}`}
+              key={`${usesDesktopPairing ? "spread" : "single"}-${currentIndex}`}
               className={`relative grid gap-2 overflow-hidden rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,#e7d9c7_0%,#e0cfbb_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_24px_72px_rgba(35,24,16,0.14)] md:p-4 ${
-                isDesktop ? "lg:grid-cols-2" : "grid-cols-1"
+                usesDesktopPairing ? "lg:grid-cols-2" : "grid-cols-1"
               } site-fade-in`}
             >
               <div className="pointer-events-none absolute inset-x-5 top-3 h-8 rounded-full bg-white/22 blur-2xl" />
-              <div className="pointer-events-none absolute inset-y-10 left-1/2 hidden w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(115,86,58,0.15),rgba(79,57,37,0.38),rgba(115,86,58,0.15))] lg:block" />
+              {usesDesktopPairing ? (
+                <div className="pointer-events-none absolute inset-y-10 left-1/2 hidden w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(115,86,58,0.15),rgba(79,57,37,0.38),rgba(115,86,58,0.15))] lg:block" />
+              ) : null}
               {visiblePages.map((page, index) => (
                 <CataloguePage
                   key={`${currentIndex}-${index}-${page ?? "blank"}`}
                   page={page}
                   pageNumber={currentIndex + index + 1}
                   title={title}
-                  side={isDesktop ? (index === 0 ? "left" : "right") : "single"}
+                  side={usesDesktopPairing ? (index === 0 ? "left" : "right") : "single"}
+                  displayMode={showsSpreadImage ? "spread" : "page"}
                 />
               ))}
             </div>
@@ -260,7 +277,7 @@ export function ExhibitionCatalogueViewer({
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-[linear-gradient(270deg,rgba(242,236,227,0.96),rgba(242,236,227,0))]" />
             <div className="flex gap-2.5 overflow-x-auto pb-1">
               {cataloguePages.map((page, index) => {
-                const selected = isDesktop
+                const selected = usesDesktopPairing
                   ? currentIndex === getDesktopStartIndex(index, totalPages)
                   : currentIndex === index;
 
@@ -281,12 +298,14 @@ export function ExhibitionCatalogueViewer({
                         : "border-[var(--line)]/70 bg-white/7 hover:border-[var(--line-strong)]/68 hover:bg-white/66"
                     }`}>
                       <div className={`mb-1.5 h-px transition-colors ${selected ? "bg-[var(--line-strong)]/74" : "bg-[var(--line)]/42 group-hover:bg-[var(--line-strong)]/48"}`} />
-                      <div className="relative h-24 w-16 overflow-hidden rounded-[13px] bg-[#f7f2ea] md:h-28 md:w-20">
+                      <div className={`relative overflow-hidden rounded-[13px] bg-[#f7f2ea] ${
+                        showsSpreadImage ? "h-20 w-32 md:h-24 md:w-40" : "h-24 w-16 md:h-28 md:w-20"
+                      }`}>
                         <ProtectedImage
                           src={page}
                           alt={`${title.zh || title.en} page ${index + 1}`}
                           fill
-                          sizes="80px"
+                          sizes={showsSpreadImage ? "160px" : "80px"}
                           wrapperClassName="h-full w-full"
                           className={`object-cover transition-transform duration-500 ${selected ? "scale-[1.015]" : "group-hover:scale-[1.03]"}`}
                         />
@@ -294,7 +313,7 @@ export function ExhibitionCatalogueViewer({
                       </div>
                       <div className="mt-2 flex items-center justify-between px-0.5 text-[0.6rem] tracking-[0.18em] text-[var(--accent)]/78">
                         <span>{String(index + 1).padStart(2, "0")}</span>
-                        <span>{selected ? "Current" : "Plate"}</span>
+                        <span>{selected ? "Current" : showsSpreadImage ? "Spread" : "Plate"}</span>
                       </div>
                     </div>
                   </button>
@@ -313,11 +332,13 @@ function CataloguePage({
   pageNumber,
   title,
   side,
+  displayMode,
 }: {
   page: string | null;
   pageNumber: number;
   title: BilingualValue;
   side: "left" | "right" | "single";
+  displayMode: "page" | "spread";
 }) {
   if (!page) {
     return (
@@ -332,12 +353,12 @@ function CataloguePage({
       <div className={`absolute inset-y-8 hidden w-px bg-[var(--line)]/24 lg:block ${side === "right" ? "left-0" : side === "left" ? "right-0" : "left-0"}`} />
       <div className={`pointer-events-none absolute inset-y-4 w-10 blur-2xl ${side === "left" ? "right-0 bg-[rgba(121,92,62,0.07)]" : side === "right" ? "left-0 bg-[rgba(121,92,62,0.07)]" : "right-0 bg-[rgba(121,92,62,0.05)]"}`} />
       <div className="relative overflow-hidden rounded-[18px] bg-white shadow-[inset_0_0_0_1px_rgba(23,21,18,0.06)]">
-        <div className="relative aspect-[0.72/1] bg-[#f8f4ec]">
+        <div className={`relative bg-[#f8f4ec] ${displayMode === "spread" ? "aspect-[1.7/1]" : "aspect-[0.72/1]"}`}>
           <ProtectedImage
             src={page}
             alt={`${title.zh || title.en} page ${pageNumber}`}
             fill
-            sizes="(min-width: 1024px) 42vw, 88vw"
+            sizes={displayMode === "spread" ? "(min-width: 1024px) 84vw, 92vw" : "(min-width: 1024px) 42vw, 88vw"}
             wrapperClassName="h-full w-full"
             className="object-contain transition-transform duration-700 group-hover:scale-[1.005]"
           />
@@ -345,7 +366,7 @@ function CataloguePage({
       </div>
       <div className="mt-3 flex items-center justify-between text-[0.68rem] uppercase tracking-[0.16em] text-[var(--accent)]/72">
         <span>{pageNumber.toString().padStart(2, "0")}</span>
-        <span>{side === "single" ? "Reader" : "Catalogue"}</span>
+        <span>{displayMode === "spread" ? "Spread" : side === "single" ? "Reader" : "Catalogue"}</span>
       </div>
     </div>
   );

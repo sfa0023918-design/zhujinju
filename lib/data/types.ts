@@ -81,6 +81,7 @@ export type Exhibition = {
   cataloguePages: number;
   cataloguePageCount?: number;
   cataloguePageImages?: string[];
+  catalogueViewMode?: "single-pages" | "spread-images";
   catalogueNote?: BilingualText;
   curatorialLead: BilingualText;
   curatorialNote?: BilingualText;

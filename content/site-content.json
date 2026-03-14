@@ -4349,7 +4349,8 @@
         "detail": "/uploads/exhibitions/1773131800503-微信图片-20260310163557-19-129.jpg",
         "width": 1600,
         "height": 1000
-      }
+      },
+      "catalogueViewMode": "spread-images"
     },
     {
       "slug": "exhibition-1773394358822",
@@ -4518,7 +4519,8 @@
         "detail": "/uploads/exhibitions/1773394368070-02c77f458e841cac23d362b3a6d62233.jpg",
         "width": 1600,
         "height": 1000
-      }
+      },
+      "catalogueViewMode": "spread-images"
     },
     {
       "slug": "exhibition-1773399222802",

@@ -94,6 +94,13 @@ export default async function ExhibitionDetailPage({
   const catalogueTitle = exhibition.catalogueTitle;
   const catalogueNote = exhibition.catalogueNote ?? exhibition.catalogueIntro;
   const curatorialNote = exhibition.curatorialNote ?? exhibition.curatorialLead;
+  const showsSpreadImageCatalogue = exhibition.catalogueViewMode === "spread-images";
+  const catalogueCountValue = showsSpreadImageCatalogue
+    ? { zh: `${cataloguePageCount} 幅`, en: `${cataloguePageCount} spreads` }
+    : { zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` };
+  const catalogueCountLabel = showsSpreadImageCatalogue
+    ? { zh: "图录版面", en: "Catalogue Spreads" }
+    : detailCopy.summaryLine.catalogueUnit;
 
   return (
     <>
@@ -143,7 +150,7 @@ export default async function ExhibitionDetailPage({
             </div>
             <div className="space-y-2.5 border-t border-[var(--line)]/65 pt-3">
               <InfoFact label={detailCopy.summaryLine.highlightUnit} value={{ zh: `${featuredWorksCount} 件`, en: `${featuredWorksCount} works` }} />
-              <InfoFact label={detailCopy.summaryLine.catalogueUnit} value={{ zh: `${cataloguePageCount} 页`, en: `${cataloguePageCount} pages` }} />
+              <InfoFact label={catalogueCountLabel} value={catalogueCountValue} />
               {getPrimaryText(catalogueTitle) ? <InfoFact label={catalogueTitleLabel} value={catalogueTitle} /> : null}
             </div>
             {cataloguePageImages.length > 0 ? (
@@ -185,6 +192,7 @@ export default async function ExhibitionDetailPage({
             title={catalogueTitle}
             note={catalogueNote}
             pages={cataloguePageImages}
+            viewMode={exhibition.catalogueViewMode}
           />
         </section>
       ) : null}

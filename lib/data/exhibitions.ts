@@ -40,6 +40,7 @@ export const exhibitions: Exhibition[] = [
     ),
     cataloguePages: 96,
     cataloguePageCount: 96,
+    catalogueViewMode: "spread-images",
     catalogueNote: bt(
       "收录 18 件重点作品，附策展前言、作品页与图像索引。",
       "Including 18 key works with a curatorial preface, object entries, and image index."
@@ -93,6 +94,7 @@ export const exhibitions: Exhibition[] = [
     ),
     cataloguePages: 88,
     cataloguePageCount: 88,
+    catalogueViewMode: "spread-images",
     catalogueNote: bt(
       "围绕材料、区域与图像关系展开，收录 16 件重点作品与一篇研究前言。",
       "Focused on material, region, and image, with 16 key works and a research preface."
