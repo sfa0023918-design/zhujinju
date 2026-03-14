@@ -37,10 +37,22 @@ export function EditorialPageHero({
           />
         </div>
         <div className="mt-5 max-w-[30rem] space-y-3 border-t border-[var(--line)]/70 pt-4 lg:mt-0 lg:max-w-[25rem] lg:border-t-0 lg:pt-0">
-          <p className="max-w-[27ch] text-[0.94rem] leading-7 text-[var(--muted)]">{description.zh}</p>
-          <p className="max-w-[32ch] text-[0.9rem] leading-7 text-[var(--muted)]/88">
-            {aside?.zh ?? description.en}
-          </p>
+          <BilingualText
+            as="p"
+            text={description}
+            className="flex max-w-[32ch] flex-col gap-2 text-[var(--muted)]"
+            zhClassName="text-[0.94rem] leading-7"
+            enClassName="text-[0.82rem] leading-6 text-[var(--muted)]/82"
+          />
+          {aside ? (
+            <BilingualText
+              as="p"
+              text={aside}
+              className="flex max-w-[34ch] flex-col gap-2 text-[var(--muted)]/88"
+              zhClassName="text-[0.92rem] leading-7"
+              enClassName="text-[0.8rem] leading-6 text-[var(--muted)]/76"
+            />
+          ) : null}
         </div>
       </div>
     </section>

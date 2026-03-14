@@ -77,12 +77,36 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             ) : null}
           </div>
           <div className="border-t border-[var(--line)]/80 pt-4">
-            <p className="text-[15px] leading-8 text-[var(--muted)]">{siteConfig.contact.address.zh}</p>
-            <p className="mt-3 text-[15px] leading-8 text-[var(--muted)]">{siteConfig.contact.appointmentNote.zh}</p>
+            <BilingualText
+              as="div"
+              text={siteConfig.contact.address}
+              className="flex flex-col gap-1.5 text-[var(--muted)]"
+              zhClassName="text-[15px] leading-8"
+              enClassName="text-[13px] leading-6 text-[var(--muted)]/82"
+            />
+            <BilingualText
+              as="div"
+              text={siteConfig.contact.appointmentNote}
+              className="mt-3 flex flex-col gap-1.5 text-[var(--muted)]"
+              zhClassName="text-[15px] leading-8"
+              enClassName="text-[13px] leading-6 text-[var(--muted)]/82"
+            />
           </div>
           <div className="border-t border-[var(--line)]/80 pt-4">
-            <p className="text-[15px] leading-8 text-[var(--muted)]">{siteConfig.contact.replyWindow.zh}</p>
-            <p className="mt-2 text-[15px] leading-8 text-[var(--muted)]">{siteConfig.contact.collaborationNote.zh}</p>
+            <BilingualText
+              as="div"
+              text={siteConfig.contact.replyWindow}
+              className="flex flex-col gap-1.5 text-[var(--muted)]"
+              zhClassName="text-[15px] leading-8"
+              enClassName="text-[13px] leading-6 text-[var(--muted)]/82"
+            />
+            <BilingualText
+              as="div"
+              text={siteConfig.contact.collaborationNote}
+              className="mt-2 flex flex-col gap-1.5 text-[var(--muted)]"
+              zhClassName="text-[15px] leading-8"
+              enClassName="text-[13px] leading-6 text-[var(--muted)]/82"
+            />
           </div>
         </div>
         <ContactForm

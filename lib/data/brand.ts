@@ -84,7 +84,7 @@ export const operationalFacts = [
   },
   {
     title: bt("研究文章", "Research Writing"),
-    value: bt("3 篇公开文章", "3 published texts"),
+    value: bt("3 篇公开文章", "3 published articles"),
     description: bt(
       "围绕观看方法、展览方法与市场判断持续发布研究与札记。",
       "Research notes continue to address methods of looking, exhibition practice, and market judgement."
