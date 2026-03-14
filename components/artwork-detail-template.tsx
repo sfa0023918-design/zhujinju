@@ -11,7 +11,6 @@ import type {
   SiteConfigContent,
 } from "@/lib/site-data";
 import { getArtworkStatusText } from "@/lib/bilingual";
-import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
 
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
@@ -192,26 +191,11 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
 export function ArtworkInquiry({
   artwork,
   detailCopy,
-  siteConfig,
   locale,
 }: ArtworkInquiryProps) {
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
   const isSold = artwork.status === "sold";
   const supportItems = artwork.inquirySupport.filter(hasText);
-  const whatsappValue = siteConfig.contact.whatsapp.trim() || siteConfig.contact.phone.trim();
-  const contactRows = [
-    { label: "Email", value: siteConfig.contact.email, href: `mailto:${siteConfig.contact.email}` },
-    { label: "WeChat", value: siteConfig.contact.wechat },
-    { label: "Phone", value: siteConfig.contact.phone, href: getTelHref(siteConfig.contact.phone) ?? undefined },
-    { label: "WhatsApp", value: whatsappValue, href: getWhatsAppHref(whatsappValue) ?? undefined },
-    {
-      label: "Instagram",
-      value: siteConfig.contact.instagram,
-      href: siteConfig.contact.instagram.startsWith("http")
-        ? siteConfig.contact.instagram
-        : `https://instagram.com/${siteConfig.contact.instagram.replace(/^@/, "")}`,
-    },
-  ].filter((item) => item.value.trim());
 
   return (
     <div className="space-y-3.5 border-t border-[var(--line)]/34 pt-5">
@@ -262,38 +246,8 @@ export function ArtworkInquiry({
         </div>
       ) : null}
 
-      {(contactRows.length || hasText(siteConfig.contact.appointmentNote) || detailCopy.backAction.zh) ? (
+      {detailCopy.backAction.zh ? (
         <div className="space-y-2.5 border-t border-[var(--line)]/20 pt-3">
-          {contactRows.length ? (
-            <dl className="grid gap-y-2 sm:grid-cols-2 sm:gap-x-6">
-              {contactRows.map((item) => (
-                <div key={`${artwork.slug}-${item.label}`} className="min-w-0">
-                  <dt className="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/68 leading-[1.45]">
-                    {item.label}
-                  </dt>
-                  <dd className="mt-1 text-[0.84rem] leading-6 text-[var(--ink)]">
-                    {item.href ? (
-                      <a href={item.href} className="transition-colors hover:text-[var(--accent)]">
-                        {item.value}
-                      </a>
-                    ) : (
-                      item.value
-                    )}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-
-          {hasText(siteConfig.contact.appointmentNote) ? (
-            <p
-              lang={locale === "en" ? "en" : "zh-CN"}
-              className="max-w-[26rem] text-[0.84rem] leading-7 text-[var(--muted)]/92"
-            >
-              {getLocalizedText(siteConfig.contact.appointmentNote, locale)}
-            </p>
-          ) : null}
-
           <HistoryBackLink
             fallbackHref="/collection"
             className="inline-flex items-center text-[0.72rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
