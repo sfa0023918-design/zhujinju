@@ -4227,9 +4227,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1773546423890-115阿弥陀佛唐卡-正.jpg",
       "gallery": [],
-      "featured": false
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773546423890-115阿弥陀佛唐卡-正.jpg",
+        "card": "/uploads/artworks/1773546423890-115阿弥陀佛唐卡-正-card.jpg",
+        "hero": "/uploads/artworks/1773546423890-115阿弥陀佛唐卡-正.jpg",
+        "detail": "/uploads/artworks/1773546423890-115阿弥陀佛唐卡-正.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": []
     }
   ],
   "exhibitions": [
