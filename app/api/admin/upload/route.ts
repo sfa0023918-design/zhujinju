@@ -4,6 +4,7 @@ import { getAdminSession } from "@/lib/admin-auth";
 import { assertMediaTargetExists, saveArtworkMediaField, saveRecordMediaField } from "@/lib/content-store";
 import { uploadAdminImage } from "@/lib/admin-media";
 import { revalidatePublicSite } from "@/lib/public-site-revalidate";
+import { appendDeployStatusMessage, triggerVercelDeploy } from "@/lib/vercel-deploy";
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -55,11 +56,13 @@ export async function POST(request: Request) {
         asset: result.asset,
       });
       revalidatePublicSite();
+      const deploy = await triggerVercelDeploy(`Admin uploaded artwork media for ${targetId}`);
 
       return NextResponse.json({
         ...result,
         saved: true,
-        message: "图片已上传并写入当前藏品。",
+        deployTriggered: deploy.triggered,
+        message: appendDeployStatusMessage("图片已上传并写入当前藏品。", deploy),
       });
     }
 
@@ -68,11 +71,13 @@ export async function POST(request: Request) {
         asset: result.asset,
       });
       revalidatePublicSite();
+      const deploy = await triggerVercelDeploy(`Admin uploaded ${targetSection} cover media for ${targetId}`);
 
       return NextResponse.json({
         ...result,
         saved: true,
-        message: "图片已上传并写入当前内容。",
+        deployTriggered: deploy.triggered,
+        message: appendDeployStatusMessage("图片已上传并写入当前内容。", deploy),
       });
     }
 

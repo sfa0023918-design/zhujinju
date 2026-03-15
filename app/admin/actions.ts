@@ -55,7 +55,7 @@ export async function saveAdminSection(
 
     revalidatePublicSite();
 
-    return { success: "内容已保存。Vercel 将自动重新部署正式站点。" };
+    return { success: "内容已保存。正式站内容会自动刷新；若本次包含新上传图片，请等待图片同步完成。" };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "保存失败，请检查 JSON 格式。",

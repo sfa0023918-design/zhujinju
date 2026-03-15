@@ -421,7 +421,7 @@ export function AdminMediaField({
       onPersisted?.(payload.url);
       setMessage(
         payload.saved
-          ? payload.message ?? "图片已上传并写入当前内容。前台需等待正式站完成同步后显示，通常需要 1-3 分钟。"
+          ? payload.message ?? "图片已上传并写入当前内容。系统正在同步到正式站，请稍后刷新前台。"
           : autoSaveAfterUpload
           ? prepared.transformed
             ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存。保存后仍需等待正式站同步完成，前台才会显示。"

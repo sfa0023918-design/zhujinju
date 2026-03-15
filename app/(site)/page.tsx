@@ -101,13 +101,29 @@ export default async function HomePage() {
                 enClassName="text-[0.48rem] uppercase tracking-[0.18em] text-[var(--accent)]/64"
               />
               <div className="space-y-2.5">
-                <p className="font-serif text-[clamp(2.56rem,4.45vw,3.56rem)] leading-[0.98] tracking-[-0.04em] text-[var(--ink)]">
-                  {currentExhibition.title.zh}
-                </p>
+                <BilingualText
+                  as="div"
+                  text={currentExhibition.title}
+                  className="font-serif text-[var(--ink)]"
+                  zhClassName="block text-[clamp(2.56rem,4.45vw,3.56rem)] leading-[0.98] tracking-[-0.04em]"
+                  enClassName="mt-2 block font-sans text-[0.7rem] uppercase tracking-[0.18em] text-[var(--accent)]/64"
+                />
               </div>
-              <div className="grid gap-2 border-y border-[var(--line)] py-3.5 text-[0.92rem] leading-7 text-[var(--muted)]">
-                <p>{currentExhibition.period.zh}</p>
-                <p>{currentExhibition.venue.zh}</p>
+              <div className="grid gap-2 border-y border-[var(--line)] py-3.5 text-[var(--muted)]">
+                <BilingualText
+                  as="p"
+                  text={currentExhibition.period}
+                  className="flex flex-col gap-1"
+                  zhClassName="text-[0.92rem] leading-7"
+                  enClassName="text-[0.56rem] uppercase tracking-[0.14em] leading-5 text-[var(--accent)]/66"
+                />
+                <BilingualText
+                  as="p"
+                  text={currentExhibition.venue}
+                  className="flex flex-col gap-1"
+                  zhClassName="text-[0.92rem] leading-7"
+                  enClassName="text-[0.56rem] uppercase tracking-[0.14em] leading-5 text-[var(--accent)]/66"
+                />
               </div>
               <div className="flex flex-wrap gap-4 pt-1">
                 <Link href={`/exhibitions/${currentExhibition.slug}`} className="inline-flex text-[var(--ink)]">

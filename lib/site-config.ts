@@ -69,7 +69,7 @@ export const siteConfig: SiteConfigContent = {
     informationHeading: bt("信息与请求", "Information"),
     collectionLink: bt("藏品浏览", "Browse Collection"),
     exhibitionsLink: bt("展览与图录", "Exhibitions & Catalogues"),
-    journalLink: bt("文章与研究", "Journal & Research"),
+    journalLink: bt("文章与研究", "Journal"),
     pdfRequestLabel: bt("PDF 索取", "PDF Request"),
     instagramLabel: bt("Instagram", "Instagram"),
     wechatLabel: bt("微信", "WeChat"),
@@ -77,7 +77,7 @@ export const siteConfig: SiteConfigContent = {
   contact: {
     email: "contact@zhujinju.com",
     phone: "+86 188 0738 1234",
-    wechat: "竹瑾居 张弥",
+    wechat: "zhujinju_art",
     whatsapp: "+86 188 0738 1234",
     instagram: "@zhujinju_arts",
     pdfRequest: "contact@zhujinju.com",

@@ -83,9 +83,9 @@ export function ExhibitionCatalogueViewer({
     ? `${currentIndex + 1}${cataloguePages[currentIndex + 1] ? ` - ${currentIndex + 2}` : ""}`
     : `${currentIndex + 1}`;
   const readingModeLabel = showsSpreadImage
-    ? "跨页图版 / Spread Plate"
+    ? "图录页 / Catalogue Page"
     : isDesktop
-      ? "双页展开 / Spread View"
+      ? "双页浏览 / Facing Pages"
       : "单页阅读 / Single Page";
   const visiblePageNumbers = visiblePages
     .map((page, index) => (page ? currentIndex + index + 1 : null))
@@ -133,7 +133,7 @@ export function ExhibitionCatalogueViewer({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.68rem] tracking-[0.22em] text-[var(--accent)]/74">
             <span>电子图录 / DIGITAL CATALOGUE</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
-            <span>{showsSpreadImage ? `Spread Count · ${totalPages}` : `Plate Count · ${totalPages}`}</span>
+            <span>{`Page Count · ${totalPages}`}</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
             <span>{readingModeLabel}</span>
           </div>
@@ -154,7 +154,9 @@ export function ExhibitionCatalogueViewer({
           <div className="pointer-events-none absolute inset-x-6 top-0 h-16 rounded-full bg-white/54 blur-2xl" />
           <div className="relative flex items-center justify-between gap-3 border-b border-[var(--line)]/56 pb-3">
             <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--accent)]/68">Reading Note</p>
-            <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]/68">Current Spread · {stageSummary}</p>
+            <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]/68">
+              {visiblePageNumbers.length > 1 ? `Current Pages · ${stageSummary}` : `Current Page · ${stageSummary}`}
+            </p>
           </div>
           <BilingualText
             as="p"
@@ -166,7 +168,7 @@ export function ExhibitionCatalogueViewer({
           <div className="relative mt-4 grid gap-3 border-t border-[var(--line)]/56 pt-3 text-[0.69rem] text-[var(--accent)]/76 md:grid-cols-3">
             <EditorialFact label="导航" value="Arrow keys" />
             <EditorialFact label="手势" value="Swipe to turn" />
-            <EditorialFact label="索引" value="Plate index" />
+            <EditorialFact label="索引" value="Page index" />
           </div>
         </div>
       </div>
@@ -178,7 +180,7 @@ export function ExhibitionCatalogueViewer({
         <div className="relative mb-5 flex flex-col gap-3 border-b border-[var(--line)]/62 pb-4 text-[0.72rem] tracking-[0.18em] text-[var(--accent)]/82 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span>
-              {showsSpreadImage ? `第 ${currentLabel} 幅 / 共 ${totalPages} 幅` : `第 ${currentLabel} 页 / 共 ${totalPages} 页`}
+              {`第 ${currentLabel} 页 / 共 ${totalPages} 页`}
             </span>
             <span className="h-px w-6 bg-[var(--line-strong)]/26" aria-hidden="true" />
             <span>当前展开 / {stageSummary}</span>

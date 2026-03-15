@@ -38,7 +38,7 @@ const EXACT_GLOSSARY = new Map<string, string>([
   ["欢迎藏家、机构、策展人与研究者联系。", "Collectors, institutions, curators, and researchers are welcome to get in touch."],
   ["浏览藏品", "Browse Collection"],
   ["展览与图录", "Exhibitions & Catalogues"],
-  ["文章与研究", "Journal & Research"],
+  ["文章与研究", "Journal"],
   ["联系", "Contact"],
   ["关于", "About"],
 ]);

@@ -116,6 +116,6 @@ export async function uploadAdminImage(
     url: originalUrl,
     fileName: `${baseFileName}${ext}`,
     asset,
-    message: "图片已上传并写入当前内容。前台需等待正式站完成同步后显示，通常需要 1-3 分钟，请勿重复上传同一张图。",
+    message: "图片已上传成功。若已绑定到正式内容，系统会继续同步到正式站，请勿重复上传同一张图。",
   };
 }

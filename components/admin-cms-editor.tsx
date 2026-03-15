@@ -438,8 +438,8 @@ function useWebsiteSyncStatus({
         phase: attempt === 0 ? "waiting" : "publishing",
         message:
           attempt === 0
-            ? "内容已保存，正在等待正式站同步。图片类变更通常需要 1-3 分钟。"
-            : "正式站正在同步最新内容。若刚上传图片，请稍等片刻再刷新前台。",
+            ? "内容已保存，正在等待正式站同步。若本次包含新上传图片，系统会继续触发正式站部署。"
+            : "正式站正在同步最新内容。若刚上传图片，请等待自动部署完成后再刷新前台。",
         hasPendingChanges: true,
         publicImpact: true,
       }));

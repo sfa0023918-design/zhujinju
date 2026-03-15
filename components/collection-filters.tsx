@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { bt } from "@/lib/bilingual";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
@@ -77,6 +78,7 @@ export function CollectionFilters({
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<number | null>(null);
   const [openKey, setOpenKey] = useState<FilterKey | null>(null);
+  const resultCountLabel = bt(`${resultCount} 件作品`, `${resultCount} works`);
 
   const cancelClose = () => {
     if (closeTimerRef.current !== null) {
@@ -277,7 +279,13 @@ export function CollectionFilters({
         </Link>
 
         <div className="md:ml-auto flex items-center">
-          <span className="select-none text-[0.72rem] tracking-[0.06em] text-[var(--muted)]/82">{`${resultCount} 件作品`}</span>
+          <BilingualText
+            as="span"
+            text={resultCountLabel}
+            className="flex flex-col select-none text-left text-[var(--muted)]/82"
+            zhClassName="text-[0.72rem] tracking-[0.06em]"
+            enClassName="mt-1 text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/72"
+          />
         </div>
       </div>
 
@@ -313,13 +321,25 @@ export function CollectionFilters({
                       : "border-[var(--line)]/52 text-[var(--muted)]"
                   }`}
                 >
-                  <span className="text-[0.72rem]">{field.label.zh}</span>
-                  <span
-                    className={`text-[0.46rem] uppercase tracking-[0.14em] ${
-                      isActive || isOpen ? "text-[var(--accent)]/88" : "text-[var(--accent)]/82"
-                    }`}
-                  >
-                    {currentLabel.zh}
+                  <span className="min-w-0">
+                    <BilingualText
+                      as="span"
+                      text={field.label}
+                      className="flex flex-col text-left"
+                      zhClassName="text-[0.72rem]"
+                      enClassName="mt-0.5 text-[0.4rem] uppercase tracking-[0.14em] text-[var(--accent)]/72"
+                    />
+                  </span>
+                  <span className="min-w-0 text-right">
+                    <BilingualText
+                      as="span"
+                      text={currentLabel}
+                      className="flex flex-col"
+                      zhClassName="truncate text-[0.68rem]"
+                      enClassName={`mt-0.5 truncate text-[0.38rem] uppercase tracking-[0.14em] ${
+                        isActive || isOpen ? "text-[var(--accent)]/88" : "text-[var(--accent)]/82"
+                      }`}
+                    />
                   </span>
                 </button>
 
@@ -375,11 +395,23 @@ export function CollectionFilters({
             href="/collection"
             className="inline-flex min-h-[2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/52 px-2.75 py-[0.32rem] text-[var(--muted)]"
           >
-            <span className="text-[0.66rem]">{labels.reset.zh}</span>
+            <BilingualText
+              as="span"
+              text={labels.reset}
+              className="flex flex-col text-left"
+              zhClassName="text-[0.66rem]"
+              enClassName="mt-0.5 text-[0.42rem] uppercase tracking-[0.14em] text-[var(--accent)]/76"
+            />
           </Link>
         </div>
         <div>
-          <span className="select-none text-[0.72rem] tracking-[0.06em] text-[var(--muted)]/82">{`${resultCount} 件作品`}</span>
+          <BilingualText
+            as="span"
+            text={resultCountLabel}
+            className="flex flex-col select-none text-left text-[var(--muted)]/82"
+            zhClassName="text-[0.72rem] tracking-[0.06em]"
+            enClassName="mt-1 text-[0.46rem] uppercase tracking-[0.14em] text-[var(--accent)]/72"
+          />
         </div>
       </div>
 

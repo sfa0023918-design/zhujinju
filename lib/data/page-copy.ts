@@ -13,7 +13,7 @@ export const pageCopy = {
       informationHeading: bt("信息与请求", "Information"),
       collectionLink: bt("藏品浏览", "Browse Collection"),
       exhibitionsLink: bt("展览与图录", "Exhibitions & Catalogues"),
-      journalLink: bt("文章与研究", "Journal & Research"),
+      journalLink: bt("文章与研究", "Journal"),
       pdfRequestLabel: bt("PDF 索取", "PDF Request"),
       instagramLabel: bt("Instagram", "Instagram"),
       wechatLabel: bt("微信", "WeChat"),
@@ -50,9 +50,9 @@ export const pageCopy = {
     heroEyebrow: bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art and Asian Antiquities"),
     heroTitle: bt("让作品先说话。", "Let the Work Speak First."),
     heroPrimaryAction: bt("浏览藏品", "Browse Collection"),
-    heroSecondaryAction: bt("查看展览与图录", "View Exhibitions"),
+    heroSecondaryAction: bt("查看展览与图录", "View Exhibitions & Catalogues"),
     focusCurrent: {
-      eyebrow: bt("当前专题", "Current Focus"),
+      eyebrow: bt("当前专题", "Current Exhibition"),
       description: bt(
         "围绕当前正在进行的专题展览，继续呈现重点作品、图录整理与观看方法。",
         "A current exhibition continuing Zhu Jin Ju's object-centered approach through selected works, catalogues, and ways of looking.",
@@ -102,7 +102,7 @@ export const pageCopy = {
         "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page.",
       ),
     },
-    contactPrimaryAction: bt("前往联系页面", "Contact Page"),
+    contactPrimaryAction: bt("前往联系页面", "Contact Us"),
     contactSecondaryAction: bt("查看文章与研究", "Read Journal"),
   },
   about: {
@@ -158,10 +158,10 @@ export const pageCopy = {
   collection: {
     hero: {
       eyebrow: bt("藏品", "Collection"),
-      title: bt("藏品浏览", "Browse the Collection"),
+      title: bt("藏品浏览", "Browse Collection"),
       description: bt(
         "按品类、地区、年代与材质筛选，建立更清晰的作品观看路径。",
-        "Filter by category, region, period, and material for a more streamlined viewing experience.",
+        "Filter by category, region, period, and material to create a clearer path through the works.",
       ),
       aside: bt(
         "字段沿用古董商与研究型图录常见的信息结构，便于从作品浏览直接进入深入比较与询洽。",
@@ -194,8 +194,8 @@ export const pageCopy = {
     provenance: bt("来源", "Provenance"),
     exhibitions: bt("展览", "Exhibitions"),
     publications: bt("出版", "Publications"),
-    relatedExhibitions: bt("相关展览", "Related Exhibition"),
-    relatedArticles: bt("相关文章", "Related Writing"),
+    relatedExhibitions: bt("相关展览", "Related Exhibitions"),
+    relatedArticles: bt("相关文章", "Related Articles"),
     relatedWorks: bt("相关推荐", "Related Works"),
     relatedWorksTitle: bt("同类方向中的其他作品", "Other Works in the Same Direction"),
     fieldLabels: {
@@ -207,7 +207,7 @@ export const pageCopy = {
   },
   exhibitions: {
     hero: {
-      eyebrow: bt("展览与图录", "Exhibitions"),
+      eyebrow: bt("展览与图录", "Exhibitions & Catalogues"),
       title: bt("展览与图录", "Exhibitions & Catalogues"),
       description: bt(
         "持续做展览与图录，不是附加动作，而是竹瑾居专业工作本身。",
@@ -231,7 +231,7 @@ export const pageCopy = {
       catalogueUnit: bt("页图录", "catalogue pages"),
     },
     catalogueNote: bt("图录说明", "Catalogue Note"),
-    relatedWriting: bt("相关文字", "Related Writing"),
+    relatedWriting: bt("相关文字", "Related Articles"),
     highlightedWorks: bt("重点作品", "Highlighted Works"),
     highlightedWorksTitle: bt("展览中的关键观看节点", "Key Viewing Points Within the Exhibition"),
   },
@@ -251,7 +251,7 @@ export const pageCopy = {
     errorTitle: bt("文章未找到", "Article Not Found"),
     errorDescription: bt("当前文章不存在或尚未公开。", "This article is unavailable or not yet published."),
     backAction: bt("返回文章", "Back to Journal"),
-    relatedExhibitions: bt("相关展览", "Related Exhibition"),
+    relatedExhibitions: bt("相关展览", "Related Exhibitions"),
     relatedWorks: bt("相关藏品", "Related Works"),
   },
 };

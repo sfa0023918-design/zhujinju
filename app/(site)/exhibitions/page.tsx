@@ -156,7 +156,7 @@ export default async function ExhibitionsPage() {
                     text={exhibition.intro}
                     className="max-w-[28ch] text-[var(--muted)]"
                     zhClassName="text-[0.9rem] leading-7"
-                    enClassName="hidden"
+                    enClassName="mt-2 block text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/62"
                   />
                 </div>
                 <div className="border-t border-[var(--line)]/68 pt-4">

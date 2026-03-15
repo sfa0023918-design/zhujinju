@@ -126,14 +126,31 @@ export default async function JournalPage() {
                   <p className="max-w-[28ch] text-[0.9rem] leading-7 text-[var(--muted)]/94">
                     {article.excerpt.zh}
                   </p>
+                  <p className="max-w-[28ch] text-[0.6rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/62">
+                    {article.excerpt.en}
+                  </p>
                 </div>
                 <div className="space-y-3.5 border-t border-[var(--line)]/75 pt-4 text-sm leading-7 text-[var(--muted)]">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-2 text-[0.8rem] leading-7 text-[var(--muted)]/92">
                     <span className="select-none">{article.date}</span>
                     <span className="h-[10px] w-px bg-[var(--line)]/75" aria-hidden="true" />
-                    <span className="select-none">{article.author.zh}</span>
+                    <BilingualText
+                      as="span"
+                      text={article.author}
+                      mode="inline"
+                      className="select-none"
+                      zhClassName="text-[0.8rem]"
+                      enClassName="text-[0.5rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
+                    />
                     <span className="h-[10px] w-px bg-[var(--line)]/75" aria-hidden="true" />
-                    <span className="select-none">{article.column.zh}</span>
+                    <BilingualText
+                      as="span"
+                      text={article.column}
+                      mode="inline"
+                      className="select-none"
+                      zhClassName="text-[0.8rem]"
+                      enClassName="text-[0.5rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
+                    />
                   </div>
                   <div className="flex flex-wrap items-end justify-between gap-4 border-t border-[var(--line)]/62 pt-3.5">
                     <div className="flex flex-wrap gap-1.5">

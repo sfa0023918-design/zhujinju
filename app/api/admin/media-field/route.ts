@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
 import { saveArtworkMediaField, saveRecordMediaField } from "@/lib/content-store";
 import { revalidatePublicSite } from "@/lib/public-site-revalidate";
+import { appendDeployStatusMessage, triggerVercelDeploy } from "@/lib/vercel-deploy";
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
@@ -35,13 +36,15 @@ export async function POST(request: Request) {
         },
       );
       revalidatePublicSite();
+      const deploy = await triggerVercelDeploy(`Admin updated artwork media field for ${body.targetId}`);
 
       return NextResponse.json({
         saved: true,
         message:
-          body.value && String(body.value).trim()
-            ? "图片路径已写入当前藏品。"
-            : "图片已从当前藏品中移除。",
+          appendDeployStatusMessage(
+            body.value && String(body.value).trim() ? "图片路径已写入当前藏品。" : "图片已从当前藏品中移除。",
+            deploy,
+          ),
       });
     }
 
@@ -54,13 +57,15 @@ export async function POST(request: Request) {
         session.email,
       );
       revalidatePublicSite();
+      const deploy = await triggerVercelDeploy(`Admin updated ${body.targetSection} cover media for ${body.targetId}`);
 
       return NextResponse.json({
         saved: true,
         message:
-          body.value && String(body.value).trim()
-            ? "封面图已写入当前内容。"
-            : "封面图已从当前内容中移除。",
+          appendDeployStatusMessage(
+            body.value && String(body.value).trim() ? "封面图已写入当前内容。" : "封面图已从当前内容中移除。",
+            deploy,
+          ),
       });
     }
 

@@ -34,7 +34,7 @@ npm run dev
 2. 在网页中编辑各内容分区。
 3. 点击保存后，系统会更新 `content/site-content.json`。
 4. 如果已配置 GitHub 写回变量，后台会把变更提交回 GitHub 仓库。
-5. Vercel 监听到 GitHub 更新后，会自动重新部署正式站点。
+5. 文字内容会直接从内容源同步到正式站；新上传的图片如需自动上线，还需要配置 `VERCEL_DEPLOY_HOOK_URL`，让后台在上传后自动触发正式站部署。
 
 ## 生产构建
 
@@ -85,5 +85,6 @@ MAINTENANCE_CN.md   后续维护说明
 - 联系表单需配置 `RESEND_API_KEY`、`INQUIRY_FROM_EMAIL`、`INQUIRY_TO_EMAIL` 后才会真正投递邮件。
 - 联系表单已包含基础防刷：隐藏蜜罐字段、最短提交间隔、按 IP 的简单限流。
 - 线上后台保存依赖 GitHub 写回变量，建议为 `GITHUB_CONTENTS_TOKEN` 使用单仓库、最小权限的 Fine-grained Token。
+- 若后台上传的新图片要自动出现在正式站，请在 Vercel 配置 `VERCEL_DEPLOY_HOOK_URL`。
 - Vercel 部署说明请查看 `DEPLOY_CN.md`。
 - 日常维护分工请查看 `MAINTENANCE_CN.md`。

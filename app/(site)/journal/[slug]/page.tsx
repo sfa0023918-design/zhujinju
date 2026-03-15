@@ -112,9 +112,23 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-2 text-[0.84rem] leading-7 text-[var(--muted)]/92">
             <p className="select-none">{article.date}</p>
             <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
-            <p className="select-none">{article.author.zh}</p>
+            <BilingualText
+              as="p"
+              text={article.author}
+              mode="inline"
+              className="select-none"
+              zhClassName="text-[0.84rem]"
+              enClassName="text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
+            />
             <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
-            <p className="select-none">{article.column.zh}</p>
+            <BilingualText
+              as="p"
+              text={article.column}
+              mode="inline"
+              className="select-none"
+              zhClassName="text-[0.84rem]"
+              enClassName="text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
+            />
           </div>
           <div className="flex flex-wrap gap-1.5 border-t border-[var(--line)]/62 pt-3.5">
             {article.keywords.map((keyword) => (

@@ -62,8 +62,14 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
             <h1 className="font-serif text-[clamp(2.28rem,3.45vw,3rem)] leading-[1.02] tracking-[-0.04em] text-[var(--ink)]">
               {pageCopy.collection.hero.title.zh}
             </h1>
+            <p className="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]/68">
+              {pageCopy.collection.hero.title.en}
+            </p>
             <p className="max-w-[21rem] text-[0.78rem] leading-[1.9] text-[var(--muted)]/88">
               {pageCopy.collection.hero.description.zh}
+            </p>
+            <p className="max-w-[21rem] text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/66">
+              {pageCopy.collection.hero.description.en}
             </p>
           </div>
         </div>

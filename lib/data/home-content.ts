@@ -9,9 +9,9 @@ export const homeContent: HomeContent = {
     "Building long-term discernment through works, exhibitions, catalogues, and research."
   ),
   heroPrimaryAction: bt("浏览藏品", "Browse Collection"),
-  heroSecondaryAction: bt("查看展览与图录", "View Exhibitions"),
+  heroSecondaryAction: bt("查看展览与图录", "View Exhibitions & Catalogues"),
   focusCurrent: {
-    eyebrow: bt("当前专题", "Current Focus"),
+    eyebrow: bt("当前专题", "Current Exhibition"),
     description: bt(
       "围绕当前正在进行的专题展览，继续呈现重点作品、图录整理与观看方法。",
       "A current exhibition continuing Zhu Jin Ju's object-centered approach through selected works, catalogues, and ways of looking."
@@ -61,6 +61,6 @@ export const homeContent: HomeContent = {
       "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page."
     ),
   },
-  contactPrimaryAction: bt("前往联系页面", "Contact Page"),
+  contactPrimaryAction: bt("前往联系页面", "Contact Us"),
   contactSecondaryAction: bt("查看文章与研究", "Read Journal"),
 };
