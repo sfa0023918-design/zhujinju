@@ -37,11 +37,97 @@ type BilingualReadingPanelProps = {
   showToggle?: boolean;
 };
 
-function splitParagraphs(text: string) {
+function normalizeProseWhitespace(text: string) {
+  return text.replace(/\r\n/g, "\n").replace(/\u00a0/g, " ").trim();
+}
+
+function collapseInlineWhitespace(text: string) {
   return text
-    .split(/\n\s*\n+/)
-    .map((paragraph) => paragraph.trim())
+    .replace(/\s*\n+\s*/g, " ")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+function normalizeChineseSpacing(text: string) {
+  return text
+    .replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g, "$1$2")
+    .replace(/([\u3400-\u9fff])\s+([，。！？：；、])/g, "$1$2")
+    .replace(/([，。！？：；、])\s+([\u3400-\u9fff])/g, "$1$2");
+}
+
+function normalizeParagraphText(text: string, locale: ReadingLocale) {
+  const collapsed = collapseInlineWhitespace(text);
+  return locale === "zh" ? normalizeChineseSpacing(collapsed) : collapsed;
+}
+
+function splitBySentenceGroups(text: string, locale: ReadingLocale) {
+  const sentenceRegex =
+    locale === "zh"
+      ? /[^。！？!?]+[。！？!?]?/g
+      : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
+  const joiner = locale === "zh" ? "" : " ";
+  const targetLength = locale === "zh" ? 116 : 260;
+  const maxLength = locale === "zh" ? 220 : 460;
+  const sentences = (text.match(sentenceRegex) ?? [])
+    .map((sentence) => sentence.trim())
     .filter(Boolean);
+
+  if (sentences.length <= 2) {
+    return [text];
+  }
+
+  const chunks: string[] = [];
+  let current = "";
+
+  sentences.forEach((sentence) => {
+    if (!current) {
+      current = sentence;
+      return;
+    }
+
+    const next = `${current}${joiner}${sentence}`;
+    if (current.length >= targetLength || next.length > maxLength) {
+      chunks.push(current);
+      current = sentence;
+      return;
+    }
+
+    current = next;
+  });
+
+  if (current) {
+    chunks.push(current);
+  }
+
+  return chunks.filter(Boolean);
+}
+
+function splitParagraphs(text: string, locale: ReadingLocale) {
+  const normalized = normalizeProseWhitespace(text);
+  if (!normalized) {
+    return [];
+  }
+
+  const manualParagraphs = normalized
+    .split(/\n\s*\n+/)
+    .map((paragraph) => normalizeParagraphText(paragraph, locale))
+    .filter(Boolean);
+
+  if (manualParagraphs.length > 1) {
+    return manualParagraphs;
+  }
+
+  const singleParagraph = normalizeParagraphText(normalized, locale);
+  if (!singleParagraph) {
+    return [];
+  }
+
+  const autoSplitThreshold = locale === "zh" ? 220 : 420;
+  if (singleParagraph.length < autoSplitThreshold) {
+    return [singleParagraph];
+  }
+
+  return splitBySentenceGroups(singleParagraph, locale);
 }
 
 export function getLocalizedText(content: BilingualValue | null | undefined, locale: ReadingLocale) {
@@ -58,7 +144,7 @@ export function getParagraphsByLocale(content: BilingualProseContent, locale: Re
   const items = Array.isArray(content) ? content : [content];
 
   return items.flatMap((item) => {
-    return splitParagraphs(getLocalizedText(item, locale));
+    return splitParagraphs(getLocalizedText(item, locale), locale);
   });
 }
 
@@ -68,21 +154,23 @@ function hasLocaleContent(content: BilingualProseContent, locale: ReadingLocale)
 }
 
 function proseClasses(variant: ProseVariant, locale: ReadingLocale) {
+  const alignmentClasses = "break-words [text-align:justify] [text-align-last:left]";
+
   if (variant === "lead") {
     return locale === "zh"
-      ? "prose-block prose-block--zh max-w-[39rem] text-[1.04rem] leading-[2.08] text-[var(--ink)] md:text-[1.08rem]"
-      : "prose-block prose-block--en max-w-[31rem] text-[0.93rem] leading-[1.86] text-[var(--muted)]/92 md:text-[0.97rem]";
+      ? `prose-block prose-block--zh max-w-[39rem] text-[1.04rem] leading-[2.08] text-[var(--ink)] md:text-[1.08rem] ${alignmentClasses}`
+      : `prose-block prose-block--en max-w-[39rem] text-[0.93rem] leading-[1.86] text-[var(--muted)]/92 md:text-[0.97rem] ${alignmentClasses}`;
   }
 
   if (variant === "secondary") {
     return locale === "zh"
-      ? "prose-block prose-block--zh max-w-[38rem] text-[0.95rem] leading-[2.02] text-[var(--muted)]"
-      : "prose-block prose-block--en max-w-[30rem] text-[0.86rem] leading-[1.82] text-[var(--muted)]/88";
+      ? `prose-block prose-block--zh max-w-[38rem] text-[0.95rem] leading-[2.02] text-[var(--muted)] ${alignmentClasses}`
+      : `prose-block prose-block--en max-w-[38rem] text-[0.86rem] leading-[1.82] text-[var(--muted)]/88 ${alignmentClasses}`;
   }
 
   return locale === "zh"
-    ? "prose-block prose-block--zh max-w-[42rem] text-[1rem] leading-[2.08] text-[var(--muted)]"
-    : "prose-block prose-block--en max-w-[33rem] text-[0.9rem] leading-[1.84] text-[var(--muted)]/90";
+    ? `prose-block prose-block--zh max-w-[42rem] text-[1rem] leading-[2.08] text-[var(--muted)] ${alignmentClasses}`
+    : `prose-block prose-block--en max-w-[42rem] text-[0.9rem] leading-[1.84] text-[var(--muted)]/90 ${alignmentClasses}`;
 }
 
 function ExpandableReadingText({
@@ -114,12 +202,7 @@ function ExpandableReadingText({
 
     const getCollapsedHeight = () => {
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-
-      if (locale === "zh") {
-        return isDesktop ? 320 : 236.8;
-      }
-
-      return isDesktop ? 224 : 166.4;
+      return isDesktop ? 304 : 208;
     };
 
     const measure = () => {
@@ -166,11 +249,7 @@ function ExpandableReadingText({
         ref={contentRef}
         data-expanded={expanded ? "true" : "false"}
         className={`relative overflow-hidden transition-[max-height] duration-300 ease-out ${
-          !expanded
-            ? locale === "zh"
-              ? "max-h-[14.8rem] md:max-h-[20rem]"
-              : "max-h-[10.4rem] md:max-h-[14rem]"
-            : "max-h-[999rem]"
+          !expanded ? "max-h-[13rem] md:max-h-[19rem]" : "max-h-[999rem]"
         }`}
       >
         <div ref={innerRef} className="space-y-4 md:space-y-5">

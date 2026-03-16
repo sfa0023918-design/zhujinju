@@ -48,7 +48,7 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
 
       <nav
         aria-label="主导航"
-        className="hidden min-w-0 flex-shrink-0 items-center justify-end gap-3 overflow-x-auto text-sm text-[var(--muted)] lg:flex lg:gap-[0.95rem] xl:gap-[1.12rem] 2xl:gap-[1.36rem]"
+        className="hidden min-w-0 flex-shrink-0 items-center justify-end gap-3 overflow-x-auto pl-2 text-sm text-[var(--muted)] lg:flex lg:gap-[0.78rem] lg:pl-3 xl:gap-[1.04rem] xl:pl-5 2xl:gap-[1.26rem]"
       >
         {items.map((item) => (
           <Link
@@ -60,9 +60,9 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
               as="span"
               text={item.label}
               mode="inline"
-              className="text-[0.8rem] xl:text-[0.84rem] 2xl:text-[0.88rem]"
-              zhClassName="text-[0.8rem] font-[430] xl:text-[0.84rem] 2xl:text-[0.88rem]"
-              enClassName="text-[0.5rem] uppercase tracking-[0.115em] text-[var(--accent)]/90 xl:text-[0.52rem] xl:tracking-[0.12em] 2xl:text-[0.55rem] 2xl:tracking-[0.125em]"
+              className="text-[0.76rem] xl:text-[0.83rem] 2xl:text-[0.88rem]"
+              zhClassName="text-[0.76rem] font-[430] xl:text-[0.83rem] 2xl:text-[0.88rem]"
+              enClassName="text-[0.47rem] uppercase tracking-[0.11em] text-[var(--accent)]/90 xl:text-[0.51rem] xl:tracking-[0.12em] 2xl:text-[0.55rem] 2xl:tracking-[0.125em]"
             />
           </Link>
         ))}
