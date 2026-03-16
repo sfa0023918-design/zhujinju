@@ -824,7 +824,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773650359856-l1001089.jpg",
       "gallery": [
-        "/uploads/artworks/1773649336218-58西藏释迦牟尼-正.jpg",
+        "/uploads/artworks/1773650387904-58西藏释迦牟尼-正.jpg",
         "/uploads/artworks/1773649348409-59西藏释迦牟尼-牧女.jpg"
       ],
       "featured": false,
@@ -838,7 +838,10 @@
       },
       "galleryAssets": [
         {
-          "original": "/uploads/artworks/1773649336218-58西藏释迦牟尼-正.jpg"
+          "original": "/uploads/artworks/1773650387904-58西藏释迦牟尼-正.jpg",
+          "card": "/uploads/artworks/1773650387904-58西藏释迦牟尼-正.jpg",
+          "hero": "/uploads/artworks/1773650387904-58西藏释迦牟尼-正.jpg",
+          "detail": "/uploads/artworks/1773650387904-58西藏释迦牟尼-正.jpg"
         },
         {
           "original": "/uploads/artworks/1773649348409-59西藏释迦牟尼-牧女.jpg"
