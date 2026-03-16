@@ -424,7 +424,13 @@ export function ArtworkScholarlyNote({
           })}
         </div>
       </div>
-      <BilingualReadingPanel sections={sections} locale={locale} onLocaleChange={onLocaleChange} showToggle={false} />
+      <BilingualReadingPanel
+        sections={sections}
+        locale={locale}
+        onLocaleChange={onLocaleChange}
+        showToggle={false}
+        zhFirstLineIndent
+      />
     </section>
   );
 }

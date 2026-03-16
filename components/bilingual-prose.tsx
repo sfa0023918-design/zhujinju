@@ -35,6 +35,7 @@ type BilingualReadingPanelProps = {
   locale?: ReadingLocale;
   onLocaleChange?: (locale: ReadingLocale) => void;
   showToggle?: boolean;
+  zhFirstLineIndent?: boolean;
 };
 
 function normalizeProseWhitespace(text: string) {
@@ -177,10 +178,12 @@ function ExpandableReadingText({
   paragraphs,
   locale,
   variant,
+  paragraphClassName,
 }: {
   paragraphs: string[];
   locale: ReadingLocale;
   variant: ProseVariant;
+  paragraphClassName?: string;
 }) {
   const [expandedByLocale, setExpandedByLocale] = useState<Record<ReadingLocale, boolean>>({
     zh: false,
@@ -257,7 +260,7 @@ function ExpandableReadingText({
             <p
               key={`${locale}-${index}`}
               lang={locale === "en" ? "en" : "zh-CN"}
-              className={proseClasses(variant, locale)}
+              className={`${proseClasses(variant, locale)} ${paragraphClassName ?? ""}`.trim()}
             >
               {paragraph}
             </p>
@@ -353,6 +356,7 @@ export function BilingualReadingPanel({
   locale: controlledLocale,
   onLocaleChange,
   showToggle = true,
+  zhFirstLineIndent = false,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -388,6 +392,7 @@ export function BilingualReadingPanel({
       <div className="space-y-7">
         {sections.map((section) => {
           const paragraphs = getParagraphsByLocale(section.content, locale);
+          const paragraphClassName = zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "";
 
           if (!paragraphs.length) {
             return null;
@@ -410,6 +415,7 @@ export function BilingualReadingPanel({
                   paragraphs={paragraphs}
                   locale={locale}
                   variant={section.variant ?? "body"}
+                  paragraphClassName={paragraphClassName}
                 />
               ) : (
                 <div className="space-y-4 md:space-y-5">
@@ -417,7 +423,7 @@ export function BilingualReadingPanel({
                     <p
                       key={`${section.key}-${locale}-${index}`}
                       lang={locale === "en" ? "en" : "zh-CN"}
-                      className={proseClasses(section.variant ?? "body", locale)}
+                      className={`${proseClasses(section.variant ?? "body", locale)} ${paragraphClassName}`.trim()}
                     >
                       {paragraph}
                     </p>
