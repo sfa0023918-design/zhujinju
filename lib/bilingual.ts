@@ -18,7 +18,7 @@ export function formatMetadataText(text: string | BilingualText) {
 
 const artworkStatusMap: Record<ArtworkStatus, BilingualText> = {
   inquiry: bt("可洽询", "Available on Request"),
-  sold: bt("已售", "Sold"),
+  sold: bt("已洽购", "Acquired"),
   reserved: bt("暂留", "On Hold"),
 };
 

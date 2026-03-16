@@ -75,6 +75,25 @@ type SyncState = {
   publicImpact?: boolean;
 };
 
+const ARTICLE_INLINE_UPLOAD_LIMIT = "4MB";
+
+type ArticleImageOrientation = "portrait" | "landscape";
+
+const ARTICLE_IMAGE_PRESETS: Record<ArticleImageOrientation, { label: string; ratio: string; width: number; height: number }> = {
+  portrait: {
+    label: "竖构图",
+    ratio: "3:4",
+    width: 1200,
+    height: 1600,
+  },
+  landscape: {
+    label: "横构图",
+    ratio: "4:3",
+    width: 1600,
+    height: 1200,
+  },
+};
+
 type AutosaveOptions<T> = {
   validate?: (value: T) => string | null;
   prepare?: (value: T) => T;
@@ -965,15 +984,42 @@ function ArticleInlineImageField({
   label,
   value,
   onChange,
+  defaultOrientation = "portrait",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  defaultOrientation?: ArticleImageOrientation;
 }) {
   const inputId = useId();
+  const [orientation, setOrientation] = useState<ArticleImageOrientation>(defaultOrientation);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const preset = ARTICLE_IMAGE_PRESETS[orientation];
+
+  useEffect(() => {
+    setOrientation(defaultOrientation);
+  }, [defaultOrientation]);
+
+  useEffect(
+    () => () => {
+      if (localPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(localPreview);
+      }
+    },
+    [localPreview],
+  );
+
+  function replaceLocalPreview(nextPreview: string | null) {
+    setLocalPreview((current) => {
+      if (current?.startsWith("blob:")) {
+        URL.revokeObjectURL(current);
+      }
+      return nextPreview;
+    });
+  }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -987,9 +1033,12 @@ function ArticleInlineImageField({
     setError(null);
 
     try {
+      const prepared = await prepareAdminImageUpload(file, { width: preset.width, height: preset.height });
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", prepared.file);
       formData.append("folder", "articles/references");
+      formData.append("assetWidth", String(prepared.width));
+      formData.append("assetHeight", String(prepared.height));
 
       const response = await fetch("/api/admin/upload", {
         method: "POST",
@@ -998,11 +1047,23 @@ function ArticleInlineImageField({
       const { payload, raw } = await readAdminUploadResponse(response);
 
       if (!response.ok || !payload.url) {
+        if (
+          response.status === 413 ||
+          /request entity too large/i.test(raw) ||
+          /function_payload_too_large/i.test(raw)
+        ) {
+          throw new Error(`图片过大，系统已自动压缩，但单张图片仍需控制在 ${ARTICLE_INLINE_UPLOAD_LIMIT} 内。`);
+        }
         throw new Error(payload.error ?? (raw.trim() || "图片上传失败。"));
       }
 
       onChange(payload.url);
-      setMessage("插图已上传。保存当前文章后前台会显示。");
+      replaceLocalPreview(prepared.previewUrl);
+      setMessage(
+        prepared.transformed
+          ? "插图已自动裁切并压缩。保存当前文章后前台会显示。"
+          : "插图已上传。保存当前文章后前台会显示。",
+      );
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "图片上传失败。");
     } finally {
@@ -1024,6 +1085,7 @@ function ArticleInlineImageField({
               type="button"
               onClick={() => {
                 onChange("");
+                replaceLocalPreview(null);
                 setMessage("插图已移除。");
                 setError(null);
               }}
@@ -1034,6 +1096,22 @@ function ArticleInlineImageField({
           ) : null}
         </div>
       </div>
+      <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]">
+        <label className="grid gap-2">
+          <span className="text-xs uppercase tracking-[0.14em] text-[var(--accent)]">构图</span>
+          <select
+            value={orientation}
+            onChange={(event) => setOrientation(event.target.value === "landscape" ? "landscape" : "portrait")}
+            className="w-full border border-[var(--line)] bg-white/60 px-3 py-3 text-sm leading-7 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+          >
+            <option value="portrait">竖构图（3:4）</option>
+            <option value="landscape">横构图（4:3）</option>
+          </select>
+        </label>
+        <p className="text-xs leading-6 text-[var(--muted)]">
+          当前：{preset.label}，建议尺寸 {preset.width} x {preset.height}（{preset.ratio}）。系统会自动裁切压缩，单张上限 {ARTICLE_INLINE_UPLOAD_LIMIT}。
+        </p>
+      </div>
       <input
         id={inputId}
         type="file"
@@ -1043,9 +1121,9 @@ function ArticleInlineImageField({
       />
       <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]">
         <div className="relative overflow-hidden border border-[var(--line)]/60 bg-[var(--surface-strong)]">
-          {value.trim() ? (
+          {localPreview || value.trim() ? (
             <Image
-              src={value}
+              src={localPreview ?? value}
               alt={label}
               width={1200}
               height={900}
@@ -1063,7 +1141,10 @@ function ArticleInlineImageField({
           <input
             type="text"
             value={value}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(event) => {
+              replaceLocalPreview(null);
+              onChange(event.target.value);
+            }}
             className="w-full border border-[var(--line)] bg-white/60 px-3 py-3 text-sm leading-7 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           />
         </label>
@@ -1121,6 +1202,7 @@ function ArticleContentBlockEditor({
           <ArticleInlineImageField
             label="插图"
             value={block.image}
+            defaultOrientation="portrait"
             onChange={(next) =>
               onChange((current) => ({
                 ...(current as typeof block),
@@ -1167,6 +1249,7 @@ function ArticleContentBlockEditor({
               <ArticleInlineImageField
                 label={`图片 ${itemIndex + 1}`}
                 value={item.image}
+                defaultOrientation="portrait"
                 onChange={(next) =>
                   onChange((current) => {
                     const currentBlock = current as typeof block;
@@ -2326,7 +2409,7 @@ function ArtworkEditor({
                     >
                       <option value="inquiry">可洽询</option>
                       <option value="reserved">暂留</option>
-                      <option value="sold">已售</option>
+                      <option value="sold">已洽购</option>
                     </select>
                   </label>
                 </div>
@@ -3104,6 +3187,9 @@ function ArticlesEditor({
               <div data-field-key="body" className="grid gap-4">
                 <div className="space-y-2">
                   <p className="text-sm leading-7 text-[var(--muted)]">正文默认支持段落；如需参考图，可在任意位置插入单图或双图。没有插图时，前台会保持当前文章格式。</p>
+                  <p className="text-sm leading-7 text-[var(--muted)]">
+                    文章插图标准：建议使用 JPG 或 WEBP。上传前选择构图：竖构图（3:4，建议 1200 x 1600）或横构图（4:3，建议 1600 x 1200）。建议单张控制在 2MB 内，系统硬上限 {ARTICLE_INLINE_UPLOAD_LIMIT}。
+                  </p>
                 </div>
                 {normalizeArticleContentBlocks(article.contentBlocks, article.body).map((block, index, blocks) => (
                   <ArticleContentBlockEditor

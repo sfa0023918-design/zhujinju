@@ -9,7 +9,7 @@ const navigation = [
   { href: "/", label: bt("首页", "Home") },
   { href: "/collection", label: bt("藏品", "Collection") },
   { href: "/exhibitions", label: bt("展览与图录", "Exhibitions") },
-  { href: "/journal", label: bt("文章", "Journal") },
+  { href: "/journal", label: bt("文章与动态", "Journal") },
   { href: "/about", label: bt("关于", "About") },
   { href: "/contact", label: bt("联系", "Contact") },
 ];

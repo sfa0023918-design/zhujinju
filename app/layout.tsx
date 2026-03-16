@@ -17,7 +17,7 @@ export async function generateMetadata() {
       "喜马拉雅艺术",
       "Himalayan Art",
       "藏传佛教艺术",
-      "Tibetan Buddhist Art",
+      "Xizang Buddhist Art",
       "亚洲古代艺术",
       "Asian Antiquities",
       "铜造像",

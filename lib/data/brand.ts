@@ -5,7 +5,7 @@ export const brandIntro = {
   heroAlt: bt("竹瑾居首页主视觉", "Zhu Jin Ju homepage hero"),
   statement: bt(
     "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
-    "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their broader dialogues with Asian antiquities, with work structured around collecting, research, exhibitions, and catalogues."
+    "Zhu Jin Ju focuses on Himalayan art, Xizang Buddhist art, and their broader dialogues with Asian antiquities, with work structured around collecting, research, exhibitions, and catalogues."
   ),
   about: bt(
     "我们以作品本体为起点，在图像学、风格学、材质工艺与流传脉络之间建立判断，并通过展览、图录与研究文字持续公开这些判断。",
@@ -32,7 +32,7 @@ export const collectingDirections = [
     name: bt("造像", "Figure"),
     description: bt(
       "聚焦早期西藏、尼泊尔、印度与相关区域的佛教造像。",
-      "Focusing on early Buddhist sculpture from Tibet, Nepal, India, and related regions."
+      "Focusing on early Buddhist sculpture from Xizang, Nepal, India, and related regions."
     ),
   },
   {

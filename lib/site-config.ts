@@ -9,7 +9,7 @@ export const siteConfig: SiteConfigContent = {
   ),
   description: bt(
     "竹瑾居专注于喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，面向藏家、机构、策展人与研究者提供收藏、展览与研究服务。",
-    "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, serving collectors, institutions, curators, and researchers through collecting, exhibitions, and research."
+    "Zhu Jin Ju focuses on Himalayan art, Xizang Buddhist art, and related Asian antiquities, serving collectors, institutions, curators, and researchers through collecting, exhibitions, and research."
   ),
   defaultDomain: "www.zhujinju.com",
   protocol: "https",
@@ -17,7 +17,7 @@ export const siteConfig: SiteConfigContent = {
   ogImagePath: "/opengraph-image",
   homeIntro: bt(
     "竹瑾居关注喜马拉雅艺术、藏传佛教艺术及其与亚洲古代艺术之间的观看脉络，工作围绕收藏、研究、展览与图录展开。",
-    "Zhu Jin Ju focuses on Himalayan art, Tibetan Buddhist art, and their visual connections with the ancient arts of Asia, with work centered on collecting, research, exhibitions, and catalogues."
+    "Zhu Jin Ju focuses on Himalayan art, Xizang Buddhist art, and their visual connections with the ancient arts of Asia, with work centered on collecting, research, exhibitions, and catalogues."
   ),
   about: {
     eyebrow: bt("关于", "About"),
@@ -61,7 +61,7 @@ export const siteConfig: SiteConfigContent = {
   footer: {
     intro: bt(
       "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
-      "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
+      "Focused on Himalayan art, Xizang Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research."
     ),
     appointment: bt("By Appointment in Chengdu", "By Appointment in Chengdu"),
     copyrightLabel: bt("版权所有", "Copyright"),
@@ -69,7 +69,7 @@ export const siteConfig: SiteConfigContent = {
     informationHeading: bt("信息与请求", "Information"),
     collectionLink: bt("藏品浏览", "Browse Collection"),
     exhibitionsLink: bt("展览与图录", "Exhibitions & Catalogues"),
-    journalLink: bt("文章与研究", "Journal"),
+    journalLink: bt("文章与动态", "Journal"),
     pdfRequestLabel: bt("PDF 索取", "PDF Request"),
     instagramLabel: bt("Instagram", "Instagram"),
     wechatLabel: bt("微信", "WeChat"),

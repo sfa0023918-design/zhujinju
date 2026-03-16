@@ -58,7 +58,7 @@ export const exhibitions: Exhibition[] = [
   },
   {
     slug: "between-gilding-and-pigment",
-    title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
+    title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Xizang Buddhist Art, 13th-18th Century"),
     subtitle: bt("研究型展览", "Research Exhibition"),
     period: bt("2024.05.12 - 2024.07.30", "12 May 2024 - 30 Jul 2024"),
     venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),

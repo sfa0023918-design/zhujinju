@@ -62,5 +62,5 @@ export const homeContent: HomeContent = {
     ),
   },
   contactPrimaryAction: bt("前往联系页面", "Contact Us"),
-  contactSecondaryAction: bt("查看文章与研究", "Read Journal"),
+  contactSecondaryAction: bt("查看文章与动态", "Read Journal"),
 };

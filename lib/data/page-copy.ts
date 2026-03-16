@@ -5,7 +5,7 @@ export const pageCopy = {
     footer: {
       intro: bt(
         "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
-        "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research.",
+        "Focused on Himalayan art, Xizang Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research.",
       ),
       appointment: bt("By Appointment in Chengdu", "By Appointment in Chengdu"),
       copyrightLabel: bt("版权所有", "Copyright"),
@@ -13,7 +13,7 @@ export const pageCopy = {
       informationHeading: bt("信息与请求", "Information"),
       collectionLink: bt("藏品浏览", "Browse Collection"),
       exhibitionsLink: bt("展览与图录", "Exhibitions & Catalogues"),
-      journalLink: bt("文章与研究", "Journal"),
+      journalLink: bt("文章与动态", "Journal"),
       pdfRequestLabel: bt("PDF 索取", "PDF Request"),
       instagramLabel: bt("Instagram", "Instagram"),
       wechatLabel: bt("微信", "WeChat"),
@@ -103,7 +103,7 @@ export const pageCopy = {
       ),
     },
     contactPrimaryAction: bt("前往联系页面", "Contact Us"),
-    contactSecondaryAction: bt("查看文章与研究", "Read Journal"),
+    contactSecondaryAction: bt("查看文章与动态", "Read Journal"),
   },
   about: {
     hero: {

@@ -14,7 +14,7 @@ export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
 
   return buildMetadata({
-    title: bt("文章", "Journal"),
+    title: bt("文章与动态", "Journal"),
     description: pageCopy.journal.hero.description,
     path: "/journal",
     site: siteConfig,
