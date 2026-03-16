@@ -1460,9 +1460,7 @@
         "silent-radiance"
       ],
       "image": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
-      "gallery": [
-        "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
-      ],
+      "gallery": [],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
@@ -1473,14 +1471,7 @@
         "height": 1500
       },
       "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
-          "card": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
-          "hero": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
-          "detail": "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg",
-          "width": 1200,
-          "height": 1500
-        }
+        null
       ]
     },
     {
