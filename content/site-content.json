@@ -1075,25 +1075,28 @@
         }
       ],
       "relatedArticleSlugs": [],
-      "relatedExhibitionSlugs": [
-        "silent-radiance"
-      ],
+      "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773641142017-36立像金刚手-正.jpg",
       "gallery": [
         "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
       ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773641142017-36立像金刚手-正.jpg",
-        "card": "/uploads/artworks/1773641142017-36立像金刚手-正-card.jpg",
-        "hero": "/uploads/artworks/1773641142017-36立像金刚手-正.jpg",
-        "detail": "/uploads/artworks/1773641142017-36立像金刚手-正.jpg",
+        "original": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "card": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "hero": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
+        "detail": "/uploads/artworks/1773246801139-b00008423fr1770280503.jpg",
         "width": 1200,
         "height": 1500
       },
       "galleryAssets": [
         {
-          "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
+          "original": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "card": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "hero": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "detail": "/uploads/artworks/1773146992939-l1000792.jpg",
+          "width": 1200,
+          "height": 1500
         },
         {
           "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
