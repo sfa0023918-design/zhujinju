@@ -100,7 +100,15 @@ function normalizeTranslation(raw: string) {
     .filter(Boolean);
 
   const joined = lines.join(" ").replace(/\s+/g, " ").trim();
-  return joined.replace(/^["“”']|["“”']$/g, "").trim();
+  return normalizeXizangTerminology(joined.replace(/^["“”']|["“”']$/g, "").trim());
+}
+
+function normalizeXizangTerminology(value: string) {
+  return value
+    .replace(/\bTibetan\b/g, "Xizang")
+    .replace(/\btibetan\b/g, "xizang")
+    .replace(/\bTibet\b/g, "Xizang")
+    .replace(/\btibet\b/g, "xizang");
 }
 
 async function requestTranslation(endpoint: string, body: unknown) {
@@ -176,7 +184,7 @@ export async function POST(request: Request) {
       const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
 
       if (fallback) {
-        return NextResponse.json({ translation: fallback, fallback: true });
+        return NextResponse.json({ translation: normalizeXizangTerminology(fallback), fallback: true });
       }
 
       return NextResponse.json(
@@ -225,7 +233,7 @@ export async function POST(request: Request) {
       const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
 
       if (fallback) {
-        return NextResponse.json({ translation: fallback, fallback: true });
+        return NextResponse.json({ translation: normalizeXizangTerminology(fallback), fallback: true });
       }
 
       const status = result.status ?? 502;
@@ -247,13 +255,13 @@ export async function POST(request: Request) {
       const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
 
       if (fallback) {
-        return NextResponse.json({ translation: fallback, fallback: true });
+        return NextResponse.json({ translation: normalizeXizangTerminology(fallback), fallback: true });
       }
 
       return NextResponse.json({ error: "未生成可用英文内容，请重试一次。" }, { status: 502 });
     }
 
-    return NextResponse.json({ translation: normalizedTranslation });
+    return NextResponse.json({ translation: normalizeXizangTerminology(normalizedTranslation) });
   } catch (error) {
     return NextResponse.json(
       {

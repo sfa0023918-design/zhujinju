@@ -146,7 +146,7 @@ const loadCachedSiteContent = unstable_cache(
     normalizeSiteContent(
       (await readBestAvailableContentFile({ preferRemote: true })) ?? getDefaultSiteContent(),
     ),
-  ["site-content-v3"],
+  ["site-content-v4"],
   { tags: [getSiteContentTag()] },
 );
 
