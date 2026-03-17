@@ -866,6 +866,14 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
     operationalFacts: structuredClone(defaultOperationalFacts),
     artworks: (content.artworks ?? []).map((artwork) => {
       const cleanedArtwork = normalizeBilingualFieldsDeep(artwork).value;
+      const sourceViewingNoteEn = typeof artwork.viewingNote?.en === "string" ? artwork.viewingNote.en : null;
+      const sourceViewingNoteZh = typeof artwork.viewingNote?.zh === "string" ? artwork.viewingNote.zh : null;
+      if (sourceViewingNoteEn !== null || sourceViewingNoteZh !== null) {
+        cleanedArtwork.viewingNote = {
+          zh: sourceViewingNoteZh ?? cleanedArtwork.viewingNote.zh,
+          en: sourceViewingNoteEn ?? cleanedArtwork.viewingNote.en,
+        };
+      }
       const imageAsset = normalizeImageAsset(cleanedArtwork.imageAsset, cleanedArtwork.image);
       const image = resolveImageUrl(cleanedArtwork.image, imageAsset);
 

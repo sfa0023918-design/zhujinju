@@ -187,6 +187,10 @@ function normalizeLongText(value: string) {
     .join("\n\n");
 }
 
+function normalizeMultilineTextPreserve(value: string) {
+  return value.replace(/\r\n/g, "\n");
+}
+
 function normalizeBilingualText(value: BilingualText, mode: "line" | "long" = "line"): BilingualText {
   return {
     zh: mode === "long" ? normalizeLongText(value.zh) : normalizeLineText(value.zh),
@@ -208,7 +212,10 @@ function normalizeArtworkDraft(value: Artwork) {
   next.image = normalizeLineText(next.image);
   next.gallery = (next.gallery ?? []).map((item) => normalizeLineText(item)).filter(Boolean);
   next.excerpt = normalizeBilingualText(next.excerpt, "long");
-  next.viewingNote = normalizeBilingualText(next.viewingNote, "long");
+  next.viewingNote = {
+    zh: normalizeMultilineTextPreserve(next.viewingNote.zh),
+    en: normalizeMultilineTextPreserve(next.viewingNote.en),
+  };
   next.comparisonNote = normalizeBilingualText(next.comparisonNote, "long");
   next.provenance = (next.provenance ?? []).map((item) => ({
     ...item,
