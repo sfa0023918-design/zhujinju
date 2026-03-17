@@ -9,7 +9,7 @@ import { BilingualText } from "./bilingual-text";
 export type BilingualProseContent = BilingualValue | BilingualValue[];
 export type ReadingLocale = "zh" | "en";
 
-type ProseVariant = "lead" | "body" | "secondary";
+type ProseVariant = "lead" | "body" | "secondary" | "compact";
 
 type BilingualProseProps = {
   content: BilingualProseContent;
@@ -31,6 +31,7 @@ type BilingualReadingPanelProps = {
   sections: ReadingSection[];
   className?: string;
   sectionClassName?: string;
+  paragraphClassName?: string;
   defaultLocale?: ReadingLocale;
   locale?: ReadingLocale;
   onLocaleChange?: (locale: ReadingLocale) => void;
@@ -67,13 +68,13 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
       ? /[^。！？!?]+[。！？!?]?/g
       : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
   const joiner = locale === "zh" ? "" : " ";
-  const targetLength = locale === "zh" ? 116 : 260;
-  const maxLength = locale === "zh" ? 220 : 460;
+  const targetLength = locale === "zh" ? 116 : 172;
+  const maxLength = locale === "zh" ? 220 : 320;
   const sentences = (text.match(sentenceRegex) ?? [])
     .map((sentence) => sentence.trim())
     .filter(Boolean);
 
-  if (sentences.length <= 2) {
+  if (sentences.length <= 1) {
     return [text];
   }
 
@@ -109,8 +110,9 @@ function splitParagraphs(text: string, locale: ReadingLocale) {
     return [];
   }
 
+  const paragraphDelimiter = /\n\s*\n+/.test(normalized) ? /\n\s*\n+/ : /\n+/;
   const manualParagraphs = normalized
-    .split(/\n\s*\n+/)
+    .split(paragraphDelimiter)
     .map((paragraph) => normalizeParagraphText(paragraph, locale))
     .filter(Boolean);
 
@@ -123,7 +125,7 @@ function splitParagraphs(text: string, locale: ReadingLocale) {
     return [];
   }
 
-  const autoSplitThreshold = locale === "zh" ? 220 : 420;
+  const autoSplitThreshold = locale === "zh" ? 220 : 260;
   if (singleParagraph.length < autoSplitThreshold) {
     return [singleParagraph];
   }
@@ -167,6 +169,12 @@ function proseClasses(variant: ProseVariant, locale: ReadingLocale) {
     return locale === "zh"
       ? `prose-block prose-block--zh max-w-[38rem] text-[0.95rem] leading-[2.02] text-[var(--muted)] ${alignmentClasses}`
       : `prose-block prose-block--en max-w-[38rem] text-[0.86rem] leading-[1.82] text-[var(--muted)]/88 ${alignmentClasses}`;
+  }
+
+  if (variant === "compact") {
+    return locale === "zh"
+      ? `prose-block prose-block--zh max-w-[44rem] text-[0.86rem] leading-[1.9] text-[var(--muted)] ${alignmentClasses}`
+      : `prose-block prose-block--en max-w-[44rem] text-[0.76rem] leading-[1.68] tracking-[0.02em] text-[var(--muted)]/86 ${alignmentClasses}`;
   }
 
   return locale === "zh"
@@ -352,6 +360,7 @@ export function BilingualReadingPanel({
   sections,
   className,
   sectionClassName = "space-y-2.5",
+  paragraphClassName,
   defaultLocale = "zh",
   locale: controlledLocale,
   onLocaleChange,
@@ -392,7 +401,12 @@ export function BilingualReadingPanel({
       <div className="space-y-7">
         {sections.map((section) => {
           const paragraphs = getParagraphsByLocale(section.content, locale);
-          const paragraphClassName = zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "";
+          const mergedParagraphClassName = [
+            zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
+            paragraphClassName ?? "",
+          ]
+            .filter(Boolean)
+            .join(" ");
 
           if (!paragraphs.length) {
             return null;
@@ -415,7 +429,7 @@ export function BilingualReadingPanel({
                   paragraphs={paragraphs}
                   locale={locale}
                   variant={section.variant ?? "body"}
-                  paragraphClassName={paragraphClassName}
+                  paragraphClassName={mergedParagraphClassName}
                 />
               ) : (
                 <div className="space-y-4 md:space-y-5">
@@ -423,7 +437,7 @@ export function BilingualReadingPanel({
                     <p
                       key={`${section.key}-${locale}-${index}`}
                       lang={locale === "en" ? "en" : "zh-CN"}
-                      className={`${proseClasses(section.variant ?? "body", locale)} ${paragraphClassName}`.trim()}
+                      className={`${proseClasses(section.variant ?? "body", locale)} ${mergedParagraphClassName}`.trim()}
                     >
                       {paragraph}
                     </p>

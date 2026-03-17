@@ -82,21 +82,21 @@ export const articles: Article[] = [
     author: bt("竹瑾居", "Zhu Jin Ju"),
     date: "2025.03.21",
     excerpt: bt(
-      "展览不是销售陈列的延伸，而是把判断公开、把研究组织成可被观看的方式。",
-      "An exhibition is not an extension of display for sale, but a way of making judgement public and research visible."
+      "我们持续作展览与图录，并不是为了重复陈列，而是为了持续创造这样的时刻：让作品重新进入今天的生活，也让人在与作品的相遇中，重新靠近自己。",
+      "We continue to make exhibitions and catalogues not to repeat display, but to keep creating moments like this: allowing works to re-enter life today, and allowing people, through encounter, to draw closer to themselves."
     ),
     body: [
       bt(
-        "对古代艺术而言，展览的意义不只是集中呈现作品，更在于建立清晰的观看结构，让作品之间形成可比较、可讨论的关系。",
-        "For historical art, the value of an exhibition lies not only in gathering works, but in creating a clear structure of viewing through which works can be compared and discussed."
+        "我们持续作展览与图录，并不只是为了呈现艺术品，更是为了保存一种与作品相遇的方式。",
+        "We continue to make exhibitions and catalogues not only to present artworks, but to preserve a way of encountering them."
       ),
       bt(
-        "图录则承担另一层功能，它把现场经验沉淀为可检索、可引用的文字与图像档案。",
-        "The catalogue serves another purpose, condensing the exhibition experience into searchable, citable texts and images."
+        "于我们而言，这些雕塑与绘画从来不仅仅只是历史遗物。它们承载着信仰、情绪、记忆与时间，也在每一次凝视中，与今天的我们重新发生关系。展览让作品回到观看现场，图录则让这种相遇得以被记录、被延续、被反复思考。",
+        "For us, these sculptures and paintings are never merely historical remnants. They carry faith, emotion, memory, and time, and in every sustained gaze they enter into renewed relation with us in the present. Exhibitions return works to the site of viewing, while catalogues allow these encounters to be recorded, extended, and revisited in thought."
       ),
       bt(
-        "竹瑾居把展览与图录视为品牌工作的核心，因为它们直接决定专业判断是否能够被长期保存与传递。",
-        "Zhu Jin Ju treats exhibitions and catalogues as central to its practice because they directly determine whether professional judgement can be preserved and transmitted over time."
+        "我们始终相信，真正优秀的艺术作品，不只是被看见，更能让人从纷杂现实中，重新触碰内心的清晰与安定。也正因如此，我们愿意持续以展览与图录为媒介，让古老的精神在今天继续发声，也让每一次观看，都成为一次与自我、与时间、与世界更深的相遇。",
+        "We always believe that truly outstanding art should not only be seen, but should also help people recover inner clarity and steadiness amid the noise of reality. For this reason, we continue to use exhibitions and catalogues as our medium, so that ancient spirit can keep speaking in the present, and each act of viewing can become a deeper encounter with the self, with time, and with the world."
       ),
     ],
     keywords: [

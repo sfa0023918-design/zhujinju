@@ -142,9 +142,9 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           </div>
         </header>
 
-        <div className="relative mt-8 overflow-hidden bg-[var(--surface-strong)]">
+        <div className="relative mx-auto mt-8 w-full max-w-[960px] overflow-hidden bg-[var(--surface-strong)]">
           {article.cover.startsWith("/api/placeholder/") ? (
-            <div className="aspect-[1.55/1]">
+            <div className="aspect-[1.85/1]">
               <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />
             </div>
           ) : (
@@ -156,7 +156,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
               priority
               unoptimized
               wrapperClassName="block"
-              className="aspect-[1.55/1] h-full w-full object-cover"
+              className="aspect-[1.85/1] h-full w-full object-cover"
             />
           )}
         </div>

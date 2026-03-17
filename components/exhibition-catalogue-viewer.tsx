@@ -8,6 +8,7 @@ import { BilingualText } from "./bilingual-text";
 import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
+const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -38,6 +39,7 @@ export function ExhibitionCatalogueViewer({
 }: ExhibitionCatalogueViewerProps) {
   const cataloguePages = pages.filter(Boolean);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const totalPages = cataloguePages.length;
@@ -54,6 +56,18 @@ export function ExhibitionCatalogueViewer({
     updateLayout();
     mediaQuery.addEventListener("change", updateLayout);
     return () => mediaQuery.removeEventListener("change", updateLayout);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_PORTRAIT_BREAKPOINT);
+
+    function updateOrientation() {
+      setIsMobilePortrait(mediaQuery.matches);
+    }
+
+    updateOrientation();
+    mediaQuery.addEventListener("change", updateOrientation);
+    return () => mediaQuery.removeEventListener("change", updateOrientation);
   }, []);
 
   useEffect(() => {
@@ -251,6 +265,7 @@ export function ExhibitionCatalogueViewer({
                   title={title}
                   side={usesDesktopPairing ? (index === 0 ? "left" : "right") : "single"}
                   displayMode={showsSpreadImage ? "spread" : "page"}
+                  isMobilePortrait={isMobilePortrait}
                 />
               ))}
             </div>
@@ -335,23 +350,28 @@ function CataloguePage({
   title,
   side,
   displayMode,
+  isMobilePortrait,
 }: {
   page: string | null;
   pageNumber: number;
   title: BilingualValue;
   side: "left" | "right" | "single";
   displayMode: "page" | "spread";
+  isMobilePortrait: boolean;
 }) {
+  const compactMobileSpread = isMobilePortrait && displayMode === "spread";
+  const minHeightClass = compactMobileSpread ? "min-h-0" : "min-h-[420px]";
+
   if (!page) {
     return (
-      <div className="relative hidden min-h-[420px] rounded-[24px] border border-white/55 bg-[linear-gradient(180deg,#f3eadc,#ede0ce)] lg:block">
+      <div className={`relative hidden ${minHeightClass} rounded-[24px] border border-white/55 bg-[linear-gradient(180deg,#f3eadc,#ede0ce)] lg:block`}>
         <div className={`absolute inset-y-10 ${side === "right" ? "left-0" : "right-0"} w-px bg-[var(--line)]/26`} />
       </div>
     );
   }
 
   return (
-    <div className="group relative min-h-[420px] rounded-[24px] border border-white/72 bg-[linear-gradient(180deg,#f8f4ec,#f4ede2)] p-3 shadow-[0_18px_38px_rgba(32,23,17,0.075)] md:p-4">
+    <div className={`group relative ${minHeightClass} rounded-[24px] border border-white/72 bg-[linear-gradient(180deg,#f8f4ec,#f4ede2)] p-3 shadow-[0_18px_38px_rgba(32,23,17,0.075)] md:p-4`}>
       <div className={`absolute inset-y-8 hidden w-px bg-[var(--line)]/24 lg:block ${side === "right" ? "left-0" : side === "left" ? "right-0" : "left-0"}`} />
       <div className={`pointer-events-none absolute inset-y-4 w-10 blur-2xl ${side === "left" ? "right-0 bg-[rgba(121,92,62,0.07)]" : side === "right" ? "left-0 bg-[rgba(121,92,62,0.07)]" : "right-0 bg-[rgba(121,92,62,0.05)]"}`} />
       <div className="relative overflow-hidden rounded-[18px] bg-white shadow-[inset_0_0_0_1px_rgba(23,21,18,0.06)]">

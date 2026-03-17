@@ -75,7 +75,8 @@ type SyncState = {
   publicImpact?: boolean;
 };
 
-const ARTICLE_INLINE_UPLOAD_LIMIT = "4MB";
+const ARTICLE_INLINE_RECOMMENDED_LIMIT = "2.8MB";
+const ARTICLE_INLINE_HARD_LIMIT = "4MB";
 
 type ArticleImageOrientation = "portrait" | "landscape";
 
@@ -177,9 +178,11 @@ function normalizeLongText(value: string) {
     return "";
   }
 
+  const paragraphDelimiter = /\n\s*\n+/.test(normalized) ? /\n\s*\n+/ : /\n+/;
+
   return normalized
-    .split(/\n\s*\n+/)
-    .map((paragraph) => paragraph.replace(/\s*\n+\s*/g, " ").replace(/\s+/g, " ").trim())
+    .split(paragraphDelimiter)
+    .map((paragraph) => paragraph.replace(/[ \t]{2,}/g, " ").trim())
     .filter(Boolean)
     .join("\n\n");
 }
@@ -238,15 +241,19 @@ function normalizeExhibitionDraft(value: Exhibition) {
   next.venue = normalizeBilingualText(next.venue);
   next.cover = normalizeLineText(next.cover);
   next.intro = normalizeBilingualText(next.intro, "long");
-  next.curatorialLead = normalizeBilingualText(next.curatorialLead, "long");
-  next.curatorialNote = normalizeBilingualText(next.curatorialNote ?? next.curatorialLead, "long");
+  const curatorialNote = normalizeBilingualText(next.curatorialNote ?? next.curatorialLead, "long");
+  next.curatorialLead = curatorialNote;
+  next.curatorialNote = curatorialNote;
   next.description = (next.description ?? []).map((item) => normalizeBilingualText(item, "long"));
   next.catalogueTitle = normalizeBilingualText(next.catalogueTitle);
-  next.catalogueIntro = normalizeBilingualText(next.catalogueIntro, "long");
-  next.catalogueNote = normalizeBilingualText(next.catalogueNote ?? next.catalogueIntro, "long");
+  const catalogueNote = normalizeBilingualText(next.catalogueNote ?? next.catalogueIntro, "long");
+  next.catalogueIntro = catalogueNote;
+  next.catalogueNote = catalogueNote;
   next.cataloguePageImages = (next.cataloguePageImages ?? []).map((item) => normalizeLineText(item)).filter(Boolean);
   next.featuredWorksCount = Number((next.featuredWorksCount ?? next.highlightCount ?? next.highlightArtworkSlugs.length) || 0);
+  next.highlightCount = next.featuredWorksCount;
   next.cataloguePageCount = Number(next.cataloguePageCount ?? next.cataloguePages ?? 0);
+  next.cataloguePages = next.cataloguePageCount;
   return next;
 }
 
@@ -266,11 +273,75 @@ function normalizeArticleDraft(value: Article) {
   return next;
 }
 
-function summarizeIssueBadges(issues: ValidationIssue[], limit = 2) {
+const WARNING_SECTION_PRIORITY: Record<ValidationIssue["section"], number> = {
+  basic: 1,
+  scholarly: 2,
+  images: 3,
+  references: 4,
+  catalogue: 5,
+  body: 6,
+};
+
+function issueSummaryLabel(issue: ValidationIssue) {
+  const raw = issue.message.replace(/。$/, "");
+  return issue.level === "error" ? raw.replace(/^请/, "") : raw.replace(/^建议/, "");
+}
+
+function warningPriority(issue: ValidationIssue) {
+  if (issue.level !== "warning") {
+    return 99;
+  }
+
+  const message = issue.message;
+
+  if (message.includes("双语一致") || message.includes("补充")) {
+    return 1;
+  }
+
+  if (message.includes("篇幅差异")) {
+    return 2;
+  }
+
+  if (message.includes("检测到")) {
+    return 3;
+  }
+
+  return 4;
+}
+
+function getPrioritizedWarnings(issues: ValidationIssue[]) {
   return issues
+    .filter((issue) => issue.level === "warning")
+    .sort((a, b) => {
+      const warningRank = warningPriority(a) - warningPriority(b);
+
+      if (warningRank !== 0) {
+        return warningRank;
+      }
+
+      const sectionRank = WARNING_SECTION_PRIORITY[a.section] - WARNING_SECTION_PRIORITY[b.section];
+
+      if (sectionRank !== 0) {
+        return sectionRank;
+      }
+
+      return issueSummaryLabel(a).localeCompare(issueSummaryLabel(b), "zh-Hans-CN");
+    });
+}
+
+function summarizeIssueBadges(issues: ValidationIssue[], limit = 2) {
+  const blockingBadges = issues
     .filter((issue) => issue.level === "error")
     .slice(0, limit)
-    .map((issue) => issue.message.replace(/^请/, "").replace(/。$/, ""));
+    .map((issue) => issueSummaryLabel(issue));
+
+  if (blockingBadges.length) {
+    return blockingBadges;
+  }
+
+  return getPrioritizedWarnings(issues)
+    .slice(0, limit)
+    .map((issue) => `提醒：${issueSummaryLabel(issue)}`);
 }
 
 async function requestJson<T>(url: string, init: RequestInit) {
@@ -592,6 +663,9 @@ function SectionBlock({
   issues?: ValidationIssue[];
   reminders?: string[];
 }) {
+  const blockingIssues = issues?.filter((issue) => issue.level === "error") ?? [];
+  const warningIssues = issues?.filter((issue) => issue.level === "warning") ?? [];
+
   return (
     <section id={id} className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-5 md:p-6 scroll-mt-28">
       <div className="space-y-2 border-b border-[var(--line)] pb-4">
@@ -600,13 +674,13 @@ function SectionBlock({
         {reminders?.length ? (
           <p className="text-sm leading-7 text-[var(--accent)]/88">{reminders.join("、")}</p>
         ) : null}
-        {issues?.length ? (
+        {blockingIssues.length ? (
           <p className="text-sm leading-7 text-[#8e4e3b]">
-            {issues
-              .filter((issue) => issue.level === "error")
-              .map((issue) => issue.message)
-              .join("、")}
+            {blockingIssues.map((issue) => issue.message).join("、")}
           </p>
+        ) : null}
+        {warningIssues.length ? (
+          <p className="text-sm leading-7 text-[#8b7867]">{`提醒：${warningIssues.map((issue) => issue.message).join("、")}`}</p>
         ) : null}
       </div>
       {children}
@@ -622,33 +696,75 @@ function ValidationSummary({
   sectionLabels: Record<string, string>;
 }) {
   const blocking = issues.filter((issue) => ("level" in issue ? issue.level === "error" : true));
+  const warnings = getPrioritizedWarnings(issues);
+  const firstWarning = warnings[0];
 
-  if (!blocking.length) {
+  if (!blocking.length && !warnings.length) {
     return null;
   }
 
   return (
-    <div className="space-y-3 border border-[#d8c1b5] bg-[#fbf5f1] p-4">
-      <p className="text-sm leading-7 text-[#8e4e3b]">
-        当前内容尚不能发布，请先完成以下字段：
-        {blocking.map((issue) => issue.message.replace(/^请/, "").replace(/。$/, "")).join("、")}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {blocking.map((issue, index) => {
-          return (
-            <button
-              key={`${issue.field}-${index}`}
-              type="button"
-              onClick={() => {
-                locateFieldTarget(issue.field, issue.section);
-              }}
-              className="border border-[#d8c1b5] px-3 py-1.5 text-xs leading-5 text-[#8e4e3b] transition-colors hover:bg-[#f7ede7]"
-            >
-              {`${sectionLabels[issue.section] ?? issue.section} · ${issue.message.replace(/^请/, "").replace(/。$/, "")}`}
-            </button>
-          );
-        })}
-      </div>
+    <div className={`space-y-3 border p-4 ${blocking.length ? "border-[#d8c1b5] bg-[#fbf5f1]" : "border-[#d8cec2] bg-[#f7f4ef]"}`}>
+      {blocking.length ? (
+        <>
+          <p className="text-sm leading-7 text-[#8e4e3b]">
+            当前内容尚不能发布，请先完成以下字段：
+            {blocking.map((issue) => issue.message.replace(/^请/, "").replace(/。$/, "")).join("、")}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {blocking.map((issue, index) => {
+              return (
+                <button
+                  key={`${issue.field}-error-${index}`}
+                  type="button"
+                  onClick={() => {
+                    locateFieldTarget(issue.field, issue.section);
+                  }}
+                  className="border border-[#d8c1b5] px-3 py-1.5 text-xs leading-5 text-[#8e4e3b] transition-colors hover:bg-[#f7ede7]"
+                >
+                  {`${sectionLabels[issue.section] ?? issue.section} · ${issue.message.replace(/^请/, "").replace(/。$/, "")}`}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <p className="text-sm leading-7 text-[#736659]">当前内容可发布，以下为建议优化项：</p>
+      )}
+      {warnings.length ? (
+        <div className="grid gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs tracking-[0.12em] text-[#736659]">建议按以下顺序修复：</p>
+            {firstWarning ? (
+              <button
+                type="button"
+                onClick={() => {
+                  locateFieldTarget(firstWarning.field, firstWarning.section);
+                }}
+                className="border border-[#d8cec2] px-3 py-1.5 text-xs leading-5 text-[#736659] transition-colors hover:bg-[#f0ece5]"
+              >
+                一键从第 1 项开始修复
+              </button>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+          {warnings.map((issue, index) => {
+            return (
+              <button
+                key={`${issue.field}-warning-${index}`}
+                type="button"
+                onClick={() => {
+                  locateFieldTarget(issue.field, issue.section);
+                }}
+                className="border border-[#d8cec2] px-3 py-1.5 text-xs leading-5 text-[#736659] transition-colors hover:bg-[#f0ece5]"
+              >
+                {`#${index + 1} ${sectionLabels[issue.section] ?? issue.section} · ${issueSummaryLabel(issue)}`}
+              </button>
+            );
+          })}
+        </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1052,7 +1168,9 @@ function ArticleInlineImageField({
           /request entity too large/i.test(raw) ||
           /function_payload_too_large/i.test(raw)
         ) {
-          throw new Error(`图片过大，系统已自动压缩，但单张图片仍需控制在 ${ARTICLE_INLINE_UPLOAD_LIMIT} 内。`);
+          throw new Error(
+            `图片过大，系统已自动压缩。建议上传前控制在 ${ARTICLE_INLINE_RECOMMENDED_LIMIT} 内（服务器硬上限 ${ARTICLE_INLINE_HARD_LIMIT}）。`,
+          );
         }
         throw new Error(payload.error ?? (raw.trim() || "图片上传失败。"));
       }
@@ -1109,7 +1227,7 @@ function ArticleInlineImageField({
           </select>
         </label>
         <p className="text-xs leading-6 text-[var(--muted)]">
-          当前：{preset.label}，建议尺寸 {preset.width} x {preset.height}（{preset.ratio}）。系统会自动裁切压缩，单张上限 {ARTICLE_INLINE_UPLOAD_LIMIT}。
+          当前：{preset.label}，建议尺寸 {preset.width} x {preset.height}（{preset.ratio}）。系统会自动裁切压缩，建议单张 {ARTICLE_INLINE_RECOMMENDED_LIMIT} 内（硬上限 {ARTICLE_INLINE_HARD_LIMIT}）。
         </p>
       </div>
       <input
@@ -1514,16 +1632,27 @@ function ToolbarButton({
 
 function RecordStatusActions({
   publicationStatus,
+  hasPendingChanges,
+  onSaveCurrent,
   onSaveDraft,
   onSavePublish,
 }: {
   publicationStatus: PublicationStatus;
+  hasPendingChanges: boolean;
+  onSaveCurrent: () => void;
   onSaveDraft: () => void;
   onSavePublish: () => void;
 }) {
   return (
     <>
       <span className="text-sm text-[var(--muted)]">{publicationStatus === "published" ? "已发布" : "草稿"}</span>
+      <button
+        type="button"
+        onClick={onSaveCurrent}
+        className="inline-flex min-h-11 items-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+      >
+        {hasPendingChanges ? "保存当前修改" : "重新保存"}
+      </button>
       <button
         type="button"
         onClick={onSaveDraft}
@@ -2336,6 +2465,8 @@ function ArtworkEditor({
             <>
               <RecordStatusActions
                 publicationStatus={selectedArtwork.publicationStatus ?? "draft"}
+                hasPendingChanges={hasPendingChanges}
+                onSaveCurrent={() => void saveCurrentArtwork(selectedArtwork.publicationStatus ?? "draft")}
                 onSaveDraft={() => void saveCurrentArtwork("draft")}
                 onSavePublish={() => void saveCurrentArtwork("published")}
               />
@@ -2568,6 +2699,8 @@ function ArtworkEditor({
                 <div className="flex flex-wrap items-center gap-3">
                   <RecordStatusActions
                     publicationStatus={selectedArtwork.publicationStatus ?? "draft"}
+                    hasPendingChanges={hasPendingChanges}
+                    onSaveCurrent={() => void saveCurrentArtwork(selectedArtwork.publicationStatus ?? "draft")}
                     onSaveDraft={() => void saveCurrentArtwork("draft")}
                     onSavePublish={() => void saveCurrentArtwork("published")}
                   />
@@ -2791,6 +2924,8 @@ function ExhibitionsEditor({
             <>
               <RecordStatusActions
                 publicationStatus={exhibition.publicationStatus ?? "draft"}
+                hasPendingChanges={isDirty}
+                onSaveCurrent={() => void saveCurrentExhibition(exhibition.publicationStatus ?? "draft")}
                 onSaveDraft={() => void saveCurrentExhibition("draft")}
                 onSavePublish={() => void saveCurrentExhibition("published")}
               />
@@ -2802,6 +2937,9 @@ function ExhibitionsEditor({
       />
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
+        <p className="text-xs leading-6 text-[var(--muted)]/82">
+          修改内容后，请点击“保存当前修改”或“保存并发布”，前台才会同步更新。
+        </p>
       </div>
       <ValidationSummary issues={validationIssues} sectionLabels={sectionLabels} />
       <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
@@ -2887,7 +3025,22 @@ function ExhibitionsEditor({
                   fieldKey="cataloguePageImages"
                 />
                 <BilingualTextarea label="策展说明" value={exhibition.curatorialNote ?? exhibition.curatorialLead} onChange={(next) => update((items) => { items[selectedIndex].curatorialNote = next; items[selectedIndex].curatorialLead = next; })} rows={4} />
-                <RelationChecklist fieldKey="highlightArtworkSlugs" label="重点作品" options={artworkOptions} selected={exhibition.highlightArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].highlightArtworkSlugs; items[selectedIndex].highlightArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
+                <RelationChecklist
+                  fieldKey="highlightArtworkSlugs"
+                  label="重点作品"
+                  options={artworkOptions}
+                  selected={exhibition.highlightArtworkSlugs}
+                  onToggle={(value) =>
+                    update((items) => {
+                      const list = items[selectedIndex].highlightArtworkSlugs;
+                      const nextList = list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
+                      items[selectedIndex].highlightArtworkSlugs = nextList;
+                      // Keep summary counts aligned with current highlighted selections.
+                      items[selectedIndex].featuredWorksCount = nextList.length;
+                      items[selectedIndex].highlightCount = nextList.length;
+                    })
+                  }
+                />
                 <RelationChecklist label="相关文章" options={articleOptions} selected={exhibition.relatedArticleSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].relatedArticleSlugs; items[selectedIndex].relatedArticleSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
               </div>
             </SectionBlock>
@@ -3109,6 +3262,8 @@ function ArticlesEditor({
             <>
               <RecordStatusActions
                 publicationStatus={article.publicationStatus ?? "draft"}
+                hasPendingChanges={isDirty}
+                onSaveCurrent={() => void saveCurrentArticle(article.publicationStatus ?? "draft")}
                 onSaveDraft={() => void saveCurrentArticle("draft")}
                 onSavePublish={() => void saveCurrentArticle("published")}
               />
@@ -3120,6 +3275,9 @@ function ArticlesEditor({
       />
       <div className="space-y-3 border-b border-[var(--line)] pb-6">
         <p className="text-sm leading-8 text-[var(--muted)]">{description}</p>
+        <p className="text-xs leading-6 text-[var(--muted)]/82">
+          修改内容后，请点击“保存当前修改”或“保存并发布”，前台才会同步更新。
+        </p>
       </div>
       <ValidationSummary issues={validationIssues} sectionLabels={sectionLabels} />
       <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
@@ -3188,7 +3346,7 @@ function ArticlesEditor({
                 <div className="space-y-2">
                   <p className="text-sm leading-7 text-[var(--muted)]">正文默认支持段落；如需参考图，可在任意位置插入单图或双图。没有插图时，前台会保持当前文章格式。</p>
                   <p className="text-sm leading-7 text-[var(--muted)]">
-                    文章插图标准：建议使用 JPG 或 WEBP。上传前选择构图：竖构图（3:4，建议 1200 x 1600）或横构图（4:3，建议 1600 x 1200）。建议单张控制在 2MB 内，系统硬上限 {ARTICLE_INLINE_UPLOAD_LIMIT}。
+                    文章插图标准：建议使用 JPG 或 WEBP。上传前选择构图：竖构图（3:4，建议 1200 x 1600）或横构图（4:3，建议 1600 x 1200）。建议单张控制在 {ARTICLE_INLINE_RECOMMENDED_LIMIT} 内，系统硬上限 {ARTICLE_INLINE_HARD_LIMIT}。
                   </p>
                 </div>
                 {normalizeArticleContentBlocks(article.contentBlocks, article.body).map((block, index, blocks) => (

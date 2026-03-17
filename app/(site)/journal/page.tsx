@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { ExpandableBilingualCopy } from "@/components/expandable-bilingual-copy";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { bt } from "@/lib/bilingual";
@@ -123,12 +124,12 @@ export default async function JournalPage() {
                       enClassName="mt-1.5 block font-sans text-[0.64rem] uppercase tracking-[0.18em] text-[var(--accent)]/56"
                     />
                   </div>
-                  <p className="max-w-[28ch] text-[0.9rem] leading-7 text-[var(--muted)]/94">
-                    {article.excerpt.zh}
-                  </p>
-                  <p className="max-w-[28ch] text-[0.6rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/62">
-                    {article.excerpt.en}
-                  </p>
+                  <ExpandableBilingualCopy
+                    text={article.excerpt}
+                    collapsedClassName="max-h-[7.2rem] md:max-h-[9.2rem]"
+                    zhClassName="max-w-[36ch] text-[0.96rem] leading-[2.02] text-[var(--muted)]/94"
+                    enClassName="max-w-[42ch] text-[0.8rem] leading-[1.78] tracking-[0.02em] text-[var(--accent)]/74"
+                  />
                 </div>
                 <div className="space-y-3.5 border-t border-[var(--line)]/75 pt-4 text-sm leading-7 text-[var(--muted)]">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-2 text-[0.8rem] leading-7 text-[var(--muted)]/92">

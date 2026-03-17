@@ -1,4 +1,5 @@
 import { articleHasBodyContent } from "./article-content";
+import { KNOWN_ZH_COPY_TYPO_FIXES } from "./copy-quality";
 import type { Article, Artwork, BilingualText, Exhibition } from "./data/types";
 
 const UNTITLED_ARTWORK_TITLES = new Set(["未命名藏品", "Untitled Artwork"]);
@@ -30,6 +31,89 @@ function hasMeaningfulArtworkTitle(text: BilingualText | undefined) {
 
 function addIssue(issues: ValidationIssue[], issue: ValidationIssue) {
   issues.push(issue);
+}
+
+function addBilingualCompletenessWarnings(
+  issues: ValidationIssue[],
+  section: ValidationSection,
+  fieldBase: string,
+  label: string,
+  value: BilingualText | undefined,
+) {
+  const zh = value?.zh.trim() ?? "";
+  const en = value?.en.trim() ?? "";
+
+  if (zh && !en) {
+    addIssue(issues, {
+      field: `${fieldBase}.en`,
+      section,
+      message: `建议补充${label}英文，保证双语一致。`,
+      level: "warning",
+    });
+  }
+
+  if (en && !zh) {
+    addIssue(issues, {
+      field: `${fieldBase}.zh`,
+      section,
+      message: `建议补充${label}中文，保证双语一致。`,
+      level: "warning",
+    });
+  }
+}
+
+function addBilingualLengthGapWarning(
+  issues: ValidationIssue[],
+  section: ValidationSection,
+  fieldBase: string,
+  label: string,
+  value: BilingualText | undefined,
+) {
+  const zh = value?.zh.trim() ?? "";
+  const en = value?.en.trim() ?? "";
+
+  if (!zh || !en) {
+    return;
+  }
+
+  const longSide = Math.max(zh.length, en.length);
+  const shortSide = Math.max(1, Math.min(zh.length, en.length));
+  const ratio = longSide / shortSide;
+
+  if (longSide >= 600 && ratio >= 4.5) {
+    addIssue(issues, {
+      field: `${fieldBase}.en`,
+      section,
+      message: `${label}中英文篇幅差异较大，建议确认英文是否为完整版本。`,
+      level: "warning",
+    });
+  }
+}
+
+function addZhTypoWarnings(
+  issues: ValidationIssue[],
+  section: ValidationSection,
+  field: string,
+  value: string,
+) {
+  const text = value.trim();
+
+  if (!text) {
+    return;
+  }
+
+  for (const item of KNOWN_ZH_COPY_TYPO_FIXES) {
+    if (!text.includes(item.wrong)) {
+      continue;
+    }
+
+    addIssue(issues, {
+      field,
+      section,
+      message: `检测到“${item.wrong}”，建议改为“${item.correct}”。`,
+      level: "warning",
+    });
+  }
 }
 
 function validateSlugValue(
@@ -116,6 +200,14 @@ export function getArtworkPublicationIssues(artwork: Artwork, artworks: Artwork[
   if (!getPrimaryText(artwork.viewingNote) && !getPrimaryText(artwork.comparisonNote)) {
     addIssue(issues, { field: "viewingNote.zh", section: "scholarly", message: "请至少填写一项学术说明。", level: "error" });
   }
+
+  addBilingualCompletenessWarnings(issues, "scholarly", "excerpt", "简述", artwork.excerpt);
+  addBilingualCompletenessWarnings(issues, "scholarly", "viewingNote", "观看描述", artwork.viewingNote);
+  addBilingualCompletenessWarnings(issues, "scholarly", "comparisonNote", "比较判断", artwork.comparisonNote);
+  addBilingualLengthGapWarning(issues, "scholarly", "viewingNote", "观看描述", artwork.viewingNote);
+  addZhTypoWarnings(issues, "scholarly", "excerpt.zh", artwork.excerpt?.zh ?? "");
+  addZhTypoWarnings(issues, "scholarly", "viewingNote.zh", artwork.viewingNote?.zh ?? "");
+  addZhTypoWarnings(issues, "scholarly", "comparisonNote.zh", artwork.comparisonNote?.zh ?? "");
 
   if (!artwork.image.trim()) {
     addIssue(issues, { field: "image", section: "images", message: "请上传主图。", level: "error" });

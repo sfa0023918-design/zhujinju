@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
-
 import { BilingualText } from "./bilingual-text";
 
 type NavItem = {

@@ -87,19 +87,27 @@ function normalizeTranslation(raw: string) {
     return "";
   }
 
-  const lines = trimmed
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) =>
-      line.replace(
-        /^(field name|字段名称|english translation|英文翻译|chinese content|中文内容|title|content)\s*[:：]\s*/i,
-        "",
-      ),
+  const paragraphs = trimmed
+    .split(/\n\s*\n+/)
+    .map((paragraph) =>
+      paragraph
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) =>
+          line.replace(
+            /^(field name|字段名称|english translation|英文翻译|chinese content|中文内容|title|content)\s*[:：]\s*/i,
+            "",
+          ),
+        )
+        .filter(Boolean)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim(),
     )
     .filter(Boolean);
 
-  const joined = lines.join(" ").replace(/\s+/g, " ").trim();
+  const joined = paragraphs.join("\n\n").trim();
   return normalizeXizangTerminology(joined.replace(/^["“”']|["“”']$/g, "").trim());
 }
 

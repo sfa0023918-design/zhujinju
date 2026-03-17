@@ -21,6 +21,12 @@ export default async function HomePage() {
   const focusCopy = currentExhibition?.current ? homeContent.focusCurrent : homeContent.focusRecent;
   const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
   const worksSectionCopy = { zh: "部分藏品赏析", en: "Selected Highlights" };
+  const heroTitleZhLines =
+    homeContent.heroTitle.zh
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean) || [];
+  const fallbackHeroTitleZh = homeContent.heroTitle.zh.replace(/\s+/g, "").trim();
 
   return (
     <>
@@ -38,6 +44,21 @@ export default async function HomePage() {
               wrapperClassName="block"
               className="aspect-[1.08/1] w-full object-cover md:aspect-[1.18/1] lg:aspect-[1.24/1] xl:aspect-[1.3/1]"
             />
+            <div className="pointer-events-none absolute inset-0 bg-black/12" />
+            <div
+              className="pointer-events-none absolute inset-0 mix-blend-screen opacity-70"
+              style={{
+                background:
+                  "radial-gradient(38% 56% at 48% 43%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 34%, rgba(255,255,255,0) 72%)",
+              }}
+            />
+            <div
+              className="pointer-events-none absolute inset-0 opacity-80"
+              style={{
+                background:
+                  "radial-gradient(85% 110% at 50% 52%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.12) 100%)",
+              }}
+            />
           </div>
           <div className="flex max-w-[22rem] flex-col justify-end gap-8 lg:pb-2">
             <div className="space-y-5">
@@ -46,14 +67,20 @@ export default async function HomePage() {
                 text={homeContent.heroEyebrow}
                 mode="inline"
                 className="text-[var(--accent)]"
-                zhClassName="text-[0.68rem] tracking-[0.2em]"
-                enClassName="text-[0.46rem] uppercase tracking-[0.22em] text-[var(--accent)]/66"
+                zhClassName="text-[0.62rem] tracking-[0.22em]"
+                enClassName="text-[0.42rem] uppercase tracking-[0.26em] text-[var(--accent)]/60"
               />
-              <div className="space-y-3.5">
-                <h1 className="max-w-[7ch] font-serif text-[clamp(3.2rem,5.2vw,4.35rem)] leading-[0.96] tracking-[-0.05em] text-[var(--ink)]">
-                  {homeContent.heroTitle.zh}
+              <div className="space-y-6">
+                <h1 className="inline-flex flex-col gap-2 font-serif text-[clamp(3.45rem,5.8vw,4.9rem)] font-normal leading-[1.1] tracking-[-0.035em] text-[var(--ink)]">
+                  {heroTitleZhLines.length > 0
+                    ? heroTitleZhLines.map((line) => (
+                        <span key={line} className="block">
+                          {line}
+                        </span>
+                      ))
+                    : <span className="block">{fallbackHeroTitleZh}</span>}
                 </h1>
-                <p className="text-[0.56rem] uppercase tracking-[0.2em] text-[var(--accent)]/72">
+                <p className="text-[0.48rem] uppercase tracking-[0.34em] text-[var(--accent)]/56 md:text-[0.5rem]">
                   {homeContent.heroTitle.en}
                 </p>
               </div>

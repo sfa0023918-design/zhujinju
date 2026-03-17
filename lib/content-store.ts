@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 
 import { getArticleBodyParagraphs, normalizeArticleContentBlocks } from "./article-content";
 import { bt } from "./bilingual";
+import { normalizeBilingualFieldsDeep } from "./copy-quality";
 import { articles as defaultArticles } from "./data/articles";
 import { artworks as defaultArtworks } from "./data/artworks";
 import { brandIntro as defaultBrandIntro, collectingDirections as defaultCollectingDirections, operationalFacts as defaultOperationalFacts } from "./data/brand";
@@ -146,7 +147,7 @@ const loadCachedSiteContent = unstable_cache(
     normalizeSiteContent(
       (await readBestAvailableContentFile({ preferRemote: true })) ?? getDefaultSiteContent(),
     ),
-  ["site-content-v4"],
+  ["site-content-v5"],
   { tags: [getSiteContentTag()] },
 );
 
@@ -377,10 +378,21 @@ function trimImageUrl(value?: string | null) {
 }
 
 function normalizeImageAsset(asset?: ImageAsset | null, fallbackUrl?: string) {
-  const original = trimImageUrl(asset?.original) || trimImageUrl(fallbackUrl);
+  const fallback = trimImageUrl(fallbackUrl);
+  const originalFromAsset = trimImageUrl(asset?.original);
+  const hasPrimaryMismatch = Boolean(fallback && originalFromAsset && fallback !== originalFromAsset);
+  const original = hasPrimaryMismatch ? fallback : originalFromAsset || fallback;
 
   if (!original) {
     return undefined;
+  }
+
+  // If primary image changed but asset metadata is still from a previous file,
+  // reset derived variants so list/detail always stay in sync.
+  if (hasPrimaryMismatch) {
+    return {
+      original,
+    } satisfies ImageAsset;
   }
 
   return {
@@ -853,44 +865,58 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
     collectingDirections: structuredClone(defaultCollectingDirections),
     operationalFacts: structuredClone(defaultOperationalFacts),
     artworks: (content.artworks ?? []).map((artwork) => {
-      const imageAsset = normalizeImageAsset(artwork.imageAsset, artwork.image);
-      const image = resolveImageUrl(artwork.image, imageAsset);
+      const cleanedArtwork = normalizeBilingualFieldsDeep(artwork).value;
+      const imageAsset = normalizeImageAsset(cleanedArtwork.imageAsset, cleanedArtwork.image);
+      const image = resolveImageUrl(cleanedArtwork.image, imageAsset);
 
       return {
-        ...artwork,
-        id: getArtworkId(artwork),
-        publicationStatus: artwork.publicationStatus ?? "published",
+        ...cleanedArtwork,
+        id: getArtworkId(cleanedArtwork),
+        publicationStatus: cleanedArtwork.publicationStatus ?? "published",
         image,
         imageAsset,
-        gallery: normalizeArtworkGallery(artwork.gallery, image, artwork.galleryAssets),
-        galleryAssets: normalizeImageAssetList(artwork.galleryAssets, artwork.gallery),
+        gallery: normalizeArtworkGallery(cleanedArtwork.gallery, image, cleanedArtwork.galleryAssets),
+        galleryAssets: normalizeImageAssetList(cleanedArtwork.galleryAssets, cleanedArtwork.gallery),
       };
     }),
     exhibitions: (content.exhibitions ?? []).map((exhibition) => {
-      const coverAsset = normalizeImageAsset(exhibition.coverAsset, exhibition.cover);
+      const cleanedExhibition = normalizeBilingualFieldsDeep(exhibition).value;
+      const coverAsset = normalizeImageAsset(cleanedExhibition.coverAsset, cleanedExhibition.cover);
+      const featuredWorksCount =
+        cleanedExhibition.featuredWorksCount ??
+        cleanedExhibition.highlightCount ??
+        cleanedExhibition.highlightArtworkSlugs.length;
+      const cataloguePageCount = cleanedExhibition.cataloguePageCount ?? cleanedExhibition.cataloguePages ?? 0;
+      const catalogueNote = cleanedExhibition.catalogueNote ?? cleanedExhibition.catalogueIntro ?? bt("", "");
+      const curatorialNote = cleanedExhibition.curatorialNote ?? cleanedExhibition.curatorialLead ?? bt("", "");
 
       return {
-        ...exhibition,
-        publicationStatus: exhibition.publicationStatus ?? "published",
-        cover: resolveImageUrl(exhibition.cover, coverAsset),
+        ...cleanedExhibition,
+        publicationStatus: cleanedExhibition.publicationStatus ?? "published",
+        cover: resolveImageUrl(cleanedExhibition.cover, coverAsset),
         coverAsset,
-        featuredWorksCount: exhibition.featuredWorksCount ?? exhibition.highlightCount ?? exhibition.highlightArtworkSlugs.length,
-        cataloguePageCount: exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? 0,
-        cataloguePageImages: normalizeExhibitionCataloguePages(exhibition.cataloguePageImages),
-        catalogueNote: exhibition.catalogueNote ?? exhibition.catalogueIntro ?? bt("", ""),
-        curatorialNote: exhibition.curatorialNote ?? exhibition.curatorialLead ?? bt("", ""),
+        featuredWorksCount,
+        highlightCount: featuredWorksCount,
+        cataloguePageCount,
+        cataloguePages: cataloguePageCount,
+        cataloguePageImages: normalizeExhibitionCataloguePages(cleanedExhibition.cataloguePageImages),
+        catalogueNote,
+        catalogueIntro: catalogueNote,
+        curatorialNote,
+        curatorialLead: curatorialNote,
       };
     }),
     articles: (content.articles ?? []).map((article) => {
-      const coverAsset = normalizeImageAsset(article.coverAsset, article.cover);
+      const cleanedArticle = normalizeBilingualFieldsDeep(article).value;
+      const coverAsset = normalizeImageAsset(cleanedArticle.coverAsset, cleanedArticle.cover);
 
       return {
-        ...article,
-        publicationStatus: article.publicationStatus ?? "published",
-        cover: resolveImageUrl(article.cover, coverAsset),
+        ...cleanedArticle,
+        publicationStatus: cleanedArticle.publicationStatus ?? "published",
+        cover: resolveImageUrl(cleanedArticle.cover, coverAsset),
         coverAsset,
-        contentBlocks: normalizeArticleContentBlocks(article.contentBlocks, article.body),
-        body: getArticleBodyParagraphs(article.contentBlocks, article.body),
+        contentBlocks: normalizeArticleContentBlocks(cleanedArticle.contentBlocks, cleanedArticle.body),
+        body: getArticleBodyParagraphs(cleanedArticle.contentBlocks, cleanedArticle.body),
       };
     }),
   };

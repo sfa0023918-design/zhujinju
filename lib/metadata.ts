@@ -32,13 +32,34 @@ export function buildMetadata({
     description: resolvedDescription,
     icons: {
       icon: [
-        { url: "/favicon.svg", type: "image/svg+xml" },
-        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-        { url: "/favicon.ico", rel: "shortcut icon" },
+        {
+          url: "/favicon-32x32.png?v=20260317",
+          sizes: "32x32",
+          type: "image/png",
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          url: "/favicon-16x16.png?v=20260317",
+          sizes: "16x16",
+          type: "image/png",
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          url: "/favicon-dark-32x32.png?v=20260317",
+          sizes: "32x32",
+          type: "image/png",
+          media: "(prefers-color-scheme: dark)",
+        },
+        {
+          url: "/favicon-dark-16x16.png?v=20260317",
+          sizes: "16x16",
+          type: "image/png",
+          media: "(prefers-color-scheme: dark)",
+        },
+        { url: "/favicon.ico?v=20260317", rel: "shortcut icon" },
       ],
-      shortcut: ["/favicon.ico"],
-      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+      shortcut: ["/favicon.ico?v=20260317"],
+      apple: [{ url: "/apple-touch-icon.png?v=20260317", sizes: "180x180", type: "image/png" }],
       other: [{ rel: "manifest", url: "/site.webmanifest" }],
     },
     alternates: {

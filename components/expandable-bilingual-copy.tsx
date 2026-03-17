@@ -35,8 +35,21 @@ export function ExpandableBilingualCopy({
       return;
     }
 
+    const parseRemFromClass = (pattern: RegExp, fallbackRem: number) => {
+      const match = collapsedClassName.match(pattern);
+      return match ? Number.parseFloat(match[1]) : fallbackRem;
+    };
+
+    const getCollapsedHeight = () => {
+      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+      const rem = isDesktop
+        ? parseRemFromClass(/md:max-h-\[([0-9.]+)rem\]/, 22)
+        : parseRemFromClass(/max-h-\[([0-9.]+)rem\]/, 18);
+      return rem * 16;
+    };
+
     const measure = () => {
-      const nextCanExpand = inner.scrollHeight - outer.clientHeight > 8;
+      const nextCanExpand = inner.scrollHeight - getCollapsedHeight() > 8;
       setCanExpand(nextCanExpand);
     };
 
@@ -50,7 +63,7 @@ export function ExpandableBilingualCopy({
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [items, expanded]);
+  }, [collapsedClassName, items]);
 
   return (
     <div className="space-y-3">

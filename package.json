@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint",
     "audit:artworks": "node scripts/audit-artwork-sync.mjs",
+    "cleanup:copy": "node scripts/cleanup-copy-quality.mjs",
     "catalogue:pages": "node scripts/pdf-to-catalogue-pages.mjs",
     "backfill:image-assets": "python3 scripts/backfill_image_assets.py"
   },

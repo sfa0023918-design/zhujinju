@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 
-const SAFE_UPLOAD_BYTES = Math.floor(3.5 * 1024 * 1024);
-const DISPLAY_UPLOAD_LIMIT = "4MB";
+// Keep request body comfortably below serverless payload limits after multipart overhead.
+const SAFE_UPLOAD_BYTES = Math.floor(2.8 * 1024 * 1024);
+const RECOMMENDED_UPLOAD_LIMIT = "2.8MB";
+const HARD_UPLOAD_LIMIT = "4MB";
 
 type PreviewRatio = "portrait" | "landscape" | "square";
 type TargetSize = {
@@ -189,7 +191,7 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
   let bestWidth = exportWidth;
   let bestHeight = exportHeight;
 
-  for (let resizeRound = 0; resizeRound < 4; resizeRound += 1) {
+  for (let resizeRound = 0; resizeRound < 6; resizeRound += 1) {
     canvas.width = exportWidth;
     canvas.height = exportHeight;
     context.clearRect(0, 0, exportWidth, exportHeight);
@@ -239,8 +241,8 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
       bestPreviewUrl = createObjectUrl(bestBlob);
     }
 
-    exportWidth = Math.max(960, Math.round(exportWidth * 0.88));
-    exportHeight = Math.max(Math.round(960 / targetRatio), Math.round(exportHeight * 0.88));
+    exportWidth = Math.max(720, Math.round(exportWidth * 0.88));
+    exportHeight = Math.max(Math.round(720 / targetRatio), Math.round(exportHeight * 0.88));
   }
 
   if (bestBlob && bestBlob.size <= SAFE_UPLOAD_BYTES) {
@@ -410,7 +412,9 @@ export function AdminMediaField({
 
       if (!response.ok || !payload.url) {
         if (response.status === 413 || /request entity too large/i.test(raw)) {
-          throw new Error(`图片过大，上传请求被服务器拒绝。系统会自动压缩，但单张图片仍需控制在 ${DISPLAY_UPLOAD_LIMIT} 内。`);
+          throw new Error(
+            `图片过大，上传请求被服务器拒绝。系统会自动压缩，建议上传前控制在 ${RECOMMENDED_UPLOAD_LIMIT} 内（服务器硬上限 ${HARD_UPLOAD_LIMIT}）。`,
+          );
         }
 
         throw new Error(payload.error ?? (raw.trim() || "图片上传失败。"));
@@ -522,7 +526,7 @@ export function AdminMediaField({
           </div>
         ) : null}
         <p className="text-xs leading-6 text-[var(--muted)]">
-          系统会自动按当前页面所需比例裁切，并在尽量保持清晰度的情况下压缩到可上传尺寸。
+          系统会自动按当前页面所需比例裁切，并在尽量保持清晰度的情况下压缩到可上传尺寸。建议上传前控制在 {RECOMMENDED_UPLOAD_LIMIT} 内（服务器硬上限 {HARD_UPLOAD_LIMIT}）。
         </p>
       </div>
 

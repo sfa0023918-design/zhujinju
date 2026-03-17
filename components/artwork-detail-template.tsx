@@ -86,6 +86,18 @@ const DETAIL_SECTION_IDS = {
   relatedArticles: "artwork-related-articles",
 } as const;
 
+const INFO_COPY_CLASSES = {
+  sectionLabelZh: "text-[0.78rem] leading-[1.4] tracking-[0.12em] text-[var(--accent)]/92",
+  sectionLabelEn: "text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/68 leading-[1.45]",
+  primaryLine: "text-[0.86rem] leading-7 text-[var(--ink)]",
+  secondaryLine: "text-[0.76rem] leading-6 text-[var(--muted)]",
+} as const;
+
+const ARTWORK_HERO_TITLE_CLASSES = {
+  zh: "font-serif text-[clamp(1.56rem,2.15vw,2.35rem)] leading-[1.04] tracking-[-0.04em] text-[var(--ink)]",
+  en: "text-[0.68rem] uppercase tracking-[0.18em] leading-[1.45] text-[var(--accent)]/58",
+} as const;
+
 function hasText(value?: { zh?: string; en?: string } | null) {
   if (!value) {
     return false;
@@ -125,8 +137,8 @@ function DetailIndexSection({
           en: "text-[0.62rem] uppercase tracking-[0.13em] text-[var(--accent)]/62 leading-[1.45]",
         }
       : {
-          zh: "text-[0.78rem] tracking-[0.12em] text-[var(--accent)]/92",
-          en: "text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/68 leading-[1.45]",
+          zh: INFO_COPY_CLASSES.sectionLabelZh,
+          en: INFO_COPY_CLASSES.sectionLabelEn,
         };
 
   return (
@@ -157,26 +169,26 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
           className="grid items-start gap-x-3 gap-y-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[102px_minmax(0,1fr)] md:gap-x-4 md:gap-y-1.5"
         >
           <dt className="min-w-0 text-[var(--accent)]">
-            <p className="text-[0.98rem] font-medium leading-[1.24] tracking-[0.02em] text-[var(--accent)]/90 md:text-[0.95rem]">
+            <p className={INFO_COPY_CLASSES.sectionLabelZh}>
               {item.label.zh}
             </p>
             {item.label.en?.trim() ? (
               <p
                 lang="en"
-                className="mt-1 text-[0.8rem] font-medium uppercase tracking-[0.12em] text-[var(--accent)]/74 leading-[1.45] md:text-[0.79rem]"
+                className={`mt-1 ${INFO_COPY_CLASSES.sectionLabelEn}`}
               >
                 {item.label.en}
               </p>
             ) : null}
           </dt>
           <dd className="min-w-0">
-            <p className="text-[1.16rem] font-medium leading-[1.28] text-[var(--ink)] md:text-[1.08rem]">
+            <p className={INFO_COPY_CLASSES.primaryLine}>
               {item.value.zh}
             </p>
             {item.value.en?.trim() ? (
               <p
                 lang="en"
-                className="mt-1 text-[0.88rem] leading-[1.5] text-[var(--ink)]/86 md:text-[0.86rem]"
+                className={`mt-1 ${INFO_COPY_CLASSES.secondaryLine}`}
               >
                 {item.value.en}
               </p>
@@ -312,17 +324,17 @@ export function ArtworkHero({
               <StatusPill status={artwork.status} />
             </div>
             <div className="space-y-2">
-              <h1 className="font-serif text-[clamp(2.5rem,3.8vw,3.4rem)] leading-[0.98] tracking-[-0.045em] text-[var(--ink)]">
+              <h1 className={ARTWORK_HERO_TITLE_CLASSES.zh}>
                 {artwork.title.zh}
               </h1>
-              <p className="text-[0.8rem] uppercase tracking-[0.12em] text-[var(--accent)]/76 leading-[1.45]">
+              <p className={ARTWORK_HERO_TITLE_CLASSES.en}>
                 {artwork.title.en}
               </p>
             </div>
             {hasText(artwork.subtitle) ? (
               <p
                 lang={locale === "en" ? "en" : "zh-CN"}
-                className="max-w-[28rem] text-[0.9rem] leading-7 text-[var(--muted)]"
+                className="max-w-[28rem] text-[0.84rem] leading-[1.85] text-[var(--muted)]"
               >
                 {getLocalizedText(artwork.subtitle, locale)}
               </p>
@@ -330,7 +342,7 @@ export function ArtworkHero({
             {hasLead ? (
               <BilingualProse
                 content={artwork.excerpt}
-                variant="lead"
+                variant="compact"
                 className="max-w-[30rem]"
                 mode="single"
                 locale={locale}
@@ -365,7 +377,7 @@ export function ArtworkScholarlyNote({
       ? {
           key: "excerpt",
           content: artwork.excerpt,
-          variant: (!hasViewing && !hasComparison ? "lead" : "body") as "lead" | "body",
+          variant: "compact" as const,
           expandable: true,
         }
       : null,
@@ -374,7 +386,7 @@ export function ArtworkScholarlyNote({
           key: "viewing",
           label: detailCopy.viewingNote,
           content: artwork.viewingNote,
-          variant: "body" as const,
+          variant: "compact" as const,
           expandable: true,
         }
       : null,
@@ -383,14 +395,14 @@ export function ArtworkScholarlyNote({
           key: "comparison",
           label: detailCopy.comparisonNote,
           content: artwork.comparisonNote,
-          variant: "body" as const,
+          variant: "compact" as const,
         }
       : null,
   ].filter(Boolean) as Array<{
     key: string;
     label?: { zh: string; en: string };
     content: { zh: string; en: string };
-    variant?: "lead" | "body" | "secondary";
+    variant?: "lead" | "body" | "secondary" | "compact";
   }>;
 
   return (
@@ -459,11 +471,11 @@ export function ArtworkReferences({
           <ul className="space-y-3">
             {artwork.provenance.map((item) => (
               <li key={item.label.zh} className="space-y-0.5">
-                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.86rem] leading-7 text-[var(--ink)]">
+                <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.primaryLine}>
                   {getLocalizedText(item.label, locale)}
                 </p>
                 {item.note && hasText(item.note) ? (
-                  <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                  <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.secondaryLine}>
                     {getLocalizedText(item.note, locale)}
                   </p>
                 ) : null}
@@ -478,10 +490,10 @@ export function ArtworkReferences({
           <ul className="space-y-3">
             {artwork.exhibitions.map((item) => (
               <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
-                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.86rem] leading-7 text-[var(--ink)]">
+                <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.primaryLine}>
                   {getLocalizedText(item.title, locale)}
                 </p>
-                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.secondaryLine}>
                   {getLocalizedText(item.venue, locale)}
                   {locale === "zh" ? "，" : ", "}
                   {item.year}
@@ -497,16 +509,16 @@ export function ArtworkReferences({
           <ul className="space-y-3">
             {artwork.publications.map((item) => (
               <li key={`${item.title.zh}-${item.year}`} className="space-y-0.5">
-                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.86rem] leading-7 text-[var(--ink)]">
+                <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.primaryLine}>
                   {getLocalizedText(item.title, locale)}
                 </p>
-                <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.secondaryLine}>
                   {item.year}
                   {locale === "zh" ? "，" : ", "}
                   {getLocalizedText(item.pages, locale)}
                 </p>
                 {item.note && hasText(item.note) ? (
-                  <p lang={locale === "en" ? "en" : "zh-CN"} className="text-[0.76rem] leading-6 text-[var(--muted)]">
+                  <p lang={locale === "en" ? "en" : "zh-CN"} className={INFO_COPY_CLASSES.secondaryLine}>
                     {getLocalizedText(item.note, locale)}
                   </p>
                 ) : null}

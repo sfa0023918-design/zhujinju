@@ -39,7 +39,7 @@ export function ExhibitionDetailReading({
   const [locale, setLocale] = useState<ReadingLocale>("zh");
 
   return (
-    <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,0.8fr)] lg:px-10 lg:py-20">
+    <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-8 py-14 md:px-[3.25rem] md:py-16 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.72fr)] lg:px-16 lg:py-20">
       <div className="lg:col-span-2 flex justify-end">
         <div className="inline-flex items-center rounded-full border border-[var(--line)]/26 p-1">
           {(["zh", "en"] as const).map((option) => {
@@ -62,28 +62,31 @@ export function ExhibitionDetailReading({
         </div>
       </div>
 
-      <div className="max-w-[42rem]">
+      <div className="max-w-[56rem]">
         <BilingualReadingPanel
           sections={[
             {
               key: "intro",
               label: introLabel,
               content: intro,
-              variant: "lead",
+              variant: "compact",
+              expandable: true,
             },
             {
               key: "description",
               content: description,
-              variant: "body",
+              variant: "compact",
+              expandable: true,
             },
           ]}
           locale={locale}
           onLocaleChange={setLocale}
           showToggle={false}
+          paragraphClassName="max-w-[56rem]"
         />
       </div>
 
-      <div className="border-t border-[var(--line)] pt-5 md:border-t-0 md:border-l md:pl-8 md:pt-0">
+      <div className="border-t border-[var(--line)] pt-5 lg:border-l lg:pl-8 lg:pt-0 lg:border-t-0">
         <BilingualReadingPanel
           className="space-y-6"
           sections={[
@@ -91,13 +94,15 @@ export function ExhibitionDetailReading({
               key: "catalogue-intro",
               label: catalogueNoteLabel,
               content: catalogueNote,
-              variant: "secondary",
+              variant: "compact",
+              expandable: true,
             },
             {
               key: "curatorial-lead",
               label: curatorialLeadLabel,
               content: curatorialLead,
-              variant: "secondary",
+              variant: "compact",
+              expandable: true,
             },
           ]}
           locale={locale}

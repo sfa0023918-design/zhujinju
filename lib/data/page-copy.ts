@@ -47,8 +47,8 @@ export const pageCopy = {
     },
   },
   home: {
-    heroEyebrow: bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art and Asian Antiquities"),
-    heroTitle: bt("让作品先说话。", "Let the Work Speak First."),
+    heroEyebrow: bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art & Asian Antiquities"),
+    heroTitle: bt("让作品\n先说话", "LET THE WORK SPEAK FIRST"),
     heroPrimaryAction: bt("浏览藏品", "Browse Collection"),
     heroSecondaryAction: bt("查看展览与图录", "View Exhibitions & Catalogues"),
     focusCurrent: {
@@ -136,18 +136,18 @@ export const pageCopy = {
       eyebrow: bt("联系", "Contact"),
       title: bt("联系", "Contact"),
       description: bt(
-        "欢迎藏家、机构、策展人与研究者联系。竹瑾居以作品咨询、借展洽谈、研究合作与图录交换为主要联络方向。",
-        "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange.",
+        "欢迎藏家、机构、策展人与我们联系。竹瑾居以收藏、咨询、展览、学术研究为主要联络方向。",
+        "Collectors, institutions, and curators are welcome to contact us. Zhu Jin Ju's primary communication focus includes collecting, consultation, exhibitions, and academic research.",
       ),
       aside: bt(
-        "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排看件与研究交流。",
-        "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment.",
+        "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，期待与您相见。",
+        "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment. We look forward to meeting you.",
       ),
     },
     appointmentLine: bt("成都会面采用预约制。", "By appointment in Chengdu."),
     cooperationLine: bt(
-      "借展、研究合作、图录交换与机构看件，请在留言中说明机构名称、时间安排与需求方向。",
-      "For loans, research collaboration, catalogue exchange, and institutional viewings, please include your institution, schedule, and requirements.",
+      "咨询通常于 24 小时内回复。可作品咨询、预约看件、学术展开。",
+      "Inquiries are typically answered within 24 hours. Artwork consultation, appointment viewings, and scholarly exchange are welcomed.",
     ),
     infoLabels: {
       email: bt("邮箱", "Email"),

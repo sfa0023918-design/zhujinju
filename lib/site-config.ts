@@ -45,12 +45,12 @@ export const siteConfig: SiteConfigContent = {
     eyebrow: bt("联系", "Contact"),
     title: bt("联系", "Contact"),
     description: bt(
-      "欢迎藏家、机构、策展人与我们联系。竹瑾居以作品咨询、借展洽谈、研究合作与图录交换为主要联络方向。",
-      "Collectors, institutions, curators, and researchers are welcome to get in touch regarding works, loans, research collaboration, and catalogue exchange."
+      "欢迎藏家、机构、策展人与我们联系。竹瑾居以收藏、咨询、展览、学术研究为主要联络方向。",
+      "Collectors, institutions, and curators are welcome to contact us. Zhu Jin Ju's primary communication focus includes collecting, consultation, exhibitions, and academic research."
     ),
     aside: bt(
-      "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，可安排与我们看件。",
-      "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment."
+      "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，期待与您相见。",
+      "If you are inquiring about a specific work, include its title in the form. When arriving from an artwork page, the title is carried over automatically. Meetings in Chengdu are by appointment. We look forward to meeting you."
     ),
     infoLabels: {
       email: bt("邮箱", "Email"),
@@ -87,8 +87,8 @@ export const siteConfig: SiteConfigContent = {
       "Address: Zhu Jin Ju Art Space, No. 88 Caotang East Road, Qingyang District, Chengdu"
     ),
     collaborationNote: bt(
-      "咨询通常于 24 小时内回复。可联系借展、研究合作、图录交换与我们预约看件。",
-      "Inquiries are typically answered within 24 hours. We welcome requests regarding exhibition loans, research collaborations, catalogue exchange, and private viewings by appointment."
+      "咨询通常于 24 小时内回复。可作品咨询、预约看件、学术展开。",
+      "Inquiries are typically answered within 24 hours. Artwork consultation, appointment viewings, and scholarly exchange are welcomed."
     ),
     appointmentNote: bt("成都会面采用预约制。", "By appointment in Chengdu."),
   },

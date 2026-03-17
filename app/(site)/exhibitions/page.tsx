@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
+import { ExpandableBilingualCopy } from "@/components/expandable-bilingual-copy";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { bt } from "@/lib/bilingual";
@@ -151,12 +152,11 @@ export default async function ExhibitionsPage() {
                       />
                     </div>
                   </div>
-                  <BilingualText
-                    as="p"
+                  <ExpandableBilingualCopy
                     text={exhibition.intro}
-                    className="max-w-[28ch] text-[var(--muted)]"
-                    zhClassName="text-[0.9rem] leading-7"
-                    enClassName="mt-2 block text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/62"
+                    collapsedClassName="max-h-[11rem] md:max-h-[13rem]"
+                    zhClassName="max-w-[36ch] text-[0.96rem] leading-[2.02] text-[var(--muted)]"
+                    enClassName="max-w-[42ch] text-[0.8rem] leading-[1.78] tracking-[0.02em] text-[var(--accent)]/74"
                   />
                 </div>
                 <div className="border-t border-[var(--line)]/68 pt-4">

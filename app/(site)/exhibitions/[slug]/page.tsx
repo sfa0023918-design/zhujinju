@@ -101,6 +101,7 @@ export default async function ExhibitionDetailPage({
   const catalogueCountLabel = showsSpreadImageCatalogue
     ? { zh: "图录版面", en: "Catalogue Spreads" }
     : detailCopy.summaryLine.catalogueUnit;
+  const hasHighlightedWorks = highlightArtworks.length > 0;
 
   return (
     <>
@@ -209,31 +210,33 @@ export default async function ExhibitionDetailPage({
         relatedArticles={relatedArticles.map((article) => ({ slug: article.slug, title: article.title }))}
       />
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-20">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <BilingualText
-              as="p"
-              text={detailCopy.highlightedWorks}
-              className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
-              zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
-            />
-            <BilingualText
-              as="h2"
-              text={detailCopy.highlightedWorksTitle}
-              className="font-serif text-[var(--ink)]"
-              zhClassName="block text-[1.75rem] leading-none tracking-[-0.038em] md:text-[2.6rem]"
-              enClassName="mt-2.5 block font-sans text-[0.72rem] uppercase tracking-[0.18em] text-[var(--accent)]/76"
-            />
+      {hasHighlightedWorks ? (
+        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-20">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <BilingualText
+                as="p"
+                text={detailCopy.highlightedWorks}
+                className="mb-3 flex flex-col gap-1 text-[var(--accent)]"
+                zhClassName="text-[0.72rem] tracking-[0.22em]"
+                enClassName="text-[0.54rem] uppercase tracking-[0.24em]"
+              />
+              <BilingualText
+                as="h2"
+                text={detailCopy.highlightedWorksTitle}
+                className="font-serif text-[var(--ink)]"
+                zhClassName="block text-[1.75rem] leading-none tracking-[-0.038em] md:text-[2.6rem]"
+                enClassName="mt-2.5 block font-sans text-[0.72rem] uppercase tracking-[0.18em] text-[var(--accent)]/76"
+              />
+            </div>
           </div>
-        </div>
-        <div className="grid gap-8">
-          {highlightArtworks.map((artwork) => (
-            <ArtworkCard key={artwork.slug} artwork={artwork} />
-          ))}
-        </div>
-      </section>
+          <div className="grid gap-8">
+            {highlightArtworks.map((artwork) => (
+              <ArtworkCard key={artwork.slug} artwork={artwork} />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }
