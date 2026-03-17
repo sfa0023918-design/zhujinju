@@ -4705,11 +4705,29 @@
           }
         },
         {
+          "type": "image",
+          "image": "/uploads/articles/references/1773769701352-l1004143.jpg",
+          "caption": {
+            "zh": "图注",
+            "en": ""
+          },
+          "layout": "wide"
+        },
+        {
           "type": "paragraph",
           "content": {
             "zh": "于我们而言，这些雕塑与绘画从来不仅仅只是历史遗物。它们承载着信仰、情绪、记忆与时间，也在每一次凝视中，与今天的我们重新发生关系。展览让作品回到观看现场，图录则让这种相遇得以被记录、被延续、被反复思考。",
             "en": "For us, these sculptures and paintings are never merely historical remnants. They carry faith, emotion, memory, and time, and in every sustained gaze they enter into renewed relation with us in the present. Exhibitions return works to the site of viewing, while catalogues allow these encounters to be recorded, extended, and revisited in thought."
           }
+        },
+        {
+          "type": "image",
+          "image": "/uploads/articles/references/1773769776290-l1004137.jpg",
+          "caption": {
+            "zh": "图注",
+            "en": ""
+          },
+          "layout": "wide"
         },
         {
           "type": "paragraph",
