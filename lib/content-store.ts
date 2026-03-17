@@ -541,9 +541,9 @@ function mergeRecordsWithBase<T>(
   const currentByKey = new Map(currentRecords.map((record) => [getKey(record), record]));
   const baseByKey = new Map(baseRecords.map((record) => [getKey(record), record]));
   const resolved: T[] = [];
-  const seenKeys = new Set<string>();
+  const consumedCurrentKeys = new Set<string>();
 
-  nextRecords.forEach((nextRecord) => {
+  nextRecords.forEach((nextRecord, nextIndex) => {
     const key = getKey(nextRecord);
     const currentRecord = currentByKey.get(key);
     const baseRecord = baseByKey.get(key);
@@ -554,26 +554,42 @@ function mergeRecordsWithBase<T>(
         return;
       }
 
+      const baseRecordAtIndex = baseRecords[nextIndex];
+
+      if (baseRecordAtIndex) {
+        const baseIndexKey = getKey(baseRecordAtIndex);
+        const currentRecordByBaseIndex = currentByKey.get(baseIndexKey);
+        const stillReferencedByNext = nextRecords.some(
+          (record, index) => index !== nextIndex && getKey(record) === baseIndexKey,
+        );
+
+        // Handle key edits (for example slug rename) by matching the same list position.
+        if (currentRecordByBaseIndex && !consumedCurrentKeys.has(baseIndexKey) && !stillReferencedByNext) {
+          resolved.push(mergeValueWithBase(baseRecordAtIndex, currentRecordByBaseIndex, nextRecord) as T);
+          consumedCurrentKeys.add(baseIndexKey);
+          return;
+        }
+      }
+
       resolved.push(nextRecord);
-      seenKeys.add(key);
       return;
     }
 
     if (!baseRecord) {
       resolved.push(nextRecord);
-      seenKeys.add(key);
+      consumedCurrentKeys.add(key);
       return;
     }
 
     resolved.push(mergeValueWithBase(baseRecord, currentRecord, nextRecord) as T);
-    seenKeys.add(key);
+    consumedCurrentKeys.add(key);
   });
 
   // Preserve records that were not present in the incoming payload to avoid accidental deletions.
   currentRecords.forEach((currentRecord) => {
     const key = getKey(currentRecord);
 
-    if (!seenKeys.has(key)) {
+    if (!consumedCurrentKeys.has(key)) {
       resolved.push(currentRecord);
     }
   });
