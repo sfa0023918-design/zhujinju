@@ -9,6 +9,7 @@ import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
+const MOBILE_LIKE_BREAKPOINT = "(max-width: 1023px)";
 const FAST_PRELOAD_AHEAD = 20;
 const FAST_PRELOAD_BEHIND = 8;
 const IDLE_PRELOAD_BATCH = 12;
@@ -43,6 +44,7 @@ export function ExhibitionCatalogueViewer({
   const cataloguePages = pages.filter(Boolean);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+  const [isMobileLike, setIsMobileLike] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
@@ -75,6 +77,18 @@ export function ExhibitionCatalogueViewer({
   }, []);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_LIKE_BREAKPOINT);
+
+    function updateMobileLike() {
+      setIsMobileLike(mediaQuery.matches);
+    }
+
+    updateMobileLike();
+    mediaQuery.addEventListener("change", updateMobileLike);
+    return () => mediaQuery.removeEventListener("change", updateMobileLike);
+  }, []);
+
+  useEffect(() => {
     setCurrentIndex((previous) => {
       if (!totalPages) {
         return 0;
@@ -94,14 +108,16 @@ export function ExhibitionCatalogueViewer({
     }
 
     const step = usesDesktopPairing ? 2 : 1;
+    const aheadLimit = isMobileLike ? 3 : FAST_PRELOAD_AHEAD;
+    const behindLimit = isMobileLike ? 1 : FAST_PRELOAD_BEHIND;
     const candidateIndexes = new Set<number>();
 
-    for (let offset = 1; offset <= FAST_PRELOAD_AHEAD; offset += 1) {
+    for (let offset = 1; offset <= aheadLimit; offset += 1) {
       candidateIndexes.add(currentIndex + step * offset);
       candidateIndexes.add(currentIndex + step * offset + 1);
     }
 
-    for (let offset = 1; offset <= FAST_PRELOAD_BEHIND; offset += 1) {
+    for (let offset = 1; offset <= behindLimit; offset += 1) {
       candidateIndexes.add(currentIndex - step * offset);
       candidateIndexes.add(currentIndex - step * offset - 1);
     }
@@ -114,14 +130,14 @@ export function ExhibitionCatalogueViewer({
       }
 
       const image = new window.Image();
-      image.decoding = "sync";
-      image.loading = "eager";
-      image.fetchPriority = "high";
+      image.decoding = "async";
       image.src = src;
       preloadedPagesRef.current.add(src);
-      void image.decode?.().catch(() => {});
+      if (!isMobileLike) {
+        void image.decode?.().catch(() => {});
+      }
     });
-  }, [cataloguePages, currentIndex, usesDesktopPairing]);
+  }, [cataloguePages, currentIndex, usesDesktopPairing, isMobileLike]);
 
   useEffect(() => {
     if (!cataloguePages.length || typeof window === "undefined") {
@@ -132,7 +148,12 @@ export function ExhibitionCatalogueViewer({
       connection?: { saveData?: boolean; effectiveType?: string };
     }).connection;
 
-    if (connection?.saveData || connection?.effectiveType === "2g" || connection?.effectiveType === "slow-2g") {
+    if (
+      isMobileLike ||
+      connection?.saveData ||
+      connection?.effectiveType === "2g" ||
+      connection?.effectiveType === "slow-2g"
+    ) {
       return;
     }
 
@@ -162,9 +183,7 @@ export function ExhibitionCatalogueViewer({
 
         if (src && !preloadedPagesRef.current.has(src)) {
           const image = new window.Image();
-          image.decoding = "sync";
-          image.loading = "eager";
-          image.fetchPriority = "high";
+          image.decoding = "async";
           image.src = src;
           preloadedPagesRef.current.add(src);
           void image.decode?.().catch(() => {});
@@ -211,7 +230,7 @@ export function ExhibitionCatalogueViewer({
         window.clearTimeout(timeoutHandle);
       }
     };
-  }, [cataloguePages]);
+  }, [cataloguePages, isMobileLike]);
 
   if (!totalPages) {
     return null;
@@ -450,7 +469,6 @@ export function ExhibitionCatalogueViewer({
                           src={page}
                           alt={`${title.zh || title.en} page ${index + 1}`}
                           fill
-                          unoptimized
                           sizes={showsSpreadImage ? "160px" : "80px"}
                           wrapperClassName="h-full w-full"
                           className="object-cover"
@@ -509,11 +527,10 @@ function CataloguePage({
             src={page}
             alt={`${title.zh || title.en} page ${pageNumber}`}
             fill
-            unoptimized
             sizes={displayMode === "spread" ? "(min-width: 1024px) 84vw, 92vw" : "(min-width: 1024px) 42vw, 88vw"}
             loading="eager"
             fetchPriority="high"
-            decoding="sync"
+            decoding="async"
             wrapperClassName="h-full w-full"
             className="object-contain"
           />
