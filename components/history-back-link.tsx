@@ -23,6 +23,33 @@ function shouldBypassClientBack(event: MouseEvent<HTMLAnchorElement>) {
   );
 }
 
+function getInternalReferrerRoute() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const rawReferrer = document.referrer?.trim();
+
+  if (!rawReferrer) {
+    return null;
+  }
+
+  try {
+    const referrerUrl = new URL(rawReferrer);
+
+    if (referrerUrl.origin !== window.location.origin) {
+      return null;
+    }
+
+    const candidate = `${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+    return candidate && candidate !== current ? candidate : null;
+  } catch {
+    return null;
+  }
+}
+
 export function HistoryBackLink({
   fallbackHref,
   className,
@@ -41,7 +68,7 @@ export function HistoryBackLink({
 
         event.preventDefault();
 
-        const previousInternalRoute = getPreviousInternalRoute();
+        const previousInternalRoute = getPreviousInternalRoute() ?? getInternalReferrerRoute();
 
         if (previousInternalRoute) {
           markBackTarget(previousInternalRoute);
