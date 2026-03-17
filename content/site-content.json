@@ -1308,7 +1308,6 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773728118037-l1002732.jpg",
       "gallery": [
-        "/uploads/artworks/1773412989098-未命名-2.jpg",
         "/uploads/artworks/1773412805579-未命名-4.jpg"
       ],
       "featured": false,
@@ -1321,14 +1320,7 @@
         "height": 1500
       },
       "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773412989098-未命名-2.jpg",
-          "card": "/uploads/artworks/1773412989098-未命名-2.jpg",
-          "hero": "/uploads/artworks/1773412989098-未命名-2.jpg",
-          "detail": "/uploads/artworks/1773412989098-未命名-2.jpg",
-          "width": 1200,
-          "height": 1500
-        },
+        null,
         {
           "original": "/uploads/artworks/1773412805579-未命名-4.jpg",
           "card": "/uploads/artworks/1773412805579-未命名-4.jpg",
