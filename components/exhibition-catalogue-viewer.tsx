@@ -9,8 +9,9 @@ import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
-const FAST_PRELOAD_AHEAD = 4;
-const FAST_PRELOAD_BEHIND = 2;
+const FAST_PRELOAD_AHEAD = 10;
+const FAST_PRELOAD_BEHIND = 4;
+const IDLE_PRELOAD_BATCH = 6;
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -118,6 +119,93 @@ export function ExhibitionCatalogueViewer({
       preloadedPagesRef.current.add(src);
     });
   }, [cataloguePages, currentIndex, usesDesktopPairing]);
+
+  useEffect(() => {
+    if (!cataloguePages.length || typeof window === "undefined") {
+      return;
+    }
+
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+
+    if (connection?.saveData || connection?.effectiveType === "2g" || connection?.effectiveType === "slow-2g") {
+      return;
+    }
+
+    const pendingIndexes = cataloguePages
+      .map((_page, index) => index)
+      .filter((index) => !preloadedPagesRef.current.has(cataloguePages[index]!));
+
+    if (!pendingIndexes.length) {
+      return;
+    }
+
+    let pointer = 0;
+    let cancelled = false;
+    let idleHandle: number | null = null;
+    let timeoutHandle: number | null = null;
+
+    const preloadBatch = () => {
+      if (cancelled) {
+        return;
+      }
+
+      let count = 0;
+
+      while (pointer < pendingIndexes.length && count < IDLE_PRELOAD_BATCH) {
+        const index = pendingIndexes[pointer]!;
+        const src = cataloguePages[index];
+
+        if (src && !preloadedPagesRef.current.has(src)) {
+          const image = new window.Image();
+          image.decoding = "async";
+          image.src = src;
+          preloadedPagesRef.current.add(src);
+        }
+
+        pointer += 1;
+        count += 1;
+      }
+
+      schedule();
+    };
+
+    const schedule = () => {
+      if (cancelled || pointer >= pendingIndexes.length) {
+        return;
+      }
+
+      const win = window as Window & {
+        requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+        cancelIdleCallback?: (handle: number) => void;
+      };
+
+      if (typeof win.requestIdleCallback === "function") {
+        idleHandle = win.requestIdleCallback(preloadBatch, { timeout: 1200 });
+        return;
+      }
+
+      timeoutHandle = window.setTimeout(preloadBatch, 300);
+    };
+
+    schedule();
+
+    return () => {
+      cancelled = true;
+
+      if (idleHandle !== null) {
+        const win = window as Window & {
+          cancelIdleCallback?: (handle: number) => void;
+        };
+        win.cancelIdleCallback?.(idleHandle);
+      }
+
+      if (timeoutHandle !== null) {
+        window.clearTimeout(timeoutHandle);
+      }
+    };
+  }, [cataloguePages]);
 
   if (!totalPages) {
     return null;
@@ -269,7 +357,7 @@ export function ExhibitionCatalogueViewer({
               const delta = endX - touchStartX.current;
               touchStartX.current = null;
 
-              if (Math.abs(delta) < 44) {
+              if (Math.abs(delta) < 28) {
                 return;
               }
 
@@ -279,13 +367,13 @@ export function ExhibitionCatalogueViewer({
                 goNext();
               }
             }}
-            className="relative outline-none"
+            className="relative touch-pan-y select-none outline-none"
           >
             <div className="pointer-events-none absolute inset-x-[11%] -bottom-3 h-12 rounded-full bg-[rgba(93,71,45,0.08)] blur-2xl" />
             <div
               className={`relative grid gap-2 overflow-hidden rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,#e7d9c7_0%,#e0cfbb_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_24px_72px_rgba(35,24,16,0.14)] md:p-4 ${
                 usesDesktopPairing ? "lg:grid-cols-2" : "grid-cols-1"
-              } site-fade-in`}
+              }`}
             >
               <div className="pointer-events-none absolute inset-x-5 top-3 h-8 rounded-full bg-white/22 blur-2xl" />
               {usesDesktopPairing ? (
@@ -337,13 +425,13 @@ export function ExhibitionCatalogueViewer({
                     key={`${page}-${index}`}
                     type="button"
                     onClick={() => jumpTo(index)}
-                    className={`group relative shrink-0 rounded-[18px] transition-all duration-150 ${
+                    className={`group relative shrink-0 rounded-[18px] transition-all duration-75 ${
                       selected
                         ? "-translate-y-1"
                         : "hover:-translate-y-0.5"
                     }`}
                   >
-                    <div className={`overflow-hidden rounded-[18px] border p-1.5 transition-all duration-150 ${
+                    <div className={`overflow-hidden rounded-[18px] border p-1.5 transition-all duration-75 ${
                       selected
                         ? "border-[var(--line-strong)] bg-white shadow-[0_14px_28px_rgba(30,22,16,0.14)]"
                         : "border-[var(--line)]/70 bg-white/7 hover:border-[var(--line-strong)]/68 hover:bg-white/66"
@@ -358,7 +446,7 @@ export function ExhibitionCatalogueViewer({
                           fill
                           sizes={showsSpreadImage ? "160px" : "80px"}
                           wrapperClassName="h-full w-full"
-                          className={`object-cover transition-transform duration-200 ${selected ? "scale-[1.01]" : "group-hover:scale-[1.015]"}`}
+                          className="object-cover"
                         />
                         <div className={`absolute inset-0 transition-colors ${selected ? "bg-[linear-gradient(180deg,transparent,rgba(15,11,8,0.14))]" : "bg-[linear-gradient(180deg,transparent,rgba(15,11,8,0.24))]"}`} />
                       </div>
@@ -418,7 +506,7 @@ function CataloguePage({
             loading="eager"
             fetchPriority="high"
             wrapperClassName="h-full w-full"
-            className="object-contain transition-transform duration-200 group-hover:scale-[1.002]"
+            className="object-contain"
           />
         </div>
       </div>
@@ -447,7 +535,7 @@ function NavigationButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--line)]/72 bg-[rgba(255,255,255,0.66)] px-4 text-[0.66rem] tracking-[0.18em] text-[var(--ink)] shadow-[0_8px_18px_rgba(28,21,16,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--line-strong)]/82 hover:bg-white disabled:cursor-not-allowed disabled:opacity-30 lg:min-h-[172px] lg:w-[56px] lg:flex-col lg:gap-2 lg:rounded-[22px] lg:px-0"
+      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--line)]/72 bg-[rgba(255,255,255,0.66)] px-4 text-[0.66rem] tracking-[0.18em] text-[var(--ink)] shadow-[0_8px_18px_rgba(28,21,16,0.05)] transition-all duration-150 hover:-translate-y-0.5 hover:border-[var(--line-strong)]/82 hover:bg-white disabled:cursor-not-allowed disabled:opacity-30 lg:min-h-[172px] lg:w-[56px] lg:flex-col lg:gap-2 lg:rounded-[22px] lg:px-0"
       aria-label={label}
     >
       <span className="text-[1rem]" aria-hidden="true">
