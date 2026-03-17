@@ -1066,12 +1066,7 @@
       ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773730176014-l1000792.jpg",
-        "card": "/uploads/artworks/1773730176014-l1000792-card.jpg",
-        "hero": "/uploads/artworks/1773730176014-l1000792.jpg",
-        "detail": "/uploads/artworks/1773730176014-l1000792.jpg",
-        "width": 1200,
-        "height": 1500
+        "original": "/uploads/artworks/1773730176014-l1000792.jpg"
       },
       "galleryAssets": [
         {
