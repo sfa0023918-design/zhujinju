@@ -81,6 +81,17 @@ export async function POST(request: Request) {
       });
     }
 
+    if (folder.startsWith("articles/")) {
+      const deploy = await triggerVercelDeploy(`Admin uploaded article body media for ${targetId || "draft"}`);
+
+      return NextResponse.json({
+        ...result,
+        saved: false,
+        deployTriggered: deploy.triggered,
+        message: appendDeployStatusMessage("图片已上传成功。", deploy),
+      });
+    }
+
     return NextResponse.json({
       ...result,
       saved: false,

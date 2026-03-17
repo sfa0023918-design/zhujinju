@@ -1,4 +1,4 @@
-import { articleHasBodyContent } from "./article-content";
+import { articleHasBodyContent, getArticleAutoExcerpt, getArticleFallbackCover } from "./article-content";
 import { KNOWN_ZH_COPY_TYPO_FIXES } from "./copy-quality";
 import type { Article, Artwork, BilingualText, Exhibition } from "./data/types";
 
@@ -272,6 +272,9 @@ export function getArticlePublicationIssues(article: Article, articles: Article[
   const issues: ValidationIssue[] = [];
   const duplicateSlugCount = articles.filter((item) => item.slug.trim() === article.slug.trim()).length;
   const slugIssue = validateSlugValue(article.slug, "basic", duplicateSlugCount, "slug");
+  const autoExcerpt = getArticleAutoExcerpt(article);
+  const effectiveExcerpt = getPrimaryText(article.excerpt) || getPrimaryText(autoExcerpt);
+  const effectiveCover = article.cover.trim() || getArticleFallbackCover(article);
 
   if (slugIssue) {
     addIssue(issues, slugIssue);
@@ -293,7 +296,7 @@ export function getArticlePublicationIssues(article: Article, articles: Article[
     addIssue(issues, { field: "date", section: "basic", message: "请填写发布时间。", level: "error" });
   }
 
-  if (!getPrimaryText(article.excerpt)) {
+  if (!effectiveExcerpt) {
     addIssue(issues, { field: "excerpt.zh", section: "basic", message: "请填写摘要。", level: "error" });
   }
 
@@ -301,7 +304,7 @@ export function getArticlePublicationIssues(article: Article, articles: Article[
     addIssue(issues, { field: "body.0.zh", section: "body", message: "请填写正文主体。", level: "error" });
   }
 
-  if (!article.cover.trim()) {
+  if (!effectiveCover) {
     addIssue(issues, { field: "cover", section: "basic", message: "请上传封面图。", level: "error" });
   }
 

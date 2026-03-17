@@ -7,16 +7,22 @@ import type { ArticleContentBlock, BilingualText as BilingualValue } from "@/lib
 import { getLocalizedText, getParagraphsByLocale, type ReadingLocale } from "./bilingual-prose";
 import { ProtectedImage } from "./protected-image";
 
+const ARTICLE_TEXT_MAX_WIDTH_CLASS = "max-w-[56rem]";
+const ARTICLE_INLINE_MEDIA_MAX_WIDTH_CLASS = "max-w-[34rem]";
+const ARTICLE_FIGURE_CAPTION_CLASS_ZH = "mx-auto max-w-full pt-1 text-center text-[0.77rem] leading-[1.82] text-[var(--accent)]/78 md:text-[0.8rem] md:leading-[1.86]";
+const ARTICLE_FIGURE_CAPTION_CLASS_EN =
+  "mx-auto max-w-full pt-1 text-center text-[0.66rem] uppercase tracking-[0.1em] leading-[1.64] text-[var(--accent)]/68 md:text-[0.7rem] md:leading-[1.68]";
+
 function proseClasses(variant: "lead" | "body", locale: ReadingLocale) {
   if (variant === "lead") {
     return locale === "zh"
-      ? "prose-block prose-block--zh max-w-[39rem] text-[1.04rem] leading-[2.08] text-[var(--ink)] md:text-[1.08rem]"
-      : "prose-block prose-block--en max-w-[31rem] text-[0.93rem] leading-[1.86] text-[var(--muted)]/92 md:text-[0.97rem]";
+      ? `prose-block prose-block--zh mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS} text-[1.02rem] leading-[1.98] tracking-[0.01em] text-[var(--ink)] md:text-[1.16rem] md:leading-[2.02]`
+      : "prose-block prose-block--en mx-auto max-w-[40rem] text-[0.92rem] leading-[1.82] text-[var(--muted)]/92 md:text-[1rem] md:leading-[1.88]";
   }
 
   return locale === "zh"
-    ? "prose-block prose-block--zh max-w-[42rem] text-[1rem] leading-[2.08] text-[var(--muted)]"
-    : "prose-block prose-block--en max-w-[33rem] text-[0.9rem] leading-[1.84] text-[var(--muted)]/90";
+    ? `prose-block prose-block--zh mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS} text-[1rem] leading-[2] tracking-[0.01em] text-[var(--ink)] md:text-[1.12rem] md:leading-[2.04]`
+    : "prose-block prose-block--en mx-auto max-w-[38rem] text-[0.9rem] leading-[1.8] text-[var(--muted)]/90 md:text-[0.94rem] md:leading-[1.86]";
 }
 
 function hasLocalizedContent(content: BilingualValue | undefined, locale: ReadingLocale) {
@@ -57,7 +63,7 @@ export function ArticleReadingContent({
   return (
     <div className={className}>
       {hasEnglish ? (
-        <div className="mb-4 flex justify-end">
+        <div className="mx-auto mb-5 flex max-w-[56rem] justify-end md:mb-6">
           <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
             {(["zh", "en"] as const).map((option) => {
               const active = locale === option;
@@ -80,14 +86,14 @@ export function ArticleReadingContent({
         </div>
       ) : null}
 
-      <div className="space-y-7">
+      <div className="space-y-9 md:space-y-11">
         {excerptParagraphs.length ? (
-          <div className="space-y-4 md:space-y-5">
+          <div className="space-y-5 md:space-y-6">
             {excerptParagraphs.map((paragraph, index) => (
               <p
                 key={`excerpt-${locale}-${index}`}
                 lang={locale === "en" ? "en" : "zh-CN"}
-                className={proseClasses("lead", locale)}
+                className={`${proseClasses("lead", locale)} ${locale === "zh" ? "indent-[2em]" : ""}`}
               >
                 {paragraph}
               </p>
@@ -104,12 +110,12 @@ export function ArticleReadingContent({
             }
 
             return (
-              <div key={`paragraph-${index}`} className="space-y-4 md:space-y-5">
+              <div key={`paragraph-${index}`} className="space-y-5 md:space-y-6">
                 {paragraphs.map((paragraph, paragraphIndex) => (
                   <p
                     key={`paragraph-${index}-${locale}-${paragraphIndex}`}
                     lang={locale === "en" ? "en" : "zh-CN"}
-                    className={proseClasses("body", locale)}
+                    className={`${proseClasses("body", locale)} ${locale === "zh" ? "indent-[2em]" : ""}`}
                   >
                     {paragraph}
                   </p>
@@ -120,31 +126,27 @@ export function ArticleReadingContent({
 
           if (block.type === "image") {
             const caption = getLocalizedText(block.caption, locale);
+            const figureWidthClass = block.layout === "inline" ? ARTICLE_INLINE_MEDIA_MAX_WIDTH_CLASS : ARTICLE_TEXT_MAX_WIDTH_CLASS;
+            const imageClasses =
+              block.layout === "inline"
+                ? "mx-auto h-auto max-h-[58vh] w-auto max-w-full object-contain md:max-h-[78vh]"
+                : "mx-auto h-auto max-h-[58vh] w-full object-contain md:max-h-[78vh]";
 
             return (
-              <figure
-                key={`image-${index}`}
-                className={`space-y-3 ${
-                  block.layout === "inline" ? "max-w-[31rem]" : "max-w-[44rem]"
-                }`}
-              >
+              <figure key={`image-${index}`} className={`mx-auto flex flex-col items-center space-y-3 ${figureWidthClass}`}>
                 <ProtectedImage
                   src={block.image}
                   alt={caption || `Article reference ${index + 1}`}
                   width={1600}
                   height={1200}
                   unoptimized
-                  wrapperClassName="block"
-                  className="h-auto w-full object-cover"
+                  wrapperClassName={block.layout === "inline" ? "mx-auto w-auto max-w-full" : "block"}
+                  className={imageClasses}
                 />
                 {caption ? (
                   <figcaption
                     lang={locale === "en" ? "en" : "zh-CN"}
-                    className={
-                      locale === "zh"
-                        ? "text-[0.78rem] leading-[1.9] text-[var(--accent)]/84"
-                        : "text-[0.72rem] uppercase tracking-[0.12em] leading-[1.72] text-[var(--accent)]/74"
-                    }
+                    className={locale === "zh" ? ARTICLE_FIGURE_CAPTION_CLASS_ZH : ARTICLE_FIGURE_CAPTION_CLASS_EN}
                   >
                     {caption}
                   </figcaption>
@@ -162,13 +164,15 @@ export function ArticleReadingContent({
           return (
             <div
               key={`image-pair-${index}`}
-              className={`grid gap-5 ${visibleItems.length > 1 ? "md:grid-cols-2" : ""}`}
+              className={`mx-auto grid ${ARTICLE_TEXT_MAX_WIDTH_CLASS} gap-5 md:gap-6 ${
+                visibleItems.length > 1 ? "md:grid-cols-2" : ""
+              }`}
             >
               {visibleItems.map((item, itemIndex) => {
                 const caption = getLocalizedText(item.caption, locale);
 
                 return (
-                  <figure key={`image-pair-${index}-${itemIndex}`} className="space-y-3">
+                  <figure key={`image-pair-${index}-${itemIndex}`} className="flex flex-col items-center space-y-3">
                     <ProtectedImage
                       src={item.image}
                       alt={caption || `Article reference ${index + 1}-${itemIndex + 1}`}
@@ -176,16 +180,12 @@ export function ArticleReadingContent({
                       height={900}
                       unoptimized
                       wrapperClassName="block"
-                      className="h-auto w-full object-cover"
+                      className="h-auto w-full bg-[var(--surface-strong)] object-contain"
                     />
                     {caption ? (
                       <figcaption
                         lang={locale === "en" ? "en" : "zh-CN"}
-                        className={
-                          locale === "zh"
-                            ? "text-[0.78rem] leading-[1.9] text-[var(--accent)]/84"
-                            : "text-[0.72rem] uppercase tracking-[0.12em] leading-[1.72] text-[var(--accent)]/74"
-                        }
+                        className={locale === "zh" ? ARTICLE_FIGURE_CAPTION_CLASS_ZH : ARTICLE_FIGURE_CAPTION_CLASS_EN}
                       >
                         {caption}
                       </figcaption>

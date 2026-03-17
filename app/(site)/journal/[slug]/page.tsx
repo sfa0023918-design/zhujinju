@@ -9,7 +9,7 @@ import { HistoryBackLink } from "@/components/history-back-link";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
-import { getRenderableArticleContentBlocks } from "@/lib/article-content";
+import { getArticleFallbackCover, getRenderableArticleContentBlocks } from "@/lib/article-content";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticleBySlug,
@@ -79,11 +79,11 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
   const renderableBlocks = getRenderableArticleContentBlocks(article);
+  const effectiveCover = article.cover.trim() || getArticleFallbackCover(article);
   const detailHeadingZhClass =
     "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
   const detailHeadingEnClass =
     "mt-2.5 block max-w-[30rem] font-sans text-[0.7rem] uppercase tracking-[0.16em] leading-[1.48] text-[var(--accent)]/78 md:text-[0.74rem]";
-
   return (
     <>
       <section className="mx-auto w-full max-w-[1120px] px-5 py-7 md:px-8 md:py-8 lg:px-10 lg:py-10">
@@ -93,7 +93,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
       </section>
 
       <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-8 md:pb-24 lg:px-10 lg:pb-28">
-        <header className="space-y-4 border-t border-[var(--line)] pt-5">
+        <header className="space-y-4 border-t border-[var(--line)] pt-5 md:space-y-5">
           <BilingualText
             as="p"
             text={article.category}
@@ -105,7 +105,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           <BilingualText
             as="h1"
             text={article.title}
-            className="max-w-4xl font-serif text-[var(--ink)]"
+            className="font-serif text-[var(--ink)]"
             zhClassName={detailHeadingZhClass}
             enClassName={detailHeadingEnClass}
           />
@@ -142,14 +142,14 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           </div>
         </header>
 
-        <div className="relative mx-auto mt-8 w-full max-w-[960px] overflow-hidden bg-[var(--surface-strong)]">
-          {article.cover.startsWith("/api/placeholder/") ? (
+        <div className="relative mx-auto mt-8 w-full max-w-[56rem] overflow-hidden bg-[var(--surface-strong)] md:mt-10">
+          {!effectiveCover || effectiveCover.startsWith("/api/placeholder/") ? (
             <div className="aspect-[1.85/1]">
               <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />
             </div>
           ) : (
             <ProtectedImage
-              src={article.cover}
+              src={effectiveCover}
               alt={`${article.title.zh} ${article.title.en}`}
               width={1600}
               height={1000}
@@ -161,10 +161,10 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           )}
         </div>
 
-        <ArticleReadingContent className="mt-10" excerpt={article.excerpt} blocks={renderableBlocks} />
+        <ArticleReadingContent className="mx-auto mt-10 w-full max-w-[56rem] md:mt-12" excerpt={article.excerpt} blocks={renderableBlocks} />
 
         {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (
-          <section className="mt-16 grid gap-10 border-t border-[var(--line)] pt-8 md:grid-cols-2">
+          <section className="mx-auto mt-16 grid w-full max-w-[56rem] gap-10 border-t border-[var(--line)] pt-8 md:mt-18 md:grid-cols-2">
             {relatedExhibitions.length > 0 ? (
               <div>
                 <BilingualText

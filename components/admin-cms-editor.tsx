@@ -2,13 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  articleBlocksToFlowText,
+  articleFlowTextToBlocks,
   createArticleImageBlock,
   createArticleImagePairBlock,
   createArticleParagraphBlock,
+  getArticleAutoExcerpt,
   getArticleBodyParagraphs,
+  getArticleFallbackCover,
+  getArticleImageReferences,
   normalizeArticleContentBlocks,
 } from "@/lib/article-content";
 import type {
@@ -29,6 +34,7 @@ import type { ValidationIssue } from "@/lib/publication-validation";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "@/lib/publication-validation";
 
 import { AdminMediaField, prepareAdminImageUpload, readAdminUploadResponse } from "./admin-media-field";
+import { getLocalizedText, getParagraphsByLocale, type ReadingLocale } from "./bilingual-prose";
 
 type AdminCmsEditorProps = {
   section: EditableSectionKey;
@@ -79,6 +85,7 @@ const ARTICLE_INLINE_RECOMMENDED_LIMIT = "2.8MB";
 const ARTICLE_INLINE_HARD_LIMIT = "4MB";
 
 type ArticleImageOrientation = "portrait" | "landscape";
+type ArticleEditorLocale = "zh" | "en";
 
 const ARTICLE_IMAGE_PRESETS: Record<ArticleImageOrientation, { label: string; ratio: string; width: number; height: number }> = {
   portrait: {
@@ -276,6 +283,16 @@ function normalizeArticleDraft(value: Article) {
   next.excerpt = normalizeBilingualText(next.excerpt, "long");
   next.contentBlocks = normalizeArticleContentBlocks(next.contentBlocks, next.body);
   next.body = getArticleBodyParagraphs(next.contentBlocks, next.body);
+  const autoExcerpt = getArticleAutoExcerpt(next);
+  next.excerpt = {
+    zh: next.excerpt.zh || autoExcerpt.zh,
+    en: next.excerpt.en || autoExcerpt.en,
+  };
+  const autoCover = getArticleFallbackCover(next);
+  if (!next.cover && autoCover) {
+    next.cover = autoCover;
+    next.coverAsset = undefined;
+  }
   next.keywords = (next.keywords ?? []).map((item) => normalizeBilingualText(item));
   return next;
 }
@@ -1103,6 +1120,484 @@ function BilingualTextarea({
   );
 }
 
+function insertImageMarkdownAtCursor(
+  currentText: string,
+  textarea: HTMLTextAreaElement | null,
+  markdownLine: string,
+) {
+  const safeText = currentText ?? "";
+
+  if (!textarea) {
+    return `${safeText}${safeText.trim() ? "\n\n" : ""}${markdownLine}\n\n`;
+  }
+
+  const start = textarea.selectionStart ?? safeText.length;
+  const end = textarea.selectionEnd ?? safeText.length;
+  const before = safeText.slice(0, start);
+  const after = safeText.slice(end);
+  const prefix = before.trimEnd().length ? "\n\n" : "";
+  const suffix = after.trimStart().length ? "\n\n" : "\n";
+
+  return `${before}${prefix}${markdownLine}${suffix}${after}`;
+}
+
+function updateBilingualLocaleValue(
+  value: BilingualText,
+  locale: ArticleEditorLocale,
+  nextLocaleValue: string,
+) {
+  return locale === "zh"
+    ? { ...value, zh: nextLocaleValue }
+    : { ...value, en: nextLocaleValue };
+}
+
+function countFlowImages(value: string) {
+  return (value.match(/!\[[^\]]*\]\([^)]+\)(?:\{layout=(?:wide|inline)\})?/g) ?? []).length;
+}
+
+function countVisibleFlowCharacters(value: string) {
+  return value
+    .replace(/^!\[[^\]]*\]\([^)]+\)(?:\{layout=(?:wide|inline)\})?$/gm, "")
+    .replace(/\s+/g, "")
+    .trim().length;
+}
+
+function summarizeArticleStructure(blocks: ArticleContentBlock[]) {
+  const summary = blocks.reduce(
+    (current, block) => {
+      if (block.type === "paragraph") {
+        current.paragraphs += 1;
+      } else if (block.type === "image") {
+        current.images += 1;
+      } else {
+        current.imagePairs += 1;
+      }
+
+      return current;
+    },
+    { paragraphs: 0, images: 0, imagePairs: 0 },
+  );
+
+  const parts = [`${blocks.length} 个内容块`];
+
+  if (summary.paragraphs) {
+    parts.push(`${summary.paragraphs} 段文字`);
+  }
+
+  if (summary.images) {
+    parts.push(`${summary.images} 张单图`);
+  }
+
+  if (summary.imagePairs) {
+    parts.push(`${summary.imagePairs} 组双图`);
+  }
+
+  return parts.join(" · ");
+}
+
+function ArticleBodyFlowPreview({
+  value,
+  locale,
+  previewMap,
+}: {
+  value: BilingualText;
+  locale: ReadingLocale;
+  previewMap?: Record<string, string>;
+}) {
+  const blocks = useMemo(
+    () =>
+      normalizeArticleContentBlocks(articleFlowTextToBlocks(value.zh, value.en)).filter((block) => {
+        if (block.type === "paragraph") {
+          return Boolean(block.content.zh.trim() || block.content.en.trim());
+        }
+
+        if (block.type === "image") {
+          return Boolean(block.image.trim());
+        }
+
+        return block.items.some((item) => item.image.trim());
+      }),
+    [value.en, value.zh],
+  );
+
+  if (!blocks.length) {
+    return (
+      <div className="border border-dashed border-[var(--line)]/70 bg-white/55 px-4 py-8 text-center text-sm leading-7 text-[var(--muted)]">
+        写入正文或插入图片后，这里会立即显示排版预览。
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8 border border-[var(--line)]/70 bg-white/70 px-4 py-6 md:px-6">
+      {blocks.map((block, index) => {
+        if (block.type === "paragraph") {
+          const paragraphs = getParagraphsByLocale(block.content, locale);
+
+          if (!paragraphs.length) {
+            return null;
+          }
+
+          return (
+            <div key={`body-flow-preview-paragraph-${index}`} className="space-y-5">
+              {paragraphs.map((paragraph, paragraphIndex) => (
+                <p
+                  key={`body-flow-preview-paragraph-${index}-${paragraphIndex}`}
+                  lang={locale === "en" ? "en" : "zh-CN"}
+                  className={`mx-auto max-w-[42rem] text-[1rem] leading-[2.02] text-[var(--ink)] ${
+                    locale === "zh" ? "indent-[2em]" : ""
+                  }`}
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          );
+        }
+
+        if (block.type === "image") {
+          const caption = getLocalizedText(block.caption, locale);
+
+          return (
+            <figure
+              key={`body-flow-preview-image-${index}`}
+              className={`mx-auto space-y-3 ${block.layout === "inline" ? "max-w-[26rem]" : "max-w-[42rem]"}`}
+            >
+              <Image
+                src={previewMap?.[block.image] ?? block.image}
+                alt={caption || `Article body preview ${index + 1}`}
+                width={1600}
+                height={1200}
+                unoptimized
+                className={`mx-auto h-auto max-w-full bg-[var(--surface-strong)] object-contain ${
+                  block.layout === "inline" ? "w-auto" : "w-full"
+                }`}
+              />
+              {caption ? (
+                <figcaption
+                  lang={locale === "en" ? "en" : "zh-CN"}
+                  className="text-center text-[0.78rem] leading-[1.8] text-[var(--accent)]/78"
+                >
+                  {caption}
+                </figcaption>
+              ) : null}
+            </figure>
+          );
+        }
+
+        const visibleItems = block.items.filter((item) => item.image.trim());
+
+        if (!visibleItems.length) {
+          return null;
+        }
+
+        return (
+          <div
+            key={`body-flow-preview-image-pair-${index}`}
+            className={`mx-auto grid max-w-[42rem] gap-4 md:gap-5 ${visibleItems.length > 1 ? "md:grid-cols-2" : ""}`}
+          >
+            {visibleItems.map((item, itemIndex) => {
+              const caption = getLocalizedText(item.caption, locale);
+
+              return (
+                <figure key={`body-flow-preview-image-pair-${index}-${itemIndex}`} className="space-y-3">
+                  <Image
+                    src={previewMap?.[item.image] ?? item.image}
+                    alt={caption || `Article body preview ${index + 1}-${itemIndex + 1}`}
+                    width={1200}
+                    height={900}
+                    unoptimized
+                    className="h-auto w-full bg-[var(--surface-strong)] object-contain"
+                  />
+                  {caption ? (
+                    <figcaption
+                      lang={locale === "en" ? "en" : "zh-CN"}
+                      className="text-center text-[0.78rem] leading-[1.8] text-[var(--accent)]/78"
+                    >
+                      {caption}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ArticleBodyFlowEditor({
+  value,
+  onChange,
+  activeLocale,
+  onActiveLocaleChange,
+  previewMap,
+  onPreviewResolve,
+}: {
+  value: BilingualText;
+  onChange: (value: BilingualText) => void;
+  activeLocale: ArticleEditorLocale;
+  onActiveLocaleChange: (locale: ArticleEditorLocale) => void;
+  previewMap?: Record<string, string>;
+  onPreviewResolve?: (imageUrl: string, previewUrl: string | null) => void;
+}) {
+  const [draft, setDraft] = useState<BilingualText>(value);
+  const draftRef = useRef<BilingualText>(value);
+  const [orientation, setOrientation] = useState<ArticleImageOrientation>("portrait");
+  const [layout, setLayout] = useState<"wide" | "inline">("wide");
+  const [uploadingLocale, setUploadingLocale] = useState<"zh" | "en" | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const zhTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const enTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const zhFileInputRef = useRef<HTMLInputElement | null>(null);
+  const enFileInputRef = useRef<HTMLInputElement | null>(null);
+  const preset = ARTICLE_IMAGE_PRESETS[orientation];
+  const activeValue = activeLocale === "zh" ? draft.zh : draft.en;
+  const activeLabel = activeLocale === "zh" ? "中文正文" : "English Body";
+  const activeInsertLabel = activeLocale === "zh" ? "插入图片" : "Insert Image";
+  const activeUploadingLabel = activeLocale === "zh" ? "上传中..." : "Uploading...";
+  const activeBodyCount = countVisibleFlowCharacters(activeValue);
+  const activeImageCount = countFlowImages(activeValue);
+
+  useEffect(() => {
+    setDraft((current) => {
+      if (current.zh === value.zh && current.en === value.en) {
+        return current;
+      }
+
+      return {
+        zh: value.zh,
+        en: value.en,
+      };
+    });
+    draftRef.current = {
+      zh: value.zh,
+      en: value.en,
+    };
+  }, [value.en, value.zh]);
+
+  function update(next: BilingualText) {
+    draftRef.current = next;
+    setDraft(next);
+    onChange(next);
+  }
+
+  async function uploadImageAndInsert(locale: "zh" | "en", file: File) {
+    setUploadingLocale(locale);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const prepared = await prepareAdminImageUpload(file, { width: preset.width, height: preset.height });
+      const formData = new FormData();
+      formData.append("file", prepared.file);
+      formData.append("folder", "articles/references");
+      formData.append("assetWidth", String(prepared.width));
+      formData.append("assetHeight", String(prepared.height));
+
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const { payload, raw } = await readAdminUploadResponse(response);
+
+      if (!response.ok || !payload.url) {
+        if (
+          response.status === 413 ||
+          /request entity too large/i.test(raw) ||
+          /function_payload_too_large/i.test(raw)
+        ) {
+          throw new Error(
+            `图片过大，系统已自动压缩。建议上传前控制在 ${ARTICLE_INLINE_RECOMMENDED_LIMIT} 内（服务器硬上限 ${ARTICLE_INLINE_HARD_LIMIT}）。`,
+          );
+        }
+        throw new Error(payload.error ?? (raw.trim() || "图片上传失败。"));
+      }
+
+      const markdown = `![${locale === "zh" ? "图注" : "Caption"}](${payload.url})${layout === "inline" ? "{layout=inline}" : ""}`;
+      const targetTextarea = locale === "zh" ? zhTextareaRef.current : enTextareaRef.current;
+      const currentValue = draftRef.current;
+      const currentLocaleValue = locale === "zh" ? currentValue.zh : currentValue.en;
+      const nextLocaleValue = insertImageMarkdownAtCursor(currentLocaleValue, targetTextarea, markdown);
+      const nextValue = updateBilingualLocaleValue(currentValue, locale, nextLocaleValue);
+
+      update(nextValue);
+      onPreviewResolve?.(payload.url, prepared.previewUrl);
+      setMessage(payload.message ?? "图片已插入当前光标位置。前台会自动按正文宽度排版，不需要再手动调整。");
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "图片上传失败。");
+    } finally {
+      setUploadingLocale(null);
+    }
+  }
+
+  function getClipboardImage(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const items = event.clipboardData?.items;
+
+    if (!items?.length) {
+      return null;
+    }
+
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        return item.getAsFile();
+      }
+    }
+
+    return null;
+  }
+
+  function handleTextareaPaste(locale: "zh" | "en", event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const file = getClipboardImage(event);
+
+    if (!file) {
+      return;
+    }
+
+    event.preventDefault();
+    void uploadImageAndInsert(locale, file);
+  }
+
+  return (
+    <div className="grid gap-4 border-t border-[var(--line)]/70 pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex items-center rounded-full border border-[var(--line)] bg-white/70 p-1">
+          {(["zh", "en"] as const).map((locale) => {
+            const active = activeLocale === locale;
+            return (
+              <button
+                key={locale}
+                type="button"
+                onClick={() => onActiveLocaleChange(locale)}
+                className={`min-w-14 rounded-full px-3 py-1.5 text-[0.68rem] tracking-[0.14em] transition-colors ${
+                  active
+                    ? "bg-[var(--ink)] text-white"
+                    : "text-[var(--accent)] hover:text-[var(--ink)]"
+                }`}
+              >
+                {locale === "zh" ? "中文" : "EN"}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs tracking-[0.12em] text-[var(--accent)]">
+          <label className="flex items-center gap-2">
+            <span>构图</span>
+            <select
+              value={orientation}
+              onChange={(event) => setOrientation(event.target.value === "landscape" ? "landscape" : "portrait")}
+              className="border border-[var(--line)] bg-white/70 px-2 py-1 text-xs text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+            >
+              <option value="portrait">竖图（3:4）</option>
+              <option value="landscape">横图（4:3）</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-2">
+            <span>版式</span>
+            <select
+              value={layout}
+              onChange={(event) => setLayout(event.target.value === "inline" ? "inline" : "wide")}
+              className="border border-[var(--line)] bg-white/70 px-2 py-1 text-xs text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+            >
+              <option value="wide">正文同宽</option>
+              <option value="inline">窄图</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">{activeLabel}</p>
+          <p className="mt-1 text-sm leading-7 text-[var(--muted)]">
+            直接写正文，把光标放到目标位置后插图即可。系统会自动限制图片宽度，不会溢出正文。
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => (activeLocale === "zh" ? zhFileInputRef.current?.click() : enFileInputRef.current?.click())}
+          disabled={uploadingLocale !== null}
+          className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          {uploadingLocale === activeLocale ? activeUploadingLabel : activeInsertLabel}
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs leading-6 text-[var(--muted)]">
+        <span>{`正文 ${activeBodyCount} 字`}</span>
+        <span>{`图片 ${activeImageCount} 张`}</span>
+        <span>{`建议尺寸 ${preset.width} x ${preset.height}`}</span>
+        <span>{`建议单张 ${ARTICLE_INLINE_RECOMMENDED_LIMIT} 内`}</span>
+      </div>
+
+      <textarea
+        ref={activeLocale === "zh" ? zhTextareaRef : enTextareaRef}
+        data-field-key={`body.flow.${activeLocale}`}
+        rows={18}
+        value={activeValue}
+        onChange={(event) => update(updateBilingualLocaleValue(draft, activeLocale, event.target.value))}
+        onPaste={(event) => handleTextareaPaste(activeLocale, event)}
+        placeholder={
+          activeLocale === "zh"
+            ? "从这里开始写正文。回车分段，Cmd/Ctrl + V 可直接粘贴图片。"
+            : "Write the English version here. You can also paste screenshots directly."
+        }
+        className="min-h-[460px] w-full border border-[var(--line)] bg-white/68 px-4 py-4 text-[1rem] leading-8 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+      />
+      <div className="grid gap-3">
+        <div className="space-y-1">
+          <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">
+            {activeLocale === "zh" ? "即时预览" : "LIVE PREVIEW"}
+          </p>
+          <p className="text-sm leading-7 text-[var(--muted)]">
+            这里会按前台排版方式显示当前正文，所以插入图片后不会在输入框里直接渲染，而会在这里立即看到效果。
+          </p>
+        </div>
+        <ArticleBodyFlowPreview value={draft} locale={activeLocale} previewMap={previewMap} />
+      </div>
+      <input
+        ref={zhFileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+
+          if (file) {
+            void uploadImageAndInsert("zh", file);
+          }
+
+          event.target.value = "";
+        }}
+      />
+      <input
+        ref={enFileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+
+          if (file) {
+            void uploadImageAndInsert("en", file);
+          }
+
+          event.target.value = "";
+        }}
+      />
+
+      <p className="text-xs leading-6 text-[var(--muted)]/88">
+        图片标记格式：<code>![图注](图片地址)</code>，窄图可用 <code>{`{layout=inline}`}</code>。
+      </p>
+      <p className="text-xs leading-6 text-[var(--muted)]/88">支持直接粘贴截图（Ctrl/Cmd + V）到正文中自动上传并插入。</p>
+      {message ? <p className="text-sm leading-7 text-[var(--muted)]">{message}</p> : null}
+      {error ? <p className="text-sm leading-7 text-[#8e4e3b]">{error}</p> : null}
+    </div>
+  );
+}
+
 function ArticleInlineImageField({
   label,
   value,
@@ -1114,7 +1609,7 @@ function ArticleInlineImageField({
   onChange: (value: string) => void;
   defaultOrientation?: ArticleImageOrientation;
 }) {
-  const inputId = useId();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [orientation, setOrientation] = useState<ArticleImageOrientation>(defaultOrientation);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -1202,9 +1697,14 @@ function ArticleInlineImageField({
       <div className="flex items-center justify-between gap-4">
         <Label>{label}</Label>
         <div className="flex flex-wrap items-center justify-end gap-3 text-xs tracking-[0.12em] text-[var(--accent)]">
-          <label htmlFor={inputId} className="cursor-pointer transition-colors hover:text-[var(--ink)]">
-            {uploading ? "上传中..." : "上传图片"}
-          </label>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center border border-[var(--line)] px-3 py-2 text-xs tracking-[0.12em] text-[var(--accent)] transition-colors hover:text-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {uploading ? "上传中..." : "导入图片"}
+          </button>
           {value.trim() ? (
             <button
               type="button"
@@ -1238,7 +1738,7 @@ function ArticleInlineImageField({
         </p>
       </div>
       <input
-        id={inputId}
+        ref={inputRef}
         type="file"
         accept="image/*"
         className="hidden"
@@ -3089,16 +3589,51 @@ function ArticlesEditor({
     hasPendingChanges: isDirty || saveState.phase === "saving" || saveState.phase === "creating",
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [editorLocale, setEditorLocale] = useState<ArticleEditorLocale>("zh");
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
+  const [articleImagePreviewMap, setArticleImagePreviewMap] = useState<Record<string, string>>({});
   const sectionLabels = {
-    basic: "基础信息",
-    body: "正文与关键词",
+    basic: "文章设置",
+    body: "正文画布",
   } satisfies Record<string, string>;
 
   useEffect(() => {
     setSelectedIndex(0);
+    setEditorLocale("zh");
     setValidationIssues([]);
+    setArticleImagePreviewMap((current) => {
+      Object.values(current).forEach((preview) => {
+        if (preview.startsWith("blob:")) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+
+      return {};
+    });
   }, [initialValue]);
+
+  useEffect(() => {
+    setEditorLocale("zh");
+    setArticleImagePreviewMap((current) => {
+      Object.values(current).forEach((preview) => {
+        if (preview.startsWith("blob:")) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+
+      return {};
+    });
+  }, [selectedIndex]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(articleImagePreviewMap).forEach((preview) => {
+        if (preview.startsWith("blob:")) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+    };
+  }, [articleImagePreviewMap]);
 
   useInitialFieldFocus(initialFocus, "basic");
 
@@ -3239,15 +3774,16 @@ function ArticlesEditor({
     const previousDraft = cloneValue(draft);
     const nextDraft = cloneValue(draft);
     nextDraft[selectedIndex].publicationStatus = nextStatus;
+    const preparedNextDraft = nextDraft.map((item) => normalizeArticleDraft(item));
     if (nextStatus === "published") {
-      setValidationIssues(getArticlePublicationIssues(nextDraft[selectedIndex], nextDraft));
+      setValidationIssues(getArticlePublicationIssues(preparedNextDraft[selectedIndex], preparedNextDraft));
     } else {
       setValidationIssues([]);
     }
 
-    setDraft(nextDraft);
+    setDraft(preparedNextDraft);
     try {
-      await saveNow(nextDraft, "manual", true);
+      await saveNow(preparedNextDraft, "manual", true);
       setValidationIssues([]);
     } catch (error) {
       setDraft(previousDraft);
@@ -3261,6 +3797,72 @@ function ArticlesEditor({
     basic: validationIssues.filter((issue) => issue.section === "basic"),
     body: validationIssues.filter((issue) => issue.section === "body"),
   };
+  const basicBlockingIssues = sectionIssues.basic.filter((issue) => issue.level === "error");
+  const basicWarningIssues = sectionIssues.basic.filter((issue) => issue.level === "warning");
+  const bodyBlockingIssues = sectionIssues.body.filter((issue) => issue.level === "error");
+  const bodyWarningIssues = sectionIssues.body.filter((issue) => issue.level === "warning");
+  const normalizedBodyBlocks = article
+    ? normalizeArticleContentBlocks(article.contentBlocks, article.body)
+    : [];
+  const bodyFlowValue: BilingualText = article
+    ? {
+        zh: articleBlocksToFlowText(normalizedBodyBlocks, article.body, "zh"),
+        en: articleBlocksToFlowText(normalizedBodyBlocks, article.body, "en"),
+      }
+    : emptyBilingual();
+  const articleImageReferences = article ? getArticleImageReferences(normalizedBodyBlocks, article.body) : [];
+  const autoExcerpt = article ? getArticleAutoExcerpt(normalizedBodyBlocks, article.body) : emptyBilingual();
+  const effectiveCover = article ? article.cover.trim() || getArticleFallbackCover(normalizedBodyBlocks, article.body) : "";
+  const effectiveCoverPreview = effectiveCover ? (articleImagePreviewMap[effectiveCover] ?? effectiveCover) : "";
+  const currentLocaleTitle = article ? (editorLocale === "zh" ? article.title.zh : article.title.en) : "";
+  const currentLocaleAuthor = article ? (editorLocale === "zh" ? article.author.zh : article.author.en) : "";
+  const structuredEditorSummary = summarizeArticleStructure(normalizedBodyBlocks);
+
+  function updateBodyByFlow(nextFlow: BilingualText) {
+    update((items) => {
+      const nextBlocks = normalizeArticleContentBlocks(
+        articleFlowTextToBlocks(nextFlow.zh, nextFlow.en),
+        items[selectedIndex].body,
+      );
+      items[selectedIndex].contentBlocks = nextBlocks;
+      items[selectedIndex].body = getArticleBodyParagraphs(nextBlocks, items[selectedIndex].body);
+    });
+  }
+
+  function applyAutoExcerpt() {
+    update((items) => {
+      items[selectedIndex].excerpt = {
+        zh: autoExcerpt.zh,
+        en: autoExcerpt.en,
+      };
+    });
+  }
+
+  function selectCoverFromBody(image: string) {
+    update((items) => {
+      items[selectedIndex].cover = image;
+      items[selectedIndex].coverAsset = undefined;
+    });
+  }
+
+  function setArticleImagePreview(imageUrl: string, previewUrl: string | null) {
+    setArticleImagePreviewMap((current) => {
+      const next = { ...current };
+      const existing = current[imageUrl];
+
+      if (existing?.startsWith("blob:") && existing !== previewUrl) {
+        URL.revokeObjectURL(existing);
+      }
+
+      if (previewUrl) {
+        next[imageUrl] = previewUrl;
+      } else {
+        delete next[imageUrl];
+      }
+
+      return next;
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -3305,124 +3907,417 @@ function ArticlesEditor({
           />
         </aside>
         {article ? (
-          <div className="space-y-6">
-            <SectionBlock id="section-basic" title="基础信息" issues={sectionIssues.basic}>
-              <div className="grid gap-4">
-                <AdminMediaField
-                  anchorKey="cover"
-                  label="文章封面"
-                  folder="articles"
-                  value={article.cover}
-                  previewRatio="landscape"
-                  targetSize={{ width: 1400, height: 900 }}
-                  recommendedUse="文章列表与详情封面"
-                  recommendedSize="1400 x 900 像素以上"
-                  autoSaveAfterUpload={false}
-                  saveTarget={{
-                    section: "articles",
-                    id: persistedArticleSlug,
-                    field: "cover",
-                  }}
-                  onChange={(next) => update((items) => { items[selectedIndex].cover = next; })}
-                  onPersisted={(next) => {
-                    setPersisted((current) => {
-                      const nextItems = cloneValue(current);
-                      const recordIndex = nextItems.findIndex((item) => item.slug === persistedArticleSlug);
-
-                      if (recordIndex < 0) {
-                        return current;
-                      }
-
-                      nextItems[recordIndex].cover = next;
-                      return nextItems;
-                    });
-                    setSaveState({ phase: "saved", message: next ? "文章封面已保存。" : "文章封面已移除。" });
-                  }}
-                  onPersistError={(message) => setSaveState({ phase: "error", message })}
-                />
-                <BilingualInput label="标题" value={article.title} onChange={(next) => update((items) => { items[selectedIndex].title = next; })} fieldKeys={{ zh: "title.zh", en: "title.en" }} />
-                <div className="grid gap-4 md:grid-cols-2">
-                  <TextField label="Slug" value={article.slug} onChange={(next) => update((items) => { items[selectedIndex].slug = next; })} fieldKey="slug" />
-                  <TextField label="日期" type="date" value={article.date} onChange={(next) => update((items) => { items[selectedIndex].date = next; })} fieldKey="date" />
-                </div>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <BilingualInput label="分类" value={article.category} onChange={(next) => update((items) => { items[selectedIndex].category = next; })} fieldKeys={{ zh: "category.zh", en: "category.en" }} />
-                  <BilingualInput label="栏目" value={article.column} onChange={(next) => update((items) => { items[selectedIndex].column = next; })} />
-                  <BilingualInput label="作者" value={article.author} onChange={(next) => update((items) => { items[selectedIndex].author = next; })} />
-                </div>
-                <BilingualTextarea label="摘要" value={article.excerpt} onChange={(next) => update((items) => { items[selectedIndex].excerpt = next; })} rows={4} fieldKeys={{ zh: "excerpt.zh", en: "excerpt.en" }} />
-              </div>
-            </SectionBlock>
-            <SectionBlock id="section-body" title="正文与关键词" issues={sectionIssues.body}>
-              <div data-field-key="body" className="grid gap-4">
+          <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_360px]">
+            <section id="section-body" className="scroll-mt-28 border border-[var(--line)] bg-[var(--surface)]">
+              <div className="border-b border-[var(--line)] px-5 py-5 md:px-8">
                 <div className="space-y-2">
-                  <p className="text-sm leading-7 text-[var(--muted)]">正文默认支持段落；如需参考图，可在任意位置插入单图或双图。没有插图时，前台会保持当前文章格式。</p>
+                  <Label>正文画布</Label>
                   <p className="text-sm leading-7 text-[var(--muted)]">
-                    文章插图标准：建议使用 JPG 或 WEBP。上传前选择构图：竖构图（3:4，建议 1200 x 1600）或横构图（4:3，建议 1600 x 1200）。建议单张控制在 {ARTICLE_INLINE_RECOMMENDED_LIMIT} 内，系统硬上限 {ARTICLE_INLINE_HARD_LIMIT}。
+                    先写文章，再处理设置。图片会跟着正文自动排版，不需要手动调宽度。
                   </p>
+                  {bodyBlockingIssues.length ? (
+                    <p className="text-sm leading-7 text-[#8e4e3b]">
+                      {bodyBlockingIssues.map((issue) => issue.message).join("、")}
+                    </p>
+                  ) : null}
+                  {bodyWarningIssues.length ? (
+                    <p className="text-sm leading-7 text-[#8b7867]">
+                      {`提醒：${bodyWarningIssues.map((issue) => issue.message).join("、")}`}
+                    </p>
+                  ) : null}
                 </div>
-                {normalizeArticleContentBlocks(article.contentBlocks, article.body).map((block, index, blocks) => (
-                  <ArticleContentBlockEditor
-                    key={`article-content-block-${index}`}
-                    block={block}
-                    index={index}
-                    total={blocks.length}
-                    onChange={(updater) =>
-                      updateContentBlocks((currentBlocks) =>
-                        updateArrayItem(currentBlocks, index, (currentBlock) => Object.assign(currentBlock, updater(currentBlock))),
-                      )
-                    }
-                    onMove={(direction) =>
-                      updateContentBlocks((currentBlocks) =>
-                        moveArrayItem(currentBlocks, index, direction === "up" ? index - 1 : index + 1),
-                      )
-                    }
-                    onRemove={() =>
-                      updateContentBlocks((currentBlocks) => {
-                        const nextBlocks = removeArrayItem(currentBlocks, index);
-                        return nextBlocks.length ? nextBlocks : [createArticleParagraphBlock()];
+              </div>
+
+              <div className="mx-auto max-w-[48rem] space-y-6 px-5 py-6 md:px-8 md:py-8">
+                <div className="space-y-3">
+                  <p className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">
+                    {editorLocale === "zh" ? "当前编辑中文" : "CURRENTLY EDITING ENGLISH"}
+                  </p>
+                  <textarea
+                    data-field-key={`title.${editorLocale}`}
+                    rows={2}
+                    value={currentLocaleTitle}
+                    onChange={(event) =>
+                      update((items) => {
+                        items[selectedIndex].title = updateBilingualLocaleValue(items[selectedIndex].title, editorLocale, event.target.value);
                       })
                     }
+                    placeholder={editorLocale === "zh" ? "请输入文章标题" : "Article title"}
+                    className="w-full resize-none border-0 bg-transparent p-0 font-serif text-[2.1rem] leading-[1.15] tracking-[-0.04em] text-[var(--ink)] outline-none placeholder:text-[var(--accent)]/42 md:text-[2.8rem]"
                   />
-                ))}
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    data-field-key="body.addParagraph"
-                    type="button"
-                    onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleParagraphBlock()])}
-                    className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                  >
-                    新增正文段落
-                  </button>
-                  <button
-                    data-field-key="body.addImage"
-                    type="button"
-                    onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImageBlock()])}
-                    className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                  >
-                    新增单图
-                  </button>
-                  <button
-                    data-field-key="body.addImagePair"
-                    type="button"
-                    onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImagePairBlock()])}
-                    className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                  >
-                    新增双图
-                  </button>
                 </div>
-                {article.keywords.map((keyword, index) => (
-                  <BilingualInput key={`article-keyword-${index}`} label={`关键词 ${index + 1}`} value={keyword} onChange={(next) => update((items) => { items[selectedIndex].keywords = updateArrayItem(items[selectedIndex].keywords, index, (item) => { item.zh = next.zh; item.en = next.en; }); })} />
-                ))}
-                <button type="button" onClick={() => update((items) => { items[selectedIndex].keywords = [...items[selectedIndex].keywords, emptyBilingual()]; })} className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]">新增关键词</button>
+
+                <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px]">
+                  <label className="grid gap-2">
+                    <span className="text-[0.72rem] tracking-[0.18em] text-[var(--accent)]">
+                      {editorLocale === "zh" ? "作者" : "AUTHOR"}
+                    </span>
+                    <input
+                      data-field-key={`author.${editorLocale}`}
+                      value={currentLocaleAuthor}
+                      onChange={(event) =>
+                        update((items) => {
+                          items[selectedIndex].author = updateBilingualLocaleValue(items[selectedIndex].author, editorLocale, event.target.value);
+                        })
+                      }
+                      placeholder={editorLocale === "zh" ? "请输入作者" : "Author"}
+                      className="min-h-11 border border-[var(--line)] bg-white/60 px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
+                    />
+                  </label>
+                  <TextField
+                    label="日期"
+                    type="date"
+                    value={article.date}
+                    onChange={(next) => update((items) => { items[selectedIndex].date = next; })}
+                    fieldKey="date"
+                  />
+                </div>
+
+                <ArticleBodyFlowEditor
+                  value={bodyFlowValue}
+                  onChange={updateBodyByFlow}
+                  activeLocale={editorLocale}
+                  onActiveLocaleChange={setEditorLocale}
+                  previewMap={articleImagePreviewMap}
+                  onPreviewResolve={setArticleImagePreview}
+                />
               </div>
-            </SectionBlock>
-            <SectionBlock title="关联内容">
-              <div className="grid gap-4">
-                <RelationChecklist label="关联藏品" options={artworkOptions} selected={article.relatedArtworkSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].relatedArtworkSlugs; items[selectedIndex].relatedArtworkSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
-                <RelationChecklist label="关联展览" options={exhibitionOptions} selected={article.relatedExhibitionSlugs} onToggle={(value) => update((items) => { const list = items[selectedIndex].relatedExhibitionSlugs; items[selectedIndex].relatedExhibitionSlugs = list.includes(value) ? list.filter((item) => item !== value) : [...list, value]; })} />
-              </div>
-            </SectionBlock>
+            </section>
+
+            <aside id="section-basic" className="space-y-4 self-start 2xl:sticky 2xl:top-28">
+              <section className="space-y-4 border border-[var(--line)] bg-[var(--surface)] p-5 md:p-6">
+                <div className="space-y-2 border-b border-[var(--line)] pb-4">
+                  <Label>文章设置</Label>
+                  <p className="text-sm leading-7 text-[var(--muted)]">
+                    摘要和封面都可以让系统先帮你兜底。写完正文后，再决定要不要手动微调。
+                  </p>
+                  {basicBlockingIssues.length ? (
+                    <p className="text-sm leading-7 text-[#8e4e3b]">
+                      {basicBlockingIssues.map((issue) => issue.message).join("、")}
+                    </p>
+                  ) : null}
+                  {basicWarningIssues.length ? (
+                    <p className="text-sm leading-7 text-[#8b7867]">
+                      {`提醒：${basicWarningIssues.map((issue) => issue.message).join("、")}`}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div data-field-key="cover" className="grid gap-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <Label>封面</Label>
+                      <p className="text-sm leading-7 text-[var(--muted)]">
+                        留空时，发布会自动使用正文第一张图片。
+                      </p>
+                    </div>
+                    {articleImageReferences.length && article.cover.trim() !== effectiveCover ? (
+                      <button
+                        type="button"
+                        onClick={() => selectCoverFromBody(effectiveCover)}
+                        className="text-xs tracking-[0.12em] text-[var(--accent)] transition-colors hover:text-[var(--ink)]"
+                      >
+                        使用正文首图
+                      </button>
+                    ) : null}
+                  </div>
+
+                  <div className="overflow-hidden border border-[var(--line)]/60 bg-[var(--surface-strong)]">
+                    {effectiveCover ? (
+                      <Image
+                        src={effectiveCoverPreview}
+                        alt={article.title.zh || article.slug}
+                        width={1400}
+                        height={900}
+                        unoptimized
+                        className="aspect-[1.85/1] h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex aspect-[1.85/1] items-center justify-center text-[0.68rem] tracking-[0.14em] text-[var(--accent)]/56">
+                        暂无封面
+                      </div>
+                    )}
+                  </div>
+
+                  {articleImageReferences.length ? (
+                    <div className="grid gap-2">
+                      <p className="text-xs leading-6 text-[var(--muted)]/84">可直接从正文已插入图片中选择：</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {articleImageReferences.slice(0, 6).map((item) => {
+                          const selected = article.cover.trim() === item.image;
+
+                          return (
+                            <button
+                              key={item.key}
+                              type="button"
+                              onClick={() => selectCoverFromBody(item.image)}
+                              className={`overflow-hidden border transition-colors ${
+                                selected
+                                  ? "border-[var(--line-strong)]"
+                                  : "border-[var(--line)]/60 hover:border-[var(--line-strong)]"
+                              }`}
+                            >
+                              <Image
+                                src={articleImagePreviewMap[item.image] ?? item.image}
+                                alt={item.caption.zh || item.caption.en || "Article cover option"}
+                                width={600}
+                                height={420}
+                                unoptimized
+                                className="aspect-[4/3] h-full w-full object-cover"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <details className="border border-[var(--line)]/70 bg-white/34 p-4">
+                    <summary className="cursor-pointer text-xs tracking-[0.14em] text-[var(--accent)]">
+                      手动上传或替换封面
+                    </summary>
+                    <div className="mt-4">
+                      <AdminMediaField
+                        anchorKey="cover"
+                        label="文章封面"
+                        folder="articles"
+                        value={article.cover}
+                        previewRatio="landscape"
+                        targetSize={{ width: 1400, height: 900 }}
+                        recommendedUse="文章列表与详情封面"
+                        recommendedSize="1400 x 900 像素以上"
+                        autoSaveAfterUpload={false}
+                        saveTarget={{
+                          section: "articles",
+                          id: persistedArticleSlug,
+                          field: "cover",
+                        }}
+                        onChange={(next) => update((items) => {
+                          items[selectedIndex].cover = next;
+                          items[selectedIndex].coverAsset = undefined;
+                        })}
+                        onPersisted={(next) => {
+                          setPersisted((current) => {
+                            const nextItems = cloneValue(current);
+                            const recordIndex = nextItems.findIndex((item) => item.slug === persistedArticleSlug);
+
+                            if (recordIndex < 0) {
+                              return current;
+                            }
+
+                            nextItems[recordIndex].cover = next;
+                            return nextItems;
+                          });
+                          setSaveState({ phase: "saved", message: next ? "文章封面已保存。" : "文章封面已移除。" });
+                        }}
+                        onPersistError={(message) => setSaveState({ phase: "error", message })}
+                      />
+                    </div>
+                  </details>
+                </div>
+
+                <div data-field-key="excerpt.zh" className="grid gap-3 border border-[var(--line)]/70 bg-white/34 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <Label>摘要</Label>
+                      <p className="text-sm leading-7 text-[var(--muted)]">
+                        留空时默认使用正文首段。需要精修时再手动填写。
+                      </p>
+                    </div>
+                    {(autoExcerpt.zh || autoExcerpt.en) ? (
+                      <button
+                        type="button"
+                        onClick={applyAutoExcerpt}
+                        className="text-xs tracking-[0.12em] text-[var(--accent)] transition-colors hover:text-[var(--ink)]"
+                      >
+                        使用正文首段
+                      </button>
+                    ) : null}
+                  </div>
+
+                  <div className="grid gap-3">
+                    <div className="border border-[var(--line)]/60 bg-white/60 p-3">
+                      <p className="text-[0.68rem] tracking-[0.14em] text-[var(--accent)]">中文摘要预览</p>
+                      <p className="mt-2 text-sm leading-7 text-[var(--ink)]">
+                        {article.excerpt.zh || autoExcerpt.zh || "系统会在你写完首段后自动生成。"}
+                      </p>
+                    </div>
+                    <div className="border border-[var(--line)]/60 bg-white/60 p-3">
+                      <p className="text-[0.68rem] tracking-[0.14em] text-[var(--accent)]">English Excerpt Preview</p>
+                      <p className="mt-2 text-sm leading-7 text-[var(--ink)]">
+                        {article.excerpt.en || autoExcerpt.en || "The first English paragraph will be used automatically."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <details className="border border-[var(--line)]/60 bg-white/60 p-4">
+                    <summary className="cursor-pointer text-xs tracking-[0.14em] text-[var(--accent)]">
+                      手动编辑摘要
+                    </summary>
+                    <div className="mt-4">
+                      <BilingualTextarea
+                        label="摘要"
+                        value={article.excerpt}
+                        onChange={(next) => update((items) => { items[selectedIndex].excerpt = next; })}
+                        rows={4}
+                        fieldKeys={{ zh: "excerpt.zh", en: "excerpt.en" }}
+                      />
+                    </div>
+                  </details>
+                </div>
+
+                <details open className="border border-[var(--line)]/70 bg-white/34 p-4">
+                  <summary className="cursor-pointer text-xs tracking-[0.14em] text-[var(--accent)]">基础设置</summary>
+                  <div className="mt-4 grid gap-4">
+                    <TextField
+                      label="Slug"
+                      value={article.slug}
+                      onChange={(next) => update((items) => { items[selectedIndex].slug = next; })}
+                      fieldKey="slug"
+                    />
+                    <BilingualInput
+                      label="分类"
+                      value={article.category}
+                      onChange={(next) => update((items) => { items[selectedIndex].category = next; })}
+                      fieldKeys={{ zh: "category.zh", en: "category.en" }}
+                    />
+                    <BilingualInput
+                      label="栏目"
+                      value={article.column}
+                      onChange={(next) => update((items) => { items[selectedIndex].column = next; })}
+                      fieldKeys={{ zh: "column.zh", en: "column.en" }}
+                    />
+                  </div>
+                </details>
+
+                <details className="border border-[var(--line)]/70 bg-white/34 p-4">
+                  <summary className="cursor-pointer text-xs tracking-[0.14em] text-[var(--accent)]">关键词</summary>
+                  <div className="mt-4 grid gap-4">
+                    {article.keywords.map((keyword, index) => (
+                      <BilingualInput
+                        key={`article-keyword-${index}`}
+                        label={`关键词 ${index + 1}`}
+                        value={keyword}
+                        onChange={(next) => update((items) => {
+                          items[selectedIndex].keywords = updateArrayItem(items[selectedIndex].keywords, index, (item) => {
+                            item.zh = next.zh;
+                            item.en = next.en;
+                          });
+                        })}
+                      />
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => update((items) => { items[selectedIndex].keywords = [...items[selectedIndex].keywords, emptyBilingual()]; })}
+                      className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                    >
+                      新增关键词
+                    </button>
+                  </div>
+                </details>
+
+                <details className="border border-[var(--line)]/70 bg-white/34 p-4">
+                  <summary className="cursor-pointer text-xs tracking-[0.14em] text-[var(--accent)]">关联内容</summary>
+                  <div className="mt-4 grid gap-4">
+                    <RelationChecklist
+                      label="关联藏品"
+                      options={artworkOptions}
+                      selected={article.relatedArtworkSlugs}
+                      onToggle={(value) =>
+                        update((items) => {
+                          const list = items[selectedIndex].relatedArtworkSlugs;
+                          items[selectedIndex].relatedArtworkSlugs = list.includes(value)
+                            ? list.filter((item) => item !== value)
+                            : [...list, value];
+                        })
+                      }
+                    />
+                    <RelationChecklist
+                      label="关联展览"
+                      options={exhibitionOptions}
+                      selected={article.relatedExhibitionSlugs}
+                      onToggle={(value) =>
+                        update((items) => {
+                          const list = items[selectedIndex].relatedExhibitionSlugs;
+                          items[selectedIndex].relatedExhibitionSlugs = list.includes(value)
+                            ? list.filter((item) => item !== value)
+                            : [...list, value];
+                        })
+                      }
+                    />
+                  </div>
+                </details>
+
+                <details className="border border-dashed border-[var(--line)]/70 bg-[var(--surface-strong)]/36 p-4">
+                  <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="text-xs tracking-[0.14em] text-[var(--accent)]">高级调整（仅特殊排版时使用）</p>
+                        <p className="text-xs leading-6 text-[var(--muted)]/84">
+                          平时直接在“正文画布”里写就够了。只有需要逐块排序、做双图组或精修图片版式时再打开。
+                        </p>
+                      </div>
+                      <span className="text-xs leading-6 text-[var(--accent)]/84">{structuredEditorSummary}</span>
+                    </div>
+                  </summary>
+                  <div data-field-key="body" className="mt-4 grid gap-4">
+                    <p className="text-xs leading-6 text-[var(--muted)]/84">
+                      这里的修改会同步回上面的正文画布，适合做最后一步精修，不建议作为日常主编辑方式。
+                    </p>
+                    {normalizedBodyBlocks.map((block, index, blocks) => (
+                      <ArticleContentBlockEditor
+                        key={`article-content-block-${index}`}
+                        block={block}
+                        index={index}
+                        total={blocks.length}
+                        onChange={(updater) =>
+                          updateContentBlocks((currentBlocks) =>
+                            updateArrayItem(currentBlocks, index, (currentBlock) => Object.assign(currentBlock, updater(currentBlock))),
+                          )
+                        }
+                        onMove={(direction) =>
+                          updateContentBlocks((currentBlocks) =>
+                            moveArrayItem(currentBlocks, index, direction === "up" ? index - 1 : index + 1),
+                          )
+                        }
+                        onRemove={() =>
+                          updateContentBlocks((currentBlocks) => {
+                            const nextBlocks = removeArrayItem(currentBlocks, index);
+                            return nextBlocks.length ? nextBlocks : [createArticleParagraphBlock()];
+                          })
+                        }
+                      />
+                    ))}
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        data-field-key="body.addParagraph"
+                        type="button"
+                        onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleParagraphBlock()])}
+                        className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                      >
+                        新增正文段落
+                      </button>
+                      <button
+                        data-field-key="body.addImage"
+                        type="button"
+                        onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImageBlock()])}
+                        className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                      >
+                        新增单图
+                      </button>
+                      <button
+                        data-field-key="body.addImagePair"
+                        type="button"
+                        onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImagePairBlock()])}
+                        className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                      >
+                        新增双图
+                      </button>
+                    </div>
+                  </div>
+                </details>
+              </section>
+            </aside>
           </div>
         ) : null}
       </div>
