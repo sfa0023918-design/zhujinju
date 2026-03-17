@@ -1306,14 +1306,19 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757.jpg",
+      "image": "/uploads/artworks/1773728118037-l1002732.jpg",
       "gallery": [
         "/uploads/artworks/1773412989098-未命名-2.jpg",
         "/uploads/artworks/1773412805579-未命名-4.jpg"
       ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757.jpg"
+        "original": "/uploads/artworks/1773728118037-l1002732.jpg",
+        "card": "/uploads/artworks/1773728118037-l1002732-card.jpg",
+        "hero": "/uploads/artworks/1773728118037-l1002732.jpg",
+        "detail": "/uploads/artworks/1773728118037-l1002732.jpg",
+        "width": 1200,
+        "height": 1500
       },
       "galleryAssets": [
         {
