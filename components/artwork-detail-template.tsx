@@ -227,7 +227,7 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
       {visibleItems.map((item) => (
         <div
           key={item.label.zh}
-          className="grid items-start gap-x-3 gap-y-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[102px_minmax(0,1fr)] md:gap-x-4 md:gap-y-1.5"
+          className="grid items-start gap-x-3 gap-y-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[108px_minmax(0,1fr)] md:items-baseline md:gap-x-4 md:gap-y-1.5"
         >
           <dt className="min-w-0 text-[var(--accent)]">
             <p className={INFO_COPY_CLASSES.sectionLabelZh}>
@@ -323,14 +323,14 @@ export function ArtworkInquiry({
         <div className="space-y-2.5 border-t border-[var(--line)]/20 pt-3">
           <HistoryBackLink
             fallbackHref="/collection"
-            className="inline-flex items-center text-[0.72rem] leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+            className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)]/34 px-4 py-1.5 text-[0.72rem] leading-6 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
           >
             <BilingualText
               as="span"
               text={detailCopy.backAction}
-              className="flex flex-col items-start text-left"
-              zhClassName="text-[0.8rem] leading-none tracking-[0.01em]"
-              enClassName="mt-1 text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+              className="flex flex-col items-center text-center"
+              zhClassName="text-[0.78rem] leading-none tracking-[0.01em]"
+              enClassName="mt-1 text-[0.62rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
             />
           </HistoryBackLink>
         </div>
