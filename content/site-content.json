@@ -4689,14 +4689,9 @@
       "relatedArtworkSlugs": [
         "ekadasamukha-avalokiteshvara",
         "manjushri-thangka",
-        "ritual-conch-set",
-        "artwork-1773059260653",
-        "artwork-1773132602982",
-        "artwork-1773203033967",
-        "artwork-1773229746480"
+        "ritual-conch-set"
       ],
       "relatedExhibitionSlugs": [
-        "silent-radiance",
         "between-gilding-and-pigment"
       ],
       "cover": "/uploads/articles/1773416480920-img-1030.jpg",
@@ -4710,11 +4705,39 @@
           }
         },
         {
+          "type": "image",
+          "image": "/uploads/articles/references/1773752633052-l1004125.jpg",
+          "caption": {
+            "zh": "",
+            "en": ""
+          },
+          "layout": "inline"
+        },
+        {
           "type": "paragraph",
           "content": {
             "zh": "于我们而言，这些雕塑与绘画从来不仅仅只是历史遗物。它们承载着信仰、情绪、记忆与时间，也在每一次凝视中，与今天的我们重新发生关系。展览让作品回到观看现场，图录则让这种相遇得以被记录、被延续、被反复思考。",
             "en": "For us, these sculptures and paintings are never merely historical remnants. They carry faith, emotion, memory, and time, and in every sustained gaze they enter into renewed relation with us in the present. Exhibitions return works to the site of viewing, while catalogues allow these encounters to be recorded, extended, and revisited in thought."
           }
+        },
+        {
+          "type": "imagePair",
+          "items": [
+            {
+              "image": "/uploads/articles/references/1773752780165-l1004143.jpg",
+              "caption": {
+                "zh": "",
+                "en": ""
+              }
+            },
+            {
+              "image": "/uploads/articles/references/1773752787037-l1004132.jpg",
+              "caption": {
+                "zh": "",
+                "en": ""
+              }
+            }
+          ]
         },
         {
           "type": "paragraph",
