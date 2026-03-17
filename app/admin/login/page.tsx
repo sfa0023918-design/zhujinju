@@ -47,11 +47,11 @@ export default async function AdminLoginPage({
         className="space-y-5 border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8"
       >
         <label className="grid gap-2 text-sm text-[var(--muted)]">
-          <span className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">管理员邮箱</span>
+          <span className="text-[0.76rem] tracking-[0.18em] text-[var(--accent)]">管理员账号</span>
           <input
             required
             name="email"
-            type="email"
+            type="text"
             className="h-11 border border-[var(--line)] bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           />
         </label>
