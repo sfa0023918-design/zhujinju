@@ -1313,12 +1313,7 @@
       ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757.jpg",
-        "card": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757-card.jpg",
-        "hero": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757.jpg",
-        "detail": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757.jpg",
-        "width": 1200,
-        "height": 1500
+        "original": "/uploads/artworks/1773727160977-a9b6175b490d1309d75e53a430308757.jpg"
       },
       "galleryAssets": [
         {
