@@ -69,6 +69,17 @@ export function HistoryBackLink({
         event.preventDefault();
 
         const previousInternalRoute = getPreviousInternalRoute() ?? getInternalReferrerRoute();
+        const historyState = typeof window !== "undefined" ? (window.history.state as { idx?: number } | null) : null;
+        const canUseBrowserBack =
+          typeof historyState?.idx === "number" ? historyState.idx > 0 : window.history.length > 1;
+
+        if (canUseBrowserBack) {
+          if (previousInternalRoute) {
+            markBackTarget(previousInternalRoute);
+          }
+          router.back();
+          return;
+        }
 
         if (previousInternalRoute) {
           markBackTarget(previousInternalRoute);
