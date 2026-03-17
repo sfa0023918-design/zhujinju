@@ -40,29 +40,29 @@ export function ExhibitionDetailReading({
 
   return (
     <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-8 py-14 md:px-[3.25rem] md:py-16 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.72fr)] lg:px-16 lg:py-20">
-      <div className="lg:col-span-2 flex justify-end">
-        <div className="inline-flex items-center rounded-full border border-[var(--line)]/26 p-1">
-          {(["zh", "en"] as const).map((option) => {
-            const active = locale === option;
-            return (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setLocale(option)}
-                className={`min-w-10 cursor-pointer select-none rounded-full px-3 py-1 text-[0.54rem] uppercase tracking-[0.14em] transition-colors ${
-                  active
-                    ? "bg-[var(--surface)] text-[var(--ink)]"
-                    : "text-[var(--accent)]/60 hover:text-[var(--ink)]"
-                }`}
-              >
-                {option.toUpperCase()}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       <div className="max-w-[56rem]">
+        <div className="mb-5 flex justify-start">
+          <div className="inline-flex items-center rounded-full border border-[var(--line)]/26 p-1">
+            {(["zh", "en"] as const).map((option) => {
+              const active = locale === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setLocale(option)}
+                  className={`min-w-10 cursor-pointer select-none rounded-full px-3 py-1 text-[0.54rem] uppercase tracking-[0.14em] transition-colors ${
+                    active
+                      ? "bg-[var(--surface)] text-[var(--ink)]"
+                      : "text-[var(--accent)]/60 hover:text-[var(--ink)]"
+                  }`}
+                >
+                  {option.toUpperCase()}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <BilingualReadingPanel
           sections={[
             {
