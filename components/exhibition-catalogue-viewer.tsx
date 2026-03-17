@@ -9,6 +9,8 @@ import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
+const FAST_PRELOAD_AHEAD = 4;
+const FAST_PRELOAD_BEHIND = 2;
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -91,13 +93,17 @@ export function ExhibitionCatalogueViewer({
     }
 
     const step = usesDesktopPairing ? 2 : 1;
-    const candidateIndexes = new Set<number>([
-      currentIndex + step,
-      currentIndex + step + 1,
-      currentIndex + step + 2,
-      currentIndex - step,
-      currentIndex - step - 1,
-    ]);
+    const candidateIndexes = new Set<number>();
+
+    for (let offset = 1; offset <= FAST_PRELOAD_AHEAD; offset += 1) {
+      candidateIndexes.add(currentIndex + step * offset);
+      candidateIndexes.add(currentIndex + step * offset + 1);
+    }
+
+    for (let offset = 1; offset <= FAST_PRELOAD_BEHIND; offset += 1) {
+      candidateIndexes.add(currentIndex - step * offset);
+      candidateIndexes.add(currentIndex - step * offset - 1);
+    }
 
     candidateIndexes.forEach((index) => {
       const src = cataloguePages[index];
@@ -331,13 +337,13 @@ export function ExhibitionCatalogueViewer({
                     key={`${page}-${index}`}
                     type="button"
                     onClick={() => jumpTo(index)}
-                    className={`group relative shrink-0 rounded-[18px] transition-all duration-300 ${
+                    className={`group relative shrink-0 rounded-[18px] transition-all duration-150 ${
                       selected
                         ? "-translate-y-1"
                         : "hover:-translate-y-0.5"
                     }`}
                   >
-                    <div className={`overflow-hidden rounded-[18px] border p-1.5 transition-all duration-300 ${
+                    <div className={`overflow-hidden rounded-[18px] border p-1.5 transition-all duration-150 ${
                       selected
                         ? "border-[var(--line-strong)] bg-white shadow-[0_14px_28px_rgba(30,22,16,0.14)]"
                         : "border-[var(--line)]/70 bg-white/7 hover:border-[var(--line-strong)]/68 hover:bg-white/66"
@@ -352,7 +358,7 @@ export function ExhibitionCatalogueViewer({
                           fill
                           sizes={showsSpreadImage ? "160px" : "80px"}
                           wrapperClassName="h-full w-full"
-                          className={`object-cover transition-transform duration-500 ${selected ? "scale-[1.015]" : "group-hover:scale-[1.03]"}`}
+                          className={`object-cover transition-transform duration-200 ${selected ? "scale-[1.01]" : "group-hover:scale-[1.015]"}`}
                         />
                         <div className={`absolute inset-0 transition-colors ${selected ? "bg-[linear-gradient(180deg,transparent,rgba(15,11,8,0.14))]" : "bg-[linear-gradient(180deg,transparent,rgba(15,11,8,0.24))]"}`} />
                       </div>
@@ -412,7 +418,7 @@ function CataloguePage({
             loading="eager"
             fetchPriority="high"
             wrapperClassName="h-full w-full"
-            className="object-contain transition-transform duration-700 group-hover:scale-[1.005]"
+            className="object-contain transition-transform duration-200 group-hover:scale-[1.002]"
           />
         </div>
       </div>
