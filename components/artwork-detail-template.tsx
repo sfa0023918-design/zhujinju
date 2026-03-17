@@ -425,6 +425,7 @@ export function ArtworkScholarlyNote({
   locale,
   onLocaleChange,
 }: ArtworkScholarlyNoteProps) {
+  const isSpecialViewingNote = artwork.slug === SPECIAL_VIEWING_NOTE_SLUG;
   const hasExcerpt = hasText(artwork.excerpt);
   const viewingNoteForRender = getViewingNoteForRender(artwork);
   const hasViewing = hasText(viewingNoteForRender);
@@ -504,6 +505,9 @@ export function ArtworkScholarlyNote({
         onLocaleChange={onLocaleChange}
         showToggle={false}
         zhFirstLineIndent
+        paragraphClassName={
+          isSpecialViewingNote ? "max-md:![text-align:left] max-md:![text-align-last:auto]" : undefined
+        }
       />
     </section>
   );
