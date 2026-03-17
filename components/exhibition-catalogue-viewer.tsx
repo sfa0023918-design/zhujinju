@@ -42,6 +42,7 @@ export function ExhibitionCatalogueViewer({
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const preloadedPagesRef = useRef<Set<string>>(new Set());
   const totalPages = cataloguePages.length;
   const showsSpreadImage = viewMode === "spread-images";
   const usesDesktopPairing = isDesktop && !showsSpreadImage;
@@ -83,6 +84,34 @@ export function ExhibitionCatalogueViewer({
         : clamp(previous, 0, totalPages - 1);
     });
   }, [isDesktop, showsSpreadImage, totalPages]);
+
+  useEffect(() => {
+    if (!cataloguePages.length) {
+      return;
+    }
+
+    const step = usesDesktopPairing ? 2 : 1;
+    const candidateIndexes = new Set<number>([
+      currentIndex + step,
+      currentIndex + step + 1,
+      currentIndex + step + 2,
+      currentIndex - step,
+      currentIndex - step - 1,
+    ]);
+
+    candidateIndexes.forEach((index) => {
+      const src = cataloguePages[index];
+
+      if (!src || preloadedPagesRef.current.has(src)) {
+        return;
+      }
+
+      const image = new window.Image();
+      image.decoding = "async";
+      image.src = src;
+      preloadedPagesRef.current.add(src);
+    });
+  }, [cataloguePages, currentIndex, usesDesktopPairing]);
 
   if (!totalPages) {
     return null;
@@ -248,7 +277,6 @@ export function ExhibitionCatalogueViewer({
           >
             <div className="pointer-events-none absolute inset-x-[11%] -bottom-3 h-12 rounded-full bg-[rgba(93,71,45,0.08)] blur-2xl" />
             <div
-              key={`${usesDesktopPairing ? "spread" : "single"}-${currentIndex}`}
               className={`relative grid gap-2 overflow-hidden rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,#e7d9c7_0%,#e0cfbb_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_24px_72px_rgba(35,24,16,0.14)] md:p-4 ${
                 usesDesktopPairing ? "lg:grid-cols-2" : "grid-cols-1"
               } site-fade-in`}
@@ -381,6 +409,8 @@ function CataloguePage({
             alt={`${title.zh || title.en} page ${pageNumber}`}
             fill
             sizes={displayMode === "spread" ? "(min-width: 1024px) 84vw, 92vw" : "(min-width: 1024px) 42vw, 88vw"}
+            loading="eager"
+            fetchPriority="high"
             wrapperClassName="h-full w-full"
             className="object-contain transition-transform duration-700 group-hover:scale-[1.005]"
           />
