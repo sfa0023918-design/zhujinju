@@ -9,9 +9,9 @@ import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
-const FAST_PRELOAD_AHEAD = 10;
-const FAST_PRELOAD_BEHIND = 4;
-const IDLE_PRELOAD_BATCH = 6;
+const FAST_PRELOAD_AHEAD = 20;
+const FAST_PRELOAD_BEHIND = 8;
+const IDLE_PRELOAD_BATCH = 12;
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -114,9 +114,12 @@ export function ExhibitionCatalogueViewer({
       }
 
       const image = new window.Image();
-      image.decoding = "async";
+      image.decoding = "sync";
+      image.loading = "eager";
+      image.fetchPriority = "high";
       image.src = src;
       preloadedPagesRef.current.add(src);
+      void image.decode?.().catch(() => {});
     });
   }, [cataloguePages, currentIndex, usesDesktopPairing]);
 
@@ -159,9 +162,12 @@ export function ExhibitionCatalogueViewer({
 
         if (src && !preloadedPagesRef.current.has(src)) {
           const image = new window.Image();
-          image.decoding = "async";
+          image.decoding = "sync";
+          image.loading = "eager";
+          image.fetchPriority = "high";
           image.src = src;
           preloadedPagesRef.current.add(src);
+          void image.decode?.().catch(() => {});
         }
 
         pointer += 1;
@@ -381,7 +387,7 @@ export function ExhibitionCatalogueViewer({
               ) : null}
               {visiblePages.map((page, index) => (
                 <CataloguePage
-                  key={`${currentIndex}-${index}-${page ?? "blank"}`}
+                  key={`slot-${index}`}
                   page={page}
                   pageNumber={currentIndex + index + 1}
                   title={title}
@@ -444,6 +450,7 @@ export function ExhibitionCatalogueViewer({
                           src={page}
                           alt={`${title.zh || title.en} page ${index + 1}`}
                           fill
+                          unoptimized
                           sizes={showsSpreadImage ? "160px" : "80px"}
                           wrapperClassName="h-full w-full"
                           className="object-cover"
@@ -502,9 +509,11 @@ function CataloguePage({
             src={page}
             alt={`${title.zh || title.en} page ${pageNumber}`}
             fill
+            unoptimized
             sizes={displayMode === "spread" ? "(min-width: 1024px) 84vw, 92vw" : "(min-width: 1024px) 42vw, 88vw"}
             loading="eager"
             fetchPriority="high"
+            decoding="sync"
             wrapperClassName="h-full w-full"
             className="object-contain"
           />
