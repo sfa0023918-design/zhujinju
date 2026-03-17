@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import type { Artwork } from "@/lib/site-data";
 
@@ -26,10 +27,18 @@ type CollectionResultsProps = {
 };
 
 export function CollectionResults({ artworks }: CollectionResultsProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const rootRef = useRef<HTMLDivElement>(null);
   const previousPageRef = useRef(1);
   const [pageSize, setPageSize] = useState(DESKTOP_PAGE_SIZE);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const requestedPage = useMemo(() => {
+    const raw = searchParams.get("page");
+    const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN;
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  }, [searchParams]);
 
   useEffect(() => {
     const updatePageSize = () => {
@@ -44,15 +53,23 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
     };
   }, []);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [artworks]);
-
   const totalPages = Math.max(1, Math.ceil(artworks.length / pageSize));
+  const currentPage = Math.min(requestedPage, totalPages);
 
   useEffect(() => {
-    setCurrentPage((previous) => Math.min(previous, totalPages));
-  }, [totalPages]);
+    if (requestedPage === currentPage) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (currentPage <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(currentPage));
+    }
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [currentPage, pathname, requestedPage, router, searchParams]);
 
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -67,6 +84,20 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
     previousPageRef.current = currentPage;
     rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [currentPage]);
+
+  function setCollectionPage(nextPage: number) {
+    const page = Math.min(Math.max(nextPage, 1), totalPages);
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (page <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+
+    const query = params.toString();
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }
 
   return (
     <div ref={rootRef}>
@@ -91,7 +122,7 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
               {currentPage > 1 ? (
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  onClick={() => setCollectionPage(currentPage - 1)}
                   className="inline-flex min-h-[2.2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/55 px-3.5 py-[0.42rem] text-[0.72rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
                 >
                   上一页
@@ -106,7 +137,7 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
                       key={page}
                       type="button"
                       aria-current={isCurrent ? "page" : undefined}
-                      onClick={() => setCurrentPage(page)}
+                      onClick={() => setCollectionPage(page)}
                       className={`inline-flex min-h-[2.2rem] min-w-[2.2rem] cursor-pointer select-none items-center justify-center rounded-full border px-3 py-[0.42rem] text-[0.72rem] transition-colors duration-150 ${
                         isCurrent
                           ? "border-[var(--line-strong)]/55 text-[var(--ink)]"
@@ -122,7 +153,7 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
               {currentPage < totalPages ? (
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  onClick={() => setCollectionPage(currentPage + 1)}
                   className="inline-flex min-h-[2.2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/55 px-3.5 py-[0.42rem] text-[0.72rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
                 >
                   下一页
