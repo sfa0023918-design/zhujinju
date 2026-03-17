@@ -1722,6 +1722,7 @@ function useAutosaveSection<T>(
           },
           body: JSON.stringify({
             value: preparedValue,
+            baseValue: persisted,
           }),
         });
 
@@ -1747,7 +1748,7 @@ function useAutosaveSection<T>(
         }
       }
     },
-    [options, section],
+    [options, persisted, section],
   );
 
   const serializedDraft = useMemo(() => JSON.stringify(draft), [draft]);
@@ -2253,6 +2254,7 @@ function ArtworkEditor({
       const artworkId = getArtworkId(artwork);
       const requestId = requestRef.current + 1;
       const preparedArtwork = normalizeArtworkDraft(artwork);
+      const baseArtwork = persisted.find((item) => getArtworkId(item) === artworkId);
 
       requestRef.current = requestId;
       setSaveState({
@@ -2268,7 +2270,10 @@ function ArtworkEditor({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ artwork: preparedArtwork }),
+            body: JSON.stringify({
+              artwork: preparedArtwork,
+              baseArtwork,
+            }),
           },
         );
 
@@ -2296,7 +2301,7 @@ function ArtworkEditor({
         throw error;
       }
     },
-    [],
+    [persisted],
   );
 
   useEffect(() => {

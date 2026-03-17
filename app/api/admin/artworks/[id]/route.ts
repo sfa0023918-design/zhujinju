@@ -28,13 +28,15 @@ export async function PATCH(request: Request, { params }: ArtworkRouteProps) {
   const { id } = await params;
 
   try {
-    const body = (await request.json()) as { artwork?: Artwork };
+    const body = (await request.json()) as { artwork?: Artwork; baseArtwork?: Artwork };
 
     if (!body.artwork) {
       return NextResponse.json({ error: "缺少藏品内容。" }, { status: 400 });
     }
 
-    const result = await saveArtworkRecord(id, body.artwork, session.email);
+    const result = await saveArtworkRecord(id, body.artwork, session.email, {
+      baseArtwork: body.baseArtwork,
+    });
     revalidateAdminArtworkViews();
 
     return NextResponse.json({

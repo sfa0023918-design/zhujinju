@@ -438,20 +438,37 @@ export async function saveSiteSection(
   section: EditableSectionKey,
   nextValue: EditableSectionValueMap[EditableSectionKey],
   actor: string,
+  options?: {
+    baseValue?: EditableSectionValueMap[EditableSectionKey];
+  },
 ) {
   const current = await readSiteContentFresh();
-  validateSectionBeforeSave(section, nextValue);
+  const baseValue = options?.baseValue;
+  const mergedSectionValue = (
+    section === "artworks"
+      ? mergeArtworkSection(
+          current.artworks,
+          nextValue as Artwork[],
+          Array.isArray(baseValue) ? (baseValue as Artwork[]) : undefined,
+        )
+      : section === "exhibitions"
+        ? mergeExhibitionSection(
+            current.exhibitions,
+            nextValue as Exhibition[],
+            Array.isArray(baseValue) ? (baseValue as Exhibition[]) : undefined,
+          )
+        : section === "articles"
+          ? mergeArticleSection(
+              current.articles,
+              nextValue as Article[],
+              Array.isArray(baseValue) ? (baseValue as Article[]) : undefined,
+            )
+          : nextValue
+  ) as EditableSectionValueMap[EditableSectionKey];
+  validateSectionBeforeSave(section, mergedSectionValue);
   const nextContent = normalizeSiteContent({
     ...current,
-    [section]: (
-      section === "artworks"
-        ? mergeArtworkSection(current.artworks, nextValue as Artwork[])
-        : section === "exhibitions"
-          ? mergeExhibitionSection(current.exhibitions, nextValue as Exhibition[])
-          : section === "articles"
-            ? mergeArticleSection(current.articles, nextValue as Article[])
-            : nextValue
-    ),
+    [section]: mergedSectionValue,
   } as SiteContent);
 
   await persistSiteContent(nextContent, `Update ${section} from admin by ${actor}`);
@@ -459,10 +476,116 @@ export async function saveSiteSection(
   return nextContent;
 }
 
-function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[]) {
-  const currentById = new Map(currentArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
-  return nextArtworks.map((artwork) => {
+function areDeepEqual(left: unknown, right: unknown): boolean {
+  if (Object.is(left, right)) {
+    return true;
+  }
+
+  if (Array.isArray(left) && Array.isArray(right)) {
+    if (left.length !== right.length) {
+      return false;
+    }
+
+    return left.every((item, index) => areDeepEqual(item, right[index]));
+  }
+
+  if (isPlainObject(left) && isPlainObject(right)) {
+    const leftKeys = Object.keys(left);
+    const rightKeys = Object.keys(right);
+
+    if (leftKeys.length !== rightKeys.length) {
+      return false;
+    }
+
+    return leftKeys.every((key) => areDeepEqual(left[key], right[key]));
+  }
+
+  return false;
+}
+
+function mergeValueWithBase(baseValue: unknown, currentValue: unknown, nextValue: unknown): unknown {
+  // If editor did not change this field (next === base), keep latest server value.
+  if (areDeepEqual(nextValue, baseValue)) {
+    return structuredClone(currentValue);
+  }
+
+  if (isPlainObject(baseValue) && isPlainObject(currentValue) && isPlainObject(nextValue)) {
+    const keys = new Set([...Object.keys(baseValue), ...Object.keys(currentValue), ...Object.keys(nextValue)]);
+    const merged: Record<string, unknown> = {};
+
+    keys.forEach((key) => {
+      merged[key] = mergeValueWithBase(baseValue[key], currentValue[key], nextValue[key]);
+    });
+
+    return merged;
+  }
+
+  // Arrays and primitives are treated as an intentional replacement if changed from base.
+  return structuredClone(nextValue);
+}
+
+function mergeRecordsWithBase<T>(
+  currentRecords: T[],
+  nextRecords: T[],
+  getKey: (record: T) => string,
+  baseRecords?: T[],
+) {
+  if (!baseRecords?.length) {
+    return nextRecords;
+  }
+
+  const currentByKey = new Map(currentRecords.map((record) => [getKey(record), record]));
+  const baseByKey = new Map(baseRecords.map((record) => [getKey(record), record]));
+  const resolved: T[] = [];
+  const seenKeys = new Set<string>();
+
+  nextRecords.forEach((nextRecord) => {
+    const key = getKey(nextRecord);
+    const currentRecord = currentByKey.get(key);
+    const baseRecord = baseByKey.get(key);
+
+    if (!currentRecord) {
+      // Record was removed by another newer save; do not resurrect it from stale payload.
+      if (baseRecord) {
+        return;
+      }
+
+      resolved.push(nextRecord);
+      seenKeys.add(key);
+      return;
+    }
+
+    if (!baseRecord) {
+      resolved.push(nextRecord);
+      seenKeys.add(key);
+      return;
+    }
+
+    resolved.push(mergeValueWithBase(baseRecord, currentRecord, nextRecord) as T);
+    seenKeys.add(key);
+  });
+
+  // Preserve records that were not present in the incoming payload to avoid accidental deletions.
+  currentRecords.forEach((currentRecord) => {
+    const key = getKey(currentRecord);
+
+    if (!seenKeys.has(key)) {
+      resolved.push(currentRecord);
+    }
+  });
+
+  return resolved;
+}
+
+function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[], baseArtworks?: Artwork[]) {
+  const currentById = new Map(currentArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
+  const resolvedArtworks = mergeRecordsWithBase(currentArtworks, nextArtworks, getArtworkId, baseArtworks);
+
+  return resolvedArtworks.map((artwork) => {
     const current = currentById.get(getArtworkId(artwork));
 
     if (!current) {
@@ -481,10 +604,15 @@ function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[]
   });
 }
 
-function mergeExhibitionSection(currentExhibitions: Exhibition[], nextExhibitions: Exhibition[]) {
+function mergeExhibitionSection(
+  currentExhibitions: Exhibition[],
+  nextExhibitions: Exhibition[],
+  baseExhibitions?: Exhibition[],
+) {
   const currentBySlug = new Map(currentExhibitions.map((exhibition) => [exhibition.slug, exhibition]));
+  const resolvedExhibitions = mergeRecordsWithBase(currentExhibitions, nextExhibitions, (exhibition) => exhibition.slug, baseExhibitions);
 
-  return nextExhibitions.map((exhibition) => {
+  return resolvedExhibitions.map((exhibition) => {
     const current = currentBySlug.get(exhibition.slug);
 
     if (!current) {
@@ -499,10 +627,11 @@ function mergeExhibitionSection(currentExhibitions: Exhibition[], nextExhibition
   });
 }
 
-function mergeArticleSection(currentArticles: Article[], nextArticles: Article[]) {
+function mergeArticleSection(currentArticles: Article[], nextArticles: Article[], baseArticles?: Article[]) {
   const currentBySlug = new Map(currentArticles.map((article) => [article.slug, article]));
+  const resolvedArticles = mergeRecordsWithBase(currentArticles, nextArticles, (article) => article.slug, baseArticles);
 
-  return nextArticles.map((article) => {
+  return resolvedArticles.map((article) => {
     const current = currentBySlug.get(article.slug);
 
     if (!current) {
@@ -678,6 +807,9 @@ export async function saveArtworkRecord(
   artworkId: string,
   nextArtwork: Artwork,
   actor: string,
+  options?: {
+    baseArtwork?: Artwork;
+  },
 ) {
   const current = await readSiteContentFresh();
   const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
@@ -688,9 +820,12 @@ export async function saveArtworkRecord(
 
   const nextContent = normalizeSiteContent(structuredClone(current));
   const currentArtwork = nextContent.artworks[artworkIndex];
+  const resolvedArtwork = options?.baseArtwork
+    ? (mergeValueWithBase(options.baseArtwork, currentArtwork, nextArtwork) as Artwork)
+    : nextArtwork;
   const mergedArtwork: Artwork = {
     ...currentArtwork,
-    ...nextArtwork,
+    ...resolvedArtwork,
     id: currentArtwork.id,
   };
 

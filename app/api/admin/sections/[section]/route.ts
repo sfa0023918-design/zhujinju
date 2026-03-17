@@ -38,13 +38,16 @@ export async function PATCH(request: Request, { params }: SectionRouteProps) {
   try {
     const body = (await request.json()) as {
       value?: unknown;
+      baseValue?: unknown;
     };
 
     if (typeof body.value === "undefined") {
       return NextResponse.json({ error: "缺少要保存的内容。" }, { status: 400 });
     }
 
-    const nextContent = await saveSiteSection(sectionMeta.key, body.value as never, session.email);
+    const nextContent = await saveSiteSection(sectionMeta.key, body.value as never, session.email, {
+      baseValue: body.baseValue as never,
+    });
     revalidatePublicSite();
 
     return NextResponse.json({
