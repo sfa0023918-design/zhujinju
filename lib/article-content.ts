@@ -370,6 +370,31 @@ export function getArticleFallbackCover(
   return getArticleImageReferences(source, fallbackBody)[0]?.image ?? "";
 }
 
+export function resolveArticleCover(
+  source: Article | ArticleContentBlock[] | undefined,
+  fallbackBody: BilingualText[] = [],
+) {
+  if (source && !Array.isArray(source)) {
+    const coverCandidates = [
+      source.cover,
+      source.coverAsset?.card,
+      source.coverAsset?.detail,
+      source.coverAsset?.hero,
+      source.coverAsset?.original,
+    ];
+
+    for (const candidate of coverCandidates) {
+      const normalized = normalizeMediaPath(candidate);
+
+      if (normalized) {
+        return normalized;
+      }
+    }
+  }
+
+  return normalizeMediaPath(getArticleFallbackCover(source, fallbackBody));
+}
+
 export function articleHasBodyContent(article: Article) {
   return getRenderableArticleContentBlocks(article).some((block) => block.type === "paragraph");
 }

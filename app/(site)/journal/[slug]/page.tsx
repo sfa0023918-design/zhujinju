@@ -9,7 +9,7 @@ import { HistoryBackLink } from "@/components/history-back-link";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
-import { getArticleDisplayExcerpt, getArticleFallbackCover, getRenderableArticleContentBlocks } from "@/lib/article-content";
+import { getArticleDisplayExcerpt, getRenderableArticleContentBlocks, resolveArticleCover } from "@/lib/article-content";
 import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
 import {
@@ -81,15 +81,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const detailCopy = content.pageCopy.articleDetail;
   const renderableBlocks = getRenderableArticleContentBlocks(article);
   const displayExcerpt = getArticleDisplayExcerpt(article);
-  const effectiveCoverCandidates = [
-    article.coverAsset?.card?.trim(),
-    article.coverAsset?.detail?.trim(),
-    article.coverAsset?.hero?.trim(),
-    article.coverAsset?.original?.trim(),
-    article.cover.trim(),
-    getArticleFallbackCover(article),
-  ].filter(Boolean) as string[];
-  const effectiveCover = effectiveCoverCandidates[0] ?? "";
+  const effectiveCover = resolveArticleCover(article);
   const detailHeadingZhClass =
     "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
   const detailHeadingEnClass =
