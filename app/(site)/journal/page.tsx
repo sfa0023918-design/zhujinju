@@ -5,10 +5,10 @@ import { BilingualText } from "@/components/bilingual-text";
 import { ExpandableBilingualCopy } from "@/components/expandable-bilingual-copy";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
+import { getArticleDisplayExcerpt, resolveArticleCover } from "@/lib/article-content";
 import { bt } from "@/lib/bilingual";
 import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
-import type { ImageAsset } from "@/lib/site-data";
 import { getPublicArticles, loadSiteContent } from "@/lib/site-data";
 
 export async function generateMetadata() {
@@ -24,15 +24,12 @@ export async function generateMetadata() {
 
 function JournalCover({
   cover,
-  coverAsset,
   title,
 }: {
   cover: string;
-  coverAsset?: ImageAsset;
   title: { zh: string; en: string };
 }) {
-  const cardImage = coverAsset?.card ?? cover;
-  const isPlaceholder = cardImage.startsWith("/api/placeholder/");
+  const isPlaceholder = cover.startsWith("/api/placeholder/");
 
   if (isPlaceholder) {
     return (
@@ -44,7 +41,7 @@ function JournalCover({
 
   return (
     <ProtectedImage
-      src={withImageVersion(cardImage)}
+      src={withImageVersion(cover)}
       alt={`${title.zh} ${title.en}`}
       width={1400}
       height={900}
@@ -97,13 +94,17 @@ export default async function JournalPage() {
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
         <div className="grid gap-9">
-          {articles.map((article) => (
+          {articles.map((article) => {
+            const displayExcerpt = getArticleDisplayExcerpt(article);
+            const resolvedCover = resolveArticleCover(article);
+
+            return (
             <article
               key={article.slug}
               className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.44fr)_minmax(0,0.56fr)] lg:gap-7"
             >
               <Link href={`/journal/${article.slug}`} className="relative overflow-hidden bg-[var(--surface-strong)]">
-                <JournalCover cover={article.cover} coverAsset={article.coverAsset} title={article.title} />
+                <JournalCover cover={resolvedCover} title={article.title} />
               </Link>
               <div className="flex flex-col justify-between gap-5">
                 <div className="space-y-3.5">
@@ -125,7 +126,7 @@ export default async function JournalPage() {
                     />
                   </div>
                   <ExpandableBilingualCopy
-                    text={article.excerpt}
+                    text={displayExcerpt}
                     collapsedClassName="max-h-[7.2rem] md:max-h-[9.2rem]"
                     zhClassName="max-w-[36ch] text-[0.96rem] leading-[2.02] text-[var(--muted)]/94"
                     enClassName="max-w-[42ch] text-[0.8rem] leading-[1.78] tracking-[0.02em] text-[var(--accent)]/74"
@@ -171,7 +172,7 @@ export default async function JournalPage() {
                 </div>
               </div>
             </article>
-          ))}
+          )})}
         </div>
       </section>
     </>

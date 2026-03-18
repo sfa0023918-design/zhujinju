@@ -9,7 +9,8 @@ import { HistoryBackLink } from "@/components/history-back-link";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
-import { getArticleFallbackCover, getRenderableArticleContentBlocks } from "@/lib/article-content";
+import { getArticleDisplayExcerpt, getRenderableArticleContentBlocks, resolveArticleCover } from "@/lib/article-content";
+import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticleBySlug,
@@ -57,7 +58,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: article.title,
-    description: article.excerpt,
+    description: getArticleDisplayExcerpt(article),
     path: `/journal/${article.slug}`,
     type: "article",
     site: content.siteConfig,
@@ -79,21 +80,22 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
   const renderableBlocks = getRenderableArticleContentBlocks(article);
-  const effectiveCover = article.cover.trim() || getArticleFallbackCover(article);
+  const displayExcerpt = getArticleDisplayExcerpt(article);
+  const effectiveCover = resolveArticleCover(article);
   const detailHeadingZhClass =
     "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
   const detailHeadingEnClass =
     "mt-2.5 block max-w-[30rem] font-sans text-[0.7rem] uppercase tracking-[0.16em] leading-[1.48] text-[var(--accent)]/78 md:text-[0.74rem]";
   return (
     <>
-      <section className="mx-auto w-full max-w-[1120px] px-5 py-7 md:px-8 md:py-8 lg:px-10 lg:py-10">
+      <section className="mx-auto w-full max-w-[1040px] px-5 py-6 md:px-8 md:py-6 lg:px-10 lg:py-7">
         <HistoryBackLink fallbackHref="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
           <ActionLabel text={detailCopy.backAction} align="start" />
         </HistoryBackLink>
       </section>
 
-      <article className="mx-auto w-full max-w-[1120px] px-5 pb-20 md:px-8 md:pb-24 lg:px-10 lg:pb-28">
-        <header className="space-y-4 border-t border-[var(--line)] pt-5 md:space-y-5">
+      <article className="mx-auto w-full max-w-[1040px] px-5 pb-16 md:px-8 md:pb-20 lg:px-10 lg:pb-24">
+        <header className="mx-auto max-w-[52rem] space-y-4 border-t border-[var(--line)] pt-4 md:space-y-5 md:pt-5">
           <BilingualText
             as="p"
             text={article.category}
@@ -109,7 +111,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
             zhClassName={detailHeadingZhClass}
             enClassName={detailHeadingEnClass}
           />
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-2 text-[0.84rem] leading-7 text-[var(--muted)]/92">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-1.5 text-[0.84rem] leading-7 text-[var(--muted)]/92 md:py-2">
             <p className="select-none">{article.date}</p>
             <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
             <BilingualText
@@ -130,7 +132,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
               enClassName="text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
             />
           </div>
-          <div className="flex flex-wrap gap-1.5 border-t border-[var(--line)]/62 pt-3.5">
+          <div className="flex flex-wrap gap-1.5 border-t border-[var(--line)]/62 pt-2.5 md:pt-3">
             {article.keywords.map((keyword) => (
               <span
                 key={keyword.zh}
@@ -142,14 +144,14 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           </div>
         </header>
 
-        <div className="relative mx-auto mt-8 w-full max-w-[56rem] overflow-hidden bg-[var(--surface-strong)] md:mt-10">
+        <div className="relative mx-auto mt-6 w-full max-w-[52rem] overflow-hidden bg-[var(--surface-strong)] md:mt-7 lg:mt-8">
           {!effectiveCover || effectiveCover.startsWith("/api/placeholder/") ? (
             <div className="aspect-[1.85/1]">
               <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />
             </div>
           ) : (
             <ProtectedImage
-              src={effectiveCover}
+              src={withImageVersion(effectiveCover)}
               alt={`${article.title.zh} ${article.title.en}`}
               width={1600}
               height={1000}
@@ -161,10 +163,10 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           )}
         </div>
 
-        <ArticleReadingContent className="mx-auto mt-10 w-full max-w-[56rem] md:mt-12" excerpt={article.excerpt} blocks={renderableBlocks} />
+        <ArticleReadingContent className="mx-auto mt-8 w-full max-w-[52rem] md:mt-9 lg:mt-10" excerpt={displayExcerpt} blocks={renderableBlocks} />
 
         {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (
-          <section className="mx-auto mt-16 grid w-full max-w-[56rem] gap-10 border-t border-[var(--line)] pt-8 md:mt-18 md:grid-cols-2">
+          <section className="mx-auto mt-12 grid w-full max-w-[52rem] gap-8 border-t border-[var(--line)] pt-6 md:mt-14 md:grid-cols-2 md:pt-7">
             {relatedExhibitions.length > 0 ? (
               <div>
                 <BilingualText
