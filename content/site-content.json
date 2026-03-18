@@ -128,7 +128,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773854867442-prod-smoke-loggedin-1x1.png",
       "gallery": [
-        "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+        "/uploads/artworks/1773854873155-prod-smoke-loggedin-1x1.png",
         "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg"
       ],
       "featured": true,
@@ -140,12 +140,10 @@
       },
       "galleryAssets": [
         {
-          "original": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
-          "card": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
-          "hero": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
-          "detail": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
-          "width": 1200,
-          "height": 1500
+          "original": "/uploads/artworks/1773854873155-prod-smoke-loggedin-1x1.png",
+          "card": "/uploads/artworks/1773854873155-prod-smoke-loggedin-1x1.png",
+          "hero": "/uploads/artworks/1773854873155-prod-smoke-loggedin-1x1.png",
+          "detail": "/uploads/artworks/1773854873155-prod-smoke-loggedin-1x1.png"
         },
         {
           "original": "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg",
