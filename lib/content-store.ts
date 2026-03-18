@@ -27,6 +27,7 @@ import type {
   SiteConfigContent,
 } from "./data/types";
 import { getRepoUtf8File, hasGitHubRepoConfig, putRepoUtf8File } from "./github-repo";
+import { normalizeMediaPath } from "./media-path";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "./publication-validation";
 import { getSiteContentTag } from "./public-site-revalidate";
 import { siteConfig as defaultSiteConfig } from "./site-config";
@@ -374,7 +375,7 @@ function getNormalizedSelectedArtworkIds(homeContent: SiteContent["homeContent"]
 }
 
 function trimImageUrl(value?: string | null) {
-  return typeof value === "string" ? value.trim() : "";
+  return normalizeMediaPath(value);
 }
 
 function normalizeImageAsset(asset?: ImageAsset | null, fallbackUrl?: string) {
@@ -625,41 +626,11 @@ function mergeExhibitionSection(
   nextExhibitions: Exhibition[],
   baseExhibitions?: Exhibition[],
 ) {
-  const currentBySlug = new Map(currentExhibitions.map((exhibition) => [exhibition.slug, exhibition]));
-  const resolvedExhibitions = mergeRecordsWithBase(currentExhibitions, nextExhibitions, (exhibition) => exhibition.slug, baseExhibitions);
-
-  return resolvedExhibitions.map((exhibition) => {
-    const current = currentBySlug.get(exhibition.slug);
-
-    if (!current) {
-      return exhibition;
-    }
-
-    return {
-      ...exhibition,
-      cover: current.cover,
-      coverAsset: current.coverAsset,
-    };
-  });
+  return mergeRecordsWithBase(currentExhibitions, nextExhibitions, (exhibition) => exhibition.slug, baseExhibitions);
 }
 
 function mergeArticleSection(currentArticles: Article[], nextArticles: Article[], baseArticles?: Article[]) {
-  const currentBySlug = new Map(currentArticles.map((article) => [article.slug, article]));
-  const resolvedArticles = mergeRecordsWithBase(currentArticles, nextArticles, (article) => article.slug, baseArticles);
-
-  return resolvedArticles.map((article) => {
-    const current = currentBySlug.get(article.slug);
-
-    if (!current) {
-      return article;
-    }
-
-    return {
-      ...article,
-      cover: current.cover,
-      coverAsset: current.coverAsset,
-    };
-  });
+  return mergeRecordsWithBase(currentArticles, nextArticles, (article) => article.slug, baseArticles);
 }
 
 export async function createArtworkDraft(actor: string) {
@@ -912,14 +883,15 @@ export async function saveArtworkMediaField(
   const artwork = nextContent.artworks[artworkIndex];
 
   if (field === "image") {
-    artwork.image = value.trim();
+    artwork.image = trimImageUrl(value);
     artwork.imageAsset = normalizeImageAsset(options?.asset, artwork.image);
   } else {
     const slotIndex = options?.galleryIndex ?? 0;
     const gallery = [...(artwork.gallery ?? [])];
     const galleryAssets = [...(artwork.galleryAssets ?? [])];
-    gallery[slotIndex] = value.trim();
-    galleryAssets[slotIndex] = normalizeImageAsset(options?.asset, value.trim()) ?? null;
+    const normalizedValue = trimImageUrl(value);
+    gallery[slotIndex] = normalizedValue;
+    galleryAssets[slotIndex] = normalizeImageAsset(options?.asset, normalizedValue) ?? null;
     artwork.gallery = gallery;
     artwork.galleryAssets = galleryAssets;
   }
@@ -979,8 +951,9 @@ export async function saveRecordMediaField(
       throw new Error("未找到要更新图片的展览。");
     }
 
-    nextContent.exhibitions[recordIndex].cover = value.trim();
-    nextContent.exhibitions[recordIndex].coverAsset = normalizeImageAsset(options?.asset, value.trim());
+    const normalizedValue = trimImageUrl(value);
+    nextContent.exhibitions[recordIndex].cover = normalizedValue;
+    nextContent.exhibitions[recordIndex].coverAsset = normalizeImageAsset(options?.asset, normalizedValue);
     await persistSiteContent(nextContent, `Update exhibition media from admin by ${actor}`);
 
     return {
@@ -995,8 +968,9 @@ export async function saveRecordMediaField(
     throw new Error("未找到要更新图片的文章。");
   }
 
-  nextContent.articles[recordIndex].cover = value.trim();
-  nextContent.articles[recordIndex].coverAsset = normalizeImageAsset(options?.asset, value.trim());
+  const normalizedValue = trimImageUrl(value);
+  nextContent.articles[recordIndex].cover = normalizedValue;
+  nextContent.articles[recordIndex].coverAsset = normalizeImageAsset(options?.asset, normalizedValue);
   await persistSiteContent(nextContent, `Update article media from admin by ${actor}`);
 
   return {
@@ -1174,6 +1148,70 @@ function isPublished(status?: PublicationStatus) {
   return (status ?? "published") === "published";
 }
 
+function parseArticleDateTimestamp(dateText: string) {
+  const raw = dateText.trim();
+
+  if (!raw) {
+    return null;
+  }
+
+  const normalized = raw
+    .replace(/[./年]/g, "-")
+    .replace(/月/g, "-")
+    .replace(/日/g, "")
+    .replace(/\s+/g, "");
+  const ymdMatch = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+  if (ymdMatch) {
+    const year = Number(ymdMatch[1]);
+    const month = Number(ymdMatch[2]);
+    const day = Number(ymdMatch[3]);
+    return Date.UTC(year, month - 1, day);
+  }
+
+  const parsed = Date.parse(raw);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function getArticleSlugTimestamp(slug: string) {
+  const match = slug.trim().match(/-(\d{10,})$/);
+  return match ? Number(match[1]) : null;
+}
+
+function compareArticlesByNewest(a: Article, b: Article) {
+  const aDate = parseArticleDateTimestamp(a.date);
+  const bDate = parseArticleDateTimestamp(b.date);
+
+  if (aDate !== null && bDate !== null && aDate !== bDate) {
+    return bDate - aDate;
+  }
+
+  if (aDate !== null && bDate === null) {
+    return -1;
+  }
+
+  if (aDate === null && bDate !== null) {
+    return 1;
+  }
+
+  const aSlugTs = getArticleSlugTimestamp(a.slug);
+  const bSlugTs = getArticleSlugTimestamp(b.slug);
+
+  if (aSlugTs !== null && bSlugTs !== null && aSlugTs !== bSlugTs) {
+    return bSlugTs - aSlugTs;
+  }
+
+  if (aSlugTs !== null && bSlugTs === null) {
+    return -1;
+  }
+
+  if (aSlugTs === null && bSlugTs !== null) {
+    return 1;
+  }
+
+  return a.slug.localeCompare(b.slug, "zh-Hans-CN");
+}
+
 export function getPublicArtworks(content: SiteContent) {
   return content.artworks.filter((artwork) => isPublished(artwork.publicationStatus));
 }
@@ -1193,7 +1231,8 @@ export function getPublicArticles(content: SiteContent) {
       ...article,
       publicationStatus: article.publicationStatus ?? "published",
     }))
-    .filter((article) => isPublished(article.publicationStatus));
+    .filter((article) => isPublished(article.publicationStatus))
+    .sort(compareArticlesByNewest);
 }
 
 function hasCatalogueData(exhibition: Exhibition) {
