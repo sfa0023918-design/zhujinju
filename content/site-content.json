@@ -4176,9 +4176,7 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773818885116-66文殊菩萨索南坚赞-正.jpg",
-      "gallery": [
-        "/uploads/artworks/1773818891715-l1004490.jpg"
-      ],
+      "gallery": [],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773818885116-66文殊菩萨索南坚赞-正.jpg",
@@ -4189,12 +4187,7 @@
         "height": 1500
       },
       "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773818891715-l1004490.jpg",
-          "card": "/uploads/artworks/1773818891715-l1004490.jpg",
-          "hero": "/uploads/artworks/1773818891715-l1004490.jpg",
-          "detail": "/uploads/artworks/1773818891715-l1004490.jpg"
-        }
+        null
       ]
     }
   ],
