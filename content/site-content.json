@@ -5431,7 +5431,15 @@
       ],
       "relatedArtworkSlugs": [],
       "relatedExhibitionSlugs": [],
-      "cover": ""
+      "cover": "/uploads/articles/1773839058974-微信图片-20260317203744-172-128.jpg",
+      "coverAsset": {
+        "original": "/uploads/articles/1773839058974-微信图片-20260317203744-172-128.jpg",
+        "card": "/uploads/articles/1773839058974-微信图片-20260317203744-172-128-card.jpg",
+        "hero": "/uploads/articles/1773839058974-微信图片-20260317203744-172-128.jpg",
+        "detail": "/uploads/articles/1773839058974-微信图片-20260317203744-172-128.jpg",
+        "width": 1400,
+        "height": 900
+      }
     }
   ]
 }
