@@ -446,25 +446,19 @@ export async function saveSiteSection(
   const current = await readSiteContentFresh();
   const baseValue = options?.baseValue;
   const mergedSectionValue = (
-    section === "artworks"
-      ? mergeArtworkSection(
-          current.artworks,
-          nextValue as Artwork[],
-          Array.isArray(baseValue) ? (baseValue as Artwork[]) : undefined,
+    section === "exhibitions"
+      ? mergeExhibitionSection(
+          current.exhibitions,
+          nextValue as Exhibition[],
+          Array.isArray(baseValue) ? (baseValue as Exhibition[]) : undefined,
         )
-      : section === "exhibitions"
-        ? mergeExhibitionSection(
-            current.exhibitions,
-            nextValue as Exhibition[],
-            Array.isArray(baseValue) ? (baseValue as Exhibition[]) : undefined,
+      : section === "articles"
+        ? mergeArticleSection(
+            current.articles,
+            nextValue as Article[],
+            Array.isArray(baseValue) ? (baseValue as Article[]) : undefined,
           )
-        : section === "articles"
-          ? mergeArticleSection(
-              current.articles,
-              nextValue as Article[],
-              Array.isArray(baseValue) ? (baseValue as Article[]) : undefined,
-            )
-          : nextValue
+        : nextValue
   ) as EditableSectionValueMap[EditableSectionKey];
   validateSectionBeforeSave(section, mergedSectionValue);
   const nextContent = normalizeSiteContent({
@@ -596,29 +590,6 @@ function mergeRecordsWithBase<T>(
   });
 
   return resolved;
-}
-
-function mergeArtworkSection(currentArtworks: Artwork[], nextArtworks: Artwork[], baseArtworks?: Artwork[]) {
-  const currentById = new Map(currentArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
-  const resolvedArtworks = mergeRecordsWithBase(currentArtworks, nextArtworks, getArtworkId, baseArtworks);
-
-  return resolvedArtworks.map((artwork) => {
-    const current = currentById.get(getArtworkId(artwork));
-
-    if (!current) {
-      return artwork;
-    }
-
-    // Media fields are persisted through dedicated endpoints so a full-form save
-    // cannot accidentally roll them back to stale client state.
-    return {
-      ...artwork,
-      image: current.image,
-      imageAsset: current.imageAsset,
-      gallery: current.gallery,
-      galleryAssets: current.galleryAssets,
-    };
-  });
 }
 
 function mergeExhibitionSection(

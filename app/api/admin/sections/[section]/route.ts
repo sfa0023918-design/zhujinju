@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getAdminSession } from "@/lib/admin-auth";
 import { revalidatePublicSite } from "@/lib/public-site-revalidate";
+import { appendDeployStatusMessage, triggerVercelDeploy } from "@/lib/vercel-deploy";
 import {
   ContentValidationError,
   createArticleDraft,
@@ -35,6 +36,15 @@ export async function PATCH(request: Request, { params }: SectionRouteProps) {
     return NextResponse.json({ error: "未知的内容分区。" }, { status: 400 });
   }
 
+  if (sectionMeta.key === "artworks") {
+    return NextResponse.json(
+      {
+        error: "artworks 分区保存入口已下线。请改用 /api/admin/artworks/* 主保存链路。",
+      },
+      { status: 410 },
+    );
+  }
+
   try {
     const body = (await request.json()) as {
       value?: unknown;
@@ -49,11 +59,17 @@ export async function PATCH(request: Request, { params }: SectionRouteProps) {
       baseValue: body.baseValue as never,
     });
     revalidatePublicSite();
+    const shouldDeploy = sectionMeta.key === "articles";
+    const deploy = shouldDeploy ? await triggerVercelDeploy(`Admin saved ${sectionMeta.key} section`) : null;
+    const message = shouldDeploy
+      ? appendDeployStatusMessage("内容已保存。", deploy ?? { triggered: false })
+      : "内容已保存。";
 
     return NextResponse.json({
       section: sectionMeta.key,
       value: getEditableSectionValue(nextContent, sectionMeta.key),
-      message: "内容已保存。",
+      deployTriggered: deploy?.triggered ?? false,
+      message,
     });
   } catch (error) {
     return NextResponse.json(
