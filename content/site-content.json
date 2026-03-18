@@ -5594,7 +5594,15 @@
       ],
       "relatedArtworkSlugs": [],
       "relatedExhibitionSlugs": [],
-      "cover": ""
+      "cover": "/uploads/articles/1773839923068-dsc02937.jpg",
+      "coverAsset": {
+        "original": "/uploads/articles/1773839923068-dsc02937.jpg",
+        "card": "/uploads/articles/1773839923068-dsc02937-card.jpg",
+        "hero": "/uploads/articles/1773839923068-dsc02937.jpg",
+        "detail": "/uploads/articles/1773839923068-dsc02937.jpg",
+        "width": 1400,
+        "height": 900
+      }
     }
   ]
 }
