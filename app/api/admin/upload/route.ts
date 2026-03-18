@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       },
     );
 
+    // Canonical upload-and-persist path for artwork image/gallery media.
     if (targetSection === "artworks" && targetId && (targetField === "image" || targetField === "gallery")) {
       await saveArtworkMediaField(targetId, targetField, result.url, session.email, {
         galleryIndex: targetField === "gallery" && targetIndexRaw ? Number(targetIndexRaw) : undefined,
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
       });
     }
 
+    // Canonical upload-and-persist path for exhibition/article cover media.
     if ((targetSection === "exhibitions" || targetSection === "articles") && targetId && targetField === "cover") {
       await saveRecordMediaField(targetSection, targetId, "cover", result.url, session.email, {
         asset: result.asset,
@@ -82,13 +84,11 @@ export async function POST(request: Request) {
     }
 
     if (folder.startsWith("articles/")) {
-      const deploy = await triggerVercelDeploy(`Admin uploaded article body media for ${targetId || "draft"}`);
-
       return NextResponse.json({
         ...result,
         saved: false,
-        deployTriggered: deploy.triggered,
-        message: appendDeployStatusMessage("图片已上传成功。", deploy),
+        deployTriggered: false,
+        message: "图片已上传成功。请保存文章后再部署，避免重复部署导致线上版本来回切换。",
       });
     }
 

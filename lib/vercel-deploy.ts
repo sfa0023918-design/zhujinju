@@ -18,6 +18,10 @@ function extractDeployError(detail: string) {
   return normalized.length > 140 ? `${normalized.slice(0, 137)}...` : normalized;
 }
 
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function triggerVercelDeploy(reason: string): Promise<VercelDeployTriggerResult> {
   const hookUrl = getDeployHookUrl();
 
@@ -28,34 +32,47 @@ export async function triggerVercelDeploy(reason: string): Promise<VercelDeployT
     };
   }
 
-  try {
-    const response = await fetch(hookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        reason,
-        source: "admin",
-      }),
-      cache: "no-store",
-    });
+  let lastError = "";
 
-    if (!response.ok) {
-      const detail = extractDeployError(await response.text());
-      return {
-        triggered: false,
-        warning: `已保存成功，但自动部署触发失败：${detail}`,
-      };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch(hookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason,
+          source: "admin",
+        }),
+        cache: "no-store",
+      });
+
+      if (response.ok) {
+        return { triggered: true };
+      }
+
+      lastError = extractDeployError(await response.text());
+      const retryable = response.status >= 500 || response.status === 429;
+
+      if (!retryable || attempt === 2) {
+        break;
+      }
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : "未知错误。";
+
+      if (attempt === 2) {
+        break;
+      }
     }
 
-    return { triggered: true };
-  } catch (error) {
-    return {
-      triggered: false,
-      warning: `已保存成功，但自动部署触发失败：${error instanceof Error ? error.message : "未知错误。"}`,
-    };
+    await wait(700 * (attempt + 1));
   }
+
+  return {
+    triggered: false,
+    warning: `已保存成功，但自动部署触发失败：${lastError || "未知错误。"}`,
+  };
 }
 
 export function appendDeployStatusMessage(

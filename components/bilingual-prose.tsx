@@ -37,6 +37,7 @@ type BilingualReadingPanelProps = {
   onLocaleChange?: (locale: ReadingLocale) => void;
   showToggle?: boolean;
   zhFirstLineIndent?: boolean;
+  singleLineBreakMode?: "paragraph" | "soft";
 };
 
 function normalizeProseWhitespace(text: string) {
@@ -104,15 +105,20 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
   return chunks.filter(Boolean);
 }
 
-function splitParagraphs(text: string, locale: ReadingLocale) {
+function splitParagraphs(text: string, locale: ReadingLocale, singleLineBreakMode: "paragraph" | "soft" = "paragraph") {
   const normalized = normalizeProseWhitespace(text);
   if (!normalized) {
     return [];
   }
 
-  const paragraphDelimiter = /\n\s*\n+/.test(normalized) ? /\n\s*\n+/ : /\n+/;
-  const manualParagraphs = normalized
-    .split(paragraphDelimiter)
+  const hasBlankLineParagraphBreak = /\n\s*\n+/.test(normalized);
+  const rawParagraphs = hasBlankLineParagraphBreak
+    ? normalized.split(/\n\s*\n+/)
+    : singleLineBreakMode === "paragraph"
+      ? normalized.split(/\n+/)
+      : [normalized];
+
+  const manualParagraphs = rawParagraphs
     .map((paragraph) => normalizeParagraphText(paragraph, locale))
     .filter(Boolean);
 
@@ -143,11 +149,15 @@ export function getLocalizedText(content: BilingualValue | null | undefined, loc
   return preferred || fallback || "";
 }
 
-export function getParagraphsByLocale(content: BilingualProseContent, locale: ReadingLocale) {
+export function getParagraphsByLocale(
+  content: BilingualProseContent,
+  locale: ReadingLocale,
+  singleLineBreakMode: "paragraph" | "soft" = "paragraph",
+) {
   const items = Array.isArray(content) ? content : [content];
 
   return items.flatMap((item) => {
-    return splitParagraphs(getLocalizedText(item, locale), locale);
+    return splitParagraphs(getLocalizedText(item, locale), locale, singleLineBreakMode);
   });
 }
 
@@ -366,6 +376,7 @@ export function BilingualReadingPanel({
   onLocaleChange,
   showToggle = true,
   zhFirstLineIndent = false,
+  singleLineBreakMode = "paragraph",
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -400,7 +411,7 @@ export function BilingualReadingPanel({
 
       <div className="space-y-7">
         {sections.map((section) => {
-          const paragraphs = getParagraphsByLocale(section.content, locale);
+          const paragraphs = getParagraphsByLocale(section.content, locale, singleLineBreakMode);
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
             paragraphClassName ?? "",

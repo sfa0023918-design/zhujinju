@@ -19,6 +19,7 @@ type ArtworkRouteProps = {
 };
 
 export async function PATCH(request: Request, { params }: ArtworkRouteProps) {
+  // Canonical artwork save path used by current admin editor.
   const session = await getAdminSession();
 
   if (!session) {

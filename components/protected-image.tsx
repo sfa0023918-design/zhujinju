@@ -3,6 +3,8 @@
 import Image, { type ImageProps } from "next/image";
 import type { DragEvent, MouseEvent } from "react";
 
+import { isUploadsPath } from "@/lib/media-path";
+
 type ProtectedImageProps = ImageProps & {
   wrapperClassName?: string;
   shieldClassName?: string;
@@ -17,11 +19,16 @@ export function ProtectedImage({
   shieldClassName,
   className,
   alt,
+  unoptimized,
   onContextMenu,
   onDragStart,
   draggable,
   ...props
 }: ProtectedImageProps) {
+  const shouldBypassOptimizer =
+    typeof props.src === "string" ? isUploadsPath(props.src) : false;
+  const resolvedUnoptimized = unoptimized || shouldBypassOptimizer;
+
   const handleContextMenu = (event: MouseEvent<HTMLElement>) => {
     event.preventDefault();
     onContextMenu?.(event as never);
@@ -43,6 +50,7 @@ export function ProtectedImage({
         {...props}
         alt={alt}
         className={className}
+        unoptimized={resolvedUnoptimized}
         draggable={draggable ?? false}
         data-protect="true"
         onContextMenu={handleContextMenu as never}

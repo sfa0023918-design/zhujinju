@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "无效的图片字段请求。" }, { status: 400 });
     }
 
+    // Companion path: explicit media-field updates (manual URL paste/remove) for artworks.
     if (body.targetSection === "artworks" && (body.targetField === "image" || body.targetField === "gallery")) {
       await saveArtworkMediaField(
         body.targetId,
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
       });
     }
 
+    // Companion path: explicit media-field updates (manual URL paste/remove) for cover fields.
     if ((body.targetSection === "exhibitions" || body.targetSection === "articles") && body.targetField === "cover") {
       await saveRecordMediaField(
         body.targetSection,

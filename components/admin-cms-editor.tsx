@@ -283,11 +283,6 @@ function normalizeArticleDraft(value: Article) {
   next.excerpt = normalizeBilingualText(next.excerpt, "long");
   next.contentBlocks = normalizeArticleContentBlocks(next.contentBlocks, next.body);
   next.body = getArticleBodyParagraphs(next.contentBlocks, next.body);
-  const autoExcerpt = getArticleAutoExcerpt(next);
-  next.excerpt = {
-    zh: next.excerpt.zh || autoExcerpt.zh,
-    en: next.excerpt.en || autoExcerpt.en,
-  };
   const autoCover = getArticleFallbackCover(next);
   if (!next.cover && autoCover) {
     next.cover = autoCover;
@@ -2179,6 +2174,8 @@ function RecordStatusActions({
 }
 
 function useAutosaveSection<T>(
+  // Canonical section autosave path is /api/admin/sections/* for exhibitions/articles.
+  // Artworks are intentionally excluded and saved through /api/admin/artworks/*.
   section: Exclude<EditableSectionKey, "artworks">,
   initialValue: T,
   options?: AutosaveOptions<T>,
@@ -2763,6 +2760,7 @@ function ArtworkEditor({
       });
 
       try {
+        // Canonical artwork save path (single-record PATCH).
         const payload = await requestJson<{ artwork: Artwork; artworks: Artwork[]; message?: string }>(
           `/api/admin/artworks/${artworkId}`,
           {

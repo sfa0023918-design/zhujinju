@@ -1,4 +1,5 @@
 import type { Article, ArticleContentBlock, ArticleImagePairItem, BilingualText } from "./site-data";
+import { normalizeMediaPath } from "./media-path";
 
 function normalizeText(value: string | undefined) {
   return (value ?? "").trim();
@@ -12,7 +13,7 @@ function normalizeBilingual(value: BilingualText | undefined, mode: "line" | "lo
 
 function normalizeImagePairItems(items: ArticleImagePairItem[] | undefined) {
   const normalized = (items ?? []).slice(0, 2).map((item) => ({
-    image: normalizeText(item?.image),
+    image: normalizeMediaPath(item?.image),
     caption: normalizeBilingual(item?.caption, "long"),
   }));
 
@@ -220,7 +221,7 @@ export function normalizeArticleContentBlocks(
     if (block.type === "image") {
       return {
         type: "image" as const,
-        image: normalizeText(block.image),
+        image: normalizeMediaPath(block.image),
         caption: normalizeBilingual(block.caption, "long"),
         layout: block.layout === "inline" ? "inline" : "wide",
       };
@@ -344,6 +345,22 @@ export function getArticleAutoExcerpt(
     zh: trimExcerptText(zhParagraph?.type === "paragraph" ? zhParagraph.content.zh : "", limits.zh ?? 88),
     en: trimExcerptText(enParagraph?.type === "paragraph" ? enParagraph.content.en : "", limits.en ?? 160),
   };
+}
+
+function hasPrimaryExcerptText(excerpt: BilingualText | undefined) {
+  return Boolean(excerpt?.zh.trim() || excerpt?.en.trim());
+}
+
+export function getArticleDisplayExcerpt(
+  source: Article | ArticleContentBlock[] | undefined,
+  fallbackBody: BilingualText[] = [],
+  limits: { zh?: number; en?: number } = {},
+) {
+  if (source && !Array.isArray(source) && hasPrimaryExcerptText(source.excerpt)) {
+    return source.excerpt;
+  }
+
+  return getArticleAutoExcerpt(source, fallbackBody, limits);
 }
 
 export function getArticleFallbackCover(

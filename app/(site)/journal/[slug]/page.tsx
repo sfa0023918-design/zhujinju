@@ -9,7 +9,8 @@ import { HistoryBackLink } from "@/components/history-back-link";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
 import { getAdminSession } from "@/lib/admin-auth";
-import { getArticleFallbackCover, getRenderableArticleContentBlocks } from "@/lib/article-content";
+import { getArticleDisplayExcerpt, getArticleFallbackCover, getRenderableArticleContentBlocks } from "@/lib/article-content";
+import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticleBySlug,
@@ -57,7 +58,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: article.title,
-    description: article.excerpt,
+    description: getArticleDisplayExcerpt(article),
     path: `/journal/${article.slug}`,
     type: "article",
     site: content.siteConfig,
@@ -79,7 +80,16 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
   const renderableBlocks = getRenderableArticleContentBlocks(article);
-  const effectiveCover = article.cover.trim() || getArticleFallbackCover(article);
+  const displayExcerpt = getArticleDisplayExcerpt(article);
+  const effectiveCoverCandidates = [
+    article.coverAsset?.card?.trim(),
+    article.coverAsset?.detail?.trim(),
+    article.coverAsset?.hero?.trim(),
+    article.coverAsset?.original?.trim(),
+    article.cover.trim(),
+    getArticleFallbackCover(article),
+  ].filter(Boolean) as string[];
+  const effectiveCover = effectiveCoverCandidates[0] ?? "";
   const detailHeadingZhClass =
     "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
   const detailHeadingEnClass =
@@ -149,7 +159,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
             </div>
           ) : (
             <ProtectedImage
-              src={effectiveCover}
+              src={withImageVersion(effectiveCover)}
               alt={`${article.title.zh} ${article.title.en}`}
               width={1600}
               height={1000}
@@ -161,7 +171,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
           )}
         </div>
 
-        <ArticleReadingContent className="mx-auto mt-10 w-full max-w-[56rem] md:mt-12" excerpt={article.excerpt} blocks={renderableBlocks} />
+        <ArticleReadingContent className="mx-auto mt-10 w-full max-w-[56rem] md:mt-12" excerpt={displayExcerpt} blocks={renderableBlocks} />
 
         {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (
           <section className="mx-auto mt-16 grid w-full max-w-[56rem] gap-10 border-t border-[var(--line)] pt-8 md:mt-18 md:grid-cols-2">

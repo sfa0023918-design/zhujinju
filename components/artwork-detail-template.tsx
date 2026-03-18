@@ -126,6 +126,36 @@ const SPECIAL_VIEWING_NOTE_MARKERS = [
   "3. 杰拉康弥勒菩萨石像铭文同样采用藏文转写梵文的方式镌刻，",
 ] as const;
 
+function normalizeWrappedViewingText(text: string, locale: ReadingLocale) {
+  const normalized = text.replace(/\r\n/g, "\n").trim();
+
+  if (!normalized.includes("\n")) {
+    return normalized;
+  }
+
+  const lines = normalized
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length < 4) {
+    return normalized;
+  }
+
+  const sentenceEndPattern = locale === "zh" ? /[。！？!?；;：:]$/ : /[.!?;:]$/;
+  const avgLineLength = lines.reduce((sum, line) => sum + line.length, 0) / lines.length;
+  const noSentenceEndCount = lines.filter((line) => !sentenceEndPattern.test(line)).length;
+  const shouldUnwrap =
+    (avgLineLength <= 42 && noSentenceEndCount / lines.length >= 0.38) ||
+    (lines.length >= 10 && avgLineLength <= 58 && noSentenceEndCount >= 3);
+
+  if (!shouldUnwrap) {
+    return normalized;
+  }
+
+  return lines.join(locale === "zh" ? "" : " ");
+}
+
 function normalizeSpecialViewingNoteZh(text: string) {
   const normalized = text
     .replace(/\r\n/g, "\n")
@@ -152,18 +182,33 @@ function normalizeSpecialViewingNoteZh(text: string) {
 }
 
 function getViewingNoteForRender(artwork: Artwork) {
+  const normalizedZh = normalizeWrappedViewingText(artwork.viewingNote?.zh ?? "", "zh");
+  const normalizedEn = normalizeWrappedViewingText(artwork.viewingNote?.en ?? "", "en");
+
   if (artwork.slug !== SPECIAL_VIEWING_NOTE_SLUG) {
-    return artwork.viewingNote;
+    if (
+      normalizedZh === (artwork.viewingNote?.zh ?? "") &&
+      normalizedEn === (artwork.viewingNote?.en ?? "")
+    ) {
+      return artwork.viewingNote;
+    }
+
+    return {
+      ...artwork.viewingNote,
+      zh: normalizedZh,
+      en: normalizedEn,
+    };
   }
 
-  const zh = normalizeSpecialViewingNoteZh(artwork.viewingNote?.zh ?? "");
-  if (!zh) {
+  const zh = normalizeSpecialViewingNoteZh(normalizedZh);
+  if (!zh && !normalizedEn) {
     return artwork.viewingNote;
   }
 
   return {
     ...artwork.viewingNote,
     zh,
+    en: normalizedEn,
   };
 }
 
@@ -505,6 +550,7 @@ export function ArtworkScholarlyNote({
         onLocaleChange={onLocaleChange}
         showToggle={false}
         zhFirstLineIndent
+        singleLineBreakMode="soft"
         paragraphClassName={
           isSpecialViewingNote ? "max-md:![text-align:left] max-md:![text-align-last:auto]" : undefined
         }

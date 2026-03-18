@@ -19,7 +19,7 @@ const MAX_SERVER_UPLOAD_BYTES = 4 * 1024 * 1024;
 function slugifyFilePart(value: string) {
   return value
     .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/gi, "-")
+    .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 60) || "image";
 }

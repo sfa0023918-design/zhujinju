@@ -5,6 +5,7 @@ import { BilingualText } from "@/components/bilingual-text";
 import { ExpandableBilingualCopy } from "@/components/expandable-bilingual-copy";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { ProtectedImage } from "@/components/protected-image";
+import { getArticleDisplayExcerpt } from "@/lib/article-content";
 import { bt } from "@/lib/bilingual";
 import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
@@ -97,7 +98,10 @@ export default async function JournalPage() {
 
       <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
         <div className="grid gap-9">
-          {articles.map((article) => (
+          {articles.map((article) => {
+            const displayExcerpt = getArticleDisplayExcerpt(article);
+
+            return (
             <article
               key={article.slug}
               className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.44fr)_minmax(0,0.56fr)] lg:gap-7"
@@ -125,7 +129,7 @@ export default async function JournalPage() {
                     />
                   </div>
                   <ExpandableBilingualCopy
-                    text={article.excerpt}
+                    text={displayExcerpt}
                     collapsedClassName="max-h-[7.2rem] md:max-h-[9.2rem]"
                     zhClassName="max-w-[36ch] text-[0.96rem] leading-[2.02] text-[var(--muted)]/94"
                     enClassName="max-w-[42ch] text-[0.8rem] leading-[1.78] tracking-[0.02em] text-[var(--accent)]/74"
@@ -171,7 +175,7 @@ export default async function JournalPage() {
                 </div>
               </div>
             </article>
-          ))}
+          )})}
         </div>
       </section>
     </>
