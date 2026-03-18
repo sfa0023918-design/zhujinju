@@ -38,6 +38,15 @@ type BilingualReadingPanelProps = {
   showToggle?: boolean;
   zhFirstLineIndent?: boolean;
   singleLineBreakMode?: "paragraph" | "soft";
+  manualParagraphMode?: "preserve" | "split-long";
+  manualSplitThresholdZh?: number;
+  manualSplitThresholdEn?: number;
+};
+
+type ParagraphSplitOptions = {
+  manualParagraphMode?: "preserve" | "split-long";
+  manualSplitThresholdZh?: number;
+  manualSplitThresholdEn?: number;
 };
 
 function normalizeProseWhitespace(text: string) {
@@ -105,7 +114,87 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
   return chunks.filter(Boolean);
 }
 
-function splitParagraphs(text: string, locale: ReadingLocale, singleLineBreakMode: "paragraph" | "soft" = "paragraph") {
+function splitByClauseGroups(text: string, locale: ReadingLocale) {
+  const clauseRegex =
+    locale === "zh"
+      ? /[^，、；：]+[，、；：]?/g
+      : /[^,;:]+[,;:]?(?:\s+|$)/g;
+  const joiner = locale === "zh" ? "" : " ";
+  const targetLength = locale === "zh" ? 90 : 150;
+  const maxLength = locale === "zh" ? 170 : 260;
+  const clauses = (text.match(clauseRegex) ?? [])
+    .map((clause) => clause.trim())
+    .filter(Boolean);
+
+  if (clauses.length <= 1) {
+    return [text];
+  }
+
+  const chunks: string[] = [];
+  let current = "";
+
+  clauses.forEach((clause) => {
+    if (!current) {
+      current = clause;
+      return;
+    }
+
+    const next = `${current}${joiner}${clause}`;
+    if (current.length >= targetLength || next.length > maxLength) {
+      chunks.push(current);
+      current = clause;
+      return;
+    }
+
+    current = next;
+  });
+
+  if (current) {
+    chunks.push(current);
+  }
+
+  return chunks.filter(Boolean);
+}
+
+function splitLongManualParagraphs(
+  paragraphs: string[],
+  locale: ReadingLocale,
+  options?: ParagraphSplitOptions,
+) {
+  if (options?.manualParagraphMode !== "split-long") {
+    return paragraphs;
+  }
+
+  const threshold = locale === "zh"
+    ? options.manualSplitThresholdZh ?? 260
+    : options.manualSplitThresholdEn ?? 420;
+  const hardCap = locale === "zh" ? 320 : 520;
+
+  return paragraphs.flatMap((paragraph) => {
+    if (paragraph.length < threshold) {
+      return [paragraph];
+    }
+
+    const chunks = splitBySentenceGroups(paragraph, locale);
+    const normalizedChunks = chunks.length > 1 ? chunks : [paragraph];
+
+    return normalizedChunks.flatMap((chunk) => {
+      if (chunk.length <= hardCap) {
+        return [chunk];
+      }
+
+      const clauseChunks = splitByClauseGroups(chunk, locale);
+      return clauseChunks.length > 1 ? clauseChunks : [chunk];
+    });
+  });
+}
+
+function splitParagraphs(
+  text: string,
+  locale: ReadingLocale,
+  singleLineBreakMode: "paragraph" | "soft" = "paragraph",
+  options?: ParagraphSplitOptions,
+) {
   const normalized = normalizeProseWhitespace(text);
   if (!normalized) {
     return [];
@@ -123,7 +212,7 @@ function splitParagraphs(text: string, locale: ReadingLocale, singleLineBreakMod
     .filter(Boolean);
 
   if (manualParagraphs.length > 1) {
-    return manualParagraphs;
+    return splitLongManualParagraphs(manualParagraphs, locale, options);
   }
 
   const singleParagraph = normalizeParagraphText(normalized, locale);
@@ -153,11 +242,12 @@ export function getParagraphsByLocale(
   content: BilingualProseContent,
   locale: ReadingLocale,
   singleLineBreakMode: "paragraph" | "soft" = "paragraph",
+  options?: ParagraphSplitOptions,
 ) {
   const items = Array.isArray(content) ? content : [content];
 
   return items.flatMap((item) => {
-    return splitParagraphs(getLocalizedText(item, locale), locale, singleLineBreakMode);
+    return splitParagraphs(getLocalizedText(item, locale), locale, singleLineBreakMode, options);
   });
 }
 
@@ -377,6 +467,9 @@ export function BilingualReadingPanel({
   showToggle = true,
   zhFirstLineIndent = false,
   singleLineBreakMode = "paragraph",
+  manualParagraphMode = "preserve",
+  manualSplitThresholdZh,
+  manualSplitThresholdEn,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -411,7 +504,11 @@ export function BilingualReadingPanel({
 
       <div className="space-y-7">
         {sections.map((section) => {
-          const paragraphs = getParagraphsByLocale(section.content, locale, singleLineBreakMode);
+          const paragraphs = getParagraphsByLocale(section.content, locale, singleLineBreakMode, {
+            manualParagraphMode,
+            manualSplitThresholdZh,
+            manualSplitThresholdEn,
+          });
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
             paragraphClassName ?? "",

@@ -492,6 +492,9 @@ export function ArtworkScholarlyNote({
         showToggle={false}
         zhFirstLineIndent
         singleLineBreakMode="soft"
+        manualParagraphMode="split-long"
+        manualSplitThresholdZh={260}
+        manualSplitThresholdEn={420}
       />
     </section>
   );
