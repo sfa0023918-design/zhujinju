@@ -32,7 +32,8 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
   const searchParams = useSearchParams();
   const rootRef = useRef<HTMLDivElement>(null);
   const previousPageRef = useRef(1);
-  const [pageSize, setPageSize] = useState(DESKTOP_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState(MOBILE_PAGE_SIZE);
+  const [pageSizeReady, setPageSizeReady] = useState(false);
 
   const requestedPage = useMemo(() => {
     const raw = searchParams.get("page");
@@ -43,6 +44,7 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
   useEffect(() => {
     const updatePageSize = () => {
       setPageSize(getPageSize(window.innerWidth));
+      setPageSizeReady(true);
     };
 
     updatePageSize();
@@ -57,6 +59,10 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
   const currentPage = Math.min(requestedPage, totalPages);
 
   useEffect(() => {
+    if (!pageSizeReady) {
+      return;
+    }
+
     if (requestedPage === currentPage) {
       return;
     }
@@ -69,7 +75,7 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
     }
     const query = params.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-  }, [currentPage, pathname, requestedPage, router, searchParams]);
+  }, [currentPage, pageSizeReady, pathname, requestedPage, router, searchParams]);
 
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
