@@ -106,26 +106,6 @@ function hasText(value?: { zh?: string; en?: string } | null) {
   return Boolean(value.zh?.trim() || value.en?.trim());
 }
 
-const SPECIAL_VIEWING_NOTE_SLUG = "artwork-1773412663200";
-const SPECIAL_VIEWING_NOTE_MARKERS = [
-  "观世音菩萨在佛教传统中具有三十三种应化身，世尊观世音即其一。",
-  "若从头部开始细看，这尊观音的身份与时代特征都极为明确。",
-  "再看面部，这尊观音几乎集中体现了成熟帕拉造像最迷人的开脸方式。",
-  "身体部分的处理，同样是帕拉造像成熟时期的重要标志。",
-  "菩萨胸前佩戴单层嵌银项链，下方为嵌宝石璎珞，双臂饰菱形臂钏；",
-  "观音左手执莲，右手轻垂膝前施予愿印，这一组合意义非常明确：",
-  "下方的仰覆式莲座，同样值得反复观看。",
-  "如果将这些局部重新收回到整体中，就会发现，",
-  "也正因为如此，这尊观音的气质并不单一。",
-  "所以，当我们站在这尊世尊观音面前时，",
-  "附注：",
-  "关于铭文中提及的人名“庞雅波罗洛迦舍（pūṇyapālhalokasa）”，",
-  "摘自马美美文章",
-  "注释:",
-  "1. 此处参照 Kashinath Tamot 所提供的铭文释读结果：",
-  "3. 杰拉康弥勒菩萨石像铭文同样采用藏文转写梵文的方式镌刻，",
-] as const;
-
 function normalizeWrappedViewingText(text: string, locale: ReadingLocale) {
   const normalized = text.replace(/\r\n/g, "\n").trim();
 
@@ -156,58 +136,20 @@ function normalizeWrappedViewingText(text: string, locale: ReadingLocale) {
   return lines.join(locale === "zh" ? "" : " ");
 }
 
-function normalizeSpecialViewingNoteZh(text: string) {
-  const normalized = text
-    .replace(/\r\n/g, "\n")
-    .replace(/\u00a0/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g, "$1$2")
-    .replace(/([\u3400-\u9fff])\s+([，。！？：；、])/g, "$1$2")
-    .replace(/([，。！？：；、])\s+([\u3400-\u9fff])/g, "$1$2")
-    .replace(/([\u3400-\u9fff])\s+([A-Za-z0-9])/g, "$1$2")
-    .replace(/([A-Za-z0-9])\s+([\u3400-\u9fff])/g, "$1$2")
-    .replace(/\s+([,.;:!?])/g, "$1")
-    .trim();
-
-  if (!normalized) {
-    return "";
-  }
-
-  let paragraphized = normalized;
-  SPECIAL_VIEWING_NOTE_MARKERS.forEach((marker) => {
-    paragraphized = paragraphized.replaceAll(marker, `\n\n${marker}`);
-  });
-
-  return paragraphized.replace(/\n{3,}/g, "\n\n").replace(/^\n+/, "").trim();
-}
-
 function getViewingNoteForRender(artwork: Artwork) {
   const normalizedZh = normalizeWrappedViewingText(artwork.viewingNote?.zh ?? "", "zh");
   const normalizedEn = normalizeWrappedViewingText(artwork.viewingNote?.en ?? "", "en");
 
-  if (artwork.slug !== SPECIAL_VIEWING_NOTE_SLUG) {
-    if (
-      normalizedZh === (artwork.viewingNote?.zh ?? "") &&
-      normalizedEn === (artwork.viewingNote?.en ?? "")
-    ) {
-      return artwork.viewingNote;
-    }
-
-    return {
-      ...artwork.viewingNote,
-      zh: normalizedZh,
-      en: normalizedEn,
-    };
-  }
-
-  const zh = normalizeSpecialViewingNoteZh(normalizedZh);
-  if (!zh && !normalizedEn) {
+  if (
+    normalizedZh === (artwork.viewingNote?.zh ?? "") &&
+    normalizedEn === (artwork.viewingNote?.en ?? "")
+  ) {
     return artwork.viewingNote;
   }
 
   return {
     ...artwork.viewingNote,
-    zh,
+    zh: normalizedZh,
     en: normalizedEn,
   };
 }
@@ -470,7 +412,6 @@ export function ArtworkScholarlyNote({
   locale,
   onLocaleChange,
 }: ArtworkScholarlyNoteProps) {
-  const isSpecialViewingNote = artwork.slug === SPECIAL_VIEWING_NOTE_SLUG;
   const hasExcerpt = hasText(artwork.excerpt);
   const viewingNoteForRender = getViewingNoteForRender(artwork);
   const hasViewing = hasText(viewingNoteForRender);
@@ -551,9 +492,6 @@ export function ArtworkScholarlyNote({
         showToggle={false}
         zhFirstLineIndent
         singleLineBreakMode="soft"
-        paragraphClassName={
-          isSpecialViewingNote ? "max-md:![text-align:left] max-md:![text-align-last:auto]" : undefined
-        }
       />
     </section>
   );
