@@ -5533,7 +5533,9 @@
           "en": ""
         }
       ],
-      "relatedArtworkSlugs": [],
+      "relatedArtworkSlugs": [
+        "artwork-1773133336920"
+      ],
       "relatedExhibitionSlugs": [],
       "cover": "/uploads/articles/1773839058974-微信图片-20260317203744-172-128.jpg",
       "coverAsset": {
