@@ -2086,9 +2086,7 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773229993893-89上师像-正.jpg",
-      "gallery": [
-        "/uploads/artworks/1773230006378-87上师像-特.jpg"
-      ],
+      "gallery": [],
       "featured": true,
       "imageAsset": {
         "original": "/uploads/artworks/1773229993893-89上师像-正.jpg",
@@ -2098,16 +2096,7 @@
         "width": 1200,
         "height": 1500
       },
-      "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773230006378-87上师像-特.jpg",
-          "card": "/uploads/artworks/1773230006378-87上师像-特.jpg",
-          "hero": "/uploads/artworks/1773230006378-87上师像-特.jpg",
-          "detail": "/uploads/artworks/1773230006378-87上师像-特.jpg",
-          "width": 1200,
-          "height": 1500
-        }
-      ]
+      "galleryAssets": []
     },
     {
       "id": "artwork_e45dee53-57bd-4464-a6c9-83845f80a496",
