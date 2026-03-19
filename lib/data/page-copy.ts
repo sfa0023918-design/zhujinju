@@ -48,7 +48,7 @@ export const pageCopy = {
   },
   home: {
     heroEyebrow: bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art & Asian Antiquities"),
-    heroTitle: bt("让作品\n先说话", "LET THE WORK SPEAK FIRST"),
+    heroTitle: bt("让作品\n先说话", "LET THE WORK SPEAK FOR ITSELF"),
     heroPrimaryAction: bt("浏览藏品", "Browse Collection"),
     heroSecondaryAction: bt("查看展览与图录", "View Exhibitions & Catalogues"),
     focusCurrent: {
@@ -161,7 +161,7 @@ export const pageCopy = {
       title: bt("藏品浏览", "Browse Collection"),
       description: bt(
         "按品类、地区、年代与材质筛选，建立更清晰的作品观看路径。",
-        "Filter by category, region, period, and material to create a clearer path through the works.",
+        "FILTER BY CATEGORY, REGION, PERIOD, AND MATERIAL FOR AN ENHANCED VIEWING EXPERIENCE",
       ),
       aside: bt(
         "字段沿用古董商与研究型图录常见的信息结构，便于从作品浏览直接进入深入比较与询洽。",

@@ -3,7 +3,7 @@ import type { HomeContent } from "./types";
 
 export const homeContent: HomeContent = {
   heroEyebrow: bt("喜马拉雅艺术与亚洲古代艺术", "Himalayan Art & Asian Antiquities"),
-  heroTitle: bt("让作品\n先说话", "LET THE WORK SPEAK FIRST"),
+  heroTitle: bt("让作品\n先说话", "LET THE WORK SPEAK FOR ITSELF"),
   heroSubtitle: bt(
     "以作品、展览、图录与研究建立长期判断。",
     "Building long-term discernment through works, exhibitions, catalogues, and research."
