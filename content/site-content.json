@@ -3555,9 +3555,7 @@
         "exhibition-1773394358822"
       ],
       "image": "/uploads/artworks/1773424878938-95ab4325afd262208648782a54a91077.jpg",
-      "gallery": [
-        "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg"
-      ],
+      "gallery": [],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773424878938-95ab4325afd262208648782a54a91077.jpg",
@@ -3567,16 +3565,7 @@
         "width": 1200,
         "height": 1500
       },
-      "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
-          "card": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
-          "hero": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
-          "detail": "/uploads/artworks/1773424883032-64484194c6f86432724ca26ba0b4aa8d.jpg",
-          "width": 960,
-          "height": 1200
-        }
-      ]
+      "galleryAssets": []
     },
     {
       "id": "artwork_e666f216-3525-45e0-a863-3ff4c1d1a1c7",
