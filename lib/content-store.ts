@@ -412,16 +412,50 @@ function resolveImageUrl(value: string | undefined, asset?: ImageAsset | null) {
   return trimImageUrl(value) || trimImageUrl(asset?.original);
 }
 
-function normalizeImageAssetList(assets: Array<ImageAsset | null> | undefined, fallbackUrls: string[] | undefined) {
-  const maxLength = Math.max(assets?.length ?? 0, fallbackUrls?.length ?? 0);
+function normalizeArtworkGalleryState(
+  gallery: string[] | undefined,
+  primaryImage: string,
+  galleryAssets?: Array<ImageAsset | null>,
+) {
+  const maxLength = Math.max(gallery?.length ?? 0, galleryAssets?.length ?? 0);
 
   if (maxLength === 0) {
-    return [];
+    return {
+      gallery: [] as string[],
+      galleryAssets: [] as Array<ImageAsset | null>,
+    };
   }
 
-  return Array.from({ length: maxLength }, (_, index) =>
-    normalizeImageAsset(assets?.[index] ?? undefined, fallbackUrls?.[index]) ?? null,
-  );
+  const seen = new Set<string>();
+  const normalizedGallery: string[] = [];
+  const normalizedGalleryAssets: Array<ImageAsset | null> = [];
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const rawEntry = gallery?.[index];
+    const normalizedEntry = trimImageUrl(rawEntry);
+    const normalizedAsset = normalizeImageAsset(galleryAssets?.[index] ?? undefined, normalizedEntry);
+    // Keep legacy compatibility for records that only have asset metadata, but never
+    // revive slots that were explicitly cleared to an empty string in admin.
+    const resolvedImage = normalizedEntry || (rawEntry === undefined ? trimImageUrl(normalizedAsset?.original) : "");
+
+    if (
+      !resolvedImage ||
+      resolvedImage === primaryImage ||
+      resolvedImage.startsWith("/api/placeholder/") ||
+      seen.has(resolvedImage)
+    ) {
+      continue;
+    }
+
+    seen.add(resolvedImage);
+    normalizedGallery.push(resolvedImage);
+    normalizedGalleryAssets.push(normalizeImageAsset(normalizedAsset, resolvedImage) ?? null);
+  }
+
+  return {
+    gallery: normalizedGallery,
+    galleryAssets: normalizedGalleryAssets,
+  };
 }
 
 export function getEditableSectionValue<K extends EditableSectionKey>(
@@ -863,8 +897,15 @@ export async function saveArtworkMediaField(
     const normalizedValue = trimImageUrl(value);
     gallery[slotIndex] = normalizedValue;
     galleryAssets[slotIndex] = normalizeImageAsset(options?.asset, normalizedValue) ?? null;
-    artwork.gallery = gallery;
-    artwork.galleryAssets = galleryAssets;
+    const normalizedGalleryState = normalizeArtworkGalleryState(gallery, artwork.image, galleryAssets);
+    artwork.gallery = normalizedGalleryState.gallery;
+    artwork.galleryAssets = normalizedGalleryState.galleryAssets;
+  }
+
+  if (field === "image") {
+    const normalizedGalleryState = normalizeArtworkGalleryState(artwork.gallery, artwork.image, artwork.galleryAssets);
+    artwork.gallery = normalizedGalleryState.gallery;
+    artwork.galleryAssets = normalizedGalleryState.galleryAssets;
   }
 
   const normalized = normalizeSiteContent(nextContent);
@@ -972,6 +1013,11 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
       }
       const imageAsset = normalizeImageAsset(cleanedArtwork.imageAsset, cleanedArtwork.image);
       const image = resolveImageUrl(cleanedArtwork.image, imageAsset);
+      const normalizedGalleryState = normalizeArtworkGalleryState(
+        cleanedArtwork.gallery,
+        image,
+        cleanedArtwork.galleryAssets,
+      );
 
       return {
         ...cleanedArtwork,
@@ -979,8 +1025,8 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
         publicationStatus: cleanedArtwork.publicationStatus ?? "published",
         image,
         imageAsset,
-        gallery: normalizeArtworkGallery(cleanedArtwork.gallery, image, cleanedArtwork.galleryAssets),
-        galleryAssets: normalizeImageAssetList(cleanedArtwork.galleryAssets, cleanedArtwork.gallery),
+        gallery: normalizedGalleryState.gallery,
+        galleryAssets: normalizedGalleryState.galleryAssets,
       };
     }),
     exhibitions: (content.exhibitions ?? []).map((exhibition) => {
@@ -1024,37 +1070,6 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
       };
     }),
   };
-}
-
-function normalizeArtworkGallery(
-  gallery: string[] | undefined,
-  primaryImage: string,
-  galleryAssets?: Array<ImageAsset | null>,
-) {
-  const trimmed = (gallery ?? []).map((image, index) => trimImageUrl(image) || trimImageUrl(galleryAssets?.[index]?.original));
-  let lastFilledIndex = -1;
-
-  trimmed.forEach((image, index) => {
-    if (image) {
-      lastFilledIndex = index;
-    }
-  });
-
-  if (lastFilledIndex < 0) {
-    return [];
-  }
-
-  const trimmedToLastFilled = trimmed.slice(0, lastFilledIndex + 1);
-  const seen = new Set<string>();
-
-  return trimmedToLastFilled.filter((image) => {
-    if (!image || image === primaryImage || image.startsWith("/api/placeholder/") || seen.has(image)) {
-      return false;
-    }
-
-    seen.add(image);
-    return true;
-  });
 }
 
 function normalizeExhibitionCataloguePages(pages: string[] | undefined) {

@@ -11,6 +11,7 @@ import { ProtectedImage } from "./protected-image";
 type ArtworkGalleryProps = {
   title: string;
   primaryImage: string;
+  primaryImageCandidates?: string[];
   category?: string;
   gallery?: string[];
 };
@@ -18,44 +19,69 @@ type ArtworkGalleryProps = {
 export function ArtworkGallery({
   title,
   primaryImage,
+  primaryImageCandidates = [],
   category = "",
   gallery = [],
 }: ArtworkGalleryProps) {
   const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const normalizedPrimaryCandidates = useMemo(() => {
+    const seen = new Set<string>();
+    const candidates = [primaryImage, ...primaryImageCandidates]
+      .map((value) => value.trim())
+      .filter((value) => {
+        if (!value || seen.has(value)) {
+          return false;
+        }
+
+        seen.add(value);
+        return true;
+      });
+
+    return candidates;
+  }, [primaryImage, primaryImageCandidates]);
+  const [primaryCandidateIndex, setPrimaryCandidateIndex] = useState(0);
+  const resolvedPrimaryImage = normalizedPrimaryCandidates[primaryCandidateIndex] ?? "";
   const detailImages = useMemo(() => {
     const seen = new Set<string>();
 
     return gallery.filter((image) => {
       const normalized = image.trim();
 
-      if (!normalized || normalized === primaryImage || normalized.startsWith("/api/placeholder/") || seen.has(normalized)) {
+      if (!normalized || normalized === resolvedPrimaryImage || normalized.startsWith("/api/placeholder/") || seen.has(normalized)) {
         return false;
       }
 
       seen.add(normalized);
       return true;
     });
-  }, [gallery, primaryImage]);
-  const thumbnailImages = useMemo(() => [primaryImage, ...detailImages], [detailImages, primaryImage]);
-  const [activeImage, setActiveImage] = useState(primaryImage);
+  }, [gallery, resolvedPrimaryImage]);
+  const thumbnailImages = useMemo(
+    () => [resolvedPrimaryImage, ...detailImages].filter((image) => Boolean(image.trim())),
+    [detailImages, resolvedPrimaryImage],
+  );
+  const [activeImage, setActiveImage] = useState(resolvedPrimaryImage);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    setActiveImage(primaryImage);
-  }, [primaryImage]);
+    setPrimaryCandidateIndex(0);
+  }, [normalizedPrimaryCandidates]);
 
   useEffect(() => {
-    if (activeImage === primaryImage || detailImages.includes(activeImage)) {
+    setActiveImage(resolvedPrimaryImage);
+  }, [resolvedPrimaryImage]);
+
+  useEffect(() => {
+    if (activeImage === resolvedPrimaryImage || detailImages.includes(activeImage)) {
       return;
     }
 
-    setActiveImage(primaryImage);
-  }, [activeImage, detailImages, primaryImage]);
+    setActiveImage(resolvedPrimaryImage);
+  }, [activeImage, detailImages, resolvedPrimaryImage]);
 
   useEffect(() => {
     if (!isLightboxOpen) {
@@ -132,6 +158,17 @@ export function ArtworkGallery({
     setActiveImage(thumbnailImages[nextIndex]);
   };
 
+  const tryFallbackPrimaryImage = () => {
+    if (activeImage !== resolvedPrimaryImage) {
+      return;
+    }
+
+    setPrimaryCandidateIndex((current) => {
+      const next = current + 1;
+      return next < normalizedPrimaryCandidates.length ? next : current;
+    });
+  };
+
   return (
     <>
       <div
@@ -205,6 +242,7 @@ export function ArtworkGallery({
                   priority
                   unoptimized
                   wrapperClassName="block lg:w-auto"
+                  onError={tryFallbackPrimaryImage}
                   onLoad={(event) => {
                     const target = event.currentTarget;
                     if (target.naturalWidth > 0 && target.naturalHeight > 0) {
@@ -216,11 +254,11 @@ export function ArtworkGallery({
               </button>
             )}
           </div>
-          {thumbnailImages.length > 1 && activeImage !== primaryImage && !primaryImage.startsWith("/api/placeholder/") ? (
+          {thumbnailImages.length > 1 && activeImage !== resolvedPrimaryImage && !resolvedPrimaryImage.startsWith("/api/placeholder/") ? (
             <div className="flex justify-end border-t border-[var(--line)]/34 pt-3 text-[var(--muted)]">
               <button
                 type="button"
-                onClick={() => setActiveImage(primaryImage)}
+                onClick={() => setActiveImage(resolvedPrimaryImage)}
                 className="cursor-pointer select-none text-[0.74rem] tracking-[0.06em] transition-colors hover:text-[var(--ink)]"
               >
                 返回主图

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { withImageVersion } from "@/lib/image-url";
+import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import type { Artwork } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
@@ -26,7 +26,7 @@ export function ArtworkCard({
   priority = false,
   variant = "editorial",
 }: ArtworkCardProps) {
-  const cardImage = artwork.imageAsset?.card ?? artwork.image;
+  const cardImage = resolveArtworkPrimaryImage(artwork);
   const isPlaceholderImage = !cardImage || cardImage.startsWith("/api/placeholder/");
   const imageSizes =
     variant === "catalogue"
