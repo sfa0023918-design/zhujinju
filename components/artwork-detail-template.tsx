@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type {
   Article,
@@ -11,6 +11,7 @@ import type {
   SiteConfigContent,
 } from "@/lib/site-data";
 import { getArtworkStatusText } from "@/lib/bilingual";
+import { resolveArtworkPrimaryImage, resolveArtworkPrimaryImageCandidates } from "@/lib/image-url";
 
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkGallery } from "./artwork-gallery";
@@ -332,6 +333,8 @@ export function ArtworkHero({
   siteConfig,
   locale,
 }: ArtworkHeroProps) {
+  const primaryImageCandidates = useMemo(() => resolveArtworkPrimaryImageCandidates(artwork), [artwork]);
+  const primaryImage = useMemo(() => resolveArtworkPrimaryImage(artwork), [artwork]);
   const facts = [
     { label: detailCopy.fieldLabels.period, value: artwork.period },
     { label: detailCopy.fieldLabels.regionOrigin, value: joinBilingual(artwork.region, artwork.origin) },
@@ -353,7 +356,8 @@ export function ArtworkHero({
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.82fr)] lg:gap-16">
         <ArtworkGallery
           title={`${artwork.title.zh} ${artwork.title.en}`.trim()}
-          primaryImage={artwork.image}
+          primaryImage={primaryImage}
+          primaryImageCandidates={primaryImageCandidates}
           category={artwork.category.zh || artwork.category.en}
           gallery={artwork.gallery}
         />
