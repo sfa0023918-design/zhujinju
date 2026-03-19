@@ -1658,8 +1658,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
       "gallery": [
-        "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
-        "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg"
+        "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1676,14 +1675,6 @@
           "card": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
           "hero": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
           "detail": "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
-          "width": 1200,
-          "height": 1500
-        },
-        {
-          "original": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
-          "card": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
-          "hero": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
-          "detail": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
           "width": 1200,
           "height": 1500
         }
