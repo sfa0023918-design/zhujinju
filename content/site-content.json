@@ -2216,8 +2216,7 @@
       ],
       "image": "/uploads/artworks/1773411709369-6eeed500398dad93dca3161c3b80b1ad.jpg",
       "gallery": [
-        "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
-        "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg"
+        "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -2234,14 +2233,6 @@
           "card": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
           "hero": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
           "detail": "/uploads/artworks/1773411714756-39e9360c17984cc4705cf09df83216a3.jpg",
-          "width": 1200,
-          "height": 1500
-        },
-        {
-          "original": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
-          "card": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
-          "hero": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
-          "detail": "/uploads/artworks/1773411724168-2b735be137fda1a96d3a19f5c8db8ce7.jpg",
           "width": 1200,
           "height": 1500
         }
