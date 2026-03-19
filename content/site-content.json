@@ -3237,9 +3237,7 @@
         "exhibition-1773394358822"
       ],
       "image": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
-      "gallery": [
-        "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg"
-      ],
+      "gallery": [],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
@@ -3250,9 +3248,7 @@
         "height": 1500
       },
       "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg"
-        },
+        null,
         {
           "original": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
           "card": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
