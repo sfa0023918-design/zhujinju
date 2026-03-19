@@ -17,10 +17,12 @@ type CollectionPageProps = {
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
+  const collectionHeroDescriptionEn =
+    "FILTER BY CATEGORY, REGION, PERIOD, AND MATERIAL FOR AN ENHANCED VIEWING EXPERIENCE";
 
   return buildMetadata({
     title: bt("藏品", "Collection"),
-    description: pageCopy.collection.hero.description,
+    description: bt(pageCopy.collection.hero.description.zh, collectionHeroDescriptionEn),
     path: "/collection",
     site: siteConfig,
   });
@@ -42,6 +44,8 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
     })),
   };
   const { pageCopy } = content;
+  const collectionHeroDescriptionEn =
+    "FILTER BY CATEGORY, REGION, PERIOD, AND MATERIAL FOR AN ENHANCED VIEWING EXPERIENCE";
   const filterLabels = {
     ...pageCopy.collection.filters,
     status: bt("状态", "Status"),
@@ -69,7 +73,7 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
               {pageCopy.collection.hero.description.zh}
             </p>
             <p className="max-w-[21rem] text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/66">
-              {pageCopy.collection.hero.description.en}
+              {collectionHeroDescriptionEn}
             </p>
           </div>
         </div>
