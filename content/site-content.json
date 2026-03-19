@@ -133,11 +133,21 @@
       ],
       "featured": true,
       "imageAsset": {
-        "original": "/uploads/artworks/1773203206965-25弥勒像-正.jpg"
+        "original": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "card": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "hero": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "detail": "/uploads/artworks/1773203206965-25弥勒像-正.jpg",
+        "width": 1200,
+        "height": 1500
       },
       "galleryAssets": [
         {
-          "original": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg"
+          "original": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "card": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "hero": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "detail": "/uploads/artworks/1773203219399-27弥勒像-右侧.jpg",
+          "width": 1200,
+          "height": 1500
         },
         {
           "original": "/uploads/artworks/1773203231557-24弥勒像-侧-1.jpg",
@@ -383,14 +393,21 @@
         "exhibition-1773399222802"
       ],
       "image": "/uploads/artworks/1773726406689-3353ee86a913f9dcc512f01832f3fea2.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773726414496-a3047d575a90c82a19789c1e1c4f4a46.jpg",
+        "/uploads/artworks/1773726424475-f3090f629e39367f01e74780e92feb8a.jpg"
+      ],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773726406689-3353ee86a913f9dcc512f01832f3fea2.jpg"
       },
       "galleryAssets": [
-        null,
-        null
+        {
+          "original": "/uploads/artworks/1773726414496-a3047d575a90c82a19789c1e1c4f4a46.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1773726424475-f3090f629e39367f01e74780e92feb8a.jpg"
+        }
       ]
     },
     {
@@ -787,7 +804,8 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773730424320-l1001089.jpg",
       "gallery": [
-        "/uploads/artworks/1773730443013-59西藏释迦牟尼-牧女.jpg"
+        "/uploads/artworks/1773730443013-59西藏释迦牟尼-牧女.jpg",
+        "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -902,7 +920,8 @@
       "image": "/uploads/artworks/1773133562827-41尼泊尔释迦牟尼-正.jpg",
       "gallery": [
         "/uploads/artworks/1773133574827-43尼泊尔释迦牟尼-右侧.jpg",
-        "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg"
+        "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
+        "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1034,7 +1053,8 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773730176014-l1000792.jpg",
       "gallery": [
-        "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
+        "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
+        "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1045,12 +1065,10 @@
           "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
         },
         {
-          "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "card": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "hero": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "detail": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "width": 1200,
-          "height": 1500
+          "original": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "card": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "hero": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "detail": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
         }
       ]
     },
@@ -1155,7 +1173,8 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773396578121-72金刚萨垛-正-1.jpg",
       "gallery": [
-        "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg"
+        "/uploads/artworks/1773396582300-70金刚萨垛-左.jpg",
+        "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1175,7 +1194,14 @@
           "width": 1200,
           "height": 1500
         },
-        null
+        {
+          "original": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "card": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "hero": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "detail": "/uploads/artworks/1773396588346-71金刚萨垛-右侧.jpg",
+          "width": 1200,
+          "height": 1500
+        }
       ]
     },
     {
@@ -1271,7 +1297,10 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773728118037-l1002732.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773412989098-未命名-2.jpg",
+        "/uploads/artworks/1773412805579-未命名-4.jpg"
+      ],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773728118037-l1002732.jpg"
@@ -1388,7 +1417,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
+      ],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
@@ -1508,19 +1539,29 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "/uploads/artworks/1773895028222-21那烂陀观音-左侧.jpg",
-      "gallery": [],
+      "image": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+      "gallery": [
+        "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+        "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg"
+      ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773895028222-21那烂陀观音-左侧.jpg",
-        "card": "/uploads/artworks/1773895028222-21那烂陀观音-左侧-card.jpg",
-        "hero": "/uploads/artworks/1773895028222-21那烂陀观音-左侧.jpg",
-        "detail": "/uploads/artworks/1773895028222-21那烂陀观音-左侧.jpg",
+        "original": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "card": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "hero": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
+        "detail": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
         "width": 1200,
         "height": 1500
       },
       "galleryAssets": [
-        null,
+        {
+          "original": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "card": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "hero": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "detail": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "width": 1200,
+          "height": 1500
+        },
         {
           "original": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
           "card": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
@@ -1660,7 +1701,8 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773229131338-74永乐紫檀普巴-正.jpg",
       "gallery": [
-        "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg"
+        "/uploads/artworks/1773229137539-76永乐紫檀普巴-侧.jpg",
+        "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1680,7 +1722,14 @@
           "width": 1200,
           "height": 1500
         },
-        null
+        {
+          "original": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "card": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "hero": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "detail": "/uploads/artworks/1773229154193-73永乐紫檀普巴-特.jpg",
+          "width": 1200,
+          "height": 1500
+        }
       ]
     },
     {
@@ -2400,6 +2449,124 @@
       ]
     },
     {
+      "id": "artwork_d390e885-2a84-439e-aa79-666e5e3fe057",
+      "slug": "artwork-1773423130363",
+      "publicationStatus": "published",
+      "title": {
+        "zh": "释迦牟尼",
+        "en": "Shakyamuni Buddha"
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "13-14世纪",
+        "en": "13th–14th Century"
+      },
+      "region": {
+        "zh": "尼泊尔",
+        "en": "Nepal"
+      },
+      "origin": {
+        "zh": "迦舍末罗",
+        "en": "Khasamalla"
+      },
+      "material": {
+        "zh": "铜鎏金",
+        "en": "Gilt bronze"
+      },
+      "category": {
+        "zh": "造像",
+        "en": "Sculpture"
+      },
+      "dimensions": {
+        "zh": "高：14.5cm",
+        "en": "Height: 14.5 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "迦舍末罗宝冠释迦牟尼",
+        "en": "A Khasa Malla image of Shakyamuni balancing ornament and composure."
+      },
+      "viewingNote": {
+        "zh": "迦舍末罗（Khasa-Malla）王朝，曾经的版图跨占中国西藏西部和尼泊尔西部的 广阔土地 。在 13-14 世纪中叶国力强盛 。这个王朝虽然短暂，但统治者笃信佛教 ，在 王室的支持下佛教艺术也取得了辉煌的成就 。这尊宝冠释迦牟尼佛就是一尊经典的 迦舍末罗风格造型 。 佛陀结跏趺坐端坐 ，螺发规整 ，肉髻微隆 。宝珠顶严，戴五叶宝冠，耳际横出 扇形冠结，大耳垂承于肩，耳饰向后翻起 ，极为别致 。面部着重正侧面转折，强调颧 部肌肉；五官集中，眉毛粗长 ，眼型强调球形结构，双眼皮 ，眼睑下垂，双目俯视前 方，眼神坚定；唇部厚实，嘴角略含笑意，整体面部圆润饱满具有无限的生命活 力，展现出年轻俊美的面容，与宝冠释迦代表的释迦牟尼出家前的王子身份相契合。 左手于腹前结禅定印，右手置于右膝，指头触地做触地印，此乃释迦牟尼佛降魔成道 时的形象 。 佛陀身着袒右式袈裟 ，袈裟轻薄贴体，衣纹采用片式 ，以刻线强调关节转折，衣 边仅錾刻连珠纹以及稻粒纹 ，表示衣服的存在 。胸前佩戴璎珞，手臂佩戴臂钏 、手 镯；手足刻画细腻 ，手指关节清晰可见，仿佛铜胎之下充盈血肉，手指随时可触可 动 。壮硕有力的肌肉线条是其最为突出的艺术表现，身体比例接近真实人体，肌肉 线条紧凑而不夸张 ，健康而有活力的躯体展现出铿锵连绵的生命力 。 仰覆式束腰莲台，上方有细密的连珠纹 ，下方有高圈足 ，显得高大稳重；莲瓣上 下对称，富有层次；莲瓣瓣端微微翘起 ，饱满有力 。其耳珰的样式 ，衣纹錾刻的图 案 ，手指指节的表现及莲瓣样式 ，都是非常鲜明的迦舍末罗造像风格特征 。",
+        "en": "The Khasa-Malla Dynasty once commanded a vast territory spanning western Tibet (China) and western Nepal. Its power reached its zenith during the mid-13th to mid-14th centuries. Although the dynasty was short-lived, its rulers were devout Buddhists; under royal patronage, Buddhist art achieved magnificent heights. This crowned figure of Shakyamuni Buddha stands as a quintessential example of the Khasa-Malla artistic style. The Buddha sits upright in the full lotus position; his hair consists of tightly coiled curls, and his cranial protuberance (ushnisha) rises gently. Surmounted by a jewel finial, he wears a five-lobed jeweled crown flanked by fan-shaped ribbons that flare outward at the temples. His large earlobes rest upon his shoulders, while his earrings curl backward—a highly distinctive stylistic feature. The facial modeling emphasizes the transition between the frontal and profile planes, accentuating the musculature of the cheekbones. His facial features are concentrated and compact; his eyebrows are thick and long, and his eyes—modeled to emphasize their spherical structure—feature double eyelids and drooping lids. Gazing downward and forward with a steadfast expression, his eyes convey a sense of unwavering resolve. His lips are full and fleshy, curving slightly upward in a gentle smile. Overall, the face appears round, full, and imbued with boundless vitality, presenting a youthful and handsome countenance that perfectly aligns with the iconography of the \"Crowned Shakyamuni\"—a representation of Shakyamuni Buddha in his princely guise prior to his renunciation of worldly life. His left hand rests before his abdomen in the Dhyana Mudra (Meditation Gesture), while his right hand rests upon his right knee, with the fingertips touching the earth in the Bhumisparsha Mudra (Earth-Touching Gesture)—the iconic pose of Shakyamuni Buddha at the moment of his enlightenment and triumph over demonic forces. The Buddha is clad in a monastic robe (kasaya) draped in the *uttarasanga* style, leaving the right shoulder bare. The robe is rendered as a thin, form-fitting garment; its folds are depicted using a \"sheet-like\" technique, with incised lines employed to accentuate the articulation of the joints. The hems of the robe are adorned solely with delicate chased patterns of continuous pearls and rice grains, serving as subtle visual cues to indicate the presence of the fabric. He wears a jeweled necklace (hara) across his chest, as well as armbands and bracelets on his limbs. His hands and feet are modeled with exquisite detail; the joints of his fingers are clearly delineated, creating the illusion that the bronze shell is filled with living flesh and blood—as if his fingers could move and reach out at any moment. The robust and powerful musculature constitutes the figure's most striking artistic feature; the bodily proportions closely approximate those of the human form, and the musculature is rendered with a compact intensity—neither exaggerated nor stylized—conveying a sense of vibrant health and a surging, indomitable vitality. The pedestal features a waisted form with inverted and upright lotus tiers; the upper section is adorned with a dense, intricate pattern of continuous pearls, while the lower section rests upon a tall, flared foot, lending the piece an appearance of imposing height and stability. The lotus petals are arranged symmetrically above and below, creating a rich sense of layering; the tips of the petals curl upward ever so slightly, appearing full and vigorous. The style of the ear ornaments, the patterns chiseled into the drapery folds, the articulation of the finger joints, and the specific rendering of the lotus petals all constitute highly distinctive stylistic hallmarks of the Karkota-Utpala sculptural tradition."
+      },
+      "comparisonNote": {
+        "zh": "",
+        "en": ""
+      },
+      "provenance": [],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "竹瑾居2023年展览",
+            "en": "Zhu Jin Ju 2023 Exhibition"
+          },
+          "venue": {
+            "zh": "北京嘉德艺术中心",
+            "en": "Guardian Art Center, Beijing"
+          },
+          "year": "2023年"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "竹瑾居2023年展览图录",
+            "en": "Zhu Jin Ju 2023 Exhibition Catalogue"
+          },
+          "year": "2023年",
+          "pages": {
+            "zh": "第50页",
+            "en": "Page 50"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available on request"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available on request"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available on request"
+        }
+      ],
+      "relatedArticleSlugs": [],
+      "relatedExhibitionSlugs": [
+        "exhibition-1773399222802"
+      ],
+      "image": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+      "gallery": [
+        "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg"
+      ],
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "card": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "hero": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "detail": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "card": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "hero": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "detail": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
+    },
+    {
       "id": "artwork_84d0fc88-8edc-4478-8073-cfefa9c09d6c",
       "slug": "artwork-1773413771882",
       "publicationStatus": "published",
@@ -2547,124 +2714,6 @@
         "height": 1500
       },
       "galleryAssets": []
-    },
-    {
-      "id": "artwork_d390e885-2a84-439e-aa79-666e5e3fe057",
-      "slug": "artwork-1773423130363",
-      "publicationStatus": "published",
-      "title": {
-        "zh": "释迦牟尼",
-        "en": "Shakyamuni Buddha"
-      },
-      "subtitle": {
-        "zh": "",
-        "en": ""
-      },
-      "period": {
-        "zh": "13-14世纪",
-        "en": "13th–14th Century"
-      },
-      "region": {
-        "zh": "尼泊尔",
-        "en": "Nepal"
-      },
-      "origin": {
-        "zh": "迦舍末罗",
-        "en": "Khasamalla"
-      },
-      "material": {
-        "zh": "铜鎏金",
-        "en": "Gilt bronze"
-      },
-      "category": {
-        "zh": "造像",
-        "en": "Sculpture"
-      },
-      "dimensions": {
-        "zh": "高：14.5cm",
-        "en": "Height: 14.5 cm"
-      },
-      "status": "inquiry",
-      "excerpt": {
-        "zh": "迦舍末罗宝冠释迦牟尼",
-        "en": "A Khasa Malla image of Shakyamuni balancing ornament and composure."
-      },
-      "viewingNote": {
-        "zh": "迦舍末罗（Khasa-Malla）王朝，曾经的版图跨占中国西藏西部和尼泊尔西部的 广阔土地 。在 13-14 世纪中叶国力强盛 。这个王朝虽然短暂，但统治者笃信佛教 ，在 王室的支持下佛教艺术也取得了辉煌的成就 。这尊宝冠释迦牟尼佛就是一尊经典的 迦舍末罗风格造型 。 佛陀结跏趺坐端坐 ，螺发规整 ，肉髻微隆 。宝珠顶严，戴五叶宝冠，耳际横出 扇形冠结，大耳垂承于肩，耳饰向后翻起 ，极为别致 。面部着重正侧面转折，强调颧 部肌肉；五官集中，眉毛粗长 ，眼型强调球形结构，双眼皮 ，眼睑下垂，双目俯视前 方，眼神坚定；唇部厚实，嘴角略含笑意，整体面部圆润饱满具有无限的生命活 力，展现出年轻俊美的面容，与宝冠释迦代表的释迦牟尼出家前的王子身份相契合。 左手于腹前结禅定印，右手置于右膝，指头触地做触地印，此乃释迦牟尼佛降魔成道 时的形象 。 佛陀身着袒右式袈裟 ，袈裟轻薄贴体，衣纹采用片式 ，以刻线强调关节转折，衣 边仅錾刻连珠纹以及稻粒纹 ，表示衣服的存在 。胸前佩戴璎珞，手臂佩戴臂钏 、手 镯；手足刻画细腻 ，手指关节清晰可见，仿佛铜胎之下充盈血肉，手指随时可触可 动 。壮硕有力的肌肉线条是其最为突出的艺术表现，身体比例接近真实人体，肌肉 线条紧凑而不夸张 ，健康而有活力的躯体展现出铿锵连绵的生命力 。 仰覆式束腰莲台，上方有细密的连珠纹 ，下方有高圈足 ，显得高大稳重；莲瓣上 下对称，富有层次；莲瓣瓣端微微翘起 ，饱满有力 。其耳珰的样式 ，衣纹錾刻的图 案 ，手指指节的表现及莲瓣样式 ，都是非常鲜明的迦舍末罗造像风格特征 。",
-        "en": "The Khasa-Malla Dynasty once commanded a vast territory spanning western Tibet (China) and western Nepal. Its power reached its zenith during the mid-13th to mid-14th centuries. Although the dynasty was short-lived, its rulers were devout Buddhists; under royal patronage, Buddhist art achieved magnificent heights. This crowned figure of Shakyamuni Buddha stands as a quintessential example of the Khasa-Malla artistic style. The Buddha sits upright in the full lotus position; his hair consists of tightly coiled curls, and his cranial protuberance (ushnisha) rises gently. Surmounted by a jewel finial, he wears a five-lobed jeweled crown flanked by fan-shaped ribbons that flare outward at the temples. His large earlobes rest upon his shoulders, while his earrings curl backward—a highly distinctive stylistic feature. The facial modeling emphasizes the transition between the frontal and profile planes, accentuating the musculature of the cheekbones. His facial features are concentrated and compact; his eyebrows are thick and long, and his eyes—modeled to emphasize their spherical structure—feature double eyelids and drooping lids. Gazing downward and forward with a steadfast expression, his eyes convey a sense of unwavering resolve. His lips are full and fleshy, curving slightly upward in a gentle smile. Overall, the face appears round, full, and imbued with boundless vitality, presenting a youthful and handsome countenance that perfectly aligns with the iconography of the \"Crowned Shakyamuni\"—a representation of Shakyamuni Buddha in his princely guise prior to his renunciation of worldly life. His left hand rests before his abdomen in the Dhyana Mudra (Meditation Gesture), while his right hand rests upon his right knee, with the fingertips touching the earth in the Bhumisparsha Mudra (Earth-Touching Gesture)—the iconic pose of Shakyamuni Buddha at the moment of his enlightenment and triumph over demonic forces. The Buddha is clad in a monastic robe (kasaya) draped in the *uttarasanga* style, leaving the right shoulder bare. The robe is rendered as a thin, form-fitting garment; its folds are depicted using a \"sheet-like\" technique, with incised lines employed to accentuate the articulation of the joints. The hems of the robe are adorned solely with delicate chased patterns of continuous pearls and rice grains, serving as subtle visual cues to indicate the presence of the fabric. He wears a jeweled necklace (hara) across his chest, as well as armbands and bracelets on his limbs. His hands and feet are modeled with exquisite detail; the joints of his fingers are clearly delineated, creating the illusion that the bronze shell is filled with living flesh and blood—as if his fingers could move and reach out at any moment. The robust and powerful musculature constitutes the figure's most striking artistic feature; the bodily proportions closely approximate those of the human form, and the musculature is rendered with a compact intensity—neither exaggerated nor stylized—conveying a sense of vibrant health and a surging, indomitable vitality. The pedestal features a waisted form with inverted and upright lotus tiers; the upper section is adorned with a dense, intricate pattern of continuous pearls, while the lower section rests upon a tall, flared foot, lending the piece an appearance of imposing height and stability. The lotus petals are arranged symmetrically above and below, creating a rich sense of layering; the tips of the petals curl upward ever so slightly, appearing full and vigorous. The style of the ear ornaments, the patterns chiseled into the drapery folds, the articulation of the finger joints, and the specific rendering of the lotus petals all constitute highly distinctive stylistic hallmarks of the Karkota-Utpala sculptural tradition."
-      },
-      "comparisonNote": {
-        "zh": "",
-        "en": ""
-      },
-      "provenance": [],
-      "exhibitions": [
-        {
-          "title": {
-            "zh": "竹瑾居2023年展览",
-            "en": "Zhu Jin Ju 2023 Exhibition"
-          },
-          "venue": {
-            "zh": "北京嘉德艺术中心",
-            "en": "Guardian Art Center, Beijing"
-          },
-          "year": "2023年"
-        }
-      ],
-      "publications": [
-        {
-          "title": {
-            "zh": "竹瑾居2023年展览图录",
-            "en": "Zhu Jin Ju 2023 Exhibition Catalogue"
-          },
-          "year": "2023年",
-          "pages": {
-            "zh": "第50页",
-            "en": "Page 50"
-          }
-        }
-      ],
-      "inquirySupport": [
-        {
-          "zh": "可索取高清图",
-          "en": "High-resolution images available on request"
-        },
-        {
-          "zh": "可索取品相信息",
-          "en": "Condition report available on request"
-        },
-        {
-          "zh": "可索取图录页",
-          "en": "Catalogue pages available on request"
-        }
-      ],
-      "relatedArticleSlugs": [],
-      "relatedExhibitionSlugs": [
-        "exhibition-1773399222802"
-      ],
-      "image": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
-      "gallery": [
-        "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg"
-      ],
-      "featured": false,
-      "imageAsset": {
-        "original": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
-        "card": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
-        "hero": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
-        "detail": "/uploads/artworks/1773423925948-c7e670b4ffe6d7d35f012cc04ca043cf.jpg",
-        "width": 1200,
-        "height": 1500
-      },
-      "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
-          "card": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
-          "hero": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
-          "detail": "/uploads/artworks/1773423930358-621642724d982ae272d6a9551559b7e6.jpg",
-          "width": 1200,
-          "height": 1500
-        }
-      ]
     },
     {
       "id": "artwork_ef11d050-db36-4d6d-9ea2-7a973ff47043",
@@ -3009,20 +3058,29 @@
       "relatedExhibitionSlugs": [
         "exhibition-1773394358822"
       ],
-      "image": "/uploads/artworks/1773895855401-吐蕃王朝金刚手立像-右.jpg",
-      "gallery": [],
-      "featured": false,
-      "galleryAssets": [
-        null
+      "image": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+      "gallery": [
+        "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
       ],
+      "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773895855401-吐蕃王朝金刚手立像-右.jpg",
-        "card": "/uploads/artworks/1773895855401-吐蕃王朝金刚手立像-右-card.jpg",
-        "hero": "/uploads/artworks/1773895855401-吐蕃王朝金刚手立像-右.jpg",
-        "detail": "/uploads/artworks/1773895855401-吐蕃王朝金刚手立像-右.jpg",
+        "original": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "card": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "hero": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
+        "detail": "/uploads/artworks/1773424078601-32140f1604e902a8e690b1f4af7f287f.jpg",
         "width": 1200,
         "height": 1500
-      }
+      },
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "card": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "hero": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "detail": "/uploads/artworks/1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "width": 1200,
+          "height": 1500
+        }
+      ]
     },
     {
       "id": "artwork_9e253a88-873d-4541-98ee-f8e67068e85e",
@@ -3237,7 +3295,10 @@
         "exhibition-1773394358822"
       ],
       "image": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+        "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg"
+      ],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773424616396-c89e9997d05147339a91869fb0d872f0.jpg",
@@ -3248,7 +3309,14 @@
         "height": 1500
       },
       "galleryAssets": [
-        null,
+        {
+          "original": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "card": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "hero": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "detail": "/uploads/artworks/1773424621122-07952fa8b785f62d040d5d7e370d89f5.jpg",
+          "width": 1200,
+          "height": 1500
+        },
         {
           "original": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
           "card": "/uploads/artworks/1773424631474-e50f742d8e93f841aa1fbb2df7aa910a.jpg",
@@ -3257,113 +3325,6 @@
           "width": 1200,
           "height": 1500
         }
-      ]
-    },
-    {
-      "id": "artwork_0436705c-7c0c-48e7-9ffd-fe06f059e34f",
-      "slug": "artwork-1773818750343",
-      "publicationStatus": "published",
-      "title": {
-        "zh": "文殊菩萨",
-        "en": "Manjushri"
-      },
-      "subtitle": {
-        "zh": "",
-        "en": ""
-      },
-      "period": {
-        "zh": "15世纪",
-        "en": "15th Century"
-      },
-      "region": {
-        "zh": "西藏",
-        "en": "Xizang"
-      },
-      "origin": {
-        "zh": "卫藏地区",
-        "en": "Central Xizang"
-      },
-      "material": {
-        "zh": "铜鎏金",
-        "en": "Gilt bronze"
-      },
-      "category": {
-        "zh": "造像",
-        "en": "Sculpture"
-      },
-      "dimensions": {
-        "zh": "高：36cm",
-        "en": "Height: 36 cm"
-      },
-      "status": "inquiry",
-      "excerpt": {
-        "zh": "索南坚赞风格",
-        "en": "Sonam Gyaltsen Style"
-      },
-      "viewingNote": {
-        "zh": "在佛教造像传统中，我们会发现，很少有匠人会留下自己名字的情况 。由\n于造像往往是对信仰的供奉与修持，所以匠人们很少在作品上留下自己的名字。\n这种“匿名”背后，是佛教世界观中“无我”与“为法而作”的实践体现 。\n然而，随着艺术史与风格学的不断发展，学者们逐渐通过不同地区造像在\n比例、线条、装饰、工艺上的差异，辨析出具有鲜明地域特征的风格体系。进\n一步地，也在少数带有铭文的作品中，通过对风格与刻款的交叉比对，匠人个人\n的风格也逐渐被识别出来 。这一转变，也被文化人类学视为“群体性宗教艺术”\n向“个体化艺术创作”的过渡 。这其中具有代表性的人物之一，便是索南坚赞。\n根据带有明确铭文记载由索南坚赞制作的那尊造像为例，我们可以\n观察到他鲜明的造型语言：造像打磨细腻，鎏金明亮且厚重；莲座风格相对固\n定，莲瓣刻画精细，排列规整，每一片莲瓣内层细长而饱满，边缘起双线同时\n末端向上翻卷，外层莲瓣则更加宽大且微微鼓起，瓣尖锋利并起棱 。对于造像\n头部的处理，开脸通常为肃穆的表情，细长的双眼上为类似弓形双线刻画处\n理；头冠的样式，于菩萨类造像通常头戴五叶宝冠，正中的冠叶比例被放\n大，造型大多是法轮或者莲花的变形；宝冠下沿会露出一排精致、有序的发际\n线；耳铛通常做成圆形，外沿起一圈连珠纹，内部做成莲花的样式 。这些元素\n构成了一种内敛而有序的视觉语言，使造像即使神性逼人，亦不失温和与典雅 。\n这些对形式的高度统一，正是他作品中最令人印象深刻的部分。\n因此，从图像风格分析，这件文殊菩萨是一尊非常标准的索南坚赞风格造\n像 。无论从脸部塑造还是装饰布局，都体现了他对“神性”温和化 、人文化的\n解读 。臂钏、璎珞等细节上，索南坚赞喜欢用花朵、水滴形花苞等柔和意象来\n体现，使得神明更接近人性、接近生活。这种“温柔的信仰”也透露出了他内\n心的细腻与慈悲 。\n生活在古代的索南坚赞，虽然面对的是一个以“规范”为核心的造像传统，但\n相较于有创造力和想法的匠人而言，他会去不断尝试和追寻属于自己的一种艺\n术风格。他会借鉴前人，却不囿于前人；他服务信仰，但又在信仰中加入了个\n体的情绪、理解与审美表达 。他用自己的方式，“再造”了菩萨在人间的形象 。\n索南坚赞的风格不仅体现在技法上，更是一种审美倾向的表达：他倾向于\n温柔的线条、祥和的意象与不张扬的力量。他赋予文殊一种温和而坚定的精神\n张力——不是刚猛的威严，而是一种蕴含、内敛的悲悯 。\n从这件文殊造像而言，索南坚赞眼中的神性首先是通过身形来体现，并不\n着重体现肌肉塑造的身形，姿态挺拔；文殊周身装饰华贵，却不显繁重；轻薄\n贴体的裙裤柔软地铺撒在莲台之上，整体气质于视觉上，产生了一种精神上的\n超脱感，自带一种清透的仙气 ，使造像整体看上去轻盈、干净、清爽 。文殊肃\n穆的神情中带着绘彩的温度，眉眼间的微微柔光，都让人感受到一种安静、含\n蓄。那不是令人畏惧的神力，而是一种宁静中带着悲悯的坚定，是一种不喧\n哗，却足以穿透人心的柔软 。\n文殊结说法印于胸前，手持两朵绽放的莲枝于两侧，弯曲的莲枝柔软、生\n动。左边莲枝上为慧剑，象征着象征智慧能够一刀斩断烦恼、执着、错见，就\n像黑暗中一道光，迅速破开混沌 。于现代语境中，这把慧剑也象征着勇敢的智\n慧，因为智慧也是勇气的表现，敢于面对真相，不回避痛苦与不确定性 。右边\n莲枝上为经书，经书常常被塑造在莲花之上，表示着智慧生于清净的法性之\n中。于现代语境，经书像是智慧的土壤，与剑的果断不同，经书代表着学\n习、沉思 、理解与累积的力量，而慧剑与经书作为文殊身份的重要标识，像是\n两种相辅相成的智慧意象：一动一静，一破一立——内有经书养心，外有慧剑\n行世；没有内养的智慧，剑会变成伤人的利器；没有外用的行动，书会变成纸\n上的空谈 。这种柔软的智慧，经过索南坚赞之手，是那么的直观且具象 。\n索南坚赞喜欢用花和水滴形这样的装饰语言，在佛教造像的象征系统\n中，水代表包容与净化，花代表无常与绽放，这些都是美好、圣洁、不带攻击\n性的意象，这也让整尊造像在审美上具备一种稀有的“纯净气场”，是一种不被\n时代尘嚣污染的祥和与安稳 。其次，造像整体在气质上还给予着我一种真实\n感，像高原的人们充满坚韧和内在张力。虽然表达方式相对含蓄、不张扬，但\n将“般若智慧”以审美形式具象化了。我甚至会想象，索南坚赞在塑造这尊造\n像时的内心状态：他是平静的、满足的、喜悦的 ...",
-        "en": "In the Buddhist tradition of sculpture, it is rare to find artisans leaving their names. Because sculpture is often an offering and practice of faith, artisans seldom inscribe their names on their works.\n\nThis anonymity reflects the Buddhist worldview of \"no-self\" and \"creating for the Dharma.\"\n\nHowever, with the development of art history and stylistics, scholars have gradually identified distinct regional stylistic systems through differences in proportion, lines, decoration, and craftsmanship among sculptures from different regions. Furthermore, in the few works with inscriptions, the individual style of the artisan has gradually been identified through cross-referencing style and inscriptions. This shift is also seen by cultural anthropology as a transition from \"collective religious art\" to \"individualized artistic creation.\" One of the representative figures in this transition is Sonam Gyaltsen.\n\nTaking the statue made by Sonam Gyaltsen with clear inscriptions as an example, we can observe his distinctive stylistic language: the statue is finely polished, with bright and heavy gilding; the lotus pedestal style is relatively fixed, the lotus petals are finely carved and neatly arranged, each petal's inner layer is slender and full, with double lines along the edges and the ends curling upwards, while the outer petals are wider and slightly bulging, with sharp, angular tips. Regarding the treatment of the head, the face is usually solemn, with arch-shaped double lines above the slender eyes; the crown style, in bodhisattva statues, is usually a five-leaf crown, with the central leaf enlarged, and the shape mostly a variation of a dharma wheel or lotus; a delicate and orderly hairline is visible below the crown; the earrings are usually round, with a beaded pattern around the outer edge and a lotus shape inside. These elements constitute a restrained yet orderly visual language, making the statue, even with its imposing divinity, gentle and elegant. This high degree of formal unity is precisely what makes his work most impressive.\n\nTherefore, from an pictorial style analysis, this Manjushri Bodhisattva is a very standard Sonam Gyaltsen-style statue. Whether in the facial sculpting or the decorative layout, it reflects his gentler, more humanistic interpretation of \"divinity.\" In details such as armlets and necklaces, Sonam Gyaltsen favored using soft imagery like flowers and teardrop-shaped buds, making the deity more approachable and relatable to everyday life. This \"gentle faith\" also reveals his inner sensitivity and compassion.\n\nLiving in ancient times, Sonam Gyaltsen, although facing a tradition of sculptural art centered on \"standards,\" constantly experimented and pursued his own artistic style, unlike more creative and imaginative craftsmen. He learned from his predecessors but was not confined by them; he served the faith but also incorporated his personal emotions, understanding, and aesthetic expression. He \"recreated\" the image of the Bodhisattva in the human world in his own way. Sonam Gyaltsen's style is not only reflected in his technique but also in his aesthetic inclinations: he favors gentle lines, peaceful imagery, and understated power. He imbues Manjushri with a gentle yet firm spiritual tension—not a fierce majesty, but a restrained and introspective compassion.\n\nIn this Manjushri sculpture, Sonam Gyaltsen's vision of divinity is primarily expressed through the form, not emphasizing muscular sculpting, but rather a dignified posture. Manjushri is adorned with opulent decorations, yet without appearing cumbersome; the light, close-fitting skirt and trousers softly drape over the lotus pedestal, creating a visually transcendent spiritual quality, imbued with a serene and ethereal aura, making the sculpture appear light, clean, and refreshing. The solemn expression of Manjushri carries the warmth of painted imagery, and the subtle glow between his brows and eyes conveys a sense of tranquility and restraint. It wasn't awe-inspiring divine power, but a steadfast tranquility imbued with compassion; a quiet strength that penetrated the heart.\n\nManjushri holds the teaching mudra at his chest, holding two blooming lotus branches on either side. The curved branches are supple and vibrant. On the left lotus branch is a wisdom sword, symbolizing how wisdom can swiftly sever afflictions, attachments, and misconceptions, like a ray of light in the darkness, swiftly breaking through chaos. In a modern context, this wisdom sword also symbolizes courageous wisdom, for wisdom is also an expression of courage—daring to face the truth, not avoiding pain and uncertainty. On the right lotus branch is a scripture, often sculpted on a lotus flower, representing that wisdom arises from the pure nature of Dharma. In the modern context, scriptures are like the soil of wisdom. Unlike the decisiveness of a sword, scriptures represent the power of learning, contemplation, understanding, and accumulation. The sword of wisdom and scriptures, as important symbols of Manjushri's identity, are like two complementary images of wisdom: one dynamic, one static; one destructive, one constructive—inner scriptures nourish the mind, outer wisdom wields the sword in the world. Without inner wisdom, a sword becomes a weapon that harms; without outward action, a book becomes empty talk on paper. This gentle wisdom, through the hands of Sonam Gyaltsen, is so direct and concrete.\n\nSonam Gyaltsen favored decorative language such as flowers and teardrop shapes. In the symbolic system of Buddhist sculpture, water represents inclusiveness and purification, while flowers represent impermanence and blossoming. These are beautiful, sacred, and non-aggressive images, giving the entire sculpture a rare \"pure aura,\" a peaceful and stable quality unpolluted by the clamor of the times. Secondly, the overall quality of the sculpture gives me a sense of realism, like the resilience and inner strength of the people of the plateau. Although the expression is relatively subtle and understated, it embodies \"prajna wisdom\" in an aesthetic form. I can even imagine Sonam Gyaltsen's inner state when he sculpted this sculpture: he was calm, content, and joyful..."
-      },
-      "comparisonNote": {
-        "zh": "",
-        "en": ""
-      },
-      "provenance": [],
-      "exhibitions": [
-        {
-          "title": {
-            "zh": "竹瑾居2025年展览",
-            "en": "Zhujinju 2025 Exhibition"
-          },
-          "venue": {
-            "zh": "北京嘉德艺术中心",
-            "en": "Guardian Art Center, Beijing"
-          },
-          "year": "2025年"
-        }
-      ],
-      "publications": [
-        {
-          "title": {
-            "zh": "竹瑾居2025年展览图录",
-            "en": "Zhujinju 2025 Exhibition Catalogue"
-          },
-          "year": "2025年",
-          "pages": {
-            "zh": "第90页",
-            "en": "Page 90"
-          }
-        }
-      ],
-      "inquirySupport": [
-        {
-          "zh": "可索取高清图",
-          "en": "High-resolution images available on request"
-        },
-        {
-          "zh": "可索取品相信息",
-          "en": "Condition report available on request"
-        },
-        {
-          "zh": "可索取图录页",
-          "en": "Catalogue pages available on request"
-        }
-      ],
-      "relatedArticleSlugs": [],
-      "relatedExhibitionSlugs": [],
-      "image": "/uploads/artworks/1773857648881-l1004490.jpg",
-      "gallery": [],
-      "featured": false,
-      "imageAsset": {
-        "original": "/uploads/artworks/1773857648881-l1004490.jpg",
-        "card": "/uploads/artworks/1773857648881-l1004490-card.jpg",
-        "hero": "/uploads/artworks/1773857648881-l1004490.jpg",
-        "detail": "/uploads/artworks/1773857648881-l1004490.jpg",
-        "width": 1200,
-        "height": 1500
-      },
-      "galleryAssets": [
-        null
       ]
     },
     {
@@ -3979,7 +3940,8 @@
       ],
       "image": "/uploads/artworks/1773427060195-9cbc87467d1a41681217a2b82be5a27f.jpg",
       "gallery": [
-        "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg"
+        "/uploads/artworks/1773427065296-036babbc0dad7d590c7ddde08ec843c6.jpg",
+        "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -3999,7 +3961,14 @@
           "width": 1200,
           "height": 1500
         },
-        null
+        {
+          "original": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "card": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "hero": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "detail": "/uploads/artworks/1773427073180-ddd3d76902438f1615023e87dcdc7cf1.jpg",
+          "width": 1200,
+          "height": 1500
+        }
       ]
     },
     {
@@ -4119,6 +4088,111 @@
           "height": 1500
         }
       ]
+    },
+    {
+      "id": "artwork_0436705c-7c0c-48e7-9ffd-fe06f059e34f",
+      "slug": "artwork-1773818750343",
+      "publicationStatus": "published",
+      "title": {
+        "zh": "文殊菩萨",
+        "en": "Manjushri"
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "15世纪",
+        "en": "15th Century"
+      },
+      "region": {
+        "zh": "西藏",
+        "en": "Xizang"
+      },
+      "origin": {
+        "zh": "卫藏地区",
+        "en": "Central Xizang"
+      },
+      "material": {
+        "zh": "铜鎏金",
+        "en": "Gilt bronze"
+      },
+      "category": {
+        "zh": "造像",
+        "en": "Sculpture"
+      },
+      "dimensions": {
+        "zh": "高：36cm",
+        "en": "Height: 36 cm"
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "索南坚赞风格",
+        "en": "Sonam Gyaltsen Style"
+      },
+      "viewingNote": {
+        "zh": "在佛教造像传统中，我们会发现，很少有匠人会留下自己名字的情况 。由\n于造像往往是对信仰的供奉与修持，所以匠人们很少在作品上留下自己的名字。\n这种“匿名”背后，是佛教世界观中“无我”与“为法而作”的实践体现 。\n然而，随着艺术史与风格学的不断发展，学者们逐渐通过不同地区造像在\n比例、线条、装饰、工艺上的差异，辨析出具有鲜明地域特征的风格体系。进\n一步地，也在少数带有铭文的作品中，通过对风格与刻款的交叉比对，匠人个人\n的风格也逐渐被识别出来 。这一转变，也被文化人类学视为“群体性宗教艺术”\n向“个体化艺术创作”的过渡 。这其中具有代表性的人物之一，便是索南坚赞。\n根据带有明确铭文记载由索南坚赞制作的那尊造像为例，我们可以\n观察到他鲜明的造型语言：造像打磨细腻，鎏金明亮且厚重；莲座风格相对固\n定，莲瓣刻画精细，排列规整，每一片莲瓣内层细长而饱满，边缘起双线同时\n末端向上翻卷，外层莲瓣则更加宽大且微微鼓起，瓣尖锋利并起棱 。对于造像\n头部的处理，开脸通常为肃穆的表情，细长的双眼上为类似弓形双线刻画处\n理；头冠的样式，于菩萨类造像通常头戴五叶宝冠，正中的冠叶比例被放\n大，造型大多是法轮或者莲花的变形；宝冠下沿会露出一排精致、有序的发际\n线；耳铛通常做成圆形，外沿起一圈连珠纹，内部做成莲花的样式 。这些元素\n构成了一种内敛而有序的视觉语言，使造像即使神性逼人，亦不失温和与典雅 。\n这些对形式的高度统一，正是他作品中最令人印象深刻的部分。\n因此，从图像风格分析，这件文殊菩萨是一尊非常标准的索南坚赞风格造\n像 。无论从脸部塑造还是装饰布局，都体现了他对“神性”温和化 、人文化的\n解读 。臂钏、璎珞等细节上，索南坚赞喜欢用花朵、水滴形花苞等柔和意象来\n体现，使得神明更接近人性、接近生活。这种“温柔的信仰”也透露出了他内\n心的细腻与慈悲 。\n生活在古代的索南坚赞，虽然面对的是一个以“规范”为核心的造像传统，但\n相较于有创造力和想法的匠人而言，他会去不断尝试和追寻属于自己的一种艺\n术风格。他会借鉴前人，却不囿于前人；他服务信仰，但又在信仰中加入了个\n体的情绪、理解与审美表达 。他用自己的方式，“再造”了菩萨在人间的形象 。\n索南坚赞的风格不仅体现在技法上，更是一种审美倾向的表达：他倾向于\n温柔的线条、祥和的意象与不张扬的力量。他赋予文殊一种温和而坚定的精神\n张力——不是刚猛的威严，而是一种蕴含、内敛的悲悯 。\n从这件文殊造像而言，索南坚赞眼中的神性首先是通过身形来体现，并不\n着重体现肌肉塑造的身形，姿态挺拔；文殊周身装饰华贵，却不显繁重；轻薄\n贴体的裙裤柔软地铺撒在莲台之上，整体气质于视觉上，产生了一种精神上的\n超脱感，自带一种清透的仙气 ，使造像整体看上去轻盈、干净、清爽 。文殊肃\n穆的神情中带着绘彩的温度，眉眼间的微微柔光，都让人感受到一种安静、含\n蓄。那不是令人畏惧的神力，而是一种宁静中带着悲悯的坚定，是一种不喧\n哗，却足以穿透人心的柔软 。\n文殊结说法印于胸前，手持两朵绽放的莲枝于两侧，弯曲的莲枝柔软、生\n动。左边莲枝上为慧剑，象征着象征智慧能够一刀斩断烦恼、执着、错见，就\n像黑暗中一道光，迅速破开混沌 。于现代语境中，这把慧剑也象征着勇敢的智\n慧，因为智慧也是勇气的表现，敢于面对真相，不回避痛苦与不确定性 。右边\n莲枝上为经书，经书常常被塑造在莲花之上，表示着智慧生于清净的法性之\n中。于现代语境，经书像是智慧的土壤，与剑的果断不同，经书代表着学\n习、沉思 、理解与累积的力量，而慧剑与经书作为文殊身份的重要标识，像是\n两种相辅相成的智慧意象：一动一静，一破一立——内有经书养心，外有慧剑\n行世；没有内养的智慧，剑会变成伤人的利器；没有外用的行动，书会变成纸\n上的空谈 。这种柔软的智慧，经过索南坚赞之手，是那么的直观且具象 。\n索南坚赞喜欢用花和水滴形这样的装饰语言，在佛教造像的象征系统\n中，水代表包容与净化，花代表无常与绽放，这些都是美好、圣洁、不带攻击\n性的意象，这也让整尊造像在审美上具备一种稀有的“纯净气场”，是一种不被\n时代尘嚣污染的祥和与安稳 。其次，造像整体在气质上还给予着我一种真实\n感，像高原的人们充满坚韧和内在张力。虽然表达方式相对含蓄、不张扬，但\n将“般若智慧”以审美形式具象化了。我甚至会想象，索南坚赞在塑造这尊造\n像时的内心状态：他是平静的、满足的、喜悦的 ...",
+        "en": "In the Buddhist tradition of sculpture, it is rare to find artisans leaving their names. Because sculpture is often an offering and practice of faith, artisans seldom inscribe their names on their works.\n\nThis anonymity reflects the Buddhist worldview of \"no-self\" and \"creating for the Dharma.\"\n\nHowever, with the development of art history and stylistics, scholars have gradually identified distinct regional stylistic systems through differences in proportion, lines, decoration, and craftsmanship among sculptures from different regions. Furthermore, in the few works with inscriptions, the individual style of the artisan has gradually been identified through cross-referencing style and inscriptions. This shift is also seen by cultural anthropology as a transition from \"collective religious art\" to \"individualized artistic creation.\" One of the representative figures in this transition is Sonam Gyaltsen.\n\nTaking the statue made by Sonam Gyaltsen with clear inscriptions as an example, we can observe his distinctive stylistic language: the statue is finely polished, with bright and heavy gilding; the lotus pedestal style is relatively fixed, the lotus petals are finely carved and neatly arranged, each petal's inner layer is slender and full, with double lines along the edges and the ends curling upwards, while the outer petals are wider and slightly bulging, with sharp, angular tips. Regarding the treatment of the head, the face is usually solemn, with arch-shaped double lines above the slender eyes; the crown style, in bodhisattva statues, is usually a five-leaf crown, with the central leaf enlarged, and the shape mostly a variation of a dharma wheel or lotus; a delicate and orderly hairline is visible below the crown; the earrings are usually round, with a beaded pattern around the outer edge and a lotus shape inside. These elements constitute a restrained yet orderly visual language, making the statue, even with its imposing divinity, gentle and elegant. This high degree of formal unity is precisely what makes his work most impressive.\n\nTherefore, from an pictorial style analysis, this Manjushri Bodhisattva is a very standard Sonam Gyaltsen-style statue. Whether in the facial sculpting or the decorative layout, it reflects his gentler, more humanistic interpretation of \"divinity.\" In details such as armlets and necklaces, Sonam Gyaltsen favored using soft imagery like flowers and teardrop-shaped buds, making the deity more approachable and relatable to everyday life. This \"gentle faith\" also reveals his inner sensitivity and compassion.\n\nLiving in ancient times, Sonam Gyaltsen, although facing a tradition of sculptural art centered on \"standards,\" constantly experimented and pursued his own artistic style, unlike more creative and imaginative craftsmen. He learned from his predecessors but was not confined by them; he served the faith but also incorporated his personal emotions, understanding, and aesthetic expression. He \"recreated\" the image of the Bodhisattva in the human world in his own way. Sonam Gyaltsen's style is not only reflected in his technique but also in his aesthetic inclinations: he favors gentle lines, peaceful imagery, and understated power. He imbues Manjushri with a gentle yet firm spiritual tension—not a fierce majesty, but a restrained and introspective compassion.\n\nIn this Manjushri sculpture, Sonam Gyaltsen's vision of divinity is primarily expressed through the form, not emphasizing muscular sculpting, but rather a dignified posture. Manjushri is adorned with opulent decorations, yet without appearing cumbersome; the light, close-fitting skirt and trousers softly drape over the lotus pedestal, creating a visually transcendent spiritual quality, imbued with a serene and ethereal aura, making the sculpture appear light, clean, and refreshing. The solemn expression of Manjushri carries the warmth of painted imagery, and the subtle glow between his brows and eyes conveys a sense of tranquility and restraint. It wasn't awe-inspiring divine power, but a steadfast tranquility imbued with compassion; a quiet strength that penetrated the heart.\n\nManjushri holds the teaching mudra at his chest, holding two blooming lotus branches on either side. The curved branches are supple and vibrant. On the left lotus branch is a wisdom sword, symbolizing how wisdom can swiftly sever afflictions, attachments, and misconceptions, like a ray of light in the darkness, swiftly breaking through chaos. In a modern context, this wisdom sword also symbolizes courageous wisdom, for wisdom is also an expression of courage—daring to face the truth, not avoiding pain and uncertainty. On the right lotus branch is a scripture, often sculpted on a lotus flower, representing that wisdom arises from the pure nature of Dharma. In the modern context, scriptures are like the soil of wisdom. Unlike the decisiveness of a sword, scriptures represent the power of learning, contemplation, understanding, and accumulation. The sword of wisdom and scriptures, as important symbols of Manjushri's identity, are like two complementary images of wisdom: one dynamic, one static; one destructive, one constructive—inner scriptures nourish the mind, outer wisdom wields the sword in the world. Without inner wisdom, a sword becomes a weapon that harms; without outward action, a book becomes empty talk on paper. This gentle wisdom, through the hands of Sonam Gyaltsen, is so direct and concrete.\n\nSonam Gyaltsen favored decorative language such as flowers and teardrop shapes. In the symbolic system of Buddhist sculpture, water represents inclusiveness and purification, while flowers represent impermanence and blossoming. These are beautiful, sacred, and non-aggressive images, giving the entire sculpture a rare \"pure aura,\" a peaceful and stable quality unpolluted by the clamor of the times. Secondly, the overall quality of the sculpture gives me a sense of realism, like the resilience and inner strength of the people of the plateau. Although the expression is relatively subtle and understated, it embodies \"prajna wisdom\" in an aesthetic form. I can even imagine Sonam Gyaltsen's inner state when he sculpted this sculpture: he was calm, content, and joyful..."
+      },
+      "comparisonNote": {
+        "zh": "",
+        "en": ""
+      },
+      "provenance": [],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "竹瑾居2025年展览",
+            "en": "Zhujinju 2025 Exhibition"
+          },
+          "venue": {
+            "zh": "北京嘉德艺术中心",
+            "en": "Guardian Art Center, Beijing"
+          },
+          "year": "2025年"
+        }
+      ],
+      "publications": [
+        {
+          "title": {
+            "zh": "竹瑾居2025年展览图录",
+            "en": "Zhujinju 2025 Exhibition Catalogue"
+          },
+          "year": "2025年",
+          "pages": {
+            "zh": "第90页",
+            "en": "Page 90"
+          }
+        }
+      ],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available on request"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available on request"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available on request"
+        }
+      ],
+      "relatedArticleSlugs": [],
+      "relatedExhibitionSlugs": [],
+      "image": "/uploads/artworks/1773841261780-l1004490.jpg",
+      "gallery": [],
+      "featured": false,
+      "imageAsset": {
+        "original": "/uploads/artworks/1773841261780-l1004490.jpg",
+        "card": "/uploads/artworks/1773841261780-l1004490-card.jpg",
+        "hero": "/uploads/artworks/1773841261780-l1004490.jpg",
+        "detail": "/uploads/artworks/1773841261780-l1004490.jpg",
+        "width": 1200,
+        "height": 1500
+      },
+      "galleryAssets": []
     }
   ],
   "exhibitions": [
@@ -4979,12 +5053,12 @@
       ],
       "relatedArtworkSlugs": [],
       "relatedExhibitionSlugs": [],
-      "cover": "/uploads/articles/1773857953317-l1003025.jpg",
+      "cover": "/uploads/articles/1773848888750-l1003025.jpg",
       "coverAsset": {
-        "original": "/uploads/articles/1773857953317-l1003025.jpg",
-        "card": "/uploads/articles/1773857953317-l1003025-card.jpg",
-        "hero": "/uploads/articles/1773857953317-l1003025.jpg",
-        "detail": "/uploads/articles/1773857953317-l1003025.jpg",
+        "original": "/uploads/articles/1773848888750-l1003025.jpg",
+        "card": "/uploads/articles/1773848888750-l1003025-card.jpg",
+        "hero": "/uploads/articles/1773848888750-l1003025.jpg",
+        "detail": "/uploads/articles/1773848888750-l1003025.jpg",
         "width": 1400,
         "height": 900
       }
@@ -5333,36 +5407,51 @@
       },
       "body": [
         {
-          "zh": "一个时代的“精神气候”，究竟怎样渗入造像的面容与身躯？\n我们以这尊 12 世纪尼泊尔过渡期的造像为例，在那段王朝更迭的历史缝隙里，它映照出了时代的内在张力。",
+          "zh": "一个时代的“精神气候”，究竟怎样渗入造像的面容与身躯？",
           "en": "How exactly does the \"spiritual climate\" of an era permeate the face and body of a sculpture?"
         },
         {
-          "zh": "当时的尼泊尔谷地正从理查维走向马拉王朝。旧秩序瓦解了，新秩序还没来。地方小王朝不断更替，但却没有爆裂式的战乱。社会虽松散，却没崩塌。",
+          "zh": "我们以这尊 12 世纪尼泊尔过渡期的造像为例，在那段王朝更迭的历史缝隙里，它映照出了时代的内在张力。",
           "en": "Let's take this 12th-century Nepalese transitional sculpture as an example. Within the historical gaps of dynastic change, it reflects the inherent tension of the era."
         },
         {
-          "zh": "贵族们用建筑、修寺、造塔来维系影响力，工匠在这样的结构里，逐步获得社会地位，同时也获得了更自由的呼吸和创作空间。那是一个生活不算富裕、秩序虽不稳固，但却精神丰盈的时代。商队频繁来往于喜马拉雅南北，使得贸易与文化交织。在这种外在不定、内在安稳的双重结构下，造像展现出一种浓郁而温和的精神密度。",
+          "zh": "当时的尼泊尔谷地正从理查维走向马拉王朝。旧秩序瓦解了，新秩序还没来。地方小王朝不断更替，但却没有爆裂式的战乱。社会虽松散，却没崩塌。",
           "en": "At that time, the Nepalese valleys were transitioning from the Richave dynasty to the Malla dynasty. The old order had crumbled, and the new order had not yet arrived. Local minor dynasties rose and fell constantly, but there was no explosive warfare. Society was loose, but not collapsed."
         },
         {
-          "zh": "你看它的面容：五官清朗，眼神沉静，有着古典遗风般间的沉思与高贵，这不是繁荣时期的自信，也不是乱世的紧绷，而是一种似乎正把时代不安慢慢收拢的内观之气。",
+          "zh": "贵族们用建筑、修寺、造塔来维系影响力，工匠在这样的结构里，逐步获得社会地位，同时也获得了更自由的呼吸和创作空间。那是一个生活不算富裕、秩序虽不稳固，但却精神丰盈的时代。商队频繁来往于喜马拉雅南北，使得贸易与文化交织。在这种外在不定、内在安稳的双重结构下，造像展现出一种浓郁而温和的精神密度。",
           "en": "Nobles maintained their influence through architecture, temple construction, and stupa building. Within this structure, artisans gradually gained social status and, at the same time, more freedom to breathe and create. It was an era of modest wealth and unstable order, but one of spiritual richness. Frequent caravans traveling between the north and south of the Himalayas intertwined trade and culture. Under this dual structure of external uncertainty and internal stability, the sculpture exhibits a rich yet gentle spiritual density."
         },
         {
-          "zh": "身体的比例被理想化处理，带着神性，也带着人的温度。线条柔韧、节奏饱满，像身体里有一条向上的气流，介于脆弱与坚韧之间，充满柔韧的张力。在它身上没有战斗的紧张，也没有帝国的浮华；反而是一种在不确定中仍保持创造力与生机的状态，这种状态让人着迷，着迷于它所散发出的朝气、优雅与澄澈，有一种站在阳光中的明亮与静候。",
+          "zh": "你看它的面容：五官清朗，眼神沉静，有着古典遗风般间的沉思与高贵，这不是繁荣时期的自信，也不是乱世的紧绷，而是一种似乎正把时代不安慢慢收拢的内观之气。",
           "en": "Look at its face: clear features, serene eyes, a contemplative nobility reminiscent of classical elegance. This isn't the confidence of a prosperous era, nor the tension of chaos, but rather an introspective aura that seems to be slowly gathering the unease of the times."
         },
         {
-          "zh": "这让我想到：战乱会塑造刚猛，盛世会塑造华丽。\n但只有那种“松散而不绝望”的时代，才会出现这样的气质。\n不豪华，但细腻。不激烈，但有内力。不悲怆，却极为深沉。\n这尊造像呈现着一个时代特有的精神气息。是一种在不确定时代中对稳定的渴望，以及依然保有文化韧性、内心并非贫瘠的精神状态...",
+          "zh": "身体的比例被理想化处理，带着神性，也带着人的温度。线条柔韧、节奏饱满，像身体里有一条向上的气流，介于脆弱与坚韧之间，充满柔韧的张力。在它身上没有战斗的紧张，也没有帝国的浮华；反而是一种在不确定中仍保持创造力与生机的状态，这种状态让人着迷，着迷于它所散发出的朝气、优雅与澄澈，有一种站在阳光中的明亮与静候。",
           "en": "The proportions of its body are idealized, imbued with both divinity and human warmth. The lines are supple, the rhythm full, like an upward current flowing within, existing between fragility and resilience, brimming with supple tension. It lacks the tension of battle, nor the extravagance of empire; instead, it possesses a state of creativity and vitality amidst uncertainty. This state is captivating, captivating the vigor, elegance, and clarity it exudes, a brightness and quiet anticipation like standing in the sunlight."
+        },
+        {
+          "zh": "这让我想到：战乱会塑造刚猛，盛世会塑造华丽。\n但只有那种“松散而不绝望”的时代，才会出现这样的气质。\n不豪华，但细腻。不激烈，但有内力。不悲怆，却极为深沉。",
+          "en": "This reminds me: war forges fierceness, prosperity forges splendor."
+        },
+        {
+          "zh": "这尊造像呈现着一个时代特有的精神气息。是一种在不确定时代中对稳定的渴望，以及依然保有文化韧性、内心并非贫瘠的精神状态。",
+          "en": "But only in an era of \"relaxation without despair\" can such a temperament emerge."
         }
       ],
       "contentBlocks": [
         {
           "type": "paragraph",
           "content": {
-            "zh": "一个时代的“精神气候”，究竟怎样渗入造像的面容与身躯？\n我们以这尊 12 世纪尼泊尔过渡期的造像为例，在那段王朝更迭的历史缝隙里，它映照出了时代的内在张力。",
+            "zh": "一个时代的“精神气候”，究竟怎样渗入造像的面容与身躯？",
             "en": "How exactly does the \"spiritual climate\" of an era permeate the face and body of a sculpture?"
+          }
+        },
+        {
+          "type": "paragraph",
+          "content": {
+            "zh": "我们以这尊 12 世纪尼泊尔过渡期的造像为例，在那段王朝更迭的历史缝隙里，它映照出了时代的内在张力。",
+            "en": "Let's take this 12th-century Nepalese transitional sculpture as an example. Within the historical gaps of dynastic change, it reflects the inherent tension of the era."
           }
         },
         {
@@ -5378,14 +5467,14 @@
           "type": "paragraph",
           "content": {
             "zh": "当时的尼泊尔谷地正从理查维走向马拉王朝。旧秩序瓦解了，新秩序还没来。地方小王朝不断更替，但却没有爆裂式的战乱。社会虽松散，却没崩塌。",
-            "en": "Let's take this 12th-century Nepalese transitional sculpture as an example. Within the historical gaps of dynastic change, it reflects the inherent tension of the era."
+            "en": "At that time, the Nepalese valleys were transitioning from the Richave dynasty to the Malla dynasty. The old order had crumbled, and the new order had not yet arrived. Local minor dynasties rose and fell constantly, but there was no explosive warfare. Society was loose, but not collapsed."
           }
         },
         {
           "type": "paragraph",
           "content": {
             "zh": "贵族们用建筑、修寺、造塔来维系影响力，工匠在这样的结构里，逐步获得社会地位，同时也获得了更自由的呼吸和创作空间。那是一个生活不算富裕、秩序虽不稳固，但却精神丰盈的时代。商队频繁来往于喜马拉雅南北，使得贸易与文化交织。在这种外在不定、内在安稳的双重结构下，造像展现出一种浓郁而温和的精神密度。",
-            "en": "At that time, the Nepalese valleys were transitioning from the Richave dynasty to the Malla dynasty. The old order had crumbled, and the new order had not yet arrived. Local minor dynasties rose and fell constantly, but there was no explosive warfare. Society was loose, but not collapsed."
+            "en": "Nobles maintained their influence through architecture, temple construction, and stupa building. Within this structure, artisans gradually gained social status and, at the same time, more freedom to breathe and create. It was an era of modest wealth and unstable order, but one of spiritual richness. Frequent caravans traveling between the north and south of the Himalayas intertwined trade and culture. Under this dual structure of external uncertainty and internal stability, the sculpture exhibits a rich yet gentle spiritual density."
           }
         },
         {
@@ -5401,14 +5490,14 @@
           "type": "paragraph",
           "content": {
             "zh": "你看它的面容：五官清朗，眼神沉静，有着古典遗风般间的沉思与高贵，这不是繁荣时期的自信，也不是乱世的紧绷，而是一种似乎正把时代不安慢慢收拢的内观之气。",
-            "en": "Nobles maintained their influence through architecture, temple construction, and stupa building. Within this structure, artisans gradually gained social status and, at the same time, more freedom to breathe and create. It was an era of modest wealth and unstable order, but one of spiritual richness. Frequent caravans traveling between the north and south of the Himalayas intertwined trade and culture. Under this dual structure of external uncertainty and internal stability, the sculpture exhibits a rich yet gentle spiritual density."
+            "en": "Look at its face: clear features, serene eyes, a contemplative nobility reminiscent of classical elegance. This isn't the confidence of a prosperous era, nor the tension of chaos, but rather an introspective aura that seems to be slowly gathering the unease of the times."
           }
         },
         {
           "type": "paragraph",
           "content": {
             "zh": "身体的比例被理想化处理，带着神性，也带着人的温度。线条柔韧、节奏饱满，像身体里有一条向上的气流，介于脆弱与坚韧之间，充满柔韧的张力。在它身上没有战斗的紧张，也没有帝国的浮华；反而是一种在不确定中仍保持创造力与生机的状态，这种状态让人着迷，着迷于它所散发出的朝气、优雅与澄澈，有一种站在阳光中的明亮与静候。",
-            "en": "Look at its face: clear features, serene eyes, a contemplative nobility reminiscent of classical elegance. This isn't the confidence of a prosperous era, nor the tension of chaos, but rather an introspective aura that seems to be slowly gathering the unease of the times."
+            "en": "The proportions of its body are idealized, imbued with both divinity and human warmth. The lines are supple, the rhythm full, like an upward current flowing within, existing between fragility and resilience, brimming with supple tension. It lacks the tension of battle, nor the extravagance of empire; instead, it possesses a state of creativity and vitality amidst uncertainty. This state is captivating, captivating the vigor, elegance, and clarity it exudes, a brightness and quiet anticipation like standing in the sunlight."
           }
         },
         {
@@ -5423,8 +5512,15 @@
         {
           "type": "paragraph",
           "content": {
-            "zh": "这让我想到：战乱会塑造刚猛，盛世会塑造华丽。\n但只有那种“松散而不绝望”的时代，才会出现这样的气质。\n不豪华，但细腻。不激烈，但有内力。不悲怆，却极为深沉。\n这尊造像呈现着一个时代特有的精神气息。是一种在不确定时代中对稳定的渴望，以及依然保有文化韧性、内心并非贫瘠的精神状态...",
-            "en": "The proportions of its body are idealized, imbued with both divinity and human warmth. The lines are supple, the rhythm full, like an upward current flowing within, existing between fragility and resilience, brimming with supple tension. It lacks the tension of battle, nor the extravagance of empire; instead, it possesses a state of creativity and vitality amidst uncertainty. This state is captivating, captivating the vigor, elegance, and clarity it exudes, a brightness and quiet anticipation like standing in the sunlight."
+            "zh": "这让我想到：战乱会塑造刚猛，盛世会塑造华丽。\n但只有那种“松散而不绝望”的时代，才会出现这样的气质。\n不豪华，但细腻。不激烈，但有内力。不悲怆，却极为深沉。",
+            "en": "This reminds me: war forges fierceness, prosperity forges splendor."
+          }
+        },
+        {
+          "type": "paragraph",
+          "content": {
+            "zh": "这尊造像呈现着一个时代特有的精神气息。是一种在不确定时代中对稳定的渴望，以及依然保有文化韧性、内心并非贫瘠的精神状态。",
+            "en": "But only in an era of \"relaxation without despair\" can such a temperament emerge."
           }
         }
       ],
