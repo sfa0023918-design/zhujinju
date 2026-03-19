@@ -804,7 +804,8 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773730424320-l1001089.jpg",
       "gallery": [
-        "/uploads/artworks/1773730443013-59西藏释迦牟尼-牧女.jpg"
+        "/uploads/artworks/1773730443013-59西藏释迦牟尼-牧女.jpg",
+        "/uploads/artworks/1773202175470-61西藏释迦牟尼-左侧.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -919,7 +920,8 @@
       "image": "/uploads/artworks/1773133562827-41尼泊尔释迦牟尼-正.jpg",
       "gallery": [
         "/uploads/artworks/1773133574827-43尼泊尔释迦牟尼-右侧.jpg",
-        "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg"
+        "/uploads/artworks/1773133584698-42尼泊尔释迦牟尼-左侧.jpg",
+        "/uploads/artworks/1773133593479-39尼泊尔释迦牟尼-背.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1051,7 +1053,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773730176014-l1000792.jpg",
       "gallery": [
-        "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
+        "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1059,15 +1061,10 @@
       },
       "galleryAssets": [
         {
-          "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg"
-        },
-        {
-          "original": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "card": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "hero": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "detail": "/uploads/artworks/1773132846487-35立像金刚手-侧特.jpg",
-          "width": 1200,
-          "height": 1500
+          "original": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "card": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "hero": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg",
+          "detail": "/uploads/artworks/1773898130449-1773424083016-3900c5c5daea874f6a5e88d5d01215ca.jpg"
         }
       ]
     },
@@ -1296,7 +1293,10 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773728118037-l1002732.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773412989098-未命名-2.jpg",
+        "/uploads/artworks/1773412805579-未命名-4.jpg"
+      ],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773728118037-l1002732.jpg"
@@ -1413,7 +1413,9 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1773202800906-32喜金刚-剪影.jpg"
+      ],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773202795354-33喜金刚-正.jpg",
@@ -4186,9 +4188,7 @@
         "width": 1200,
         "height": 1500
       },
-      "galleryAssets": [
-        null
-      ]
+      "galleryAssets": []
     }
   ],
   "exhibitions": [
