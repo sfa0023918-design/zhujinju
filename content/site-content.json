@@ -1510,7 +1510,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773228557100-5cc14fef0d78bbbbe2e9358a0f9168ed.jpg",
       "gallery": [
-        "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg"
+        "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg"
       ],
       "featured": false,
       "imageAsset": {
@@ -1522,15 +1522,15 @@
         "height": 1500
       },
       "galleryAssets": [
+        null,
         {
-          "original": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
-          "card": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
-          "hero": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
-          "detail": "/uploads/artworks/1773228561887-22那烂陀观音-右侧.jpg",
+          "original": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "card": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "hero": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
+          "detail": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
           "width": 1200,
           "height": 1500
-        },
-        null
+        }
       ]
     },
     {
