@@ -1509,9 +1509,7 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773895028222-21那烂陀观音-左侧.jpg",
-      "gallery": [
-        "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg"
-      ],
+      "gallery": [],
       "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773895028222-21那烂陀观音-左侧.jpg",
@@ -1522,9 +1520,7 @@
         "height": 1500
       },
       "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg"
-        },
+        null,
         {
           "original": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
           "card": "/uploads/artworks/1773228571349-8a23a62f4a18621347864f2f8949aed8.jpg",
