@@ -394,7 +394,6 @@
       ],
       "image": "/uploads/artworks/1773726406689-3353ee86a913f9dcc512f01832f3fea2.jpg",
       "gallery": [
-        "/uploads/artworks/1773726414496-a3047d575a90c82a19789c1e1c4f4a46.jpg",
         "/uploads/artworks/1773726424475-f3090f629e39367f01e74780e92feb8a.jpg"
       ],
       "featured": false,
@@ -402,9 +401,6 @@
         "original": "/uploads/artworks/1773726406689-3353ee86a913f9dcc512f01832f3fea2.jpg"
       },
       "galleryAssets": [
-        {
-          "original": "/uploads/artworks/1773726414496-a3047d575a90c82a19789c1e1c4f4a46.jpg"
-        },
         {
           "original": "/uploads/artworks/1773726424475-f3090f629e39367f01e74780e92feb8a.jpg"
         }
