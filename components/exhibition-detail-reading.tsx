@@ -93,8 +93,8 @@ function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
     return normalized;
   }
 
-  const joiner = locale === "zh" ? "" : " ";
-  const targetLength = locale === "zh" ? 120 : 220;
+  const joiner = " ";
+  const targetLength = 220;
   const merged: string[] = [];
   let current = "";
 
@@ -105,7 +105,7 @@ function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
     }
 
     const next = `${current}${joiner}${paragraph}`;
-    if (current.length >= targetLength || next.length > targetLength + (locale === "zh" ? 36 : 70)) {
+    if (current.length >= targetLength || next.length > targetLength + 70) {
       merged.push(current);
       current = paragraph;
       return;
