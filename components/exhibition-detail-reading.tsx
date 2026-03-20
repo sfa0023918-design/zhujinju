@@ -46,11 +46,35 @@ function collapseLocaleWhitespace(text: string, locale: ReadingLocale) {
   return collapsed;
 }
 
+function splitIntoSentenceParagraphs(text: string, locale: ReadingLocale) {
+  const normalized = collapseLocaleWhitespace(
+    normalizeInlineWhitespace(text).replace(/\n+/g, locale === "zh" ? "" : " "),
+    locale,
+  );
+
+  if (!normalized) {
+    return [];
+  }
+
+  const sentenceRegex =
+    locale === "zh"
+      ? /[^。！？!?]+[。！？!?]?/g
+      : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
+
+  return (normalized.match(sentenceRegex) ?? [])
+    .map((sentence) => collapseLocaleWhitespace(sentence, locale))
+    .filter(Boolean);
+}
+
 function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
   const normalized = normalizeInlineWhitespace(text);
 
   if (!normalized) {
     return "";
+  }
+
+  if (locale === "zh") {
+    return splitIntoSentenceParagraphs(normalized, locale).join("\n\n");
   }
 
   const rawParagraphs = normalized
