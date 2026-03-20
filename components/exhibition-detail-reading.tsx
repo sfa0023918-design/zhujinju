@@ -79,7 +79,7 @@ function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
 
   const rawParagraphs = normalized
     .split(/\n\s*\n+/)
-    .map((paragraph) => collapseLocaleWhitespace(paragraph.replace(/\n+/g, locale === "zh" ? "" : " "), locale))
+    .map((paragraph) => collapseLocaleWhitespace(paragraph.replace(/\n+/g, " "), locale))
     .filter(Boolean);
 
   if (rawParagraphs.length < 4) {
