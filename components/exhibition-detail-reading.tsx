@@ -87,7 +87,7 @@ function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
   }
 
   const averageLength = rawParagraphs.reduce((sum, paragraph) => sum + paragraph.length, 0) / rawParagraphs.length;
-  const shouldMerge = averageLength <= (locale === "zh" ? 48 : 90);
+  const shouldMerge = averageLength <= 90;
 
   if (!shouldMerge) {
     return normalized;
