@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
 import { fallbackTranslateChineseToEnglish } from "@/lib/admin-translation-fallback";
 
-const OPENAI_TRANSLATION_MODEL = process.env.OPENAI_TRANSLATION_MODEL ?? "gpt-5-mini";
+const OPENAI_TRANSLATION_MODEL = process.env.OPENAI_TRANSLATION_MODEL ?? "gpt-4o-mini";
 const OPENAI_TRANSLATION_BASE_URL = (process.env.OPENAI_TRANSLATION_BASE_URL ?? "https://api.openai.com/v1").replace(/\/$/, "");
 const OPENAI_TRANSLATION_API_STYLE =
   process.env.OPENAI_TRANSLATION_API_STYLE ??
@@ -126,16 +126,46 @@ async function requestTranslation(endpoint: string, body: unknown) {
   let lastMessage = "自动翻译失败。";
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_TRANSLATION_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
 
-    const payload = await response.json();
+    let response: Response;
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_TRANSLATION_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeout);
+      lastStatus = 504;
+      lastMessage = fetchError instanceof DOMException && fetchError.name === "AbortError"
+        ? "翻译请求超时，请稍后再试。"
+        : "翻译服务连接失败，请稍后再试。";
+      if (attempt === maxAttempts) {
+        return { error: lastMessage, status: lastStatus };
+      }
+      await sleep(220 * attempt);
+      continue;
+    }
+    clearTimeout(timeout);
+
+    let payload: unknown;
+    try {
+      payload = await response.json();
+    } catch {
+      lastStatus = 502;
+      lastMessage = "翻译服务返回了无法解析的响应。";
+      if (attempt === maxAttempts) {
+        return { error: lastMessage, status: lastStatus };
+      }
+      await sleep(220 * attempt);
+      continue;
+    }
 
     if (response.ok) {
       return { payload };

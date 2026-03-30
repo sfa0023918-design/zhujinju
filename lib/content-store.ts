@@ -1007,8 +1007,8 @@ function normalizeSiteContent(content: Partial<SiteContent>): SiteContent {
       const sourceViewingNoteZh = typeof artwork.viewingNote?.zh === "string" ? artwork.viewingNote.zh : null;
       if (sourceViewingNoteEn !== null || sourceViewingNoteZh !== null) {
         cleanedArtwork.viewingNote = {
-          zh: sourceViewingNoteZh ?? cleanedArtwork.viewingNote.zh,
-          en: sourceViewingNoteEn ?? cleanedArtwork.viewingNote.en,
+          zh: sourceViewingNoteZh ?? cleanedArtwork.viewingNote?.zh ?? "",
+          en: sourceViewingNoteEn ?? cleanedArtwork.viewingNote?.en ?? "",
         };
       }
       const imageAsset = normalizeImageAsset(cleanedArtwork.imageAsset, cleanedArtwork.image);
@@ -1155,7 +1155,10 @@ function parseArticleDateTimestamp(dateText: string) {
     return Date.UTC(year, month - 1, day);
   }
 
-  const parsed = Date.parse(raw);
+  const withUtcSuffix = raw.includes("T") && !raw.includes("Z") && !/[+-]\d{2}:?\d{2}$/.test(raw)
+    ? `${raw}Z`
+    : raw;
+  const parsed = Date.parse(withUtcSuffix);
   return Number.isNaN(parsed) ? null : parsed;
 }
 
