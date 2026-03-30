@@ -132,7 +132,7 @@
 
 - `OPENAI_API_KEY`
 - `OPENAI_TRANSLATION_MODEL`
-  - 这项可选，不填时默认使用 `gpt-5-mini`
+  - 这项可选，不填时默认使用 `gpt-4o-mini`
 
 如果你希望官网联系表单真的发到你的邮箱，还需要补这 3 个环境变量：
 

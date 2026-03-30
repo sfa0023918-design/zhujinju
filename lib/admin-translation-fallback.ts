@@ -94,6 +94,8 @@ const PUNCTUATION_REPLACEMENTS: Array<[RegExp, string]> = [
 ];
 
 let translationMemoryPromise: Promise<TranslationMemory> | null = null;
+let translationMemoryCreatedAt = 0;
+const TRANSLATION_MEMORY_TTL_MS = 5 * 60 * 1000;
 
 function normalizeKey(value: string) {
   return value.replace(/\s+/g, " ").trim();
@@ -263,7 +265,8 @@ function collectBilingualPairs(value: unknown, memory: TranslationMemory) {
 }
 
 async function getTranslationMemory() {
-  if (!translationMemoryPromise) {
+  if (!translationMemoryPromise || Date.now() - translationMemoryCreatedAt > TRANSLATION_MEMORY_TTL_MS) {
+    translationMemoryCreatedAt = Date.now();
     translationMemoryPromise = readSiteContentFresh().then((content) => {
       const memory: TranslationMemory = new Map();
       collectBilingualPairs(content, memory);
