@@ -1,9 +1,15 @@
-import { CollectionResults } from "@/components/collection-results";
+import { BilingualText } from "@/components/bilingual-text";
 import { CollectionFilters } from "@/components/collection-filters";
-import { getArtworkStatusText } from "@/lib/bilingual";
+import styles from "@/components/collection-page.module.css";
+import { CollectionResults } from "@/components/collection-results";
+import { bt, getArtworkStatusText } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { bt } from "@/lib/bilingual";
-import { getFilterOptions, getFilteredArtworks, getPublicArtworks, loadSiteContent } from "@/lib/site-data";
+import {
+  getFilterOptions,
+  getFilteredArtworks,
+  getPublicArtworks,
+  loadSiteContent,
+} from "@/lib/site-data";
 
 type CollectionPageProps = {
   searchParams?: Promise<{
@@ -12,6 +18,7 @@ type CollectionPageProps = {
     period?: string;
     material?: string;
     status?: string;
+    page?: string;
   }>;
 };
 
@@ -29,7 +36,8 @@ export async function generateMetadata() {
 }
 
 export default async function CollectionPage({ searchParams }: CollectionPageProps) {
-  const filters = (await searchParams) ?? {};
+  const params = (await searchParams) ?? {};
+  const { page: _page, ...filters } = params;
   const content = await loadSiteContent();
   const baseArtworks = getFilteredArtworks(content, filters);
   const publicArtworks = getPublicArtworks(content);
@@ -50,55 +58,62 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
     ...pageCopy.collection.filters,
     status: bt("状态", "Status"),
   };
+  const filterKey = [
+    filters.category,
+    filters.region,
+    filters.period,
+    filters.material,
+    filters.status,
+  ].map((value) => value ?? "").join("|");
 
   return (
-    <>
-      <section className="mx-auto w-full max-w-[1480px] px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8">
-        <div className="grid gap-3 md:grid-cols-[168px_minmax(0,480px)] md:items-start md:gap-6">
-          <p className="text-[0.7rem] tracking-[0.17em] text-[var(--accent)]/84">
-            {pageCopy.collection.hero.eyebrow.zh}
-            <span className="mx-[0.45em] opacity-40">·</span>
-            <span className="text-[0.44rem] uppercase tracking-[0.15em] text-[var(--accent)]/54">
-              {pageCopy.collection.hero.eyebrow.en}
-            </span>
-          </p>
-          <div className="space-y-2">
-            <h1 className="font-serif text-[clamp(2.28rem,3.45vw,3rem)] leading-[1.02] tracking-[-0.04em] text-[var(--ink)]">
-              {pageCopy.collection.hero.title.zh}
-            </h1>
-            <p className="text-[0.62rem] uppercase tracking-[0.18em] text-[var(--accent)]/68">
-              {pageCopy.collection.hero.title.en}
-            </p>
-            <p className="max-w-[21rem] text-[0.78rem] leading-[1.9] text-[var(--muted)]/88">
-              {pageCopy.collection.hero.description.zh}
-            </p>
-            <p className="max-w-[21rem] text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/66">
-              {collectionHeroDescriptionEn}
-            </p>
+    <div className={styles.collectionPage}>
+      <section className={styles.hero}>
+        <BilingualText
+          as="p"
+          text={pageCopy.collection.hero.eyebrow}
+          mode="inline"
+          className={`${styles.bilingualPair} ${styles.eyebrow}`}
+          zhClassName={styles.zh}
+          enClassName={styles.en}
+        />
+        <div className={styles.heroGrid}>
+          <div className={styles.heroTitleGroup}>
+            <h1>{pageCopy.collection.hero.title.zh}</h1>
+            <p>{pageCopy.collection.hero.title.en}</p>
+          </div>
+          <div className={styles.heroDescription}>
+            <p>{pageCopy.collection.hero.description.zh}</p>
+            <p lang="en">{collectionHeroDescriptionEn}</p>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-14 md:px-8 md:pb-18 lg:px-10 lg:pb-20">
+      <section className={styles.collectionBody}>
         <CollectionFilters
           current={filters}
           options={filterOptions}
           labels={filterLabels}
           resultCount={filteredArtworks.length}
         />
-        <div className="mt-6">
-          {filteredArtworks.length > 0 ? (
-            <CollectionResults artworks={filteredArtworks} />
-          ) : (
-            <div className="border-t border-[var(--line)] py-10 text-[var(--muted)]">
-              <p className="text-sm leading-8">{pageCopy.collection.emptyState.zh}</p>
-              <p className="mt-2 text-[0.66rem] uppercase tracking-[0.18em] text-[var(--accent)]/72">
-                {pageCopy.collection.emptyState.en}
-              </p>
-            </div>
-          )}
-        </div>
+        {filteredArtworks.length > 0 ? (
+          <CollectionResults
+            key={filterKey}
+            artworks={filteredArtworks}
+            filterSignature={filterKey}
+          />
+        ) : (
+          <div className={styles.emptyState}>
+            <BilingualText
+              as="p"
+              text={pageCopy.collection.emptyState}
+              className={styles.bilingualPair}
+              zhClassName={styles.zh}
+              enClassName={styles.en}
+            />
+          </div>
+        )}
       </section>
-    </>
+    </div>
   );
 }

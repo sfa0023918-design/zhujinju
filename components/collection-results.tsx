@@ -5,10 +5,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Artwork } from "@/lib/site-data";
 
 import { ArtworkCard } from "./artwork-card";
+import styles from "./collection-page.module.css";
 
 const DESKTOP_PAGE_SIZE = 9;
 const TABLET_PAGE_SIZE = 6;
 const MOBILE_PAGE_SIZE = 4;
+type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
 
 function getPageSize(width: number) {
   if (width >= 1280) {
@@ -22,11 +24,35 @@ function getPageSize(width: number) {
   return MOBILE_PAGE_SIZE;
 }
 
+function getPaginationItems(currentPage: number, totalPages: number): PaginationItem[] {
+  if (totalPages <= 9) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const pages = Array.from(
+    new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]),
+  )
+    .filter((page) => page >= 1 && page <= totalPages)
+    .sort((left, right) => left - right);
+  const items: PaginationItem[] = [];
+
+  pages.forEach((page, index) => {
+    const previousPage = pages[index - 1];
+    if (previousPage && page - previousPage > 1) {
+      items.push(previousPage === 1 ? "ellipsis-start" : "ellipsis-end");
+    }
+    items.push(page);
+  });
+
+  return items;
+}
+
 type CollectionResultsProps = {
   artworks: Artwork[];
+  filterSignature: string;
 };
 
-export function CollectionResults({ artworks }: CollectionResultsProps) {
+export function CollectionResults({ artworks, filterSignature }: CollectionResultsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -40,6 +66,12 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
     const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN;
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
   }, [searchParams]);
+  const activeFilterSignature = useMemo(
+    () => ["category", "region", "period", "material", "status"]
+      .map((key) => searchParams.get(key) ?? "")
+      .join("|"),
+    [searchParams],
+  );
 
   useEffect(() => {
     const updatePageSize = () => {
@@ -57,9 +89,10 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
 
   const totalPages = Math.max(1, Math.ceil(artworks.length / pageSize));
   const currentPage = Math.min(requestedPage, totalPages);
+  const paginationItems = getPaginationItems(currentPage, totalPages);
 
   useEffect(() => {
-    if (!pageSizeReady) {
+    if (!pageSizeReady || activeFilterSignature !== filterSignature) {
       return;
     }
 
@@ -75,7 +108,16 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
     }
     const query = params.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-  }, [currentPage, pageSizeReady, pathname, requestedPage, router, searchParams]);
+  }, [
+    activeFilterSignature,
+    currentPage,
+    filterSignature,
+    pageSizeReady,
+    pathname,
+    requestedPage,
+    router,
+    searchParams,
+  ]);
 
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -106,8 +148,8 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
   }
 
   return (
-    <div ref={rootRef}>
-      <div className="grid gap-x-8 gap-y-11 md:grid-cols-2 xl:grid-cols-3">
+    <div ref={rootRef} className={styles.results}>
+      <div className={styles.artworksGrid}>
         {currentItems.map((artwork, index) => (
           <ArtworkCard
             key={artwork.slug}
@@ -119,55 +161,45 @@ export function CollectionResults({ artworks }: CollectionResultsProps) {
       </div>
 
       {artworks.length > pageSize ? (
-        <div className="mt-12 border-t border-[var(--line)]/55 pt-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[0.76rem] leading-7 text-[var(--muted)]/86">
-              第 {currentPage} 页，共 {totalPages} 页
-            </p>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {currentPage > 1 ? (
-                <button
-                  type="button"
-                  onClick={() => setCollectionPage(currentPage - 1)}
-                  className="inline-flex min-h-[2.2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/55 px-3.5 py-[0.42rem] text-[0.72rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
-                >
-                  上一页
-                </button>
-              ) : null}
+        <nav className={styles.pagination} aria-label="Collection pages">
+          <p>第 {currentPage} 页，共 {totalPages} 页</p>
+          <div className={styles.pageLinks}>
+            <button
+              type="button"
+              aria-label="上一页"
+              disabled={currentPage === 1}
+              onClick={() => setCollectionPage(currentPage - 1)}
+            >
+              ←
+            </button>
 
-              <div className="flex flex-wrap items-center gap-1.5">
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
-                  const isCurrent = page === currentPage;
-                  return (
-                    <button
-                      key={page}
-                      type="button"
-                      aria-current={isCurrent ? "page" : undefined}
-                      onClick={() => setCollectionPage(page)}
-                      className={`inline-flex min-h-[2.2rem] min-w-[2.2rem] cursor-pointer select-none items-center justify-center rounded-full border px-3 py-[0.42rem] text-[0.72rem] transition-colors duration-150 ${
-                        isCurrent
-                          ? "border-[var(--line-strong)]/55 text-[var(--ink)]"
-                          : "border-[var(--line)]/45 text-[var(--muted)] hover:border-[var(--line-strong)]/42 hover:text-[var(--ink)]"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {currentPage < totalPages ? (
+            {paginationItems.map((item) =>
+              typeof item === "number" ? (
                 <button
+                  key={item}
                   type="button"
-                  onClick={() => setCollectionPage(currentPage + 1)}
-                  className="inline-flex min-h-[2.2rem] cursor-pointer select-none items-center rounded-full border border-[var(--line)]/55 px-3.5 py-[0.42rem] text-[0.72rem] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
+                  aria-current={item === currentPage ? "page" : undefined}
+                  onClick={() => setCollectionPage(item)}
                 >
-                  下一页
+                  {item}
                 </button>
-              ) : null}
-            </div>
+              ) : (
+                <span key={item} className={styles.paginationEllipsis} aria-hidden="true">
+                  …
+                </span>
+              ),
+            )}
+
+            <button
+              type="button"
+              aria-label="下一页"
+              disabled={currentPage === totalPages}
+              onClick={() => setCollectionPage(currentPage + 1)}
+            >
+              →
+            </button>
           </div>
-        </div>
+        </nav>
       ) : null}
     </div>
   );
