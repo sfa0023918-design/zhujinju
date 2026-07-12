@@ -11,6 +11,19 @@ function normalizeImageUrl(value: string | undefined | null) {
   return (value ?? "").trim();
 }
 
+function encodeImageUrlPath(src: string) {
+  try {
+    const absolute = /^https?:\/\//i.test(src);
+    const url = new URL(src, "https://zhujinju.local");
+
+    return absolute
+      ? url.href
+      : `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return src;
+  }
+}
+
 export function resolveImageCandidates(values: Array<string | undefined | null>) {
   const seen = new Set<string>();
   const resolved: string[] = [];
@@ -50,8 +63,9 @@ export function withImageVersion(src: string) {
     return src;
   }
 
+  const encodedSrc = encodeImageUrlPath(src);
   const versionSeed = src.split("/").pop()?.replace(/\.[^.]+$/, "") ?? "image";
-  const separator = src.includes("?") ? "&" : "?";
+  const separator = encodedSrc.includes("?") ? "&" : "?";
 
-  return `${src}${separator}v=${encodeURIComponent(`${IMAGE_URL_VERSION}-${versionSeed}`)}`;
+  return `${encodedSrc}${separator}v=${encodeURIComponent(`${IMAGE_URL_VERSION}-${versionSeed}`)}`;
 }
