@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-12T09:24:00Z",
+  "title": "Design System: 竹瑾居",
+  "extensions": {
+    "colorMeta": {
+      "wall-current": {
+        "role": "neutral",
+        "displayName": "暖展墙 current baseline",
+        "canonical": "#f4f0e8",
+        "tonalRamp": ["#201e1a", "#3b3730", "#5d574d", "#80786b", "#a79f92", "#cbc4b9", "#e6e1d8", "#f4f0e8"]
+      },
+      "surface-current": {
+        "role": "neutral",
+        "displayName": "安静表面 current baseline",
+        "canonical": "#f7f3ec",
+        "tonalRamp": ["#211f1b", "#3d3932", "#605950", "#847b6f", "#aca397", "#d0c9bf", "#ebe6de", "#f7f3ec"]
+      },
+      "surface-strong-current": {
+        "role": "neutral",
+        "displayName": "作品衬底 current baseline",
+        "canonical": "#fbf8f2",
+        "tonalRamp": ["#22201c", "#403b34", "#645d53", "#898075", "#b1a89d", "#d7d0c6", "#f0ebe4", "#fbf8f2"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "墨色正文",
+        "canonical": "#171512",
+        "tonalRamp": ["#171512", "#302c26", "#4c463d", "#6d6559", "#938a7c", "#bab2a6", "#ddd8d0", "#f5f2ed"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "研究灰",
+        "canonical": "#5b554d",
+        "tonalRamp": ["#1f1d1a", "#39352f", "#5b554d", "#7d756b", "#a1988d", "#c6bfb5", "#e4dfd7", "#f5f2ed"]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "石褐非文字强调色",
+        "canonical": "#85715a",
+        "tonalRamp": ["#261f18", "#443629", "#65513e", "#85715a", "#a6937c", "#c8b7a3", "#e6dacb", "#f7f1e9"]
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "石褐文字色",
+        "canonical": "#6f5d48",
+        "tonalRamp": ["#241d16", "#3d3024", "#574532", "#6f5d48", "#94806a", "#b9a691", "#ddcfbf", "#f5eee6"]
+      },
+      "error": {
+        "role": "semantic",
+        "displayName": "功能错误红",
+        "canonical": "#87372f",
+        "tonalRamp": ["#2b1210", "#4a1d19", "#6a2923", "#87372f", "#aa5d54", "#cc887f", "#e8bcb6", "#f8e9e7"]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "功能成功绿",
+        "canonical": "#356247",
+        "tonalRamp": ["#102419", "#1c3b29", "#28543b", "#356247", "#5b856a", "#86aa93", "#bad0c0", "#e8f1ea"]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "功能警告赭",
+        "canonical": "#71521b",
+        "tonalRamp": ["#261b08", "#3f2d0d", "#594113", "#71521b", "#96752f", "#bd9b5b", "#dec791", "#f4ead0"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "结构线",
+        "canonical": "#1715121f",
+        "tonalRamp": ["#171512", "#302c26", "#4c463d", "#6d6559", "#938a7c", "#bab2a6", "#ddd8d0", "#f5f2ed"]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "强调结构线",
+        "canonical": "#17151247",
+        "tonalRamp": ["#171512", "#302c26", "#4c463d", "#6d6559", "#938a7c", "#bab2a6", "#ddd8d0", "#f5f2ed"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "中文展示标题",
+        "purpose": "首页主标题和少量一级标题，桌面最大 64px。"
+      },
+      "headline": {
+        "displayName": "内容标题",
+        "purpose": "展览、文章和内容区的主要标题。"
+      },
+      "body": {
+        "displayName": "研究正文",
+        "purpose": "中英文正文、字段值和长篇阅读。"
+      },
+      "label": {
+        "displayName": "资料标签",
+        "purpose": "字段、状态、按钮和双语辅助层，最低 12px。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "temporary-overlay",
+        "value": "0 8px 24px rgba(23, 21, 18, 0.10)",
+        "purpose": "仅用于移动菜单、弹层和灯箱。"
+      },
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 2px rgba(133, 113, 90, 0.42)",
+        "purpose": "键盘焦点，不与装饰阴影叠加。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "180ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "链接、边框和按钮状态反馈。"
+      },
+      {
+        "name": "route-calm",
+        "value": "360ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "单次页面进入过渡，减少动态模式下取消。"
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Action Link",
+      "kind": "button",
+      "refersTo": "action-link",
+      "description": "首页和内容页的中英文双层文本操作。",
+      "html": "<a class=\"ds-action-link\" href=\"#\"><span>浏览藏品</span><small>BROWSE COLLECTION</small></a>",
+      "css": ".ds-action-link { display: inline-flex; flex-direction: column; align-items: flex-start; color: var(--ink, #171512); text-decoration: none; padding: 8px 0; font-family: var(--font-sans, sans-serif); transition: color 180ms cubic-bezier(0.16,1,0.3,1), transform 180ms cubic-bezier(0.16,1,0.3,1); } .ds-action-link span { font-size: 14px; line-height: 1.2; } .ds-action-link small { margin-top: 4px; color: var(--accent-text, #6f5d48); font-size: 12px; line-height: 1.4; letter-spacing: 0.1em; } .ds-action-link:hover { color: var(--muted, #5b554d); } .ds-action-link:active { transform: translateY(1px); } .ds-action-link:focus-visible { outline: 2px solid var(--accent, #85715a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "联系、查看图录和后台入口等明确操作。",
+      "html": "<button class=\"ds-button-outline\" type=\"button\">查看电子图录</button>",
+      "css": ".ds-button-outline { min-height: 44px; border: 1px solid var(--line-strong, rgba(23,21,18,0.28)); border-radius: 0; background: transparent; color: var(--ink, #171512); padding: 12px 24px; font: 400 14px/1.2 var(--font-sans, sans-serif); transition: background-color 180ms cubic-bezier(0.16,1,0.3,1), transform 180ms cubic-bezier(0.16,1,0.3,1); } .ds-button-outline:hover { background: var(--surface, #f7f3ec); } .ds-button-outline:active { transform: translateY(1px); } .ds-button-outline:focus-visible { outline: 2px solid var(--accent, #85715a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "藏品列表的真实筛选条件，不承担装饰。",
+      "html": "<button class=\"ds-filter-chip\" type=\"button\"><span>年代</span><small>PERIOD</small><strong>全部</strong></button>",
+      "css": ".ds-filter-chip { min-height: 36px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line, rgba(23,21,18,0.12)); border-radius: 9999px; background: var(--surface, #f7f3ec); color: var(--muted, #5b554d); padding: 6px 12px; font-family: var(--font-sans, sans-serif); } .ds-filter-chip span, .ds-filter-chip strong { font-size: 12px; font-weight: 400; } .ds-filter-chip small { font-size: 12px; letter-spacing: 0.08em; color: var(--accent-text, #6f5d48); } .ds-filter-chip:hover { border-color: var(--line-strong, rgba(23,21,18,0.28)); color: var(--ink, #171512); } .ds-filter-chip:focus-visible { outline: 2px solid var(--accent, #85715a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "联系表单和后台表单使用的直角字段。",
+      "html": "<label class=\"ds-field\"><span>邮箱 <small>EMAIL</small></span><input type=\"email\" /></label>",
+      "css": ".ds-field { display: grid; gap: 8px; color: var(--muted, #5b554d); font-family: var(--font-sans, sans-serif); } .ds-field > span { font-size: 13px; line-height: 1.5; } .ds-field small { margin-left: 6px; color: var(--accent-text, #6f5d48); font-size: 12px; letter-spacing: 0.1em; } .ds-field input { height: 44px; border: 1px solid var(--line, rgba(23,21,18,0.12)); border-radius: 0; background: var(--bg, #f4f0e8); color: var(--ink, #171512); padding: 0 12px; font-size: 16px; } .ds-field input:focus-visible { outline: 2px solid var(--accent, #85715a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Navigation Item",
+      "kind": "nav",
+      "description": "桌面单行主导航中的中英文入口。",
+      "html": "<a class=\"ds-nav-item\" href=\"#\"><span>展览与图录</span><small>EXHIBITIONS</small></a>",
+      "css": ".ds-nav-item { display: inline-flex; align-items: baseline; gap: 7px; min-height: 44px; color: var(--muted, #5b554d); text-decoration: none; font-family: var(--font-sans, sans-serif); white-space: nowrap; } .ds-nav-item span { font-size: 14px; } .ds-nav-item small { color: var(--accent-text, #6f5d48); font-size: 12px; letter-spacing: 0.08em; } .ds-nav-item:hover { color: var(--ink, #171512); } .ds-nav-item:focus-visible { outline: 2px solid var(--accent, #85715a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "藏品可询洽、已洽购等真实状态。",
+      "html": "<span class=\"ds-status-chip\">可询洽 <small>AVAILABLE ON REQUEST</small></span>",
+      "css": ".ds-status-chip { min-height: 32px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line, rgba(23,21,18,0.12)); border-radius: 9999px; background: var(--surface, #f7f3ec); color: var(--muted, #5b554d); padding: 4px 10px; font: 400 12px/1.4 var(--font-sans, sans-serif); } .ds-status-chip small { font-size: 12px; letter-spacing: 0.06em; color: var(--accent-text, #6f5d48); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "让作品先说话",
+    "overview": "竹瑾居的界面是一座当代研究展厅。作品图像承担第一视觉判断，标题和资料紧随其后，界面只负责建立顺序、尺度和可信度。它既不表演传统，也不借冷白和空旷扮演西方画廊。\n\n这份文档是从当前线上系统、干净代码基线和已确认的视觉审核中提炼出的重设计基准。前置 YAML 是后续预览的规范层，不代表当前每个组件已经达到标准。当前令牌保留品牌连续性，已识别的小字、低对比、大圆角和过度阴影属于待修正的旧表现，不得被当作新组件依据。\n\n首页的板块、顺序、中英文文案和真实图片完全锁定。成都研究空间方向不能把空间照片加入首页。三套预览都必须在当前无 current 展览时显示真实的近期展览状态，并直接读取线上真实内容，不使用模拟记录。",
+    "keyCharacteristics": [
+      "真实作品和资料优先，装饰退后。",
+      "浅色但不冷白，温和但不泛黄成仿古纸。",
+      "中文标题有书卷气，正文和数据使用清晰无衬线。",
+      "以细线、比例和间距建立层级，平面化优先。",
+      "动效克制，只承担反馈和层级提示。",
+      "信息密度按页面任务分配：首页约 4，藏品列表约 6，作品与展览详情约 7，文章列表约 5，文章阅读约 4。数值只描述相对密度，不写入全站统一常量。",
+      "布局必须适应藏品、展览、文章、相关推荐和图录页数持续增长。"
+    ],
+    "rules": [
+      { "name": "The Warmth Without Parchment Rule", "body": "温度由真实作品、空间经验、文字和比例产生。禁止用泛黄、纸纹、木纹或铜金色替代品牌温度。", "section": "colors" },
+      { "name": "The Accent Split Rule", "body": "`accent` 只做非文字强调，`accent-text` 承担石褐文字。任何 12px 标签都禁止继续使用 `#85715a`，也禁止通过透明度降低 `accent-text` 的对比度。", "section": "colors" },
+      { "name": "The Functional Semantics Rule", "body": "`error`、`success` 和 `warning` 只表达功能状态，不参与品牌装饰和内容分类。", "section": "colors" },
+      { "name": "The Readable Scholarship Rule", "body": "资料可信度首先取决于可读性。禁止 6-10px 英文、低于 4.5:1 的功能文字，以及依靠过宽字距掩盖字号不足。", "section": "typography" },
+      { "name": "The Two-Family Rule", "body": "除品牌图片字标外，页面只使用一套中文显示字体和一套正文无衬线。不得为了显得编辑化而继续叠加衬线、等宽或手写字体。", "section": "typography" },
+      { "name": "The Flat Archive Rule", "body": "数字图录应像清晰的档案桌面，不像带柔光、厚阴影和 24-34px 圆角的消费产品卡片。", "section": "elevation" },
+      { "name": "The Border Or Shadow Rule", "body": "同一静态元素不得同时使用 1px 边框和 16px 以上模糊阴影。结构边界与浮层高度只能选择一种主要表达。", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** 完整保留首页现有板块、顺序、中英文文案和真实图片。",
+      "**Do** 在没有 current 展览时真实显示近期展览状态。",
+      "**Do** 直接读取线上真实藏品、展览、文章和图录记录。",
+      "**Do** 让网格、分页、筛选、相关推荐和图录索引适应未来内容增长。",
+      "**Do** 分别设定首页、藏品列表、作品详情、展览详情、文章列表和长文阅读的视觉密度。",
+      "**Do** 在减少背景泛黄时保留温度，使用暖展墙而不是冷白。",
+      "**Do** 保留 CMS、上传、保存、API、内容字段和部署逻辑的完整边界。",
+      "**Do** 保持正文、字段、状态和交互文字可读，并维持 44px 触控目标。",
+      "**Do** 使用 `accent-text` 呈现 12px 石褐标签，并在每个预览背景上重新验证 4.5:1。",
+      "**Do** 只在功能反馈中使用 `error`、`success` 和 `warning`。"
+    ],
+    "donts": [
+      "**Don't** 增加、删除、改写或重新命名首页板块和文案。",
+      "**Don't** 在成都研究空间方向中擅自把空间照片加入首页。",
+      "**Don't** 使用模拟藏品、模拟展览、模拟文章、模拟数量或占位记录。",
+      "**Don't** 把当前 32 件藏品、3 个展览和 6 篇文章写死为布局容量。",
+      "**Don't** 把 VISUAL_DENSITY 5 或任何单一密度值应用到全站。",
+      "**Don't** 把背景改成冷白西方画廊，也不要使用仿古纸、泛黄纸纹、木纹或暖金商城色。",
+      "**Don't** 使用黑金、暗红、莲花、祥云、印章、宗教光效或商业海报语言。",
+      "**Don't** 使用巨大中文口号、无内容依据的过度空白、过小过淡正文或花哨视差。",
+      "**Don't** 直接照搬 David Zwirner、Hauser & Wirth、Eskenazi 或 The Met 的品牌表面。",
+      "**Don't** 将数字图录做成大圆角、宽阴影、玻璃感或消费产品式卡片。",
+      "**Don't** 将 `#f4f0e8`、`#f7f3ec` 和 `#fbf8f2` 宣布为最终目标色，它们只是 current baseline。",
+      "**Don't** 将 `#85715a` 用于 12px 标签或正文文字。",
+      "**Don't** 把错误红、成功绿或警告赭扩展为品牌装饰、栏目配色或作品分类色。"
+    ]
+  }
+}
