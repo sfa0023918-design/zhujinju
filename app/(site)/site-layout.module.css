@@ -1,0 +1,27 @@
+.siteTheme {
+  --bg: #eeeae2;
+  --surface: #f4f0e8;
+  --surface-2: #f4f0e8;
+  --surface-strong: #e2ddd2;
+  --ink: #1c1a17;
+  --muted: #504a42;
+  --accent: #85715a;
+  --accent-text: #62523f;
+  --error: #87372f;
+  --success: #356247;
+  --warning: #71521b;
+  --line: rgb(28 26 23 / 18%);
+  --line-strong: rgb(28 26 23 / 36%);
+  --content-width: 1240px;
+  --page-inline: 24px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-section: 64px;
+  --motion-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+}

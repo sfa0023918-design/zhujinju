@@ -39,7 +39,7 @@ export function FooterSocialLinks({ platforms, wechatQrSrc, wechatLabel }: Foote
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-3.5 pt-1">
+      <div className="flex flex-wrap items-center gap-1 pt-1">
         {platforms.map((platform) => {
           if (platform.key === "wechat") {
             return (
@@ -51,7 +51,7 @@ export function FooterSocialLinks({ platforms, wechatQrSrc, wechatLabel }: Foote
                 aria-expanded={isWechatOpen}
                 title={platform.label}
                 onClick={() => setIsWechatOpen(true)}
-                className="inline-flex h-7 w-7 items-center justify-center transition-colors hover:text-[var(--ink)]"
+                className="inline-flex h-11 w-11 items-center justify-center transition-colors hover:text-[var(--ink)]"
               >
                 <FooterSocialIcon platform={platform.key} />
               </button>
@@ -67,7 +67,7 @@ export function FooterSocialLinks({ platforms, wechatQrSrc, wechatLabel }: Foote
                 rel="noreferrer"
                 aria-label={platform.label}
                 title={platform.label}
-                className="inline-flex h-7 w-7 items-center justify-center transition-colors hover:text-[var(--ink)]"
+                className="inline-flex h-11 w-11 items-center justify-center transition-colors hover:text-[var(--ink)]"
               >
                 <FooterSocialIcon platform={platform.key} />
               </a>
@@ -79,7 +79,7 @@ export function FooterSocialLinks({ platforms, wechatQrSrc, wechatLabel }: Foote
               key={platform.key}
               aria-label={platform.label}
               title={platform.label}
-              className="inline-flex h-7 w-7 items-center justify-center"
+              className="inline-flex h-11 w-11 items-center justify-center"
             >
               <FooterSocialIcon platform={platform.key} />
             </span>

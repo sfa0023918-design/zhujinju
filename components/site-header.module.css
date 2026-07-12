@@ -1,0 +1,46 @@
+.header {
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.inner {
+  display: flex;
+  width: min(100%, var(--content-width));
+  min-height: 72px;
+  margin-inline: auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding-inline: var(--page-inline);
+}
+
+.brand {
+  width: clamp(146px, 42vw, 168px);
+  flex: none;
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    --page-inline: 40px;
+  }
+
+  .brand {
+    width: 176px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    min-height: 78px;
+  }
+
+  .brand {
+    width: 184px;
+  }
+}
