@@ -43,6 +43,7 @@ export function ExhibitionCatalogueViewer({
   const [isLayoutReady, setIsLayoutReady] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<Set<number>>(() => new Set([0]));
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
   const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
@@ -155,6 +156,63 @@ export function ExhibitionCatalogueViewer({
     strip.scrollTo({ left: Math.max(0, targetLeft), behavior: "auto" });
   }, [currentIndex, usesDesktopPairing]);
 
+  useEffect(() => {
+    setThumbnailImageIndexes((previous) => {
+      const next = new Set(previous);
+      next.add(currentIndex);
+
+      if (usesDesktopPairing && currentIndex + 1 < totalPages) {
+        next.add(currentIndex + 1);
+      }
+
+      return next.size === previous.size ? previous : next;
+    });
+  }, [currentIndex, totalPages, usesDesktopPairing]);
+
+  useEffect(() => {
+    const strip = thumbnailStripRef.current;
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+
+    if (
+      !strip
+      || typeof IntersectionObserver === "undefined"
+      || connection?.saveData
+      || connection?.effectiveType === "2g"
+      || connection?.effectiveType === "slow-2g"
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      const visibleIndexes = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => Number((entry.target as HTMLElement).dataset.thumbnailIndex))
+        .filter(Number.isInteger);
+
+      if (!visibleIndexes.length) {
+        return;
+      }
+
+      setThumbnailImageIndexes((previous) => {
+        const next = new Set(previous);
+        visibleIndexes.forEach((index) => next.add(index));
+        return next.size === previous.size ? previous : next;
+      });
+    }, {
+      root: strip,
+      rootMargin: "0px 160px",
+      threshold: 0.01,
+    });
+
+    strip.querySelectorAll<HTMLElement>("[data-thumbnail-index]").forEach((thumbnail) => {
+      observer.observe(thumbnail);
+    });
+
+    return () => observer.disconnect();
+  }, [cataloguePages.length]);
+
   if (!totalPages) {
     return null;
   }
@@ -178,8 +236,6 @@ export function ExhibitionCatalogueViewer({
   const stageSummary = visiblePageNumbers.length > 1
     ? `${visiblePageNumbers[0]} - ${visiblePageNumbers[visiblePageNumbers.length - 1]}`
     : `${visiblePageNumbers[0] ?? 1}`;
-  const thumbnailImageIndexes = new Set(visiblePageNumbers.map((pageNumber) => pageNumber - 1));
-
   function jumpTo(index: number) {
     if (!totalPages) {
       return;
@@ -363,6 +419,7 @@ export function ExhibitionCatalogueViewer({
                     onClick={() => jumpTo(index)}
                     aria-label={`${title.zh || title.en} page ${index + 1}`}
                     aria-current={selected ? "page" : undefined}
+                    data-thumbnail-index={index}
                     className="group relative shrink-0 rounded-[2px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                   >
                     <div className={`overflow-hidden rounded-[2px] border p-1.5 transition-colors duration-150 ${
