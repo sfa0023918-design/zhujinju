@@ -382,7 +382,7 @@ function ExpandableReadingText({
         <button
           type="button"
           onClick={toggleExpanded}
-          className="inline-flex cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent)]/92 transition-colors hover:text-[var(--ink)]"
+          className="inline-flex min-h-11 cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)]"
         >
           {locale === "zh" ? (expanded ? "收起" : "查看更多") : expanded ? "Show less" : "View more"}
           {expanded ? <span aria-hidden="true">∧</span> : null}
@@ -488,10 +488,10 @@ export function BilingualReadingPanel({
                   key={option}
                   type="button"
                   onClick={() => setLocale(option)}
-                  className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-full px-3 py-1 text-xs uppercase tracking-[0.12em] transition-colors ${
                     active
                       ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                      : "text-[var(--accent-text)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {option.toUpperCase()}
@@ -527,9 +527,9 @@ export function BilingualReadingPanel({
                   as="p"
                   text={section.label}
                   mode="inline"
-                  className="text-[var(--accent)]"
-                  zhClassName="text-[0.58rem] tracking-[0.15em]"
-                  enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
+                  className="text-[var(--accent-text)]"
+                  zhClassName="text-xs tracking-[0.12em]"
+                  enClassName="text-xs uppercase tracking-[0.12em]"
                 />
               ) : null}
               {section.expandable ? (

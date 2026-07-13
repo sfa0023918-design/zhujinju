@@ -164,9 +164,9 @@ export function ExhibitionDetailReading({
             as="p"
             text={introLabel}
             mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/94"
-            enClassName="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+            className="text-[var(--accent-text)]"
+            zhClassName="text-xs tracking-[0.12em]"
+            enClassName="text-xs uppercase tracking-[0.12em] leading-[1.45]"
           />
           <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
             {(["zh", "en"] as const).map((option) => {
@@ -176,10 +176,10 @@ export function ExhibitionDetailReading({
                   key={option}
                   type="button"
                   onClick={() => setLocale(option)}
-                  className={`min-w-10 cursor-pointer select-none rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                  className={`min-h-11 min-w-11 cursor-pointer select-none rounded-full px-3 py-1 text-xs uppercase tracking-[0.12em] transition-colors ${
                     active
                       ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                      : "text-[var(--accent-text)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {option.toUpperCase()}
@@ -235,9 +235,9 @@ export function ExhibitionDetailReading({
               as="p"
               text={relatedWritingLabel}
               mode="inline"
-              className="mb-4 text-[var(--accent)]"
-              zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]/78"
+              className="mb-4 text-[var(--accent-text)]"
+              zhClassName="text-xs tracking-[0.12em]"
+              enClassName="text-xs uppercase tracking-[0.12em]"
             />
             <div className="space-y-3">
               {relatedArticles.map((article) => (

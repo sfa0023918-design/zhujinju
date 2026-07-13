@@ -465,7 +465,7 @@
 }
 
 .readingFrame :global(button) {
-  min-height: 40px;
+  min-height: 44px;
   border-radius: 4px !important;
 }
 

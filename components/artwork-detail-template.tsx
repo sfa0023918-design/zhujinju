@@ -182,8 +182,8 @@ function DetailIndexSection({
   const titleClasses =
     tone === "secondary"
       ? {
-          zh: "text-[0.74rem] tracking-[0.12em] text-[var(--accent)]/90",
-          en: "text-[0.62rem] uppercase tracking-[0.13em] text-[var(--accent)]/62 leading-[1.45]",
+          zh: "text-[0.75rem] tracking-[0.12em] text-[var(--accent-text)]",
+          en: "text-[0.75rem] uppercase tracking-[0.12em] text-[var(--accent-text)] leading-[1.45]",
         }
       : {
           zh: INFO_COPY_CLASSES.sectionLabelZh,

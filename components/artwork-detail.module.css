@@ -352,11 +352,11 @@
 
 .localeToggle button {
   min-width: 44px;
-  min-height: 36px;
+  min-height: 44px;
   border: 0;
   border-right: 1px solid var(--line);
   background: transparent;
-  color: var(--muted);
+  color: var(--accent-text);
   font-size: 0.75rem;
 }
 

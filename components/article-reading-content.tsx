@@ -148,10 +148,10 @@ export function ArticleReadingContent({
                   key={option}
                   type="button"
                   onClick={() => setLocale(option)}
-                  className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-full px-3 py-1 text-xs uppercase tracking-[0.12em] transition-colors ${
                     active
                       ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                      : "text-[var(--accent-text)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {option.toUpperCase()}

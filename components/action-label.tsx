@@ -12,9 +12,9 @@ export function ActionLabel({ text, align = "center" }: ActionLabelProps) {
     <BilingualText
       as="span"
       text={text}
-      className={`flex flex-col ${align === "center" ? "items-center text-center" : "items-start text-left"}`}
+      className={`flex flex-col text-[var(--accent-text)] ${align === "center" ? "items-center text-center" : "items-start text-left"}`}
       zhClassName="text-sm leading-none tracking-[0.01em]"
-      enClassName="mt-1 text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+      enClassName="mt-1 text-xs leading-none uppercase tracking-[0.12em]"
     />
   );
 }
