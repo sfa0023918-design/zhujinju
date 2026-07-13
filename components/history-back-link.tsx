@@ -69,25 +69,24 @@ export function HistoryBackLink({
         event.preventDefault();
 
         const previousInternalRoute = getPreviousInternalRoute() ?? getInternalReferrerRoute();
+
+        if (!previousInternalRoute) {
+          router.push(fallbackHref);
+          return;
+        }
+
         const historyState = typeof window !== "undefined" ? (window.history.state as { idx?: number } | null) : null;
         const canUseBrowserBack =
           typeof historyState?.idx === "number" ? historyState.idx > 0 : window.history.length > 1;
 
         if (canUseBrowserBack) {
-          if (previousInternalRoute) {
-            markBackTarget(previousInternalRoute);
-          }
+          markBackTarget(previousInternalRoute);
           router.back();
           return;
         }
 
-        if (previousInternalRoute) {
-          markBackTarget(previousInternalRoute);
-          router.push(previousInternalRoute);
-          return;
-        }
-
-        router.push(fallbackHref);
+        markBackTarget(previousInternalRoute);
+        router.push(previousInternalRoute);
       }}
     >
       {children}

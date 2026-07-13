@@ -144,7 +144,7 @@ export function ExhibitionsPageContent({
     : { zh: "近期展览", en: "Recent Exhibition" };
 
   return (
-    <main className={styles.exhibitionsPage}>
+    <div className={styles.exhibitionsPage}>
       <header className={styles.listHero}>
         <BilingualText
           as="p"
@@ -287,7 +287,7 @@ export function ExhibitionsPageContent({
           </div>
         </section>
       ) : null}
-    </main>
+    </div>
   );
 }
 
@@ -304,7 +304,7 @@ export function ExhibitionDetailPageContent({
   const curatorialNote = exhibition.curatorialNote ?? exhibition.curatorialLead;
 
   return (
-    <main className={styles.exhibitionDetail}>
+    <div className={styles.exhibitionDetail}>
       <section className={styles.detailHero}>
         <div className={styles.detailCover}>
           <ExhibitionImage exhibition={exhibition} priority />
@@ -419,6 +419,6 @@ export function ExhibitionDetailPageContent({
           </div>
         </section>
       ) : null}
-    </main>
+    </div>
   );
 }
