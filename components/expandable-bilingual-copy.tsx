@@ -97,7 +97,7 @@ export function ExpandableBilingualCopy({
         <button
           type="button"
           onClick={() => setExpanded((current) => !current)}
-          className="inline-flex items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent)]/92 transition-colors hover:text-[var(--ink)]"
+          className="inline-flex min-h-11 items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)]"
         >
           {expanded ? "收起" : "查看更多"}
           <span aria-hidden="true">{expanded ? "∧" : "∨"}</span>
