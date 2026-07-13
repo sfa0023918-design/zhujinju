@@ -12,7 +12,7 @@
   --warning: #71521b;
   --line: rgb(28 26 23 / 18%);
   --line-strong: rgb(28 26 23 / 36%);
-  --content-width: 1240px;
+  --content-width: 1480px;
   --page-inline: 24px;
   --space-xs: 4px;
   --space-sm: 8px;
@@ -24,4 +24,10 @@
   min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
+}
+
+@media (min-width: 768px) {
+  .siteTheme {
+    --page-inline: 40px;
+  }
 }

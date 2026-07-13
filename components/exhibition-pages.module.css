@@ -22,9 +22,9 @@
 .detailHero,
 .catalogueSection,
 .highlightedWorks {
-  width: min(100%, 1480px);
+  width: min(100%, var(--content-width));
   margin-inline: auto;
-  padding-inline: clamp(20px, 3vw, 40px);
+  padding-inline: var(--page-inline);
 }
 
 .listHero {
@@ -540,15 +540,6 @@
 }
 
 @media (max-width: 767px) {
-  .listHero,
-  .recentSection,
-  .pastSection,
-  .detailHero,
-  .catalogueSection,
-  .highlightedWorks {
-    padding-inline: 16px;
-  }
-
   .listHero {
     gap: 22px;
     padding-block: 32px 28px;

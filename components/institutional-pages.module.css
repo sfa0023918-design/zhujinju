@@ -1,7 +1,7 @@
 .pageShell {
-  width: min(100%, 1480px);
+  width: min(100%, var(--content-width));
   margin-inline: auto;
-  padding-inline: 40px;
+  padding-inline: var(--page-inline);
 }
 
 .kicker {
@@ -135,33 +135,31 @@
 
 .philosophyBody {
   grid-column: 6 / -1;
-}
-
-.philosophyParagraph {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   gap: 48px;
-  padding-block: 30px;
-  border-top: 1px solid var(--line);
+  align-items: start;
+}
+
+.philosophyLanguageColumn {
   color: var(--muted);
 }
 
-.philosophyParagraph:first-child {
-  padding-top: 0;
-  border-top: 0;
+.philosophyLanguageColumn p + p {
+  margin-top: 24px;
 }
 
-.philosophyParagraph .zh {
+.philosophyLanguageColumn.zh {
   font-size: 16px;
   line-height: 2;
 }
 
-.philosophyParagraph .en {
+.philosophyLanguageColumn.en {
   font-size: 14px;
   line-height: 1.75;
 }
 
-.philosophyParagraph[data-emphasis="lead"] .zh {
+.philosophyLanguageColumn.zh p[data-emphasis="lead"] {
   color: var(--ink);
   font-family: var(--font-serif);
   font-size: 20px;
@@ -539,10 +537,6 @@
 }
 
 @media (max-width: 820px) {
-  .pageShell {
-    padding-inline: 20px;
-  }
-
   .aboutHero {
     display: flex;
     flex-direction: column;
@@ -578,13 +572,14 @@
   }
 
   .philosophyBody {
+    grid-template-columns: 1fr;
+    gap: 30px;
     margin-top: 42px;
   }
 
-  .philosophyParagraph {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding-block: 28px;
+  .philosophyLanguageColumn.en {
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
   }
 
   .factsSection {
@@ -617,10 +612,6 @@
 }
 
 @media (max-width: 560px) {
-  .pageShell {
-    padding-inline: 16px;
-  }
-
   .pageTitle .zh {
     font-size: 40px;
   }
@@ -634,12 +625,12 @@
   }
 
   .aboutIntroduction .zh,
-  .philosophyParagraph .zh {
+  .philosophyLanguageColumn.zh {
     font-size: 16px;
     line-height: 1.9;
   }
 
-  .philosophyParagraph[data-emphasis="lead"] .zh {
+  .philosophyLanguageColumn.zh p[data-emphasis="lead"] {
     font-size: 19px;
     line-height: 1.78;
   }
@@ -662,8 +653,8 @@
   }
 
   .inquiryForm {
-    margin-inline: -16px;
-    padding: 26px 16px 30px;
+    margin-inline: calc(-1 * var(--page-inline));
+    padding: 26px var(--page-inline) 30px;
     border-inline: 0;
   }
 

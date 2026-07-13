@@ -94,17 +94,20 @@ export function AboutPageContent({
         </div>
 
         <div className={styles.philosophyBody}>
-          {siteConfig.about.body.map((paragraph, index) => (
-            <BilingualText
-              key={`${paragraph.zh}-${index}`}
-              as="div"
-              text={paragraph}
-              className={styles.philosophyParagraph}
-              data-emphasis={index === 0 ? "lead" : "body"}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-          ))}
+          <div className={`${styles.philosophyLanguageColumn} ${styles.zh}`} lang="zh-CN">
+            {siteConfig.about.body.map((paragraph, index) =>
+              paragraph.zh.trim() ? (
+                <p key={`${paragraph.zh}-${index}`} data-emphasis={index === 0 ? "lead" : "body"}>
+                  {paragraph.zh}
+                </p>
+              ) : null,
+            )}
+          </div>
+          <div className={`${styles.philosophyLanguageColumn} ${styles.en}`} lang="en">
+            {siteConfig.about.body.map((paragraph, index) =>
+              paragraph.en.trim() ? <p key={`${paragraph.en}-${index}`}>{paragraph.en}</p> : null,
+            )}
+          </div>
         </div>
       </section>
 
