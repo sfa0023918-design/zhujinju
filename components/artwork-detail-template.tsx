@@ -419,30 +419,21 @@ export function ArtworkScholarlyNote({
   locale,
   onLocaleChange,
 }: ArtworkScholarlyNoteProps) {
-  const hasExcerpt = hasText(artwork.excerpt);
   const viewingNoteForRender = getViewingNoteForRender(artwork);
   const hasViewing = hasText(viewingNoteForRender);
   const hasComparison = hasText(artwork.comparisonNote);
 
-  if (!hasExcerpt && !hasViewing && !hasComparison) {
+  if (!hasViewing && !hasComparison) {
     return null;
   }
 
   const sections = [
-    hasExcerpt
-      ? {
-          key: "excerpt",
-          content: artwork.excerpt,
-          variant: "compact" as const,
-          expandable: true,
-        }
-      : null,
     hasViewing
       ? {
           key: "viewing",
           label: detailCopy.viewingNote,
           content: viewingNoteForRender,
-          variant: "compact" as const,
+          variant: "body" as const,
           expandable: true,
         }
       : null,
@@ -451,7 +442,7 @@ export function ArtworkScholarlyNote({
           key: "comparison",
           label: detailCopy.comparisonNote,
           content: artwork.comparisonNote,
-          variant: "compact" as const,
+          variant: "body" as const,
         }
       : null,
   ].filter(Boolean) as Array<{

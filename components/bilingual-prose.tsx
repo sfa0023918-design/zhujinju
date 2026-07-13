@@ -41,12 +41,14 @@ type BilingualReadingPanelProps = {
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
+  autoSplitLongSingleParagraph?: boolean;
 };
 
 type ParagraphSplitOptions = {
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
+  autoSplitLongSingleParagraph?: boolean;
 };
 
 function normalizeProseWhitespace(text: string) {
@@ -78,8 +80,8 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
       ? /[^。！？!?]+[。！？!?]?/g
       : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
   const joiner = locale === "zh" ? "" : " ";
-  const targetLength = locale === "zh" ? 116 : 172;
-  const maxLength = locale === "zh" ? 220 : 320;
+  const targetLength = locale === "zh" ? 180 : 420;
+  const maxLength = locale === "zh" ? 300 : 680;
   const sentences = (text.match(sentenceRegex) ?? [])
     .map((sentence) => sentence.trim())
     .filter(Boolean);
@@ -220,7 +222,11 @@ function splitParagraphs(
     return [];
   }
 
-  const autoSplitThreshold = locale === "zh" ? 220 : 260;
+  if (options?.autoSplitLongSingleParagraph === false) {
+    return [singleParagraph];
+  }
+
+  const autoSplitThreshold = locale === "zh" ? 300 : 680;
   if (singleParagraph.length < autoSplitThreshold) {
     return [singleParagraph];
   }
@@ -363,7 +369,7 @@ function ExpandableReadingText({
           !expanded ? "max-h-[13rem] md:max-h-[19rem]" : "max-h-[999rem]"
         }`}
       >
-        <div ref={innerRef} className="space-y-4 md:space-y-5">
+        <div ref={innerRef} className="space-y-3 md:space-y-4">
           {paragraphs.map((paragraph, index) => (
             <p
               key={`${locale}-${index}`}
@@ -470,6 +476,7 @@ export function BilingualReadingPanel({
   manualParagraphMode = "preserve",
   manualSplitThresholdZh,
   manualSplitThresholdEn,
+  autoSplitLongSingleParagraph = true,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -508,6 +515,7 @@ export function BilingualReadingPanel({
             manualParagraphMode,
             manualSplitThresholdZh,
             manualSplitThresholdEn,
+            autoSplitLongSingleParagraph,
           });
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
@@ -540,7 +548,7 @@ export function BilingualReadingPanel({
                   paragraphClassName={mergedParagraphClassName}
                 />
               ) : (
-                <div className="space-y-4 md:space-y-5">
+                <div className="space-y-3 md:space-y-4">
                   {paragraphs.map((paragraph, index) => (
                     <p
                       key={`${section.key}-${locale}-${index}`}

@@ -29,106 +29,6 @@ type ExhibitionDetailReadingProps = {
   relatedArticles: RelatedArticleItem[];
 };
 
-function normalizeInlineWhitespace(text: string) {
-  return text.replace(/\r\n/g, "\n").replace(/\u00a0/g, " ").trim();
-}
-
-function collapseLocaleWhitespace(text: string, locale: ReadingLocale) {
-  const collapsed = text.replace(/[ \t]{2,}/g, " ").trim();
-
-  if (locale === "zh") {
-    return collapsed
-      .replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g, "$1$2")
-      .replace(/([\u3400-\u9fff])\s+([，。！？：；、])/g, "$1$2")
-      .replace(/([，。！？：；、])\s+([\u3400-\u9fff])/g, "$1$2");
-  }
-
-  return collapsed;
-}
-
-function splitIntoSentenceParagraphs(text: string, locale: ReadingLocale) {
-  const normalized = collapseLocaleWhitespace(
-    normalizeInlineWhitespace(text).replace(/\n+/g, locale === "zh" ? "" : " "),
-    locale,
-  );
-
-  if (!normalized) {
-    return [];
-  }
-
-  const sentenceRegex =
-    locale === "zh"
-      ? /[^。！？!?]+[。！？!?]?/g
-      : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
-
-  return (normalized.match(sentenceRegex) ?? [])
-    .map((sentence) => collapseLocaleWhitespace(sentence, locale))
-    .filter(Boolean);
-}
-
-function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
-  const normalized = normalizeInlineWhitespace(text);
-
-  if (!normalized) {
-    return "";
-  }
-
-  if (locale === "zh") {
-    return splitIntoSentenceParagraphs(normalized, locale).join("\n\n");
-  }
-
-  const rawParagraphs = normalized
-    .split(/\n\s*\n+/)
-    .map((paragraph) => collapseLocaleWhitespace(paragraph.replace(/\n+/g, " "), locale))
-    .filter(Boolean);
-
-  if (rawParagraphs.length < 4) {
-    return normalized;
-  }
-
-  const averageLength = rawParagraphs.reduce((sum, paragraph) => sum + paragraph.length, 0) / rawParagraphs.length;
-  const shouldMerge = averageLength <= 90;
-
-  if (!shouldMerge) {
-    return normalized;
-  }
-
-  const joiner = " ";
-  const targetLength = 220;
-  const merged: string[] = [];
-  let current = "";
-
-  rawParagraphs.forEach((paragraph) => {
-    if (!current) {
-      current = paragraph;
-      return;
-    }
-
-    const next = `${current}${joiner}${paragraph}`;
-    if (current.length >= targetLength || next.length > targetLength + 70) {
-      merged.push(current);
-      current = paragraph;
-      return;
-    }
-
-    current = next;
-  });
-
-  if (current) {
-    merged.push(current);
-  }
-
-  return merged.join("\n\n");
-}
-
-function normalizeExhibitionTextItem(item: BilingualValue): BilingualValue {
-  return {
-    ...item,
-    zh: mergeOversegmentedParagraphs(item.zh ?? "", "zh"),
-    en: mergeOversegmentedParagraphs(item.en ?? "", "en"),
-  };
-}
-
 export function ExhibitionDetailReading({
   introLabel,
   intro,
@@ -145,7 +45,7 @@ export function ExhibitionDetailReading({
     () => [
       ...(Array.isArray(intro) ? intro : [intro]),
       ...(Array.isArray(description) ? description : [description]),
-    ].map(normalizeExhibitionTextItem),
+    ],
     [description, intro],
   );
   const exhibitionTextLayoutProps = {
@@ -157,7 +57,7 @@ export function ExhibitionDetailReading({
   };
 
   return (
-    <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.72fr)] lg:px-10 lg:py-20">
+    <section className="mx-auto grid w-full max-w-[var(--content-width)] gap-10 border-t border-[var(--line)] px-[var(--page-inline)] py-14 md:py-16 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.72fr)] lg:py-20">
       <section className="max-w-[42rem] scroll-mt-28 space-y-4">
         <div className="flex items-center justify-between gap-4">
           <BilingualText
@@ -194,7 +94,7 @@ export function ExhibitionDetailReading({
             {
               key: "exhibition-text",
               content: exhibitionTextContent,
-              variant: "compact",
+              variant: "body",
               expandable: true,
             },
           ]}
@@ -213,14 +113,14 @@ export function ExhibitionDetailReading({
               key: "catalogue-intro",
               label: catalogueNoteLabel,
               content: catalogueNote,
-              variant: "compact",
+              variant: "secondary",
               expandable: true,
             },
             {
               key: "curatorial-lead",
               label: curatorialLeadLabel,
               content: curatorialLead,
-              variant: "compact",
+              variant: "secondary",
               expandable: true,
             },
           ]}
