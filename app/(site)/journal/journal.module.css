@@ -1,7 +1,7 @@
 .journalShell {
-  width: min(100%, 1480px);
+  width: min(100%, var(--content-width));
   margin: 0 auto;
-  padding-inline: 40px;
+  padding-inline: var(--page-inline);
 }
 
 .indexHero {
@@ -313,7 +313,9 @@
 }
 
 .detailCover {
+  width: min(100%, 44rem);
   margin-top: 34px;
+  margin-inline: auto;
   background: var(--surface-strong);
 }
 
@@ -326,20 +328,57 @@
   margin-top: 44px;
 }
 
+.readingFrame :global(.article-reading-flow) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.readingFrame :global(.article-reading-lead) {
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.readingFrame :global(.article-reading-copy) {
+  width: 100%;
+}
+
+.readingFrame :global(.article-reading-copy) + :global(.article-reading-copy) {
+  margin-top: 20px;
+}
+
+.readingFrame :global(.article-reading-lead) + :global(.article-reading-media),
+.readingFrame :global(.article-reading-copy) + :global(.article-reading-media),
+.readingFrame :global(.article-reading-media) + :global(.article-reading-copy),
+.readingFrame :global(.article-reading-media) + :global(.article-reading-media) {
+  margin-top: 52px;
+}
+
+.readingFrame :global(.prose-block) {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.readingFrame :global(.article-reading-lead p + p),
+.readingFrame :global(.article-reading-copy p + p) {
+  margin-top: 20px;
+}
+
 .readingFrame :global(.prose-block--zh) {
-  max-width: 36em;
+  max-width: 40rem;
   font-size: 17px;
-  line-height: 2.08;
+  line-height: 1.95;
 }
 
 .readingFrame :global(.prose-block--en) {
-  max-width: 66ch;
+  max-width: 42rem;
   font-size: 15px;
-  line-height: 1.88;
+  line-height: 1.82;
 }
 
-.readingFrame figure {
-  max-width: 900px;
+.readingFrame :global(.article-reading-media--group) {
+  width: 100%;
+  max-width: 52rem;
 }
 
 .readingFrame figcaption {
@@ -395,10 +434,6 @@
 }
 
 @media (max-width: 900px) {
-  .journalShell {
-    padding-inline: 28px;
-  }
-
   .card[data-layout="lead"] {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -420,10 +455,6 @@
 }
 
 @media (max-width: 680px) {
-  .journalShell {
-    padding-inline: 20px;
-  }
-
   .indexHero {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
@@ -510,16 +541,32 @@
     margin-top: 34px;
   }
 
+  .readingFrame :global(.article-reading-lead) {
+    margin-bottom: 24px;
+  }
+
+  .readingFrame :global(.article-reading-lead p + p),
+  .readingFrame :global(.article-reading-copy p + p) {
+    margin-top: 18px;
+  }
+
+  .readingFrame :global(.article-reading-lead) + :global(.article-reading-media),
+  .readingFrame :global(.article-reading-copy) + :global(.article-reading-media),
+  .readingFrame :global(.article-reading-media) + :global(.article-reading-copy),
+  .readingFrame :global(.article-reading-media) + :global(.article-reading-media) {
+    margin-top: 38px;
+  }
+
   .readingFrame :global(.prose-block--zh) {
-    max-width: 36em;
+    max-width: 40rem;
     font-size: 16px;
-    line-height: 2;
+    line-height: 1.92;
   }
 
   .readingFrame :global(.prose-block--en) {
-    max-width: 66ch;
+    max-width: 42rem;
     font-size: 15px;
-    line-height: 1.82;
+    line-height: 1.78;
   }
 
   .readingFrame figure {
@@ -528,7 +575,7 @@
 
   .readingFrame figcaption {
     font-size: 13px;
-    text-align: left;
+    text-align: center;
   }
 
   .related {
