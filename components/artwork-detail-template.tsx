@@ -14,11 +14,11 @@ import { getArtworkStatusText } from "@/lib/bilingual";
 import { resolveArtworkPrimaryImage, resolveArtworkPrimaryImageCandidates } from "@/lib/image-url";
 
 import { ArtworkCard } from "./artwork-card";
+import styles from "./artwork-detail.module.css";
 import { ArtworkGallery } from "./artwork-gallery";
 import { BilingualProse, BilingualReadingPanel, getLocalizedText, type ReadingLocale } from "./bilingual-prose";
 import { BilingualText } from "./bilingual-text";
 import { HistoryBackLink } from "./history-back-link";
-import { StatusPill } from "./status-pill";
 
 type ArtworkDetailCopy = PageCopyContent["artworkDetail"];
 
@@ -88,15 +88,15 @@ const DETAIL_SECTION_IDS = {
 } as const;
 
 const INFO_COPY_CLASSES = {
-  sectionLabelZh: "text-[0.78rem] leading-[1.4] tracking-[0.12em] text-[var(--accent)]/92",
-  sectionLabelEn: "text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/68 leading-[1.45]",
-  primaryLine: "text-[0.86rem] leading-7 text-[var(--ink)]",
-  secondaryLine: "text-[0.76rem] leading-6 text-[var(--muted)]",
+  sectionLabelZh: "text-[0.75rem] leading-[1.5] tracking-[0.06em] text-[var(--accent-text)]",
+  sectionLabelEn: "text-[0.75rem] uppercase tracking-[0.06em] text-[var(--accent-text)] leading-[1.5]",
+  primaryLine: "text-[0.8125rem] leading-[1.65] text-[var(--ink)]",
+  secondaryLine: "text-[0.8125rem] leading-[1.65] text-[var(--muted)]",
 } as const;
 
 const ARTWORK_HERO_TITLE_CLASSES = {
-  zh: "font-serif text-[clamp(1.56rem,2.15vw,2.35rem)] leading-[1.04] tracking-[-0.04em] text-[var(--ink)]",
-  en: "text-[0.68rem] uppercase tracking-[0.18em] leading-[1.45] text-[var(--accent)]/58",
+  zh: "font-serif text-[clamp(2.375rem,7vw,3.5rem)] leading-[1.05] tracking-[-0.035em] text-[var(--ink)] text-balance",
+  en: "text-[0.8125rem] uppercase tracking-[0.08em] leading-[1.6] text-[var(--accent-text)]",
 } as const;
 
 function hasText(value?: { zh?: string; en?: string } | null) {
@@ -182,8 +182,8 @@ function DetailIndexSection({
   const titleClasses =
     tone === "secondary"
       ? {
-          zh: "text-[0.74rem] tracking-[0.12em] text-[var(--accent)]/90",
-          en: "text-[0.62rem] uppercase tracking-[0.13em] text-[var(--accent)]/62 leading-[1.45]",
+          zh: "text-[0.75rem] tracking-[0.12em] text-[var(--accent-text)]",
+          en: "text-[0.75rem] uppercase tracking-[0.12em] text-[var(--accent-text)] leading-[1.45]",
         }
       : {
           zh: INFO_COPY_CLASSES.sectionLabelZh,
@@ -191,14 +191,14 @@ function DetailIndexSection({
         };
 
   return (
-    <section id={id} className="scroll-mt-28 border-t border-[var(--line)]/34 pt-4.5 first:border-t-0 first:pt-0">
+    <section id={id} className={styles.referenceSection}>
       <p
         lang={locale === "en" ? "en" : "zh-CN"}
-        className={`text-[var(--accent)] ${locale === "zh" ? titleClasses.zh : titleClasses.en}`}
+        className={`${styles.referenceLabel} ${locale === "zh" ? titleClasses.zh : titleClasses.en}`}
       >
         {getLocalizedText(label, locale)}
       </p>
-      <div className="mt-3">{children}</div>
+      <div className={styles.referenceContent}>{children}</div>
     </section>
   );
 }
@@ -211,13 +211,10 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
   }
 
   return (
-    <dl className="space-y-0.5 border-t border-[var(--line)]/34 pt-1">
+    <dl className={styles.facts}>
       {visibleItems.map((item) => (
-        <div
-          key={item.label.zh}
-          className="grid items-start gap-x-3 gap-y-1 border-b border-[var(--line)]/18 py-3.5 last:border-b-0 md:grid-cols-[108px_minmax(0,1fr)] md:items-baseline md:gap-x-4 md:gap-y-1.5"
-        >
-          <dt className="min-w-0 text-[var(--accent)]">
+        <div key={item.label.zh}>
+          <dt>
             <p className={INFO_COPY_CLASSES.sectionLabelZh}>
               {item.label.zh}
             </p>
@@ -230,7 +227,7 @@ export function ArtworkFacts({ items }: ArtworkFactsProps) {
               </p>
             ) : null}
           </dt>
-          <dd className="min-w-0">
+          <dd>
             <p className={INFO_COPY_CLASSES.primaryLine}>
               {item.value.zh}
             </p>
@@ -259,48 +256,47 @@ export function ArtworkInquiry({
   const supportItems = artwork.inquirySupport.filter(hasText);
 
   return (
-    <div className="space-y-3.5 border-t border-[var(--line)]/34 pt-5">
+    <div className={styles.inquiry}>
       {isSold ? (
-        <div className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line)]/58 px-5 text-[var(--muted)]">
+        <div className={styles.inquiryAction}>
           <BilingualText
             as="span"
             text={getArtworkStatusText(artwork.status)}
-            className="flex flex-col items-center text-center"
-            zhClassName="text-sm leading-none tracking-[0.01em]"
-            enClassName="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--accent)]/72 leading-[1.45]"
+            className={styles.bilingualPair}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
           />
         </div>
       ) : (
         <Link
           href={inquiryHref}
-          className="inline-flex min-h-[3.15rem] w-full items-center justify-center border border-[var(--line-strong)]/62 px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface)]"
+          className={styles.inquiryAction}
         >
           <BilingualText
             as="span"
             text={detailCopy.inquireAction}
-            className="flex flex-col items-center text-center"
-            zhClassName="text-sm leading-none tracking-[0.01em]"
-            enClassName="mt-1 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--accent)]/78 leading-[1.45]"
+            className={styles.bilingualPair}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
           />
         </Link>
       )}
 
       {!isSold && supportItems.length ? (
-        <div className="flex flex-wrap gap-2">
+        <div className={styles.inquirySupport}>
           {supportItems.map((item) => (
             <Link
               key={item.zh}
               href={`${inquiryHref}&request=${encodeURIComponent(item.zh || item.en)}`}
-              className="inline-flex min-h-8 cursor-pointer select-none items-center rounded-full border border-[var(--line)]/26 px-3 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/38 hover:text-[var(--ink)]"
             >
               <BilingualText
                 as="span"
                 text={item}
                 mode="single"
                 locale={locale}
-                className="leading-none"
-                zhClassName="text-[0.72rem]"
-                enClassName="text-[0.62rem] uppercase tracking-[0.12em] text-[var(--accent)]/66 leading-[1.45]"
+                className={styles.bilingualPair}
+                zhClassName={styles.zh}
+                enClassName={styles.en}
               />
             </Link>
           ))}
@@ -308,17 +304,17 @@ export function ArtworkInquiry({
       ) : null}
 
       {detailCopy.backAction.zh ? (
-        <div className="space-y-2.5 border-t border-[var(--line)]/20 pt-3">
+        <div>
           <HistoryBackLink
             fallbackHref="/collection"
-            className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)]/34 px-4 py-1.5 text-[0.72rem] leading-6 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/46 hover:text-[var(--ink)]"
+            className={styles.backAction}
           >
             <BilingualText
               as="span"
               text={detailCopy.backAction}
-              className="flex flex-col items-center text-center"
-              zhClassName="text-[0.78rem] leading-none tracking-[0.01em]"
-              enClassName="mt-1 text-[0.62rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+              className={styles.bilingualPair}
+              zhClassName={styles.zh}
+              enClassName={styles.en}
             />
           </HistoryBackLink>
         </div>
@@ -344,38 +340,45 @@ export function ArtworkHero({
   const hasLead = hasText(artwork.excerpt);
 
   return (
-    <section id={DETAIL_SECTION_IDS.info} className="mx-auto scroll-mt-28 w-full max-w-[1480px] px-5 py-7 md:px-8 md:py-9 lg:px-10 lg:py-10">
-      <div className="mb-5 text-[0.82rem] leading-6 text-[var(--muted)]">
+    <section id={DETAIL_SECTION_IDS.info} className={styles.hero}>
+      <div className={styles.breadcrumb}>
         <Link href="/collection" className="transition-colors hover:text-[var(--ink)]">
           {detailCopy.breadcrumb.zh}
         </Link>
-        <span className="px-2 text-[var(--accent)]/34">/</span>
-        <span className="text-[var(--ink)]">{artwork.title.zh}</span>
+        <span>/</span>
+        <span>{artwork.title.zh}</span>
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.82fr)] lg:gap-16">
-        <ArtworkGallery
-          title={`${artwork.title.zh} ${artwork.title.en}`.trim()}
-          primaryImage={primaryImage}
-          primaryImageCandidates={primaryImageCandidates}
-          category={artwork.category.zh || artwork.category.en}
-          gallery={artwork.gallery}
-        />
+      <div className={styles.heroGrid}>
+        <div className={styles.galleryColumn}>
+          <ArtworkGallery
+            title={`${artwork.title.zh} ${artwork.title.en}`.trim()}
+            primaryImage={primaryImage}
+            primaryImageCandidates={primaryImageCandidates}
+            category={artwork.category.zh || artwork.category.en}
+            gallery={artwork.gallery}
+          />
+        </div>
 
-        <aside className="space-y-5 lg:sticky lg:top-8 lg:self-start">
-          <div className="space-y-4 border-t border-[var(--line)]/56 pt-5">
-            <div className="flex items-center justify-between gap-4">
+        <aside className={styles.recordColumn}>
+          <div className={styles.recordHeading}>
+            <div className={styles.categoryStatus}>
               <BilingualText
                 as="p"
                 text={artwork.category}
-                mode="inline"
-                className="text-[var(--accent)]"
-                zhClassName="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/94"
-                enClassName="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+                className={`${styles.bilingualPair} ${styles.category}`}
+                zhClassName={styles.zh}
+                enClassName={styles.en}
               />
-              <StatusPill status={artwork.status} />
+              <BilingualText
+                as="p"
+                text={getArtworkStatusText(artwork.status)}
+                className={`${styles.bilingualPair} ${styles.status}`}
+                zhClassName={styles.zh}
+                enClassName={styles.en}
+              />
             </div>
-            <div className="space-y-2">
+            <div className={styles.titleGroup}>
               <h1 className={ARTWORK_HERO_TITLE_CLASSES.zh}>
                 {artwork.title.zh}
               </h1>
@@ -386,7 +389,7 @@ export function ArtworkHero({
             {hasText(artwork.subtitle) ? (
               <p
                 lang={locale === "en" ? "en" : "zh-CN"}
-                className="max-w-[28rem] text-[0.84rem] leading-[1.85] text-[var(--muted)]"
+                className={styles.subtitle}
               >
                 {getLocalizedText(artwork.subtitle, locale)}
               </p>
@@ -395,7 +398,7 @@ export function ArtworkHero({
               <BilingualProse
                 content={artwork.excerpt}
                 variant="compact"
-                className="max-w-[30rem]"
+                className={styles.lead}
                 mode="single"
                 locale={locale}
               />
@@ -416,30 +419,21 @@ export function ArtworkScholarlyNote({
   locale,
   onLocaleChange,
 }: ArtworkScholarlyNoteProps) {
-  const hasExcerpt = hasText(artwork.excerpt);
   const viewingNoteForRender = getViewingNoteForRender(artwork);
   const hasViewing = hasText(viewingNoteForRender);
   const hasComparison = hasText(artwork.comparisonNote);
 
-  if (!hasExcerpt && !hasViewing && !hasComparison) {
+  if (!hasViewing && !hasComparison) {
     return null;
   }
 
   const sections = [
-    hasExcerpt
-      ? {
-          key: "excerpt",
-          content: artwork.excerpt,
-          variant: "compact" as const,
-          expandable: true,
-        }
-      : null,
     hasViewing
       ? {
           key: "viewing",
           label: detailCopy.viewingNote,
           content: viewingNoteForRender,
-          variant: "compact" as const,
+          variant: "body" as const,
           expandable: true,
         }
       : null,
@@ -448,7 +442,7 @@ export function ArtworkScholarlyNote({
           key: "comparison",
           label: detailCopy.comparisonNote,
           content: artwork.comparisonNote,
-          variant: "compact" as const,
+          variant: "body" as const,
         }
       : null,
   ].filter(Boolean) as Array<{
@@ -459,29 +453,24 @@ export function ArtworkScholarlyNote({
   }>;
 
   return (
-    <section id={DETAIL_SECTION_IDS.viewing} className="max-w-[42rem] scroll-mt-28 space-y-4">
-      <div className="flex items-center justify-between gap-4">
+    <section id={DETAIL_SECTION_IDS.viewing} className={styles.scholarlyColumn}>
+      <div className={styles.researchHeading}>
         <BilingualText
           as="p"
           text={detailCopy.scholarlyNote}
-          mode="inline"
-          className="text-[var(--accent)]"
-          zhClassName="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/94"
-          enClassName="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+          className={`${styles.bilingualPair} ${styles.researchLabel}`}
+          zhClassName={styles.zh}
+          enClassName={styles.en}
         />
-        <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
+        <div className={styles.localeToggle}>
           {(["zh", "en"] as const).map((option) => {
             const active = locale === option;
             return (
               <button
                 key={option}
                 type="button"
+                aria-pressed={active}
                 onClick={() => onLocaleChange(option)}
-                className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
-                  active
-                    ? "bg-[var(--surface)] text-[var(--ink)]"
-                    : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
-                }`}
               >
                 {option.toUpperCase()}
               </button>
@@ -522,7 +511,7 @@ export function ArtworkReferences({
   }
 
   return (
-    <aside className="space-y-4.5 lg:pl-6">
+    <aside className={styles.referencesColumn}>
       {hasProvenance ? (
         <DetailIndexSection id={DETAIL_SECTION_IDS.provenance} label={detailCopy.provenance} locale={locale}>
           <ul className="space-y-3">
@@ -643,27 +632,23 @@ function DetailSectionNav({ sections }: { sections: DetailSectionLink[] }) {
   return (
     <nav
       aria-label="Artwork sections"
-      className="mx-auto w-full max-w-[1480px] px-5 pb-1 md:px-8 lg:px-10"
+      className={styles.sectionNav}
     >
-      <div className="flex flex-wrap gap-2.5 border-t border-[var(--line)]/28 pt-4">
-        {sections.map((section) => (
-          <button
-            key={section.id}
-            type="button"
-            onClick={() => scrollToSection(section.id)}
-            className="inline-flex cursor-pointer select-none items-center rounded-full border border-[var(--line)]/26 px-3 py-1.5 text-[var(--muted)] transition-colors hover:border-[var(--line-strong)]/36 hover:text-[var(--ink)] focus-visible:border-[var(--line-strong)]/42 focus-visible:outline-none"
-          >
-            <BilingualText
-              as="span"
-              text={section.label}
-              mode="inline"
-              className="leading-none"
-              zhClassName="text-[0.76rem] tracking-[0.01em]"
-              enClassName="text-[0.64rem] uppercase tracking-[0.12em] text-[var(--accent)]/68 leading-[1.45]"
-            />
-          </button>
-        ))}
-      </div>
+      {sections.map((section) => (
+        <button
+          key={section.id}
+          type="button"
+          onClick={() => scrollToSection(section.id)}
+        >
+          <BilingualText
+            as="span"
+            text={section.label}
+            className={styles.bilingualPair}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
+          />
+        </button>
+      ))}
     </nav>
   );
 }
@@ -675,38 +660,22 @@ export function RelatedWorks({ items, detailCopy }: RelatedWorksProps) {
     return null;
   }
 
-  const gridClassName =
-    visibleItems.length === 1
-      ? "max-w-[24rem]"
-      : visibleItems.length === 2
-        ? "grid gap-x-7 gap-y-9 md:grid-cols-2"
-        : "grid gap-x-7 gap-y-9 md:grid-cols-2 xl:grid-cols-3";
-  const innerClassName = visibleItems.length === 1 ? "max-w-[24rem]" : "";
-  const headingClassName = visibleItems.length === 1 ? "max-w-[20rem] space-y-1.5" : "max-w-[34rem] space-y-2";
-  const titleClassName =
-    visibleItems.length === 1
-      ? "font-serif text-[clamp(1.58rem,2.2vw,2.1rem)] leading-[1.06] tracking-[-0.035em] text-[var(--ink)] text-balance"
-      : "font-serif text-[clamp(1.9rem,3vw,2.65rem)] leading-[1.02] tracking-[-0.04em] text-[var(--ink)]";
-
   return (
-    <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
-      <div className={innerClassName}>
-        <div className={headingClassName}>
+    <section className={styles.relatedWorks}>
+      <div>
+        <div className={styles.relatedHeading}>
           <BilingualText
             as="p"
             text={detailCopy.relatedWorks}
-            mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.66rem] tracking-[0.16em]"
-            enClassName="text-[0.46rem] uppercase tracking-[0.16em] text-[var(--accent)]/48"
+            className={`${styles.bilingualPair} ${styles.researchLabel}`}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
           />
-          <h2 className={titleClassName}>
-            {detailCopy.relatedWorksTitle.zh}
-          </h2>
+          <h2>{detailCopy.relatedWorksTitle.zh}</h2>
         </div>
-        <div className={`mt-7 ${gridClassName}`}>
+        <div className={styles.relatedGrid}>
           {visibleItems.map((item, index) => (
-            <ArtworkCard key={item.slug} artwork={item} priority={index === 0} variant="compact" />
+            <ArtworkCard key={item.slug} artwork={item} priority={index === 0} variant="catalogue" />
           ))}
         </div>
       </div>
@@ -743,24 +712,22 @@ export function ArtworkDetailTemplate({
   ].filter(Boolean) as DetailSectionLink[];
 
   return (
-    <>
+    <article className={styles.artworkDetail}>
       <ArtworkHero artwork={artwork} detailCopy={detailCopy} siteConfig={siteConfig} locale={locale} />
       <DetailSectionNav sections={sections} />
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)]/56 px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(260px,0.62fr)] lg:gap-14">
-          <ArtworkScholarlyNote artwork={artwork} detailCopy={detailCopy} locale={locale} onLocaleChange={setLocale} />
-          <ArtworkReferences
-            artwork={artwork}
-            detailCopy={detailCopy}
-            relatedArticles={relatedArticles}
-            relatedExhibitions={relatedExhibitions}
-            locale={locale}
-          />
-        </div>
+      <section className={styles.researchSection}>
+        <ArtworkScholarlyNote artwork={artwork} detailCopy={detailCopy} locale={locale} onLocaleChange={setLocale} />
+        <ArtworkReferences
+          artwork={artwork}
+          detailCopy={detailCopy}
+          relatedArticles={relatedArticles}
+          relatedExhibitions={relatedExhibitions}
+          locale={locale}
+        />
       </section>
 
       <RelatedWorks items={relatedWorks} detailCopy={detailCopy} />
-    </>
+    </article>
   );
 }

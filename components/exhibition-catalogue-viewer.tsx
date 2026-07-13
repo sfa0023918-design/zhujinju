@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -9,10 +9,7 @@ import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
-const MOBILE_LIKE_BREAKPOINT = "(max-width: 1023px)";
-const FAST_PRELOAD_AHEAD = 20;
-const FAST_PRELOAD_BEHIND = 8;
-const IDLE_PRELOAD_BATCH = 12;
+const PRELOAD_GROUP_OFFSETS = [-1, 1, 2] as const;
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -41,13 +38,16 @@ export function ExhibitionCatalogueViewer({
   pages,
   viewMode = "single-pages",
 }: ExhibitionCatalogueViewerProps) {
-  const cataloguePages = pages.filter(Boolean);
+  const cataloguePages = useMemo(() => pages.filter(Boolean), [pages]);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isLayoutReady, setIsLayoutReady] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
-  const [isMobileLike, setIsMobileLike] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<Set<number>>(() => new Set([0]));
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
+  const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
+  const selectedThumbnailRef = useRef<HTMLButtonElement | null>(null);
   const totalPages = cataloguePages.length;
   const showsSpreadImage = viewMode === "spread-images";
   const usesDesktopPairing = isDesktop && !showsSpreadImage;
@@ -57,6 +57,7 @@ export function ExhibitionCatalogueViewer({
 
     function updateLayout() {
       setIsDesktop(mediaQuery.matches);
+      setIsLayoutReady(true);
     }
 
     updateLayout();
@@ -77,18 +78,6 @@ export function ExhibitionCatalogueViewer({
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(MOBILE_LIKE_BREAKPOINT);
-
-    function updateMobileLike() {
-      setIsMobileLike(mediaQuery.matches);
-    }
-
-    updateMobileLike();
-    mediaQuery.addEventListener("change", updateMobileLike);
-    return () => mediaQuery.removeEventListener("change", updateMobileLike);
-  }, []);
-
-  useEffect(() => {
     setCurrentIndex((previous) => {
       if (!totalPages) {
         return 0;
@@ -103,24 +92,41 @@ export function ExhibitionCatalogueViewer({
   }, [isDesktop, showsSpreadImage, totalPages]);
 
   useEffect(() => {
-    if (!cataloguePages.length) {
+    if (!cataloguePages.length || !isLayoutReady) {
       return;
     }
 
-    const step = usesDesktopPairing ? 2 : 1;
-    const aheadLimit = isMobileLike ? 3 : FAST_PRELOAD_AHEAD;
-    const behindLimit = isMobileLike ? 1 : FAST_PRELOAD_BEHIND;
+    const groupSize = usesDesktopPairing ? 2 : 1;
+
+    for (let slot = 0; slot < groupSize; slot += 1) {
+      const visibleSource = cataloguePages[currentIndex + slot];
+      if (visibleSource) {
+        preloadedPagesRef.current.add(visibleSource);
+      }
+    }
+
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+
+    if (
+      connection?.saveData
+      || connection?.effectiveType === "2g"
+      || connection?.effectiveType === "slow-2g"
+    ) {
+      return;
+    }
+
+    const groupStep = groupSize;
     const candidateIndexes = new Set<number>();
 
-    for (let offset = 1; offset <= aheadLimit; offset += 1) {
-      candidateIndexes.add(currentIndex + step * offset);
-      candidateIndexes.add(currentIndex + step * offset + 1);
-    }
+    PRELOAD_GROUP_OFFSETS.forEach((offset) => {
+      const groupStart = currentIndex + groupStep * offset;
 
-    for (let offset = 1; offset <= behindLimit; offset += 1) {
-      candidateIndexes.add(currentIndex - step * offset);
-      candidateIndexes.add(currentIndex - step * offset - 1);
-    }
+      for (let slot = 0; slot < groupSize; slot += 1) {
+        candidateIndexes.add(groupStart + slot);
+      }
+    });
 
     candidateIndexes.forEach((index) => {
       const src = cataloguePages[index];
@@ -131,106 +137,81 @@ export function ExhibitionCatalogueViewer({
 
       const image = new window.Image();
       image.decoding = "async";
+      image.fetchPriority = "low";
       image.src = src;
       preloadedPagesRef.current.add(src);
-      if (!isMobileLike) {
-        void image.decode?.().catch(() => {});
-      }
+      void image.decode?.().catch(() => {});
     });
-  }, [cataloguePages, currentIndex, usesDesktopPairing, isMobileLike]);
+  }, [cataloguePages, currentIndex, isLayoutReady, usesDesktopPairing]);
 
   useEffect(() => {
-    if (!cataloguePages.length || typeof window === "undefined") {
+    const strip = thumbnailStripRef.current;
+    const selected = selectedThumbnailRef.current;
+
+    if (!strip || !selected) {
       return;
     }
 
+    const targetLeft = selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
+    strip.scrollTo({ left: Math.max(0, targetLeft), behavior: "auto" });
+  }, [currentIndex, usesDesktopPairing]);
+
+  useEffect(() => {
+    setThumbnailImageIndexes((previous) => {
+      const next = new Set(previous);
+      next.add(currentIndex);
+
+      if (usesDesktopPairing && currentIndex + 1 < totalPages) {
+        next.add(currentIndex + 1);
+      }
+
+      return next.size === previous.size ? previous : next;
+    });
+  }, [currentIndex, totalPages, usesDesktopPairing]);
+
+  useEffect(() => {
+    const strip = thumbnailStripRef.current;
     const connection = (navigator as Navigator & {
       connection?: { saveData?: boolean; effectiveType?: string };
     }).connection;
 
     if (
-      isMobileLike ||
-      connection?.saveData ||
-      connection?.effectiveType === "2g" ||
-      connection?.effectiveType === "slow-2g"
+      !strip
+      || typeof IntersectionObserver === "undefined"
+      || connection?.saveData
+      || connection?.effectiveType === "2g"
+      || connection?.effectiveType === "slow-2g"
     ) {
       return;
     }
 
-    const pendingIndexes = cataloguePages
-      .map((_page, index) => index)
-      .filter((index) => !preloadedPagesRef.current.has(cataloguePages[index]!));
+    const observer = new IntersectionObserver((entries) => {
+      const visibleIndexes = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => Number((entry.target as HTMLElement).dataset.thumbnailIndex))
+        .filter(Number.isInteger);
 
-    if (!pendingIndexes.length) {
-      return;
-    }
-
-    let pointer = 0;
-    let cancelled = false;
-    let idleHandle: number | null = null;
-    let timeoutHandle: number | null = null;
-
-    const preloadBatch = () => {
-      if (cancelled) {
+      if (!visibleIndexes.length) {
         return;
       }
 
-      let count = 0;
+      setThumbnailImageIndexes((previous) => {
+        const next = new Set(previous);
+        visibleIndexes.forEach((index) => next.add(index));
+        return next.size === previous.size ? previous : next;
+      });
+    }, {
+      root: strip,
+      rootMargin: "0px 160px",
+      threshold: 0.01,
+    });
 
-      while (pointer < pendingIndexes.length && count < IDLE_PRELOAD_BATCH) {
-        const index = pendingIndexes[pointer]!;
-        const src = cataloguePages[index];
+    strip.querySelectorAll<HTMLElement>("[data-thumbnail-index]").forEach((thumbnail) => {
+      observer.observe(thumbnail);
+    });
 
-        if (src && !preloadedPagesRef.current.has(src)) {
-          const image = new window.Image();
-          image.decoding = "async";
-          image.src = src;
-          preloadedPagesRef.current.add(src);
-          void image.decode?.().catch(() => {});
-        }
-
-        pointer += 1;
-        count += 1;
-      }
-
-      schedule();
-    };
-
-    const schedule = () => {
-      if (cancelled || pointer >= pendingIndexes.length) {
-        return;
-      }
-
-      const win = window as Window & {
-        requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
-        cancelIdleCallback?: (handle: number) => void;
-      };
-
-      if (typeof win.requestIdleCallback === "function") {
-        idleHandle = win.requestIdleCallback(preloadBatch, { timeout: 1200 });
-        return;
-      }
-
-      timeoutHandle = window.setTimeout(preloadBatch, 300);
-    };
-
-    schedule();
-
-    return () => {
-      cancelled = true;
-
-      if (idleHandle !== null) {
-        const win = window as Window & {
-          cancelIdleCallback?: (handle: number) => void;
-        };
-        win.cancelIdleCallback?.(idleHandle);
-      }
-
-      if (timeoutHandle !== null) {
-        window.clearTimeout(timeoutHandle);
-      }
-    };
-  }, [cataloguePages, isMobileLike]);
+    return () => observer.disconnect();
+  }, [cataloguePages.length]);
 
   if (!totalPages) {
     return null;
@@ -255,7 +236,6 @@ export function ExhibitionCatalogueViewer({
   const stageSummary = visiblePageNumbers.length > 1
     ? `${visiblePageNumbers[0]} - ${visiblePageNumbers[visiblePageNumbers.length - 1]}`
     : `${visiblePageNumbers[0] ?? 1}`;
-
   function jumpTo(index: number) {
     if (!totalPages) {
       return;
@@ -289,13 +269,13 @@ export function ExhibitionCatalogueViewer({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <div className="grid gap-6 border-b border-[var(--line)]/68 pb-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)] lg:items-end">
         <div className="space-y-5">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.68rem] tracking-[0.22em] text-[var(--accent)]/74">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">
             <span>电子图录 / DIGITAL CATALOGUE</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
-            <span>{`Page Count · ${totalPages}`}</span>
+            <span>{`Page Count / ${totalPages}`}</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
             <span>{readingModeLabel}</span>
           </div>
@@ -303,43 +283,34 @@ export function ExhibitionCatalogueViewer({
             as="h2"
             text={title}
             className="font-serif text-[var(--ink)]"
-            zhClassName="block max-w-[11ch] text-[2rem] leading-[1.03] tracking-[-0.05em] md:text-[2.82rem]"
-            enClassName="mt-3 block text-[0.64rem] uppercase tracking-[0.24em] text-[var(--accent)]/68"
+            zhClassName="block max-w-[11ch] text-[2rem] leading-[1.06] tracking-[-0.035em] md:text-[2.82rem]"
+            enClassName="mt-3 block text-[0.8125rem] uppercase tracking-[0.08em] leading-[1.5] text-[var(--accent-text)]"
           />
-          <div className="flex items-center gap-3 text-[0.72rem] tracking-[0.16em] text-[var(--accent)]/72">
+          <div className="flex items-center gap-3 text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">
             <span className="h-px w-12 bg-[var(--line-strong)]/34" aria-hidden="true" />
-            <span>刊首阅读页 · Editorial Opening</span>
+            <span>刊首阅读页 / Editorial Opening</span>
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-[26px] border border-[var(--line)]/72 bg-[linear-gradient(155deg,rgba(255,255,255,0.78),rgba(243,235,225,0.96))] p-5 shadow-[0_16px_40px_rgba(32,24,17,0.06)]">
-          <div className="pointer-events-none absolute inset-x-6 top-0 h-16 rounded-full bg-white/54 blur-2xl" />
-          <div className="relative flex items-center justify-between gap-3 border-b border-[var(--line)]/56 pb-3">
-            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--accent)]/68">Reading Note</p>
-            <p className="text-[0.68rem] tracking-[0.18em] text-[var(--accent)]/68">
+        <div className="rounded-[4px] border border-[var(--line)] bg-[var(--surface)] p-5">
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-3">
+            <p className="text-[0.75rem] uppercase tracking-[0.08em] text-[var(--accent-text)]">Reading Note</p>
+            <p className="text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
               {visiblePageNumbers.length > 1 ? `Current Pages · ${stageSummary}` : `Current Page · ${stageSummary}`}
             </p>
           </div>
           <BilingualText
             as="p"
             text={note}
-            className="relative mt-4 text-[0.92rem] leading-7 text-[var(--muted)]"
+            className="mt-4 text-[0.9375rem] leading-7 text-[var(--muted)]"
             zhClassName="block"
-            enClassName="mt-2 block text-[0.6rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/70"
+            enClassName="mt-2 block text-[0.8125rem] tracking-[0.04em] leading-[1.65] text-[var(--accent-text)]"
           />
-          <div className="relative mt-4 grid gap-3 border-t border-[var(--line)]/56 pt-3 text-[0.69rem] text-[var(--accent)]/76 md:grid-cols-3">
-            <EditorialFact label="导航" value="Arrow keys" />
-            <EditorialFact label="手势" value="Swipe to turn" />
-            <EditorialFact label="索引" value="Page index" />
-          </div>
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-[34px] border border-[#d8cab8] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.94),rgba(244,236,226,0.965)_42%,rgba(234,223,209,0.985)_100%)] p-4 shadow-[0_34px_84px_rgba(33,25,18,0.1)] md:p-5 lg:p-7">
-        <div className="pointer-events-none absolute inset-x-8 top-0 h-24 rounded-full bg-white/58 blur-3xl" />
-        <div className="pointer-events-none absolute inset-3 rounded-[28px] border border-white/32" />
-
-        <div className="relative mb-5 flex flex-col gap-3 border-b border-[var(--line)]/62 pb-4 text-[0.72rem] tracking-[0.18em] text-[var(--accent)]/82 md:flex-row md:items-center md:justify-between">
+      <div className="rounded-[4px] border border-[var(--line-strong)] bg-[var(--surface)] p-4 md:p-5 lg:p-7">
+        <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--line)] pb-4 text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span>
               {`第 ${currentLabel} 页 / 共 ${totalPages} 页`}
@@ -347,10 +318,9 @@ export function ExhibitionCatalogueViewer({
             <span className="h-px w-6 bg-[var(--line-strong)]/26" aria-hidden="true" />
             <span>当前展开 / {stageSummary}</span>
           </div>
-          <span>翻阅图录请横向浏览 / Swipe or click to turn pages</span>
         </div>
 
-        <div className="relative grid gap-4 lg:grid-cols-[58px_minmax(0,1fr)_58px] lg:items-center">
+        <div className="grid gap-3 lg:grid-cols-[48px_minmax(0,1fr)_48px] lg:items-center">
           <NavigationButton
             direction="previous"
             disabled={!canGoPrevious}
@@ -392,17 +362,15 @@ export function ExhibitionCatalogueViewer({
                 goNext();
               }
             }}
-            className="relative touch-pan-y select-none outline-none"
+            className="touch-pan-y select-none outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]"
           >
-            <div className="pointer-events-none absolute inset-x-[11%] -bottom-3 h-12 rounded-full bg-[rgba(93,71,45,0.08)] blur-2xl" />
             <div
-              className={`relative grid gap-2 overflow-hidden rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,#e7d9c7_0%,#e0cfbb_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_24px_72px_rgba(35,24,16,0.14)] md:p-4 ${
+              className={`relative grid gap-2 overflow-hidden rounded-[4px] border border-[var(--line)] bg-[var(--surface-strong)] p-2 md:p-3 ${
                 usesDesktopPairing ? "lg:grid-cols-2" : "grid-cols-1"
               }`}
             >
-              <div className="pointer-events-none absolute inset-x-5 top-3 h-8 rounded-full bg-white/22 blur-2xl" />
               {usesDesktopPairing ? (
-                <div className="pointer-events-none absolute inset-y-10 left-1/2 hidden w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(115,86,58,0.15),rgba(79,57,37,0.38),rgba(115,86,58,0.15))] lg:block" />
+                <div className="pointer-events-none absolute inset-y-8 left-1/2 hidden w-px -translate-x-1/2 bg-[var(--line-strong)]/48 lg:block" />
               ) : null}
               {visiblePages.map((page, index) => (
                 <CataloguePage
@@ -425,57 +393,59 @@ export function ExhibitionCatalogueViewer({
           />
         </div>
 
-        <div className="relative mt-6 overflow-hidden rounded-[24px] border border-[var(--line)]/64 bg-[linear-gradient(180deg,rgba(255,255,255,0.5),rgba(246,240,232,0.74))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.32)] md:p-4">
+        <div className="mt-6 overflow-hidden rounded-[4px] border border-[var(--line)] bg-[var(--surface)] p-3 md:p-4">
           <div className="mb-3 flex flex-col gap-2 border-b border-[var(--line)]/52 pb-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[0.72rem] tracking-[0.2em] text-[var(--accent)]">图版索引 · PLATE INDEX</p>
-              <p className="mt-1 text-[0.8rem] text-[var(--muted)]">点击缩略图可快速跳转到任意页</p>
+              <p className="text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">图版索引 / PLATE INDEX</p>
             </div>
-            <p className="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/78">
+            <p className="text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
               当前浏览 / Page {stageSummary}
             </p>
           </div>
 
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-[linear-gradient(90deg,rgba(242,236,227,0.96),rgba(242,236,227,0))]" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-[linear-gradient(270deg,rgba(242,236,227,0.96),rgba(242,236,227,0))]" />
-            <div className="flex gap-2.5 overflow-x-auto pb-1">
+          <div>
+            <div ref={thumbnailStripRef} className="flex gap-2 overflow-x-auto pb-1">
               {cataloguePages.map((page, index) => {
                 const selected = usesDesktopPairing
                   ? currentIndex === getDesktopStartIndex(index, totalPages)
                   : currentIndex === index;
+                const showThumbnail = thumbnailImageIndexes.has(index);
 
                 return (
                   <button
                     key={`${page}-${index}`}
+                    ref={selected ? selectedThumbnailRef : null}
                     type="button"
                     onClick={() => jumpTo(index)}
-                    className={`group relative shrink-0 rounded-[18px] transition-all duration-75 ${
-                      selected
-                        ? "-translate-y-1"
-                        : "hover:-translate-y-0.5"
-                    }`}
+                    aria-label={`${title.zh || title.en} page ${index + 1}`}
+                    aria-current={selected ? "page" : undefined}
+                    data-thumbnail-index={index}
+                    className="group relative shrink-0 rounded-[2px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                   >
-                    <div className={`overflow-hidden rounded-[18px] border p-1.5 transition-all duration-75 ${
+                    <div className={`overflow-hidden rounded-[2px] border p-1.5 transition-colors duration-150 ${
                       selected
-                        ? "border-[var(--line-strong)] bg-white shadow-[0_14px_28px_rgba(30,22,16,0.14)]"
-                        : "border-[var(--line)]/70 bg-white/7 hover:border-[var(--line-strong)]/68 hover:bg-white/66"
+                        ? "border-[var(--line-strong)] bg-[var(--surface-strong)]"
+                        : "border-[var(--line)] bg-transparent hover:border-[var(--line-strong)]"
                     }`}>
-                      <div className={`mb-1.5 h-px transition-colors ${selected ? "bg-[var(--line-strong)]/74" : "bg-[var(--line)]/42 group-hover:bg-[var(--line-strong)]/48"}`} />
-                      <div className={`relative overflow-hidden rounded-[13px] bg-[#f7f2ea] ${
+                      <div className={`relative overflow-hidden rounded-[1px] bg-[var(--surface-strong)] ${
                         showsSpreadImage ? "h-20 w-32 md:h-24 md:w-40" : "h-24 w-16 md:h-28 md:w-20"
                       }`}>
-                        <ProtectedImage
-                          src={page}
-                          alt={`${title.zh || title.en} page ${index + 1}`}
-                          fill
-                          sizes={showsSpreadImage ? "160px" : "80px"}
-                          wrapperClassName="h-full w-full"
-                          className="object-cover"
-                        />
-                        <div className={`absolute inset-0 transition-colors ${selected ? "bg-[linear-gradient(180deg,transparent,rgba(15,11,8,0.14))]" : "bg-[linear-gradient(180deg,transparent,rgba(15,11,8,0.24))]"}`} />
+                        {showThumbnail ? (
+                          <ProtectedImage
+                            src={page}
+                            alt={`${title.zh || title.en} page ${index + 1}`}
+                            fill
+                            sizes={showsSpreadImage ? "160px" : "80px"}
+                            wrapperClassName="h-full w-full"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center font-serif text-[1.1rem] text-[var(--accent-text)]">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                        )}
                       </div>
-                      <div className="mt-2 flex items-center justify-between px-0.5 text-[0.6rem] tracking-[0.18em] text-[var(--accent)]/78">
+                      <div className="mt-2 flex items-center justify-between px-0.5 text-[0.75rem] tracking-[0.04em] text-[var(--accent-text)]">
                         <span>{String(index + 1).padStart(2, "0")}</span>
                         <span>{selected ? "Current" : showsSpreadImage ? "Spread" : "Plate"}</span>
                       </div>
@@ -511,18 +481,17 @@ function CataloguePage({
 
   if (!page) {
     return (
-      <div className={`relative hidden ${minHeightClass} rounded-[24px] border border-white/55 bg-[linear-gradient(180deg,#f3eadc,#ede0ce)] lg:block`}>
+      <div className={`relative hidden ${minHeightClass} rounded-[2px] border border-[var(--line)] bg-[var(--surface)] lg:block`}>
         <div className={`absolute inset-y-10 ${side === "right" ? "left-0" : "right-0"} w-px bg-[var(--line)]/26`} />
       </div>
     );
   }
 
   return (
-    <div className={`group relative ${minHeightClass} rounded-[24px] border border-white/72 bg-[linear-gradient(180deg,#f8f4ec,#f4ede2)] p-3 shadow-[0_18px_38px_rgba(32,23,17,0.075)] md:p-4`}>
+    <div className={`group relative ${minHeightClass} rounded-[2px] border border-[var(--line)] bg-[var(--surface)] p-2 md:p-3`}>
       <div className={`absolute inset-y-8 hidden w-px bg-[var(--line)]/24 lg:block ${side === "right" ? "left-0" : side === "left" ? "right-0" : "left-0"}`} />
-      <div className={`pointer-events-none absolute inset-y-4 w-10 blur-2xl ${side === "left" ? "right-0 bg-[rgba(121,92,62,0.07)]" : side === "right" ? "left-0 bg-[rgba(121,92,62,0.07)]" : "right-0 bg-[rgba(121,92,62,0.05)]"}`} />
-      <div className="relative overflow-hidden rounded-[18px] bg-white shadow-[inset_0_0_0_1px_rgba(23,21,18,0.06)]">
-        <div className={`relative bg-[#f8f4ec] ${displayMode === "spread" ? "aspect-[1.7/1]" : "aspect-[0.72/1]"}`}>
+      <div className="relative overflow-hidden rounded-[1px] border border-[var(--line)] bg-[var(--surface)]">
+        <div className={`relative bg-[var(--surface)] ${displayMode === "spread" ? "aspect-[1.7/1]" : "aspect-[0.72/1]"}`}>
           <ProtectedImage
             src={page}
             alt={`${title.zh || title.en} page ${pageNumber}`}
@@ -536,7 +505,7 @@ function CataloguePage({
           />
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-between text-[0.68rem] uppercase tracking-[0.16em] text-[var(--accent)]/72">
+      <div className="mt-3 flex items-center justify-between text-[0.75rem] uppercase tracking-[0.06em] text-[var(--accent-text)]">
         <span>{pageNumber.toString().padStart(2, "0")}</span>
         <span>{displayMode === "spread" ? "Spread" : side === "single" ? "Reader" : "Catalogue"}</span>
       </div>
@@ -561,28 +530,12 @@ function NavigationButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--line)]/72 bg-[rgba(255,255,255,0.66)] px-4 text-[0.66rem] tracking-[0.18em] text-[var(--ink)] shadow-[0_8px_18px_rgba(28,21,16,0.05)] transition-all duration-150 hover:-translate-y-0.5 hover:border-[var(--line-strong)]/82 hover:bg-white disabled:cursor-not-allowed disabled:opacity-30 lg:min-h-[172px] lg:w-[56px] lg:flex-col lg:gap-2 lg:rounded-[22px] lg:px-0"
+      className="inline-flex min-h-11 items-center justify-center rounded-[2px] border border-[var(--line)] bg-transparent px-4 text-[var(--ink)] transition-colors duration-150 hover:border-[var(--line-strong)] hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-30 lg:min-h-[144px] lg:w-[48px] lg:px-0"
       aria-label={label}
     >
-      <span className="text-[1rem]" aria-hidden="true">
+      <span className="text-[1.1rem]" aria-hidden="true">
         {symbol}
       </span>
-      <span className="leading-5 text-center">{label}</span>
     </button>
-  );
-}
-
-function EditorialFact({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[0.62rem] uppercase tracking-[0.2em] text-[var(--accent)]/58">{label}</p>
-      <p className="text-[0.72rem] tracking-[0.16em] text-[var(--accent)]/82">{value}</p>
-    </div>
   );
 }

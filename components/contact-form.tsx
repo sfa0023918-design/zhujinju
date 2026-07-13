@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 
+import { BilingualText } from "@/components/bilingual-text";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
-import { ActionLabel } from "./action-label";
-import { BilingualText } from "./bilingual-text";
+import styles from "./institutional-pages.module.css";
 
 type ContactFormProps = {
   initialArtwork?: string;
@@ -32,10 +32,12 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
   const [errorMessage, setErrorMessage] = useState("");
   const [submittedAt, setSubmittedAt] = useState(() => Date.now().toString());
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setStatus("submitting");
     setErrorMessage("");
 
+    const formData = new FormData(event.currentTarget);
     const payload = {
       name: formData.get("name"),
       organization: formData.get("organization"),
@@ -83,151 +85,99 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
     success: copy.introSuccess,
     error: copy.introError,
   } as const;
-  const statusTone =
-    status === "success"
-      ? "text-[var(--ink)]"
-      : status === "error"
-        ? "text-[var(--accent)]"
-        : "text-[var(--muted)]";
 
   return (
     <form
       ref={formRef}
-      action={handleSubmit}
-      className="space-y-4 border border-[var(--line)]/75 bg-[var(--surface)] px-5 py-5 md:px-7 md:py-6"
+      onSubmit={handleSubmit}
+      className={styles.inquiryForm}
+      aria-busy={status === "submitting"}
     >
       <input type="hidden" name="submittedAt" value={submittedAt} />
-      <label className="hidden" aria-hidden="true">
+      <label className={styles.honeypot} aria-hidden="true">
         Website
-        <input
-          tabIndex={-1}
-          autoComplete="off"
-          name="website"
-          className="hidden"
-        />
+        <input tabIndex={-1} autoComplete="off" name="website" />
       </label>
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="grid gap-2 text-sm text-[var(--muted)]">
-          <BilingualText
-            as="span"
-            text={copy.nameLabel}
-            mode="inline"
-            className="block"
-            zhClassName="text-[15px]"
-            enClassName="text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]/62"
-          />
-          <input
-            required
-            name="name"
-            className="h-10 border border-[var(--line)]/75 bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-          />
-        </label>
-        <label className="grid gap-2 text-sm text-[var(--muted)]">
-          <BilingualText
-            as="span"
-            text={copy.emailLabel}
-            mode="inline"
-            className="block"
-            zhClassName="text-[15px]"
-            enClassName="text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]/62"
-          />
-          <input
-            required
-            type="email"
-            name="email"
-            className="h-10 border border-[var(--line)]/75 bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-          />
-        </label>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="grid gap-2 text-sm text-[var(--muted)]">
-          <BilingualText
-            as="span"
-            text={copy.organizationLabel}
-            mode="inline"
-            className="block"
-            zhClassName="text-[15px]"
-            enClassName="text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]/62"
-          />
-          <input
-            name="organization"
-            className="h-10 border border-[var(--line)]/75 bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-          />
-        </label>
-        <label className="grid gap-2 text-sm text-[var(--muted)]">
-          <BilingualText
-            as="span"
-            text={copy.roleLabel}
-            mode="inline"
-            className="block"
-            zhClassName="text-[15px]"
-            enClassName="text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]/62"
-          />
+
+      <BilingualText
+        as="p"
+        text={statusCopy[status]}
+        className={styles.formIntroduction}
+        data-status={status}
+        aria-live="polite"
+        aria-atomic="true"
+        zhClassName={styles.zh}
+        enClassName={styles.en}
+      />
+
+      <div className={styles.formGrid}>
+        <ContactField label={copy.nameLabel}>
+          <input required name="name" />
+        </ContactField>
+        <ContactField label={copy.emailLabel}>
+          <input required type="email" name="email" />
+        </ContactField>
+        <ContactField label={copy.organizationLabel}>
+          <input name="organization" />
+        </ContactField>
+        <ContactField label={copy.roleLabel}>
           <select
             name="identity"
             defaultValue={`${copy.roleOptions[0]?.zh ?? ""} · ${copy.roleOptions[0]?.en ?? ""}`}
-            className="h-10 border border-[var(--line)]/75 bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
           >
             {copy.roleOptions.map((option) => (
               <option key={option.zh}>{`${option.zh} · ${option.en}`}</option>
             ))}
           </select>
-        </label>
+        </ContactField>
+        <ContactField label={copy.artworkLabel} className={styles.fullField}>
+          <input name="artwork" defaultValue={initialArtwork} />
+        </ContactField>
+        <ContactField label={copy.messageLabel} className={styles.fullField}>
+          <textarea required name="message" rows={6} />
+        </ContactField>
       </div>
-      <label className="grid gap-2 text-sm text-[var(--muted)]">
+
+      <div className={styles.formFooter}>
+        <button type="submit" disabled={status === "submitting"}>
           <BilingualText
             as="span"
-            text={copy.artworkLabel}
-            mode="inline"
-            className="block"
-            zhClassName="text-[15px]"
-            enClassName="text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]/62"
+            text={status === "submitting" ? copy.submittingLabel : copy.submitLabel}
+            className={styles.submitLabel}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
           />
-        <input
-          name="artwork"
-          defaultValue={initialArtwork}
-          className="h-10 border border-[var(--line)]/75 bg-[var(--bg)] px-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-        />
-      </label>
-      <label className="grid gap-2 text-sm text-[var(--muted)]">
-          <BilingualText
-            as="span"
-            text={copy.messageLabel}
-            mode="inline"
-            className="block"
-            zhClassName="text-[15px]"
-            enClassName="text-[11px] uppercase tracking-[0.14em] text-[var(--accent)]/62"
-          />
-        <textarea
-          required
-          name="message"
-          rows={5}
-          className="border border-[var(--line)]/75 bg-[var(--bg)] px-3 py-3 text-[var(--ink)] outline-none transition-colors focus:border-[var(--line-strong)]"
-        />
-      </label>
-      <div className="flex flex-col items-start gap-3 border-t border-[var(--line)]/65 pt-4 md:flex-row md:items-center md:justify-between">
-        <button
-          type="submit"
-          disabled={status === "submitting"}
-          className="inline-flex min-h-10 items-center border border-[var(--line-strong)]/85 px-5 text-[var(--ink)] transition-colors duration-300 hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {status === "submitting" ? (
-            <ActionLabel text={copy.submittingLabel} />
-          ) : (
-            <ActionLabel text={copy.submitLabel} />
-          )}
         </button>
-        <BilingualText
-          as="p"
-          text={statusCopy[status]}
-          className={`flex max-w-[25rem] flex-col gap-1.5 text-sm ${statusTone}`}
-          zhClassName="text-[15px] leading-7"
-          enClassName="text-[11px] leading-5 text-[var(--accent)]/72"
-        />
+        {status === "error" && errorMessage ? (
+          <p className={styles.formError} role="alert">
+            {errorMessage}
+          </p>
+        ) : null}
       </div>
-      {status === "error" && errorMessage ? (
-        <p className="text-sm leading-6 text-[var(--accent)]">{errorMessage}</p>
-      ) : null}
     </form>
+  );
+}
+
+function ContactField({
+  label,
+  children,
+  className,
+}: {
+  label: BilingualValue;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <label className={`${styles.formField} ${className ?? ""}`}>
+      <BilingualText
+        as="span"
+        text={label}
+        mode="inline"
+        className={styles.formLabel}
+        zhClassName={styles.inlineZh}
+        enClassName={styles.inlineEn}
+      />
+      {children}
+    </label>
   );
 }

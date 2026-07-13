@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 
 import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
@@ -9,7 +10,10 @@ import { getArticleDisplayExcerpt, resolveArticleCover } from "@/lib/article-con
 import { bt } from "@/lib/bilingual";
 import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
+import type { Article, BilingualText as BilingualValue } from "@/lib/site-data";
 import { getPublicArticles, loadSiteContent } from "@/lib/site-data";
+
+import styles from "./journal.module.css";
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
@@ -22,34 +26,128 @@ export async function generateMetadata() {
   });
 }
 
-function JournalCover({
-  cover,
-  title,
-}: {
-  cover: string;
-  title: { zh: string; en: string };
-}) {
-  const isPlaceholder = cover.startsWith("/api/placeholder/");
+function JournalCover({ article, priority = false }: { article: Article; priority?: boolean }) {
+  const cover = resolveArticleCover(article);
 
-  if (isPlaceholder) {
-    return (
-      <div className="aspect-[1.45/1]">
-        <MediaPlaceholder eyebrow="Journal Image" title={title.zh} />
-      </div>
-    );
+  if (!cover || cover.startsWith("/api/placeholder/")) {
+    return <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />;
   }
 
   return (
     <ProtectedImage
       src={withImageVersion(cover)}
-      alt={`${title.zh} ${title.en}`}
+      alt={`${article.title.zh} ${article.title.en}`}
       width={1400}
-      height={900}
+      height={1050}
+      priority={priority}
       quality={84}
-      sizes="(min-width: 1024px) 44vw, 100vw"
-      wrapperClassName="block"
-      className="aspect-[1.45/1] h-full w-full object-cover"
+      sizes="(min-width: 1100px) 52vw, (min-width: 720px) 60vw, 100vw"
+      wrapperClassName={styles.coverImage}
+      className={styles.coverImageElement}
     />
+  );
+}
+
+function ArticleMeta({ article }: { article: Article }) {
+  const items = [
+    article.date.trim() ? <span key="date">{article.date}</span> : null,
+    article.author.zh.trim() || article.author.en.trim() ? (
+      <BilingualText
+        key="author"
+        as="span"
+        text={article.author}
+        mode="inline"
+        zhClassName={styles.inlineZh}
+        enClassName={styles.inlineEn}
+      />
+    ) : null,
+    article.column.zh.trim() || article.column.en.trim() ? (
+      <BilingualText
+        key="column"
+        as="span"
+        text={article.column}
+        mode="inline"
+        zhClassName={styles.inlineZh}
+        enClassName={styles.inlineEn}
+      />
+    ) : null,
+  ].filter(Boolean);
+
+  return (
+    <div className={styles.metaLine}>
+      {items.map((item, index) => (
+        <Fragment key={index}>
+          {index > 0 ? <span className={styles.metaDivider} aria-hidden="true" /> : null}
+          {item}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+function collapsedExcerptClass(index: number) {
+  if (index === 0) {
+    return "max-h-[10.5rem] md:max-h-[11rem]";
+  }
+
+  if (index < 3) {
+    return "max-h-[8.8rem] md:max-h-[9.4rem]";
+  }
+
+  return "max-h-[7.2rem] md:max-h-[7.8rem]";
+}
+
+function ArticleCard({
+  article,
+  index,
+  readAction,
+}: {
+  article: Article;
+  index: number;
+  readAction: BilingualValue;
+}) {
+  const href = `/journal/${article.slug}`;
+  const excerpt = getArticleDisplayExcerpt(article);
+
+  return (
+    <article className={styles.card} data-layout={index === 0 ? "lead" : index < 3 ? "paired" : "index"}>
+      <Link href={href} className={styles.cardMedia} aria-label={article.title.zh}>
+        <JournalCover article={article} priority={index === 0} />
+      </Link>
+      <div className={styles.cardCopy}>
+        <BilingualText
+          as="p"
+          text={article.category}
+          mode="inline"
+          className={styles.kicker}
+          zhClassName={styles.inlineZh}
+          enClassName={styles.inlineEn}
+        />
+        <Link href={href} className={styles.titleLink}>
+          <BilingualText
+            as="h2"
+            text={article.title}
+            className={styles.cardTitle}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
+          />
+        </Link>
+        <div className={styles.expandableExcerpt}>
+          <ExpandableBilingualCopy
+            text={excerpt}
+            collapsedClassName={collapsedExcerptClass(index)}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
+          />
+        </div>
+        <div className={styles.cardFooter}>
+          <ArticleMeta article={article} />
+          <Link href={href} className={styles.readLink}>
+            <ActionLabel text={readAction} align="start" />
+          </Link>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -57,124 +155,46 @@ export default async function JournalPage() {
   const content = await loadSiteContent();
   const articles = getPublicArticles(content);
   const { pageCopy } = content;
-  const readAction = pageCopy.journal.readAction;
 
   return (
-    <>
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-5 pt-8 md:px-8 md:pb-6 md:pt-9 lg:px-10 lg:pb-7">
-        <div className="border-b border-[var(--line)]/80 pb-5 lg:grid lg:grid-cols-[minmax(0,0.64fr)_minmax(300px,0.36fr)] lg:items-end lg:gap-9 lg:pb-6">
-          <div className="space-y-2.5">
-            <BilingualText
-              as="p"
-              text={pageCopy.journal.hero.eyebrow}
-              mode="inline"
-              className="text-[var(--accent)]"
-              zhClassName="text-[0.72rem] tracking-[0.24em]"
-              enClassName="text-[0.52rem] uppercase tracking-[0.16em] text-[var(--accent)]/68"
-            />
-            <BilingualText
-              as="h1"
-              text={pageCopy.journal.hero.title}
-              className="font-serif text-[var(--ink)]"
-              zhClassName="block text-[clamp(2.05rem,2.9vw,2.7rem)] leading-[1.04] tracking-[-0.043em]"
-              enClassName="mt-2 block text-[0.68rem] uppercase tracking-[0.16em] text-[var(--accent)]/58"
-            />
-          </div>
-          <div className="mt-4 max-w-[26rem] border-t border-[var(--line)]/70 pt-3 lg:mt-0 lg:max-w-[22rem] lg:border-t-0 lg:pt-0">
-            <BilingualText
-              as="div"
-              text={pageCopy.journal.hero.description}
-              className="max-w-[24ch] text-[var(--muted)]"
-              zhClassName="block text-[0.9rem] leading-7"
-              enClassName="mt-2 block text-[0.62rem] uppercase tracking-[0.14em] leading-6 text-[var(--accent)]/64"
-            />
-          </div>
+    <div className={styles.journalShell}>
+      <section className={styles.indexHero}>
+        <div>
+          <BilingualText
+            as="p"
+            text={pageCopy.journal.hero.eyebrow}
+            mode="inline"
+            className={styles.kicker}
+            zhClassName={styles.inlineZh}
+            enClassName={styles.inlineEn}
+          />
+          <BilingualText
+            as="h1"
+            text={pageCopy.journal.hero.title}
+            className={styles.pageTitle}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
+          />
         </div>
+        <BilingualText
+          as="div"
+          text={pageCopy.journal.hero.description}
+          className={styles.heroDescription}
+          zhClassName={styles.zh}
+          enClassName={styles.en}
+        />
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] px-5 pb-16 md:px-10 md:pb-24">
-        <div className="grid gap-9">
-          {articles.map((article) => {
-            const displayExcerpt = getArticleDisplayExcerpt(article);
-            const resolvedCover = resolveArticleCover(article);
-
-            return (
-            <article
-              key={article.slug}
-              className="grid gap-5 border-t border-[var(--line)]/85 pt-6 lg:grid-cols-[minmax(0,0.44fr)_minmax(0,0.56fr)] lg:gap-7"
-            >
-              <Link href={`/journal/${article.slug}`} className="relative overflow-hidden bg-[var(--surface-strong)]">
-                <JournalCover cover={resolvedCover} title={article.title} />
-              </Link>
-              <div className="flex flex-col justify-between gap-5">
-                <div className="space-y-3.5">
-                  <BilingualText
-                    as="p"
-                    text={article.category}
-                    mode="inline"
-                    className="text-[var(--accent)]"
-                    zhClassName="text-[0.7rem] tracking-[0.2em]"
-                    enClassName="text-[0.5rem] uppercase tracking-[0.16em] text-[var(--accent)]/64"
-                  />
-                  <div>
-                    <BilingualText
-                      as="h2"
-                      text={article.title}
-                      className="font-serif text-[var(--ink)]"
-                      zhClassName="block max-w-[15ch] text-[clamp(1.38rem,1.8vw,1.95rem)] leading-[1.06] tracking-[-0.036em]"
-                      enClassName="mt-1.5 block font-sans text-[0.64rem] uppercase tracking-[0.18em] text-[var(--accent)]/56"
-                    />
-                  </div>
-                  <ExpandableBilingualCopy
-                    text={displayExcerpt}
-                    collapsedClassName="max-h-[7.2rem] md:max-h-[9.2rem]"
-                    zhClassName="max-w-[36ch] text-[0.96rem] leading-[2.02] text-[var(--muted)]/94"
-                    enClassName="max-w-[42ch] text-[0.8rem] leading-[1.78] tracking-[0.02em] text-[var(--accent)]/74"
-                  />
-                </div>
-                <div className="space-y-3.5 border-t border-[var(--line)]/75 pt-4 text-sm leading-7 text-[var(--muted)]">
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-2 text-[0.8rem] leading-7 text-[var(--muted)]/92">
-                    <span className="select-none">{article.date}</span>
-                    <span className="h-[10px] w-px bg-[var(--line)]/75" aria-hidden="true" />
-                    <BilingualText
-                      as="span"
-                      text={article.author}
-                      mode="inline"
-                      className="select-none"
-                      zhClassName="text-[0.8rem]"
-                      enClassName="text-[0.5rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
-                    />
-                    <span className="h-[10px] w-px bg-[var(--line)]/75" aria-hidden="true" />
-                    <BilingualText
-                      as="span"
-                      text={article.column}
-                      mode="inline"
-                      className="select-none"
-                      zhClassName="text-[0.8rem]"
-                      enClassName="text-[0.5rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
-                    />
-                  </div>
-                  <div className="flex flex-wrap items-end justify-between gap-4 border-t border-[var(--line)]/62 pt-3.5">
-                    <div className="flex flex-wrap gap-1.5">
-                      {article.keywords.map((keyword) => (
-                        <span
-                          key={keyword.zh}
-                          className="border border-[var(--line)]/65 px-2.5 py-0.5 text-[10px] tracking-[0.1em] text-[var(--muted)]/84"
-                        >
-                          {keyword.zh}
-                        </span>
-                      ))}
-                    </div>
-                    <Link href={`/journal/${article.slug}`} className="inline-flex text-sm text-[var(--ink)]">
-                      <ActionLabel text={readAction} align="start" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </article>
-          )})}
-        </div>
+      <section className={styles.articleGrid} aria-label={pageCopy.journal.hero.title.zh}>
+        {articles.map((article, index) => (
+          <ArticleCard
+            key={article.slug}
+            article={article}
+            index={index}
+            readAction={pageCopy.journal.readAction}
+          />
+        ))}
       </section>
-    </>
+    </div>
   );
 }

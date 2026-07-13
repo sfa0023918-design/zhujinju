@@ -29,106 +29,6 @@ type ExhibitionDetailReadingProps = {
   relatedArticles: RelatedArticleItem[];
 };
 
-function normalizeInlineWhitespace(text: string) {
-  return text.replace(/\r\n/g, "\n").replace(/\u00a0/g, " ").trim();
-}
-
-function collapseLocaleWhitespace(text: string, locale: ReadingLocale) {
-  const collapsed = text.replace(/[ \t]{2,}/g, " ").trim();
-
-  if (locale === "zh") {
-    return collapsed
-      .replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g, "$1$2")
-      .replace(/([\u3400-\u9fff])\s+([，。！？：；、])/g, "$1$2")
-      .replace(/([，。！？：；、])\s+([\u3400-\u9fff])/g, "$1$2");
-  }
-
-  return collapsed;
-}
-
-function splitIntoSentenceParagraphs(text: string, locale: ReadingLocale) {
-  const normalized = collapseLocaleWhitespace(
-    normalizeInlineWhitespace(text).replace(/\n+/g, locale === "zh" ? "" : " "),
-    locale,
-  );
-
-  if (!normalized) {
-    return [];
-  }
-
-  const sentenceRegex =
-    locale === "zh"
-      ? /[^。！？!?]+[。！？!?]?/g
-      : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
-
-  return (normalized.match(sentenceRegex) ?? [])
-    .map((sentence) => collapseLocaleWhitespace(sentence, locale))
-    .filter(Boolean);
-}
-
-function mergeOversegmentedParagraphs(text: string, locale: ReadingLocale) {
-  const normalized = normalizeInlineWhitespace(text);
-
-  if (!normalized) {
-    return "";
-  }
-
-  if (locale === "zh") {
-    return splitIntoSentenceParagraphs(normalized, locale).join("\n\n");
-  }
-
-  const rawParagraphs = normalized
-    .split(/\n\s*\n+/)
-    .map((paragraph) => collapseLocaleWhitespace(paragraph.replace(/\n+/g, " "), locale))
-    .filter(Boolean);
-
-  if (rawParagraphs.length < 4) {
-    return normalized;
-  }
-
-  const averageLength = rawParagraphs.reduce((sum, paragraph) => sum + paragraph.length, 0) / rawParagraphs.length;
-  const shouldMerge = averageLength <= 90;
-
-  if (!shouldMerge) {
-    return normalized;
-  }
-
-  const joiner = " ";
-  const targetLength = 220;
-  const merged: string[] = [];
-  let current = "";
-
-  rawParagraphs.forEach((paragraph) => {
-    if (!current) {
-      current = paragraph;
-      return;
-    }
-
-    const next = `${current}${joiner}${paragraph}`;
-    if (current.length >= targetLength || next.length > targetLength + 70) {
-      merged.push(current);
-      current = paragraph;
-      return;
-    }
-
-    current = next;
-  });
-
-  if (current) {
-    merged.push(current);
-  }
-
-  return merged.join("\n\n");
-}
-
-function normalizeExhibitionTextItem(item: BilingualValue): BilingualValue {
-  return {
-    ...item,
-    zh: mergeOversegmentedParagraphs(item.zh ?? "", "zh"),
-    en: mergeOversegmentedParagraphs(item.en ?? "", "en"),
-  };
-}
-
 export function ExhibitionDetailReading({
   introLabel,
   intro,
@@ -145,7 +45,7 @@ export function ExhibitionDetailReading({
     () => [
       ...(Array.isArray(intro) ? intro : [intro]),
       ...(Array.isArray(description) ? description : [description]),
-    ].map(normalizeExhibitionTextItem),
+    ],
     [description, intro],
   );
   const exhibitionTextLayoutProps = {
@@ -157,16 +57,16 @@ export function ExhibitionDetailReading({
   };
 
   return (
-    <section className="mx-auto grid w-full max-w-[1480px] gap-10 border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.72fr)] lg:px-10 lg:py-20">
+    <section className="mx-auto grid w-full max-w-[var(--content-width)] gap-10 border-t border-[var(--line)] px-[var(--page-inline)] py-14 md:py-16 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.72fr)] lg:py-20">
       <section className="max-w-[42rem] scroll-mt-28 space-y-4">
         <div className="flex items-center justify-between gap-4">
           <BilingualText
             as="p"
             text={introLabel}
             mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.74rem] tracking-[0.14em] text-[var(--accent)]/94"
-            enClassName="text-[0.66rem] uppercase tracking-[0.13em] text-[var(--accent)]/72 leading-[1.45]"
+            className="text-[var(--accent-text)]"
+            zhClassName="text-xs tracking-[0.12em]"
+            enClassName="text-xs uppercase tracking-[0.12em] leading-[1.45]"
           />
           <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
             {(["zh", "en"] as const).map((option) => {
@@ -176,10 +76,10 @@ export function ExhibitionDetailReading({
                   key={option}
                   type="button"
                   onClick={() => setLocale(option)}
-                  className={`min-w-10 cursor-pointer select-none rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                  className={`min-h-11 min-w-11 cursor-pointer select-none rounded-full px-3 py-1 text-xs uppercase tracking-[0.12em] transition-colors ${
                     active
                       ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                      : "text-[var(--accent-text)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {option.toUpperCase()}
@@ -194,7 +94,7 @@ export function ExhibitionDetailReading({
             {
               key: "exhibition-text",
               content: exhibitionTextContent,
-              variant: "compact",
+              variant: "body",
               expandable: true,
             },
           ]}
@@ -213,14 +113,14 @@ export function ExhibitionDetailReading({
               key: "catalogue-intro",
               label: catalogueNoteLabel,
               content: catalogueNote,
-              variant: "compact",
+              variant: "secondary",
               expandable: true,
             },
             {
               key: "curatorial-lead",
               label: curatorialLeadLabel,
               content: curatorialLead,
-              variant: "compact",
+              variant: "secondary",
               expandable: true,
             },
           ]}
@@ -235,9 +135,9 @@ export function ExhibitionDetailReading({
               as="p"
               text={relatedWritingLabel}
               mode="inline"
-              className="mb-4 text-[var(--accent)]"
-              zhClassName="text-[0.72rem] tracking-[0.22em]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.16em] text-[var(--accent)]/78"
+              className="mb-4 text-[var(--accent-text)]"
+              zhClassName="text-xs tracking-[0.12em]"
+              enClassName="text-xs uppercase tracking-[0.12em]"
             />
             <div className="space-y-3">
               {relatedArticles.map((article) => (

@@ -1,38 +1,96 @@
 import Link from "next/link";
 
-import { ActionLabel } from "@/components/action-label";
-import { BilingualText } from "@/components/bilingual-text";
-import { ArtworkCard } from "@/components/artwork-card";
 import { ProtectedImage } from "@/components/protected-image";
+import { getArtworkStatusText } from "@/lib/bilingual";
+import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import {
   getCurrentExhibition,
   getFeaturedArtworks,
   loadSiteContent,
+  type Artwork,
+  type BilingualText as BilingualValue,
 } from "@/lib/site-data";
+
+import styles from "./home.module.css";
+
+type BilingualPairProps = {
+  text: BilingualValue;
+  className?: string;
+};
+
+const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
+const worksSectionCopy = { zh: "部分藏品赏析", en: "Selected Highlights" };
+
+function BilingualPair({ text, className = "" }: BilingualPairProps) {
+  return (
+    <span className={`${styles.bilingualPair} ${className}`}>
+      <span className={styles.zh}>{text.zh}</span>
+      <span className={styles.en}>{text.en}</span>
+    </span>
+  );
+}
+
+function HomeAction({ href, text }: { href: string; text: BilingualValue }) {
+  return (
+    <Link href={href} className={styles.action}>
+      <BilingualPair text={text} />
+    </Link>
+  );
+}
+
+function HomeArtwork({ artwork, priority }: { artwork: Artwork; priority: boolean }) {
+  const image = resolveArtworkPrimaryImage(artwork);
+  const status = getArtworkStatusText(artwork.status);
+
+  return (
+    <article className={styles.artwork}>
+      <Link href={`/collection/${artwork.slug}`} className={styles.artworkLink}>
+        <div className={styles.artworkImageFrame}>
+          <ProtectedImage
+            src={withImageVersion(image)}
+            alt={`${artwork.title.zh} ${artwork.title.en}`}
+            width={960}
+            height={1200}
+            priority={priority}
+            quality={84}
+            sizes="(min-width: 1024px) 42vw, (min-width: 768px) 44vw, 100vw"
+            wrapperClassName={styles.artworkImageWrapper}
+            className={styles.artworkImage}
+          />
+        </div>
+        <div className={styles.artworkInfo}>
+          <div className={styles.artworkMeta}>
+            <BilingualPair text={artwork.period} className={styles.period} />
+            <BilingualPair text={status} className={styles.status} />
+          </div>
+          <BilingualPair text={artwork.title} className={styles.artworkTitle} />
+        </div>
+      </Link>
+    </article>
+  );
+}
 
 export default async function HomePage() {
   const content = await loadSiteContent();
   const { brandIntro, homeContent } = content;
-  const currentExhibition = getCurrentExhibition(content);
-  const currentExhibitionImage = currentExhibition
-    ? currentExhibition.coverAsset?.card ?? currentExhibition.cover
+  const exhibition = getCurrentExhibition(content);
+  const exhibitionImage = exhibition
+    ? exhibition.coverAsset?.card ?? exhibition.cover
     : "";
   const featuredArtworks = getFeaturedArtworks(content);
-  const focusCopy = currentExhibition?.current ? homeContent.focusCurrent : homeContent.focusRecent;
-  const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
-  const worksSectionCopy = { zh: "部分藏品赏析", en: "Selected Highlights" };
-  const heroTitleZhLines =
-    homeContent.heroTitle.zh
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean) || [];
-  const fallbackHeroTitleZh = homeContent.heroTitle.zh.replace(/\s+/g, "").trim();
+  const focusCopy = exhibition?.current
+    ? homeContent.focusCurrent
+    : homeContent.focusRecent;
+  const heroTitleLines = homeContent.heroTitle.zh
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
 
   return (
-    <>
-      <section className="mx-auto w-full max-w-[1480px] px-5 py-8 md:px-8 md:py-9 lg:px-10 lg:py-11">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,1.38fr)_minmax(280px,0.52fr)] lg:items-end lg:gap-12 xl:grid-cols-[minmax(0,1.44fr)_minmax(320px,0.48fr)]">
-          <div className="relative self-start overflow-hidden bg-[var(--surface-strong)]">
+    <div className={styles.home}>
+      <section className={`${styles.section} ${styles.hero}`}>
+        <div className={styles.heroGrid}>
+          <div className={styles.heroImageFrame}>
             <ProtectedImage
               src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
               alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
@@ -40,171 +98,81 @@ export default async function HomePage() {
               height={1080}
               priority
               quality={85}
-              sizes="(min-width: 1280px) 60vw, (min-width: 1024px) 58vw, 100vw"
-              wrapperClassName="block"
-              className="aspect-[1.08/1] w-full object-cover md:aspect-[1.18/1] lg:aspect-[1.24/1] xl:aspect-[1.3/1]"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-black/12" />
-            <div
-              className="pointer-events-none absolute inset-0 mix-blend-screen opacity-70"
-              style={{
-                background:
-                  "radial-gradient(38% 56% at 48% 43%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 34%, rgba(255,255,255,0) 72%)",
-              }}
-            />
-            <div
-              className="pointer-events-none absolute inset-0 opacity-80"
-              style={{
-                background:
-                  "radial-gradient(85% 110% at 50% 52%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.12) 100%)",
-              }}
+              sizes="(min-width: 1024px) 58vw, 100vw"
+              wrapperClassName={styles.heroImageWrapper}
+              className={styles.heroImage}
             />
           </div>
-          <div className="flex max-w-[22rem] flex-col justify-end gap-8 lg:pb-2">
-            <div className="space-y-5">
-              <BilingualText
-                as="p"
-                text={homeContent.heroEyebrow}
-                mode="inline"
-                className="text-[var(--accent)]"
-                zhClassName="text-[0.62rem] tracking-[0.22em]"
-                enClassName="text-[0.42rem] uppercase tracking-[0.26em] text-[var(--accent)]/60"
-              />
-              <div className="space-y-6">
-                <h1 className="inline-flex flex-col gap-2 font-serif text-[clamp(3.45rem,5.8vw,4.9rem)] font-normal leading-[1.1] tracking-[-0.035em] text-[var(--ink)]">
-                  {heroTitleZhLines.length > 0
-                    ? heroTitleZhLines.map((line) => (
-                        <span key={line} className="block">
-                          {line}
-                        </span>
-                      ))
-                    : <span className="block">{fallbackHeroTitleZh}</span>}
-                </h1>
-                <p className="text-[0.48rem] uppercase tracking-[0.34em] text-[var(--accent)]/56 md:text-[0.5rem]">
-                  {homeContent.heroTitle.en}
-                </p>
-              </div>
+          <div className={styles.heroCopy}>
+            <BilingualPair text={homeContent.heroEyebrow} className={styles.eyebrow} />
+            <div className={styles.heroTitleGroup}>
+              <h1 className={styles.heroTitle}>
+                {(heroTitleLines.length > 0 ? heroTitleLines : [homeContent.heroTitle.zh]).map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </h1>
+              <p className={styles.heroTitleEn}>{homeContent.heroTitle.en}</p>
             </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-3 border-t border-[var(--line)] pt-5">
-              <Link
-                href="/collection"
-                className="inline-flex text-[var(--ink)]"
-              >
-                <ActionLabel text={homeContent.heroPrimaryAction} align="start" />
-              </Link>
-              <Link
-                href="/exhibitions"
-                className="inline-flex text-[var(--muted)] hover:text-[var(--ink)]"
-              >
-                <ActionLabel text={homeContent.heroSecondaryAction} align="start" />
-              </Link>
+            <div className={styles.actions}>
+              <HomeAction href="/collection" text={homeContent.heroPrimaryAction} />
+              <HomeAction href="/exhibitions" text={homeContent.heroSecondaryAction} />
             </div>
           </div>
         </div>
       </section>
 
-      {currentExhibition ? (
-        <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
-          <div className="grid gap-7 lg:grid-cols-[minmax(0,1.04fr)_minmax(320px,0.76fr)] lg:items-start lg:gap-10">
-            <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+      {exhibition ? (
+        <section className={`${styles.section} ${styles.exhibition}`}>
+          <div className={styles.exhibitionGrid}>
+            <div className={styles.exhibitionImageFrame}>
               <ProtectedImage
-                src={currentExhibitionImage}
-                alt={`${currentExhibition.title.zh} ${currentExhibition.title.en}`}
+                src={exhibitionImage}
+                alt={`${exhibition.title.zh} ${exhibition.title.en}`}
                 width={1600}
                 height={1000}
-                quality={84}
-                sizes="(min-width: 1280px) 52vw, (min-width: 1024px) 50vw, 100vw"
-                wrapperClassName="block"
-                className="aspect-[1.42/1] h-full w-full object-cover"
+                quality={86}
+                sizes="(min-width: 1024px) 62vw, 100vw"
+                wrapperClassName={styles.exhibitionImageWrapper}
+                className={styles.exhibitionImage}
               />
             </div>
-            <div className="space-y-5 md:pt-3">
-              <BilingualText
-                as="p"
-                text={focusCopy.eyebrow}
-                mode="inline"
-                className="text-[var(--accent)]"
-                zhClassName="text-[0.72rem] tracking-[0.18em]"
-                enClassName="text-[0.48rem] uppercase tracking-[0.18em] text-[var(--accent)]/64"
-              />
-              <div className="space-y-2.5">
-                <BilingualText
-                  as="div"
-                  text={currentExhibition.title}
-                  className="font-serif text-[var(--ink)]"
-                  zhClassName="block text-[clamp(2.56rem,4.45vw,3.56rem)] leading-[0.98] tracking-[-0.04em]"
-                  enClassName="mt-2 block font-sans text-[0.7rem] uppercase tracking-[0.18em] text-[var(--accent)]/64"
-                />
+            <div className={styles.exhibitionCopy}>
+              <BilingualPair text={focusCopy.eyebrow} className={styles.eyebrow} />
+              <h2 className={styles.exhibitionHeading}>
+                <BilingualPair text={exhibition.title} className={styles.exhibitionTitle} />
+              </h2>
+              <div className={styles.exhibitionFacts}>
+                <BilingualPair text={exhibition.period} className={styles.fact} />
+                <BilingualPair text={exhibition.venue} className={styles.fact} />
               </div>
-              <div className="grid gap-2 border-y border-[var(--line)] py-3.5 text-[var(--muted)]">
-                <BilingualText
-                  as="p"
-                  text={currentExhibition.period}
-                  className="flex flex-col gap-1"
-                  zhClassName="text-[0.92rem] leading-7"
-                  enClassName="text-[0.56rem] uppercase tracking-[0.14em] leading-5 text-[var(--accent)]/66"
+              <div className={styles.actions}>
+                <HomeAction
+                  href={`/exhibitions/${exhibition.slug}`}
+                  text={homeContent.focusAction}
                 />
-                <BilingualText
-                  as="p"
-                  text={currentExhibition.venue}
-                  className="flex flex-col gap-1"
-                  zhClassName="text-[0.92rem] leading-7"
-                  enClassName="text-[0.56rem] uppercase tracking-[0.14em] leading-5 text-[var(--accent)]/66"
-                />
-              </div>
-              <div className="flex flex-wrap gap-4 pt-1">
-                <Link href={`/exhibitions/${currentExhibition.slug}`} className="inline-flex text-[var(--ink)]">
-                  <ActionLabel text={homeContent.focusAction} align="start" />
-                </Link>
-                <Link href="/exhibitions" className="inline-flex text-[var(--muted)] hover:text-[var(--ink)]">
-                  <ActionLabel text={archiveEntryCopy} align="start" />
-                </Link>
+                <HomeAction href="/exhibitions" text={archiveEntryCopy} />
               </div>
             </div>
           </div>
         </section>
       ) : null}
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-14 md:px-8 md:py-16 lg:px-10 lg:py-18">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.58fr)] lg:items-end lg:gap-8">
-          <div className="space-y-2">
-            <h2 className="font-serif text-[clamp(2rem,3vw,2.5rem)] leading-[1.02] tracking-[-0.035em] text-[var(--ink)]">
-              {worksSectionCopy.zh}
-            </h2>
-            <p className="text-[0.58rem] uppercase tracking-[0.18em] text-[var(--accent)]/64 md:text-[0.62rem]">
-              {worksSectionCopy.en}
-            </p>
-          </div>
+      <section className={`${styles.section} ${styles.works}`}>
+        <div className={styles.sectionHeading}>
+          <h2>{worksSectionCopy.zh}</h2>
+          <p>{worksSectionCopy.en}</p>
         </div>
-        <div className="mt-9 grid gap-7 sm:grid-cols-2 xl:grid-cols-4">
+        <div className={styles.artworksGrid}>
           {featuredArtworks.slice(0, 4).map((artwork, index) => (
-            <ArtworkCard
-              key={artwork.slug}
-              artwork={artwork}
-              priority={index < 2}
-              variant="compact"
-            />
+            <HomeArtwork key={artwork.slug} artwork={artwork} priority={index < 2} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1480px] border-t border-[var(--line)] px-5 py-10 md:px-8 md:py-11 lg:px-10 lg:py-12">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <BilingualText
-              as="p"
-              text={homeContent.contact.eyebrow}
-              mode="inline"
-              className="text-[var(--accent)]"
-              zhClassName="text-[0.76rem] tracking-[0.18em]"
-              enClassName="text-[0.52rem] uppercase tracking-[0.18em] text-[var(--accent)]/72"
-            />
-          </div>
-          <Link href="/contact" className="inline-flex text-[var(--ink)]">
-            <ActionLabel text={homeContent.contactPrimaryAction} align="start" />
-          </Link>
-        </div>
+      <section className={`${styles.section} ${styles.contact}`}>
+        <BilingualPair text={homeContent.contact.eyebrow} className={styles.contactLabel} />
+        <HomeAction href="/contact" text={homeContent.contactPrimaryAction} />
       </section>
-    </>
+    </div>
   );
 }

@@ -1,9 +1,11 @@
 import Link from "next/link";
 
+import { getArtworkStatusText } from "@/lib/bilingual";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import type { Artwork } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
+import styles from "./collection-page.module.css";
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
 import { StatusPill } from "./status-pill";
@@ -36,10 +38,12 @@ export function ArtworkCard({
         : "(min-width: 768px) 44vw, 92vw";
 
   if (variant === "catalogue") {
+    const status = getArtworkStatusText(artwork.status);
+
     return (
-      <article className="group">
-        <Link href={`/collection/${artwork.slug}`} className="block space-y-2.5">
-          <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+      <article className={styles.artworkCard}>
+        <Link href={`/collection/${artwork.slug}`} className={styles.artworkLink}>
+          <div className={styles.artworkImageFrame}>
             {isPlaceholderImage ? (
               <div className="aspect-[4/5]">
                 <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
@@ -51,33 +55,37 @@ export function ArtworkCard({
                 width={900}
                 height={1200}
                 priority={priority}
-                quality={82}
-                sizes={imageSizes}
-                wrapperClassName="block"
-                className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.004]"
+                quality={84}
+                sizes="(min-width: 1280px) 27vw, (min-width: 768px) 44vw, 100vw"
+                wrapperClassName={styles.artworkImageWrapper}
+                className={styles.artworkImage}
               />
             )}
           </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between gap-4">
+          <div className={styles.artworkRecord}>
+            <div className={styles.artworkMeta}>
               <BilingualText
                 as="p"
                 text={artwork.period}
-                mode="inline"
-                className="text-[var(--muted)]"
-                zhClassName="text-[0.6rem] tracking-[0.08em]"
-                enClassName="text-[0.38rem] uppercase tracking-[0.16em] text-[var(--accent)]/82"
+                className={`${styles.bilingualPair} ${styles.period}`}
+                zhClassName={styles.zh}
+                enClassName={styles.en}
               />
-              <StatusPill status={artwork.status} variant="fine" />
+              <BilingualText
+                as="p"
+                text={status}
+                className={`${styles.bilingualPair} ${styles.status}`}
+                zhClassName={styles.zh}
+                enClassName={styles.en}
+              />
             </div>
-            <div className="space-y-0.5">
-              <p className="font-serif text-[1.16rem] leading-[1.08] tracking-[-0.026em] text-[var(--ink)] md:text-[1.28rem]">
-                {artwork.title.zh}
-              </p>
-              <p className="text-[0.44rem] uppercase tracking-[0.16em] text-[var(--accent)]/82">
-                {artwork.title.en}
-              </p>
-            </div>
+            <BilingualText
+              as="h2"
+              text={artwork.title}
+              className={`${styles.bilingualPair} ${styles.artworkTitle}`}
+              zhClassName={styles.zh}
+              enClassName={styles.en}
+            />
           </div>
         </Link>
       </article>

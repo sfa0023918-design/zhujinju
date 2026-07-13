@@ -4,6 +4,7 @@ import { bt } from "@/lib/bilingual";
 import { loadSiteContent } from "@/lib/site-data";
 
 import { SiteHeaderNav } from "./site-header-nav";
+import styles from "./site-header.module.css";
 
 const navigation = [
   { href: "/", label: bt("首页", "Home") },
@@ -18,11 +19,11 @@ export async function SiteHeader() {
   const { siteConfig } = await loadSiteContent();
 
   return (
-    <header className="border-b border-[var(--line)]">
-      <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-3 px-5 py-3.5 md:gap-4 md:px-8 md:py-4 lg:gap-5 lg:px-10 2xl:px-12">
+    <header className={styles.header}>
+      <div className={styles.inner}>
         <Link
           href="/"
-          className="w-[clamp(146px,18.2vw,262px)] shrink-0"
+          className={styles.brand}
           aria-label={siteConfig.siteName.zh}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -33,7 +34,7 @@ export async function SiteHeader() {
             height={322}
             draggable="false"
             data-protect="true"
-            className="block h-auto w-full opacity-100"
+            className={styles.logo}
           />
         </Link>
         <SiteHeaderNav items={navigation} />

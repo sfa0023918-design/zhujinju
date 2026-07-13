@@ -41,12 +41,14 @@ type BilingualReadingPanelProps = {
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
+  autoSplitLongSingleParagraph?: boolean;
 };
 
 type ParagraphSplitOptions = {
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
+  autoSplitLongSingleParagraph?: boolean;
 };
 
 function normalizeProseWhitespace(text: string) {
@@ -78,8 +80,8 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
       ? /[^。！？!?]+[。！？!?]?/g
       : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
   const joiner = locale === "zh" ? "" : " ";
-  const targetLength = locale === "zh" ? 116 : 172;
-  const maxLength = locale === "zh" ? 220 : 320;
+  const targetLength = locale === "zh" ? 180 : 420;
+  const maxLength = locale === "zh" ? 300 : 680;
   const sentences = (text.match(sentenceRegex) ?? [])
     .map((sentence) => sentence.trim())
     .filter(Boolean);
@@ -220,7 +222,11 @@ function splitParagraphs(
     return [];
   }
 
-  const autoSplitThreshold = locale === "zh" ? 220 : 260;
+  if (options?.autoSplitLongSingleParagraph === false) {
+    return [singleParagraph];
+  }
+
+  const autoSplitThreshold = locale === "zh" ? 300 : 680;
   if (singleParagraph.length < autoSplitThreshold) {
     return [singleParagraph];
   }
@@ -363,7 +369,7 @@ function ExpandableReadingText({
           !expanded ? "max-h-[13rem] md:max-h-[19rem]" : "max-h-[999rem]"
         }`}
       >
-        <div ref={innerRef} className="space-y-4 md:space-y-5">
+        <div ref={innerRef} className="space-y-3 md:space-y-4">
           {paragraphs.map((paragraph, index) => (
             <p
               key={`${locale}-${index}`}
@@ -382,7 +388,7 @@ function ExpandableReadingText({
         <button
           type="button"
           onClick={toggleExpanded}
-          className="inline-flex cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent)]/92 transition-colors hover:text-[var(--ink)]"
+          className="inline-flex min-h-11 cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)]"
         >
           {locale === "zh" ? (expanded ? "收起" : "查看更多") : expanded ? "Show less" : "View more"}
           {expanded ? <span aria-hidden="true">∧</span> : null}
@@ -470,6 +476,7 @@ export function BilingualReadingPanel({
   manualParagraphMode = "preserve",
   manualSplitThresholdZh,
   manualSplitThresholdEn,
+  autoSplitLongSingleParagraph = true,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -488,10 +495,10 @@ export function BilingualReadingPanel({
                   key={option}
                   type="button"
                   onClick={() => setLocale(option)}
-                  className={`min-w-10 rounded-full px-3 py-1 text-[0.52rem] uppercase tracking-[0.14em] transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-full px-3 py-1 text-xs uppercase tracking-[0.12em] transition-colors ${
                     active
                       ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--accent)]/52 hover:text-[var(--ink)]"
+                      : "text-[var(--accent-text)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {option.toUpperCase()}
@@ -508,6 +515,7 @@ export function BilingualReadingPanel({
             manualParagraphMode,
             manualSplitThresholdZh,
             manualSplitThresholdEn,
+            autoSplitLongSingleParagraph,
           });
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
@@ -527,9 +535,9 @@ export function BilingualReadingPanel({
                   as="p"
                   text={section.label}
                   mode="inline"
-                  className="text-[var(--accent)]"
-                  zhClassName="text-[0.58rem] tracking-[0.15em]"
-                  enClassName="text-[0.42rem] uppercase tracking-[0.15em] text-[var(--accent)]/46"
+                  className="text-[var(--accent-text)]"
+                  zhClassName="text-xs tracking-[0.12em]"
+                  enClassName="text-xs uppercase tracking-[0.12em]"
                 />
               ) : null}
               {section.expandable ? (
@@ -540,7 +548,7 @@ export function BilingualReadingPanel({
                   paragraphClassName={mergedParagraphClassName}
                 />
               ) : (
-                <div className="space-y-4 md:space-y-5">
+                <div className="space-y-3 md:space-y-4">
                   {paragraphs.map((paragraph, index) => (
                     <p
                       key={`${section.key}-${locale}-${index}`}

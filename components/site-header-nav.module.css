@@ -1,0 +1,152 @@
+.menuButton {
+  position: relative;
+  z-index: 60;
+  display: inline-flex;
+  min-width: 52px;
+  min-height: 44px;
+  cursor: pointer;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  transition:
+    border-color var(--motion-fast),
+    color var(--motion-fast);
+}
+
+.desktopNav {
+  display: none;
+}
+
+.mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgb(28 26 23 / 18%);
+}
+
+.mobilePanel {
+  position: absolute;
+  inset: 0 0 auto;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  padding: 84px var(--page-inline) var(--space-lg);
+  box-shadow: 0 8px 24px rgb(28 26 23 / 10%);
+}
+
+.mobileLinks {
+  display: grid;
+}
+
+.mobileLink {
+  min-height: 52px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  transition: color var(--motion-fast);
+}
+
+.mobileLabel {
+  display: flex;
+  min-height: 52px;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.mobileZh {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.mobileEn {
+  color: var(--accent-text);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .menuButton:hover,
+  .navLink:hover,
+  .mobileLink:hover {
+    color: var(--ink);
+  }
+
+  .menuButton:hover {
+    border-color: var(--accent);
+  }
+}
+
+@media (min-width: 768px) {
+  .mobilePanel {
+    --page-inline: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .menuButton,
+  .mobileBackdrop {
+    display: none;
+  }
+
+  .desktopNav {
+    display: flex;
+    min-width: 0;
+    flex: 0 1 auto;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    color: var(--muted);
+  }
+
+  .navLink {
+    display: inline-flex;
+    min-height: 44px;
+    min-width: fit-content;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    white-space: nowrap;
+    transition: color var(--motion-fast);
+  }
+
+  .navLabel {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+  }
+
+  .navZh {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .navEn {
+    color: var(--accent-text);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+@media (min-width: 1200px) {
+  .desktopNav {
+    gap: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menuButton,
+  .navLink,
+  .mobileLink {
+    transition: none;
+  }
+}
