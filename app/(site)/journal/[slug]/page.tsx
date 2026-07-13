@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 
 import { ActionLabel } from "@/components/action-label";
 import { ArticleReadingContent } from "@/components/article-reading-content";
@@ -12,6 +13,7 @@ import { getAdminSession } from "@/lib/admin-auth";
 import { getArticleDisplayExcerpt, getRenderableArticleContentBlocks, resolveArticleCover } from "@/lib/article-content";
 import { withImageVersion } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
+import type { Article } from "@/lib/site-data";
 import {
   getArticleBySlug,
   getExhibitionsBySlugs,
@@ -19,6 +21,8 @@ import {
   getPublicArticles,
   loadSiteContent,
 } from "@/lib/site-data";
+
+import styles from "../journal.module.css";
 
 type ArticleDetailPageProps = {
   params: Promise<{
@@ -65,6 +69,64 @@ export async function generateMetadata({
   });
 }
 
+function ArticleMeta({ article }: { article: Article }) {
+  const items = [
+    article.date.trim() ? <span key="date">{article.date}</span> : null,
+    article.author.zh.trim() || article.author.en.trim() ? (
+      <BilingualText
+        key="author"
+        as="span"
+        text={article.author}
+        mode="inline"
+        zhClassName={styles.inlineZh}
+        enClassName={styles.inlineEn}
+      />
+    ) : null,
+    article.column.zh.trim() || article.column.en.trim() ? (
+      <BilingualText
+        key="column"
+        as="span"
+        text={article.column}
+        mode="inline"
+        zhClassName={styles.inlineZh}
+        enClassName={styles.inlineEn}
+      />
+    ) : null,
+  ].filter(Boolean);
+
+  return (
+    <div className={styles.metaLine}>
+      {items.map((item, index) => (
+        <Fragment key={index}>
+          {index > 0 ? <span className={styles.metaDivider} aria-hidden="true" /> : null}
+          {item}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+function ArticleCover({ article }: { article: Article }) {
+  const cover = resolveArticleCover(article);
+
+  if (!cover || cover.startsWith("/api/placeholder/")) {
+    return <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />;
+  }
+
+  return (
+    <ProtectedImage
+      src={withImageVersion(cover)}
+      alt={`${article.title.zh} ${article.title.en}`}
+      width={1600}
+      height={1200}
+      priority
+      unoptimized
+      wrapperClassName={styles.coverImage}
+      className={styles.coverImageElement}
+    />
+  );
+}
+
 export default async function ArticleDetailPage({ params, searchParams }: ArticleDetailPageProps) {
   const { slug } = await params;
   const query = (await searchParams) ?? {};
@@ -79,143 +141,101 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   const relatedExhibitions = getExhibitionsBySlugs(content, article.relatedExhibitionSlugs);
   const relatedArtworks = getHighlightedArtworks(content, article.relatedArtworkSlugs);
   const detailCopy = content.pageCopy.articleDetail;
-  const renderableBlocks = getRenderableArticleContentBlocks(article);
-  const displayExcerpt = getArticleDisplayExcerpt(article);
-  const effectiveCover = resolveArticleCover(article);
-  const detailHeadingZhClass =
-    "block max-w-[13.5ch] text-[clamp(1.98rem,3.45vw,3.15rem)] leading-[0.99] tracking-[-0.04em] text-balance md:max-w-[11.5ch]";
-  const detailHeadingEnClass =
-    "mt-2.5 block max-w-[30rem] font-sans text-[0.7rem] uppercase tracking-[0.16em] leading-[1.48] text-[var(--accent)]/78 md:text-[0.74rem]";
+  const blocks = getRenderableArticleContentBlocks(article);
+  const excerpt = getArticleDisplayExcerpt(article);
+
   return (
-    <>
-      <section className="mx-auto w-full max-w-[1040px] px-5 py-6 md:px-8 md:py-6 lg:px-10 lg:py-7">
-        <HistoryBackLink fallbackHref="/journal" className="inline-flex text-sm text-[var(--muted)] transition-colors hover:text-[var(--ink)]">
+    <div className={styles.journalShell}>
+      <div className={styles.backRow}>
+        <HistoryBackLink fallbackHref="/journal" className={styles.backLink}>
           <ActionLabel text={detailCopy.backAction} align="start" />
         </HistoryBackLink>
-      </section>
+      </div>
 
-      <article className="mx-auto w-full max-w-[1040px] px-5 pb-16 md:px-8 md:pb-20 lg:px-10 lg:pb-24">
-        <header className="mx-auto max-w-[52rem] space-y-4 border-t border-[var(--line)] pt-4 md:space-y-5 md:pt-5">
+      <article className={styles.detailArticle}>
+        <header className={styles.detailHeader}>
           <BilingualText
             as="p"
             text={article.category}
             mode="inline"
-            className="text-[var(--accent)]"
-            zhClassName="text-[0.72rem] tracking-[0.22em]"
-            enClassName="text-[0.64rem] uppercase tracking-[0.16em] leading-[1.45] text-[var(--accent)]/76"
+            className={styles.kicker}
+            zhClassName={styles.inlineZh}
+            enClassName={styles.inlineEn}
           />
           <BilingualText
             as="h1"
             text={article.title}
-            className="font-serif text-[var(--ink)]"
-            zhClassName={detailHeadingZhClass}
-            enClassName={detailHeadingEnClass}
+            className={styles.detailTitle}
+            zhClassName={styles.zh}
+            enClassName={styles.en}
           />
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-y border-[var(--line)]/68 py-1.5 text-[0.84rem] leading-7 text-[var(--muted)]/92 md:py-2">
-            <p className="select-none">{article.date}</p>
-            <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
-            <BilingualText
-              as="p"
-              text={article.author}
-              mode="inline"
-              className="select-none"
-              zhClassName="text-[0.84rem]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
-            />
-            <span className="h-[10px] w-px bg-[var(--line)]/72" aria-hidden="true" />
-            <BilingualText
-              as="p"
-              text={article.column}
-              mode="inline"
-              className="select-none"
-              zhClassName="text-[0.84rem]"
-              enClassName="text-[0.54rem] uppercase tracking-[0.14em] text-[var(--accent)]/66"
-            />
-          </div>
-          <div className="flex flex-wrap gap-1.5 border-t border-[var(--line)]/62 pt-2.5 md:pt-3">
-            {article.keywords.map((keyword) => (
-              <span
-                key={keyword.zh}
-                className="border border-[var(--line)]/65 px-2.5 py-0.5 text-[0.68rem] tracking-[0.06em] text-[var(--muted)]/84"
-              >
-                {keyword.zh}
-              </span>
-            ))}
+          <ArticleMeta article={article} />
+          <div className={styles.keywords}>
+            {article.keywords
+              .filter((keyword) => keyword.zh.trim() || keyword.en.trim())
+              .map((keyword) => (
+                <span key={`${keyword.zh}-${keyword.en}`}>{keyword.zh || keyword.en}</span>
+              ))}
           </div>
         </header>
 
-        <div className="relative mx-auto mt-6 w-full max-w-[52rem] overflow-hidden bg-[var(--surface-strong)] md:mt-7 lg:mt-8">
-          {!effectiveCover || effectiveCover.startsWith("/api/placeholder/") ? (
-            <div className="aspect-[1.85/1]">
-              <MediaPlaceholder eyebrow="Journal Image" title={article.title.zh} />
-            </div>
-          ) : (
-            <ProtectedImage
-              src={withImageVersion(effectiveCover)}
-              alt={`${article.title.zh} ${article.title.en}`}
-              width={1600}
-              height={1000}
-              priority
-              unoptimized
-              wrapperClassName="block"
-              className="aspect-[1.85/1] h-full w-full object-cover"
-            />
-          )}
+        <div className={styles.detailCover}>
+          <ArticleCover article={article} />
         </div>
 
-        <ArticleReadingContent className="mx-auto mt-8 w-full max-w-[52rem] md:mt-9 lg:mt-10" excerpt={displayExcerpt} blocks={renderableBlocks} />
+        <ArticleReadingContent className={styles.readingFrame} excerpt={excerpt} blocks={blocks} />
 
-        {(relatedExhibitions.length > 0 || relatedArtworks.length > 0) ? (
-          <section className="mx-auto mt-12 grid w-full max-w-[52rem] gap-8 border-t border-[var(--line)] pt-6 md:mt-14 md:grid-cols-2 md:pt-7">
-            {relatedExhibitions.length > 0 ? (
+        {relatedExhibitions.length || relatedArtworks.length ? (
+          <section className={styles.related}>
+            {relatedExhibitions.length ? (
               <div>
                 <BilingualText
-                  as="p"
+                  as="h2"
                   text={detailCopy.relatedExhibitions}
                   mode="inline"
-                  className="mb-4 text-[var(--accent)]"
-                  zhClassName="text-[0.72rem] tracking-[0.22em]"
-                  enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+                  className={styles.relatedTitle}
+                  zhClassName={styles.inlineZh}
+                  enClassName={styles.inlineEn}
                 />
-                <div className="space-y-3">
-                  {relatedExhibitions.map((exhibition) => (
-                    <Link
-                      key={exhibition.slug}
-                      href={`/exhibitions/${exhibition.slug}`}
-                      className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
-                    >
-                      {exhibition.title.zh}
-                    </Link>
-                  ))}
-                </div>
+                {relatedExhibitions.map((exhibition) => (
+                  <Link key={exhibition.slug} href={`/exhibitions/${exhibition.slug}`} className={styles.relatedLink}>
+                    <BilingualText
+                      as="span"
+                      text={exhibition.title}
+                      className={styles.relatedLinkText}
+                      zhClassName={styles.zh}
+                      enClassName={styles.en}
+                    />
+                  </Link>
+                ))}
               </div>
             ) : null}
-            {relatedArtworks.length > 0 ? (
+            {relatedArtworks.length ? (
               <div>
                 <BilingualText
-                  as="p"
+                  as="h2"
                   text={detailCopy.relatedWorks}
                   mode="inline"
-                  className="mb-4 text-[var(--accent)]"
-                  zhClassName="text-[0.72rem] tracking-[0.22em]"
-                  enClassName="text-[0.48rem] uppercase tracking-[0.16em] text-[var(--accent)]/76"
+                  className={styles.relatedTitle}
+                  zhClassName={styles.inlineZh}
+                  enClassName={styles.inlineEn}
                 />
-                <div className="space-y-3">
-                  {relatedArtworks.map((artwork) => (
-                    <Link
-                      key={artwork.slug}
-                      href={`/collection/${artwork.slug}`}
-                      className="block text-sm leading-7 text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
-                    >
-                      {artwork.title.zh}
-                    </Link>
-                  ))}
-                </div>
+                {relatedArtworks.map((artwork) => (
+                  <Link key={artwork.slug} href={`/collection/${artwork.slug}`} className={styles.relatedLink}>
+                    <BilingualText
+                      as="span"
+                      text={artwork.title}
+                      className={styles.relatedLinkText}
+                      zhClassName={styles.zh}
+                      enClassName={styles.en}
+                    />
+                  </Link>
+                ))}
               </div>
             ) : null}
           </section>
         ) : null}
       </article>
-    </>
+    </div>
   );
 }
