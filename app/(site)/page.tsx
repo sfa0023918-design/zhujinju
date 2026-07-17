@@ -16,18 +16,43 @@ import styles from "./home.module.css";
 type BilingualPairProps = {
   text: BilingualValue;
   className?: string;
+  zhLines?: string[];
 };
 
 const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
 const worksSectionCopy = { zh: "部分藏品赏析", en: "Selected Highlights" };
 
-function BilingualPair({ text, className = "" }: BilingualPairProps) {
+function BilingualPair({ text, className = "", zhLines }: BilingualPairProps) {
   return (
     <span className={`${styles.bilingualPair} ${className}`}>
-      <span className={styles.zh}>{text.zh}</span>
+      <span className={styles.zh}>
+        {zhLines?.length
+          ? zhLines.map((line) => (
+              <span key={line} className={styles.zhLine}>
+                {line}
+              </span>
+            ))
+          : text.zh}
+      </span>
       <span className={styles.en}>{text.en}</span>
     </span>
   );
+}
+
+function getExhibitionTitleLines(title: string) {
+  const normalizedTitle = title.trim();
+  const separatedTitle = normalizedTitle.match(/^(.+?[|｜])\s*(.+)$/);
+
+  if (!separatedTitle) {
+    return [normalizedTitle];
+  }
+
+  const [, prefix, remainder] = separatedTitle;
+  const datedTitle = remainder.match(/^(.*?)\s+(\d{4})$/);
+
+  return datedTitle
+    ? [prefix.trim(), datedTitle[1].trim(), datedTitle[2]]
+    : [prefix.trim(), remainder.trim()];
 }
 
 function HomeAction({ href, text }: { href: string; text: BilingualValue }) {
@@ -139,7 +164,11 @@ export default async function HomePage() {
             <div className={styles.exhibitionCopy}>
               <BilingualPair text={focusCopy.eyebrow} className={styles.eyebrow} />
               <h2 className={styles.exhibitionHeading}>
-                <BilingualPair text={exhibition.title} className={styles.exhibitionTitle} />
+                <BilingualPair
+                  text={exhibition.title}
+                  className={styles.exhibitionTitle}
+                  zhLines={getExhibitionTitleLines(exhibition.title.zh)}
+                />
               </h2>
               <div className={styles.exhibitionFacts}>
                 <BilingualPair text={exhibition.period} className={styles.fact} />
