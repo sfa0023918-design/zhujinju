@@ -54,6 +54,7 @@
 .heroCopy,
 .exhibitionCopy {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   align-items: flex-start;
 }
@@ -165,12 +166,16 @@
 }
 
 .exhibitionHeading {
+  width: 100%;
+  min-width: 0;
   margin: 0;
   font-weight: 400;
 }
 
 .exhibitionTitle {
   display: flex;
+  width: 100%;
+  min-width: 0;
   flex-direction: column;
   gap: var(--space-sm);
   font-family: var(--font-serif);
@@ -178,13 +183,19 @@
 }
 
 .exhibitionTitle .zh {
-  max-width: 12em;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: -0.03em;
-  word-break: keep-all;
-  text-wrap: balance;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.exhibitionTitle .zhLine {
+  display: block;
 }
 
 .exhibitionTitle .en {
