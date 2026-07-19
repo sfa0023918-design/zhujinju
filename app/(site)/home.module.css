@@ -436,6 +436,14 @@
   }
 }
 
+@media (min-width: 1280px) {
+  .sectionHeading,
+  .artworksGrid {
+    width: min(100%, 1240px);
+    margin-inline: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .action,
   .artworkImage {
