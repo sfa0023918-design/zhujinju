@@ -63,4 +63,10 @@ export const homeContent: HomeContent = {
   },
   contactPrimaryAction: bt("前往联系页面", "Contact Us"),
   contactSecondaryAction: bt("查看文章与动态", "Read Journal"),
+  selectedArtworkIds: [
+    "artwork_b1a24c0e-ed53-4eda-92b1-2a8b8dde8346",
+    "artwork_2c964f41-a3ce-4ae4-bae7-73c01a2fecef",
+    "artwork_4b97b29a-b96b-47e4-a860-490bc721804d",
+    "artwork_2f2ecffa-8d50-4838-a28e-eb92b9fdb779",
+  ],
 };

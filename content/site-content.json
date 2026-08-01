@@ -504,7 +504,7 @@
         "/uploads/artworks/1773059376623-50帝释天-侧.jpg",
         "/uploads/artworks/1773059388376-47帝释天-特.jpg"
       ],
-      "featured": true,
+      "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
         "card": "/uploads/artworks/1773059363713-48帝释天-正.jpg",
@@ -1275,7 +1275,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773728118037-l1002732.jpg",
       "gallery": [],
-      "featured": false,
+      "featured": true,
       "imageAsset": {
         "original": "/uploads/artworks/1773728118037-l1002732.jpg"
       },
@@ -2067,7 +2067,7 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1773229993893-89上师像-正.jpg",
       "gallery": [],
-      "featured": true,
+      "featured": false,
       "imageAsset": {
         "original": "/uploads/artworks/1773229993893-89上师像-正.jpg",
         "card": "/uploads/artworks/1773229993893-89上师像-正.jpg",
@@ -3042,7 +3042,7 @@
       ],
       "image": "/uploads/artworks/1773905899136-吐蕃王朝金刚手立像-右.jpg",
       "gallery": [],
-      "featured": false,
+      "featured": true,
       "galleryAssets": [],
       "imageAsset": {
         "original": "/uploads/artworks/1773905899136-吐蕃王朝金刚手立像-右.jpg",

@@ -37,10 +37,10 @@
 
 @media (min-width: 1024px) {
   .inner {
-    min-height: 78px;
+    min-height: 72px;
   }
 
   .brand {
-    width: 184px;
+    width: 162px;
   }
 }
