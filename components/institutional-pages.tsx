@@ -22,7 +22,7 @@ type ContactPageContentProps = {
   initialArtwork?: string;
 };
 
-const aboutSpaceImage = "/uploads/branding/about-space-entrance-web-v2.jpg";
+const aboutSpaceImage = "/uploads/branding/about-space-staircase-daylight.jpg";
 
 export function AboutPageContent({
   siteConfig,
@@ -62,9 +62,9 @@ export function AboutPageContent({
         <figure className={styles.spaceFigure}>
           <ProtectedImage
             src={aboutSpaceImage}
-            alt="竹瑾居艺术空间门头"
-            width={1024}
-            height={1536}
+            alt="竹瑾居艺术空间与旋梯"
+            width={724}
+            height={1086}
             priority
             quality={86}
             sizes="(min-width: 1024px) 42vw, 100vw"
