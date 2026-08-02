@@ -44,7 +44,7 @@
 }
 
 .mobileLink {
-  min-height: 52px;
+  min-height: 60px;
   cursor: pointer;
   user-select: none;
   border-bottom: 1px solid var(--line);
@@ -54,9 +54,11 @@
 
 .mobileLabel {
   display: flex;
-  min-height: 52px;
-  align-items: baseline;
-  gap: var(--space-sm);
+  min-height: 60px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
 }
 
 .mobileZh {
@@ -70,6 +72,10 @@
   line-height: 1.5;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.mobileLinkActive {
+  color: var(--ink);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -102,44 +108,90 @@
     flex: 0 1 auto;
     align-items: center;
     justify-content: flex-end;
-    gap: 12px;
+    gap: clamp(1.35rem, 2.1vw, 2.15rem);
+    overflow: visible;
     color: var(--muted);
   }
 
   .navLink {
-    display: inline-flex;
-    min-height: 44px;
+    position: relative;
+    display: flex;
+    min-height: 56px;
     min-width: fit-content;
     cursor: pointer;
     user-select: none;
     align-items: center;
+    justify-content: center;
+    padding: 7px 0 6px;
     white-space: nowrap;
     transition: color var(--motion-fast);
   }
 
   .navLabel {
-    display: inline-flex;
-    align-items: baseline;
-    gap: var(--space-xs);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    line-height: 1;
+    text-align: center;
   }
 
   .navZh {
-    font-size: 0.8125rem;
-    line-height: 1.5;
+    color: var(--ink);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25;
   }
 
   .navEn {
     color: var(--accent-text);
     font-size: 0.75rem;
-    line-height: 1.5;
-    letter-spacing: 0.06em;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+
+  .navLink::after {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background: var(--ink);
+    content: "";
+    opacity: 0;
+    transform: translateX(-50%);
+    transition:
+      width var(--motion-fast),
+      opacity var(--motion-fast);
+  }
+
+  .navLinkActive::after {
+    width: 24px;
+    opacity: 1;
+  }
+
+  .navLinkSectionStart {
+    margin-left: clamp(0.55rem, 1vw, 1rem);
+  }
+
+  .navLinkSectionStart::before {
+    position: absolute;
+    top: 50%;
+    left: clamp(-1.35rem, -1.45vw, -0.95rem);
+    width: 1px;
+    height: 24px;
+    background: var(--line);
+    content: "";
+    transform: translateY(-50%);
   }
 }
 
-@media (min-width: 1200px) {
-  .desktopNav {
-    gap: 18px;
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  .navLink:hover::after {
+    width: 100%;
+    opacity: 0.55;
   }
 }
 
@@ -147,6 +199,10 @@
   .menuButton,
   .navLink,
   .mobileLink {
+    transition: none;
+  }
+
+  .navLink::after {
     transition: none;
   }
 }
