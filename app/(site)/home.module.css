@@ -264,6 +264,7 @@
 .artworksGrid {
   display: grid;
   grid-template-columns: 1fr;
+  align-items: start;
   gap: var(--space-xl) var(--space-lg);
 }
 
@@ -429,10 +430,6 @@
 
   .artworksGrid {
     gap: var(--space-section) var(--space-xl);
-  }
-
-  .artwork:nth-child(even) {
-    padding-top: var(--space-xl);
   }
 
   .contact {
