@@ -110,8 +110,8 @@ export const pageCopy = {
       eyebrow: bt("关于", "About"),
       title: bt("关于竹瑾居", "About Zhu Jin Ju"),
       description: bt(
-        "竹瑾居创立于2016年，位于中国成都，是一家专注于喜马拉雅艺术的研究与交流空间。我们持续关注喜马拉雅艺术品的历史脉络、文化语境、审美精神与收藏价值，致力于为藏家提供兼具学术视野、审美判断与专业信赖的观察角度。",
-        "Founded in 2016 and based in Chengdu, China, Zhu Jin Ju is a space for the research and exchange of Himalayan art. We continue to attend to the historical lineages, cultural contexts, aesthetic spirit, and collecting value of Himalayan works, offering collectors a perspective grounded in scholarship, connoisseurship, and professional trust.",
+        "竹瑾居创立于2016年，位于中国成都，是一家专注于喜马拉雅艺术收藏、研究与交流的艺术空间。我们持续关注喜马拉雅艺术的历史脉络、文化语境、审美精神与收藏价值，并以长期研究与实践为基础，致力于为藏家提供兼具学术视野与审美判断的观察方式，协助建立更具系统性与长期价值的收藏体系。",
+        "Founded in 2016 and based in Chengdu, China, Zhu Jin Ju is an art space dedicated to the collection, research, and exchange of Himalayan art. We maintain a sustained engagement with its historical lineages, cultural contexts, aesthetic ethos, and significance as a field of collecting. Grounded in long-term research and practice, we seek to offer collectors an approach informed by both scholarly insight and connoisseurial judgment, supporting them in building more coherent collections of enduring value.",
       ),
       aside: bt("", ""),
     },
