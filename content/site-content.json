@@ -5801,7 +5801,8 @@
         "/uploads/artworks/1790501869933-vajra-dakini-detail-1.jpg",
         "/uploads/artworks/1790501906655-vajra-dakini-detail-2.jpg",
         "/uploads/artworks/1790501936132-vajra-dakini-detail-3.jpg",
-        "/uploads/artworks/1790501976639-vajra-dakini-detail-4.jpg"
+        "/uploads/artworks/1790501976639-vajra-dakini-detail-4.jpg",
+        "/uploads/artworks/1790502005521-vajra-dakini-detail-5.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -5828,6 +5829,12 @@
           "card": "/uploads/artworks/1790501976639-vajra-dakini-detail-4.jpg",
           "hero": "/uploads/artworks/1790501976639-vajra-dakini-detail-4.jpg",
           "detail": "/uploads/artworks/1790501976639-vajra-dakini-detail-4.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790502005521-vajra-dakini-detail-5.jpg",
+          "card": "/uploads/artworks/1790502005521-vajra-dakini-detail-5.jpg",
+          "hero": "/uploads/artworks/1790502005521-vajra-dakini-detail-5.jpg",
+          "detail": "/uploads/artworks/1790502005521-vajra-dakini-detail-5.jpg"
         }
       ],
       "imageAsset": {
