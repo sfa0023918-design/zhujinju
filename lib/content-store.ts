@@ -149,7 +149,7 @@ const loadCachedSiteContent = unstable_cache(
     normalizeSiteContent(
       (await readBestAvailableContentFile({ preferRemote: true })) ?? getDefaultSiteContent(),
     ),
-  ["site-content-v6", process.env.VERCEL_GIT_COMMIT_SHA ?? "local"],
+  ["site-content-v7", process.env.VERCEL_GIT_COMMIT_SHA ?? "local"],
   { tags: [getSiteContentTag()] },
 );
 
@@ -394,8 +394,8 @@ function getFeaturedArtworkIds(artworks: Artwork[]) {
 function getNormalizedSelectedArtworkIds(homeContent: SiteContent["homeContent"], artworks: Artwork[]) {
   const fallbackIds = getFeaturedArtworkIds(artworks);
   const rawIds = Array.isArray(homeContent?.selectedArtworkIds) ? homeContent.selectedArtworkIds : fallbackIds;
-  const featuredIdSet = new Set(fallbackIds);
-  const normalized = rawIds.filter((id, index) => id && rawIds.indexOf(id) === index && featuredIdSet.has(id));
+  const availableIdSet = new Set(artworks.map((artwork) => getArtworkId(artwork)));
+  const normalized = rawIds.filter((id, index) => id && rawIds.indexOf(id) === index && availableIdSet.has(id));
   const remaining = fallbackIds.filter((id) => !normalized.includes(id));
 
   return [...normalized, ...remaining];
@@ -1129,9 +1129,10 @@ function getUniqueBilingual(items: BilingualText[]) {
 }
 
 export function getFeaturedArtworks(content: SiteContent) {
-  const publicFeaturedArtworks = getPublicArtworks(content).filter((artwork) => artwork.featured);
-  const artworksById = new Map(publicFeaturedArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
-  const orderedIds = getNormalizedSelectedArtworkIds(content.homeContent, content.artworks);
+  const publicArtworks = getPublicArtworks(content);
+  const publicFeaturedArtworks = publicArtworks.filter((artwork) => artwork.featured);
+  const artworksById = new Map(publicArtworks.map((artwork) => [getArtworkId(artwork), artwork]));
+  const orderedIds = getNormalizedSelectedArtworkIds(content.homeContent, publicArtworks);
   const ordered = orderedIds
     .map((id) => artworksById.get(id))
     .filter((artwork): artwork is Artwork => Boolean(artwork));
