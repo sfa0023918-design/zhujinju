@@ -6208,7 +6208,7 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
       "gallery": [
         "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg",
         "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg"
@@ -6227,7 +6227,10 @@
           "hero": "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
           "detail": "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg"
         }
-      ]
+      ],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg"
+      }
     }
   ],
   "exhibitions": [
