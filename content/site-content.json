@@ -8488,10 +8488,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790519594575-painted-tibetan-cabinet-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790519594575-painted-tibetan-cabinet-main.jpg",
+        "card": "/uploads/artworks/1790519594575-painted-tibetan-cabinet-main-card.jpg",
+        "hero": "/uploads/artworks/1790519594575-painted-tibetan-cabinet-main.jpg",
+        "detail": "/uploads/artworks/1790519594575-painted-tibetan-cabinet-main.jpg",
+        "width": 2400,
+        "height": 2828
+      }
     }
   ],
   "exhibitions": [
