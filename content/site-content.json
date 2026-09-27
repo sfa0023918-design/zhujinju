@@ -4126,10 +4126,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790490052938-buddha-narrative-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790490052938-buddha-narrative-main.jpg",
+        "card": "/uploads/artworks/1790490052938-buddha-narrative-main-card.jpg",
+        "hero": "/uploads/artworks/1790490052938-buddha-narrative-main.jpg",
+        "detail": "/uploads/artworks/1790490052938-buddha-narrative-main.jpg",
+        "width": 1200,
+        "height": 1500
+      }
     }
   ],
   "exhibitions": [
