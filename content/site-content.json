@@ -6211,7 +6211,8 @@
       "image": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
       "gallery": [
         "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg",
-        "/uploads/artworks/1790509845434-sakya-pandit-kunga-gyaltsen-detail-2.jpg"
+        "/uploads/artworks/1790509845434-sakya-pandit-kunga-gyaltsen-detail-2.jpg",
+        "/uploads/artworks/1790509876561-sakya-pandit-kunga-gyaltsen-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -6226,6 +6227,12 @@
           "card": "/uploads/artworks/1790509845434-sakya-pandit-kunga-gyaltsen-detail-2.jpg",
           "hero": "/uploads/artworks/1790509845434-sakya-pandit-kunga-gyaltsen-detail-2.jpg",
           "detail": "/uploads/artworks/1790509845434-sakya-pandit-kunga-gyaltsen-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790509876561-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
+          "card": "/uploads/artworks/1790509876561-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
+          "hero": "/uploads/artworks/1790509876561-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
+          "detail": "/uploads/artworks/1790509876561-sakya-pandit-kunga-gyaltsen-detail-3.jpg"
         }
       ],
       "imageAsset": {
