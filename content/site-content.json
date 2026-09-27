@@ -5941,7 +5941,8 @@
       "image": "/uploads/artworks/1790502627516-vajravarahi-western-xia-main.jpg",
       "gallery": [
         "/uploads/artworks/1790502841922-vajravarahi-western-xia-detail-1.jpg",
-        "/uploads/artworks/1790502875930-vajravarahi-western-xia-detail-2.jpg"
+        "/uploads/artworks/1790502875930-vajravarahi-western-xia-detail-2.jpg",
+        "/uploads/artworks/1790502927147-vajravarahi-western-xia-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -5956,6 +5957,12 @@
           "card": "/uploads/artworks/1790502875930-vajravarahi-western-xia-detail-2.jpg",
           "hero": "/uploads/artworks/1790502875930-vajravarahi-western-xia-detail-2.jpg",
           "detail": "/uploads/artworks/1790502875930-vajravarahi-western-xia-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790502927147-vajravarahi-western-xia-detail-3.jpg",
+          "card": "/uploads/artworks/1790502927147-vajravarahi-western-xia-detail-3.jpg",
+          "hero": "/uploads/artworks/1790502927147-vajravarahi-western-xia-detail-3.jpg",
+          "detail": "/uploads/artworks/1790502927147-vajravarahi-western-xia-detail-3.jpg"
         }
       ],
       "imageAsset": {
