@@ -5109,10 +5109,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790499179609-akshobhya-buddha-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790499179609-akshobhya-buddha-main.jpg",
+        "card": "/uploads/artworks/1790499179609-akshobhya-buddha-main-card.jpg",
+        "hero": "/uploads/artworks/1790499179609-akshobhya-buddha-main.jpg",
+        "detail": "/uploads/artworks/1790499179609-akshobhya-buddha-main.jpg",
+        "width": 2400,
+        "height": 2828
+      }
     }
   ],
   "exhibitions": [
