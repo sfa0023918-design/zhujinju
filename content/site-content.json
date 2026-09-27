@@ -6208,27 +6208,26 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
+      "image": "",
       "gallery": [
-        "/uploads/artworks/1790508383858-sakya-pandit-kunga-gyaltsen-detail-2.jpg"
+        "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg",
+        "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
         {
-          "original": "/uploads/artworks/1790508383858-sakya-pandit-kunga-gyaltsen-detail-2.jpg",
-          "card": "/uploads/artworks/1790508383858-sakya-pandit-kunga-gyaltsen-detail-2.jpg",
-          "hero": "/uploads/artworks/1790508383858-sakya-pandit-kunga-gyaltsen-detail-2.jpg",
-          "detail": "/uploads/artworks/1790508383858-sakya-pandit-kunga-gyaltsen-detail-2.jpg"
+          "original": "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg",
+          "card": "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg",
+          "hero": "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg",
+          "detail": "/uploads/artworks/1790508324756-sakya-pandit-kunga-gyaltsen-detail-1.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
+          "card": "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
+          "hero": "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg",
+          "detail": "/uploads/artworks/1790508439581-sakya-pandit-kunga-gyaltsen-detail-3.jpg"
         }
-      ],
-      "imageAsset": {
-        "original": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
-        "card": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main-card.jpg",
-        "hero": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
-        "detail": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
-        "width": 2400,
-        "height": 2928
-      }
+      ]
     }
   ],
   "exhibitions": [
