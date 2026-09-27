@@ -143,12 +143,13 @@ async function readBestAvailableContentFile(options?: { preferRemote?: boolean }
   return null;
 }
 
+// A new deployment must not reuse content cached before its Git commit was published.
 const loadCachedSiteContent = unstable_cache(
   async () =>
     normalizeSiteContent(
       (await readBestAvailableContentFile({ preferRemote: true })) ?? getDefaultSiteContent(),
     ),
-  ["site-content-v5"],
+  ["site-content-v6", process.env.VERCEL_GIT_COMMIT_SHA ?? "local"],
   { tags: [getSiteContentTag()] },
 );
 
