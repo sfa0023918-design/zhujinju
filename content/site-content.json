@@ -7514,6 +7514,78 @@
         "width": 2400,
         "height": 2915
       }
+    },
+    {
+      "id": "artwork_c739d81f-05ec-41ee-9826-e124d2b2e821",
+      "slug": "artwork-1790514960631",
+      "publicationStatus": "draft",
+      "title": {
+        "zh": "未命名藏品",
+        "en": "Untitled Artwork"
+      },
+      "subtitle": {
+        "zh": "",
+        "en": ""
+      },
+      "period": {
+        "zh": "",
+        "en": ""
+      },
+      "region": {
+        "zh": "",
+        "en": ""
+      },
+      "origin": {
+        "zh": "",
+        "en": ""
+      },
+      "material": {
+        "zh": "",
+        "en": ""
+      },
+      "category": {
+        "zh": "",
+        "en": ""
+      },
+      "dimensions": {
+        "zh": "",
+        "en": ""
+      },
+      "status": "inquiry",
+      "excerpt": {
+        "zh": "",
+        "en": ""
+      },
+      "viewingNote": {
+        "zh": "",
+        "en": ""
+      },
+      "comparisonNote": {
+        "zh": "",
+        "en": ""
+      },
+      "provenance": [],
+      "exhibitions": [],
+      "publications": [],
+      "inquirySupport": [
+        {
+          "zh": "可索取高清图",
+          "en": "High-resolution images available on request"
+        },
+        {
+          "zh": "可索取品相信息",
+          "en": "Condition report available on request"
+        },
+        {
+          "zh": "可索取图录页",
+          "en": "Catalogue pages available on request"
+        }
+      ],
+      "relatedArticleSlugs": [],
+      "relatedExhibitionSlugs": [],
+      "image": "",
+      "gallery": [],
+      "featured": false
     }
   ],
   "exhibitions": [
