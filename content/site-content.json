@@ -5407,10 +5407,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790500322048-buddha-mother-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790500322048-buddha-mother-main.jpg",
+        "card": "/uploads/artworks/1790500322048-buddha-mother-main-card.jpg",
+        "hero": "/uploads/artworks/1790500322048-buddha-mother-main.jpg",
+        "detail": "/uploads/artworks/1790500322048-buddha-mother-main.jpg",
+        "width": 2400,
+        "height": 2400
+      }
     }
   ],
   "exhibitions": [
