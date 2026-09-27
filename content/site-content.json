@@ -6857,7 +6857,8 @@
       "image": "/uploads/artworks/1790512251411-shakyamuni-14c-40cm-main.jpg",
       "gallery": [
         "/uploads/artworks/1790512308669-shakyamuni-14c-40cm-detail-1.jpg",
-        "/uploads/artworks/1790512352642-shakyamuni-14c-40cm-detail-2.jpg"
+        "/uploads/artworks/1790512352642-shakyamuni-14c-40cm-detail-2.jpg",
+        "/uploads/artworks/1790512446994-shakyamuni-14c-40cm-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -6872,6 +6873,12 @@
           "card": "/uploads/artworks/1790512352642-shakyamuni-14c-40cm-detail-2.jpg",
           "hero": "/uploads/artworks/1790512352642-shakyamuni-14c-40cm-detail-2.jpg",
           "detail": "/uploads/artworks/1790512352642-shakyamuni-14c-40cm-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790512446994-shakyamuni-14c-40cm-detail-3.jpg",
+          "card": "/uploads/artworks/1790512446994-shakyamuni-14c-40cm-detail-3.jpg",
+          "hero": "/uploads/artworks/1790512446994-shakyamuni-14c-40cm-detail-3.jpg",
+          "detail": "/uploads/artworks/1790512446994-shakyamuni-14c-40cm-detail-3.jpg"
         }
       ],
       "imageAsset": {
