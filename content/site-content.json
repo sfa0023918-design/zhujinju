@@ -6365,7 +6365,8 @@
         "/uploads/artworks/1790510482929-vajrapani-mahachakra-mandala-detail-1.jpg",
         "/uploads/artworks/1790510523150-vajrapani-mahachakra-mandala-detail-2.jpg",
         "/uploads/artworks/1790510572487-vajrapani-mahachakra-mandala-detail-3.jpg",
-        "/uploads/artworks/1790510607216-vajrapani-mahachakra-mandala-detail-4.jpg"
+        "/uploads/artworks/1790510607216-vajrapani-mahachakra-mandala-detail-4.jpg",
+        "/uploads/artworks/1790510649487-vajrapani-mahachakra-mandala-detail-5.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -6392,6 +6393,12 @@
           "card": "/uploads/artworks/1790510607216-vajrapani-mahachakra-mandala-detail-4.jpg",
           "hero": "/uploads/artworks/1790510607216-vajrapani-mahachakra-mandala-detail-4.jpg",
           "detail": "/uploads/artworks/1790510607216-vajrapani-mahachakra-mandala-detail-4.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790510649487-vajrapani-mahachakra-mandala-detail-5.jpg",
+          "card": "/uploads/artworks/1790510649487-vajrapani-mahachakra-mandala-detail-5.jpg",
+          "hero": "/uploads/artworks/1790510649487-vajrapani-mahachakra-mandala-detail-5.jpg",
+          "detail": "/uploads/artworks/1790510649487-vajrapani-mahachakra-mandala-detail-5.jpg"
         }
       ],
       "imageAsset": {
