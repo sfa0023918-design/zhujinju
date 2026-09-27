@@ -7623,7 +7623,8 @@
       "image": "/uploads/artworks/1790515037772-mahasiddha-khazi-lhazo-main.jpg",
       "gallery": [
         "/uploads/artworks/1790516176813-mahasiddha-khazi-lhazo-detail-1-straight-3.jpg",
-        "/uploads/artworks/1790515142599-mahasiddha-khazi-lhazo-detail-2.jpg"
+        "/uploads/artworks/1790515142599-mahasiddha-khazi-lhazo-detail-2.jpg",
+        "/uploads/artworks/1790516493718-mahasiddha-khazi-lhazo-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -7638,6 +7639,12 @@
           "card": "/uploads/artworks/1790515142599-mahasiddha-khazi-lhazo-detail-2.jpg",
           "hero": "/uploads/artworks/1790515142599-mahasiddha-khazi-lhazo-detail-2.jpg",
           "detail": "/uploads/artworks/1790515142599-mahasiddha-khazi-lhazo-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790516493718-mahasiddha-khazi-lhazo-detail-3.jpg",
+          "card": "/uploads/artworks/1790516493718-mahasiddha-khazi-lhazo-detail-3.jpg",
+          "hero": "/uploads/artworks/1790516493718-mahasiddha-khazi-lhazo-detail-3.jpg",
+          "detail": "/uploads/artworks/1790516493718-mahasiddha-khazi-lhazo-detail-3.jpg"
         }
       ],
       "imageAsset": {
