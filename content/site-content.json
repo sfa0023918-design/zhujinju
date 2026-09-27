@@ -7240,7 +7240,8 @@
       "image": "/uploads/artworks/1790513550005-prajnaparamita-folio-13c-main.jpg",
       "gallery": [
         "/uploads/artworks/1790513602901-prajnaparamita-folio-13c-detail-1.jpg",
-        "/uploads/artworks/1790513639021-prajnaparamita-folio-13c-detail-2.jpg"
+        "/uploads/artworks/1790513639021-prajnaparamita-folio-13c-detail-2.jpg",
+        "/uploads/artworks/1790513676915-prajnaparamita-folio-13c-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -7255,6 +7256,12 @@
           "card": "/uploads/artworks/1790513639021-prajnaparamita-folio-13c-detail-2.jpg",
           "hero": "/uploads/artworks/1790513639021-prajnaparamita-folio-13c-detail-2.jpg",
           "detail": "/uploads/artworks/1790513639021-prajnaparamita-folio-13c-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790513676915-prajnaparamita-folio-13c-detail-3.jpg",
+          "card": "/uploads/artworks/1790513676915-prajnaparamita-folio-13c-detail-3.jpg",
+          "hero": "/uploads/artworks/1790513676915-prajnaparamita-folio-13c-detail-3.jpg",
+          "detail": "/uploads/artworks/1790513676915-prajnaparamita-folio-13c-detail-3.jpg"
         }
       ],
       "imageAsset": {
