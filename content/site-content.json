@@ -4230,9 +4230,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790491905849-standing-buddha-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790491940107-standing-buddha-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790491940107-standing-buddha-detail-1.jpg",
+          "card": "/uploads/artworks/1790491940107-standing-buddha-detail-1.jpg",
+          "hero": "/uploads/artworks/1790491940107-standing-buddha-detail-1.jpg",
+          "detail": "/uploads/artworks/1790491940107-standing-buddha-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790491905849-standing-buddha-main.jpg",
         "card": "/uploads/artworks/1790491905849-standing-buddha-main-card.jpg",
