@@ -6854,10 +6854,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790512251411-shakyamuni-14c-40cm-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790512251411-shakyamuni-14c-40cm-main.jpg",
+        "card": "/uploads/artworks/1790512251411-shakyamuni-14c-40cm-main-card.jpg",
+        "hero": "/uploads/artworks/1790512251411-shakyamuni-14c-40cm-main.jpg",
+        "detail": "/uploads/artworks/1790512251411-shakyamuni-14c-40cm-main.jpg",
+        "width": 2400,
+        "height": 2831
+      }
     }
   ],
   "exhibitions": [
