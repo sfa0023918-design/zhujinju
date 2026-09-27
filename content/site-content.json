@@ -4096,7 +4096,19 @@
           }
         }
       ],
-      "exhibitions": [],
+      "exhibitions": [
+        {
+          "title": {
+            "zh": "竹瑾居2026年展览",
+            "en": "Zhu Jin Ju Exhibition 2026"
+          },
+          "venue": {
+            "zh": "北京嘉德艺术中心",
+            "en": "Guardian Art Center, Beijing"
+          },
+          "year": "2026"
+        }
+      ],
       "publications": [
         {
           "title": {
@@ -4107,6 +4119,17 @@
           "pages": {
             "zh": "",
             "en": ""
+          }
+        },
+        {
+          "title": {
+            "zh": "竹瑾居2026年展览图录",
+            "en": "Zhu Jin Ju 2026 Exhibition Catalogue"
+          },
+          "year": "2026年",
+          "pages": {
+            "zh": "第14–17页",
+            "en": "pp. 14–17"
           }
         }
       ],
