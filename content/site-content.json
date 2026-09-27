@@ -6580,7 +6580,8 @@
       "image": "/uploads/artworks/1790510877657-five-pronged-vajra-main.jpg",
       "gallery": [
         "/uploads/artworks/1790510915753-five-pronged-vajra-detail-1.jpg",
-        "/uploads/artworks/1790510963122-five-pronged-vajra-detail-2.jpg"
+        "/uploads/artworks/1790510963122-five-pronged-vajra-detail-2.jpg",
+        "/uploads/artworks/1790511004791-five-pronged-vajra-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -6595,6 +6596,12 @@
           "card": "/uploads/artworks/1790510963122-five-pronged-vajra-detail-2.jpg",
           "hero": "/uploads/artworks/1790510963122-five-pronged-vajra-detail-2.jpg",
           "detail": "/uploads/artworks/1790510963122-five-pronged-vajra-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790511004791-five-pronged-vajra-detail-3.jpg",
+          "card": "/uploads/artworks/1790511004791-five-pronged-vajra-detail-3.jpg",
+          "hero": "/uploads/artworks/1790511004791-five-pronged-vajra-detail-3.jpg",
+          "detail": "/uploads/artworks/1790511004791-five-pronged-vajra-detail-3.jpg"
         }
       ],
       "imageAsset": {
