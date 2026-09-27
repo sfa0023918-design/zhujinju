@@ -7748,10 +7748,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790517064039-phagmodrupa-portrait-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790517064039-phagmodrupa-portrait-main.jpg",
+        "card": "/uploads/artworks/1790517064039-phagmodrupa-portrait-main-card.jpg",
+        "hero": "/uploads/artworks/1790517064039-phagmodrupa-portrait-main.jpg",
+        "detail": "/uploads/artworks/1790517064039-phagmodrupa-portrait-main.jpg",
+        "width": 2400,
+        "height": 2827
+      }
     }
   ],
   "exhibitions": [
