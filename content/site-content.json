@@ -7869,10 +7869,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790517371173-right-coiling-conch-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790517371173-right-coiling-conch-main.jpg",
+        "card": "/uploads/artworks/1790517371173-right-coiling-conch-main-card.jpg",
+        "hero": "/uploads/artworks/1790517371173-right-coiling-conch-main.jpg",
+        "detail": "/uploads/artworks/1790517371173-right-coiling-conch-main.jpg",
+        "width": 1304,
+        "height": 3000
+      }
     }
   ],
   "exhibitions": [
