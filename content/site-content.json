@@ -5554,10 +5554,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790500926274-manjushri-expounding-dharma-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790500926274-manjushri-expounding-dharma-main.jpg",
+        "card": "/uploads/artworks/1790500926274-manjushri-expounding-dharma-main-card.jpg",
+        "hero": "/uploads/artworks/1790500926274-manjushri-expounding-dharma-main.jpg",
+        "detail": "/uploads/artworks/1790500926274-manjushri-expounding-dharma-main.jpg",
+        "width": 2400,
+        "height": 2919
+      }
     }
   ],
   "exhibitions": [
