@@ -4429,10 +4429,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790493687520-brass-standing-buddha-main-pdf-match.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790493687520-brass-standing-buddha-main-pdf-match.jpg",
+        "card": "/uploads/artworks/1790493687520-brass-standing-buddha-main-pdf-match-card.jpg",
+        "hero": "/uploads/artworks/1790493687520-brass-standing-buddha-main-pdf-match.jpg",
+        "detail": "/uploads/artworks/1790493687520-brass-standing-buddha-main-pdf-match.jpg",
+        "width": 1200,
+        "height": 1500
+      }
     }
   ],
   "exhibitions": [
