@@ -6360,10 +6360,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790510421533-vajrapani-mahachakra-mandala-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790510421533-vajrapani-mahachakra-mandala-main.jpg",
+        "card": "/uploads/artworks/1790510421533-vajrapani-mahachakra-mandala-main-card.jpg",
+        "hero": "/uploads/artworks/1790510421533-vajrapani-mahachakra-mandala-main.jpg",
+        "detail": "/uploads/artworks/1790510421533-vajrapani-mahachakra-mandala-main.jpg",
+        "width": 2000,
+        "height": 2369
+      }
     }
   ],
   "exhibitions": [
