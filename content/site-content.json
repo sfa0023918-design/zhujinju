@@ -6577,10 +6577,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790510877657-five-pronged-vajra-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790510877657-five-pronged-vajra-main.jpg",
+        "card": "/uploads/artworks/1790510877657-five-pronged-vajra-main-card.jpg",
+        "hero": "/uploads/artworks/1790510877657-five-pronged-vajra-main.jpg",
+        "detail": "/uploads/artworks/1790510877657-five-pronged-vajra-main.jpg",
+        "width": 1061,
+        "height": 2793
+      }
     }
   ],
   "exhibitions": [
