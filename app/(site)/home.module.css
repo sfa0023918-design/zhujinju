@@ -275,7 +275,7 @@
 
 .artworkImage {
   aspect-ratio: 4 / 5;
-  transition: transform 200ms ease-out;
+  object-fit: contain;
 }
 
 .artworkInfo {
@@ -368,9 +368,6 @@
     transform: translateY(-1px);
   }
 
-  .artworkLink:hover .artworkImage {
-    transform: scale(1.006);
-  }
 }
 
 @media (min-width: 768px) {

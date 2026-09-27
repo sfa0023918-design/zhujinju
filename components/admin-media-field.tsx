@@ -13,6 +13,10 @@ type TargetSize = {
   width: number;
   height: number;
 };
+type ImageFit = "cover" | "inside";
+
+// Artwork masters keep their full composition at a useful zoom resolution.
+export const ARTWORK_UPLOAD_SIZE = { width: 2400, height: 3000 };
 
 export type UploadSaveTarget = {
   section: "artworks" | "exhibitions" | "articles";
@@ -33,6 +37,7 @@ type AdminMediaFieldProps = {
   onRequestAutoSave?: () => void;
   previewRatio?: PreviewRatio;
   targetSize?: TargetSize;
+  imageFit?: ImageFit;
   recommendedSize?: string;
   recommendedUse?: string;
   saveTarget?: UploadSaveTarget;
@@ -127,7 +132,7 @@ async function loadImage(file: File) {
   });
 }
 
-export async function prepareAdminImageUpload(file: File, outputSize: TargetSize) {
+export async function prepareAdminImageUpload(file: File, outputSize: TargetSize, imageFit: ImageFit = "cover") {
   if (!file.type.startsWith("image/")) {
     throw new Error("仅支持上传图片文件。");
   }
@@ -135,7 +140,7 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
   const image = await loadImage(file);
   const targetRatio = outputSize.width / outputSize.height;
   const sourceRatio = image.width / image.height;
-  const needsCropping = Math.abs(sourceRatio - targetRatio) > 0.015;
+  const needsCropping = imageFit === "cover" && Math.abs(sourceRatio - targetRatio) > 0.015;
   const needsResizing = image.width > outputSize.width || image.height > outputSize.height;
   const needsCompression = file.size > SAFE_UPLOAD_BYTES;
   const canKeepOriginal =
@@ -185,7 +190,7 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
     throw new Error("当前浏览器无法处理图片，请更换一张图片后再试。");
   }
 
-  const qualitySteps = [0.92, 0.86, 0.8, 0.74, 0.68];
+  const qualitySteps = imageFit === "inside" ? [0.94, 0.9, 0.86, 0.82] : [0.92, 0.86, 0.8, 0.74, 0.68];
   let bestBlob: Blob | null = null;
   let bestPreviewUrl: string | null = null;
   let bestWidth = exportWidth;
@@ -241,8 +246,13 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
       bestPreviewUrl = createObjectUrl(bestBlob);
     }
 
-    exportWidth = Math.max(720, Math.round(exportWidth * 0.88));
-    exportHeight = Math.max(Math.round(720 / targetRatio), Math.round(exportHeight * 0.88));
+    if (imageFit === "inside") {
+      exportWidth = Math.max(1, Math.round(exportWidth * 0.88));
+      exportHeight = Math.max(1, Math.round(exportWidth / sourceRatio));
+    } else {
+      exportWidth = Math.max(720, Math.round(exportWidth * 0.88));
+      exportHeight = Math.max(Math.round(720 / targetRatio), Math.round(exportHeight * 0.88));
+    }
   }
 
   if (bestBlob && bestBlob.size <= SAFE_UPLOAD_BYTES) {
@@ -256,14 +266,16 @@ export async function prepareAdminImageUpload(file: File, outputSize: TargetSize
       width: bestWidth,
       height: bestHeight,
       details: {
-        cropped: true,
+        cropped: needsCropping,
         resized: true,
         compressed: true,
       },
     };
   }
 
-  throw new Error("系统已经自动裁切和压缩，但图片仍然过大。请换一张更清晰但尺寸更适中的图片，或先裁掉多余背景后再上传。");
+  throw new Error(imageFit === "inside"
+    ? "系统已按原比例缩小和压缩，但图片仍然过大。请使用文件更小的高清图片重试，无需裁切或补边。"
+    : "系统已经自动裁切和压缩，但图片仍然过大。请换一张更清晰但尺寸更适中的图片，或先裁掉多余背景后再上传。");
 }
 
 async function createAdminUploadVariant(file: File, maxWidth: number) {
@@ -316,6 +328,7 @@ export function AdminMediaField({
   onRequestAutoSave,
   previewRatio = "portrait",
   targetSize,
+  imageFit = "cover",
   recommendedSize,
   recommendedUse,
   saveTarget,
@@ -382,7 +395,7 @@ export function AdminMediaField({
         throw new Error("当前内容还没有真实记录，暂时不能上传图片。");
       }
 
-      const prepared = await prepareAdminImageUpload(file, outputSize);
+      const prepared = await prepareAdminImageUpload(file, outputSize, imageFit);
       const cardVariant = await createAdminUploadVariant(prepared.file, 900);
       replaceLocalPreview(prepared.previewUrl);
 
@@ -428,10 +441,10 @@ export function AdminMediaField({
           ? payload.message ?? "图片已上传并写入当前内容。系统正在同步到正式站，请稍后刷新前台。"
           : autoSaveAfterUpload
           ? prepared.transformed
-            ? "图片已自动裁切并压缩为网站适用尺寸，系统正在自动保存。保存后仍需等待正式站同步完成，前台才会显示。"
+            ? `${imageFit === "inside" ? "图片已保留原比例并压缩" : "图片已自动裁切并压缩"}为网站适用尺寸，系统正在自动保存。保存后仍需等待正式站同步完成，前台才会显示。`
             : "图片已上传，系统正在自动保存。保存后仍需等待正式站同步完成，前台才会显示。"
           : prepared.transformed
-            ? "图片已自动裁切并压缩为网站适用尺寸。"
+            ? `${imageFit === "inside" ? "图片已保留原比例并压缩" : "图片已自动裁切并压缩"}为网站适用尺寸。`
             : payload.message ?? "图片上传成功。",
       );
 
@@ -526,7 +539,7 @@ export function AdminMediaField({
           </div>
         ) : null}
         <p className="text-xs leading-6 text-[var(--muted)]">
-          系统会自动按当前页面所需比例裁切，并在尽量保持清晰度的情况下压缩到可上传尺寸。建议上传前控制在 {RECOMMENDED_UPLOAD_LIMIT} 内（服务器硬上限 {HARD_UPLOAD_LIMIT}）。
+          {imageFit === "inside" ? "保留原图比例与完整构图，不裁切、不补边、不放大；仅在必要时缩小和压缩。" : "系统会自动按当前页面所需比例裁切，并在尽量保持清晰度的情况下压缩到可上传尺寸。"}建议上传前控制在 {RECOMMENDED_UPLOAD_LIMIT} 内（服务器硬上限 {HARD_UPLOAD_LIMIT}）。
         </p>
       </div>
 
@@ -539,7 +552,7 @@ export function AdminMediaField({
               width={outputSize.width}
               height={outputSize.height}
               unoptimized
-              className="h-full w-full object-cover"
+              className={`h-full w-full ${imageFit === "inside" ? "object-contain" : "object-cover"}`}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs tracking-[0.16em] text-[var(--accent)]">
