@@ -11,6 +11,7 @@ import type {
   SiteConfigContent,
 } from "@/lib/site-data";
 import { getArtworkStatusText } from "@/lib/bilingual";
+import { COVER_VAJRA_IMAGE, COVER_VAJRA_SLUG } from "@/lib/artwork-presentation";
 import { resolveArtworkPrimaryImage, resolveArtworkPrimaryImageCandidates } from "@/lib/image-url";
 
 import { ArtworkCard } from "./artwork-card";
@@ -331,6 +332,7 @@ export function ArtworkHero({
 }: ArtworkHeroProps) {
   const primaryImageCandidates = useMemo(() => resolveArtworkPrimaryImageCandidates(artwork), [artwork]);
   const primaryImage = useMemo(() => resolveArtworkPrimaryImage(artwork), [artwork]);
+  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
   const facts = [
     { label: detailCopy.fieldLabels.period, value: artwork.period },
     { label: detailCopy.fieldLabels.regionOrigin, value: joinBilingual(artwork.region, artwork.origin) },
@@ -353,7 +355,7 @@ export function ArtworkHero({
         <div className={styles.galleryColumn}>
           <ArtworkGallery
             title={`${artwork.title.zh} ${artwork.title.en}`.trim()}
-            primaryImage={primaryImage}
+            primaryImage={isCoverVajra ? COVER_VAJRA_IMAGE : primaryImage}
             primaryImageCandidates={primaryImageCandidates}
             category={artwork.category.zh || artwork.category.en}
             gallery={artwork.gallery}

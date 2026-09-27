@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { withImageVersion } from "@/lib/image-url";
+import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_IMAGE } from "@/lib/artwork-presentation";
 
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
@@ -126,6 +127,7 @@ export function ArtworkGallery({
   const hasMultipleImages = thumbnailImages.length > 1;
   const activeImageIndex = Math.max(thumbnailImages.indexOf(activeImage), 0);
   const activeImageSrc = withImageVersion(activeImage);
+  const isCoverVajraActive = activeImage === COVER_VAJRA_IMAGE;
   const isActivePlaceholder = !activeImage || activeImage.startsWith("/api/placeholder/");
   const categoryHint = category.toLowerCase();
   const isPaintingLike =
@@ -195,6 +197,7 @@ export function ArtworkGallery({
                       ? "border-[var(--line-strong)]/72 ring-1 ring-[var(--line-strong)]/12"
                       : "border-[var(--line)]/42 group-hover:border-[var(--line-strong)]/42"
                   }`}
+                  style={image === COVER_VAJRA_IMAGE ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
                 >
                   {image.startsWith("/api/placeholder/") ? (
                     <div className="flex aspect-[4/5] h-[90px] w-[68px] items-end bg-[linear-gradient(180deg,rgba(239,235,229,0.8)_0%,rgba(233,228,221,0.97)_100%)] p-2.5 lg:h-[98px] lg:w-[72px]">
@@ -213,6 +216,7 @@ export function ArtworkGallery({
                       unoptimized
                       wrapperClassName="block"
                       className="aspect-[4/5] h-[90px] w-[68px] object-contain lg:h-[98px] lg:w-[72px]"
+                      style={image === COVER_VAJRA_IMAGE ? { clipPath: COVER_VAJRA_CLIP } : undefined}
                     />
                   )}
                 </div>
@@ -222,7 +226,10 @@ export function ArtworkGallery({
           </div>
         ) : null}
         <div className={`order-1 min-w-0 grid gap-3.5 ${hasMultipleImages ? "" : "lg:justify-items-center"}`}>
-          <div className={`relative overflow-hidden bg-transparent lg:flex lg:overflow-visible ${desktopContainerClass}`}>
+          <div
+            className={`relative overflow-hidden lg:flex ${isCoverVajraActive ? "lg:overflow-hidden" : "bg-transparent lg:overflow-visible"} ${desktopContainerClass}`}
+            style={isCoverVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+          >
             {isActivePlaceholder ? (
               <div className="aspect-[4/5] lg:flex lg:min-h-full lg:w-full lg:items-start lg:justify-center">
                 <MediaPlaceholder eyebrow="Artwork Image" title={title} />
@@ -250,6 +257,7 @@ export function ArtworkGallery({
                     }
                   }}
                   className={`h-auto w-full object-contain ${desktopImageClass}`}
+                  style={isCoverVajraActive ? { clipPath: COVER_VAJRA_CLIP } : undefined}
                 />
               </button>
             )}
@@ -293,7 +301,10 @@ export function ArtworkGallery({
                 关闭
               </button>
             </div>
-            <div className="relative z-20 min-h-[calc(100vh-7.5rem)] flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] md:min-h-[calc(100vh-9rem)]">
+            <div
+              className="relative z-20 min-h-[calc(100vh-7.5rem)] flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] md:min-h-[calc(100vh-9rem)]"
+              style={isCoverVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+            >
               {thumbnailImages.length > 1 ? (
                 <>
                   <button
@@ -322,6 +333,7 @@ export function ArtworkGallery({
                     unoptimized
                     wrapperClassName="inline-block !h-auto !w-auto"
                     className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
+                    style={isCoverVajraActive ? { clipPath: COVER_VAJRA_CLIP } : undefined}
                   />
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ProtectedImage } from "@/components/protected-image";
+import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_IMAGE, COVER_VAJRA_SLUG } from "@/lib/artwork-presentation";
 import { getArtworkStatusText } from "@/lib/bilingual";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import {
@@ -64,13 +65,17 @@ function HomeAction({ href, text }: { href: string; text: BilingualValue }) {
 }
 
 function HomeArtwork({ artwork, priority }: { artwork: Artwork; priority: boolean }) {
-  const image = resolveArtworkPrimaryImage(artwork);
+  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
+  const image = isCoverVajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(artwork);
   const status = getArtworkStatusText(artwork.status);
 
   return (
     <article className={styles.artwork}>
       <Link href={`/collection/${artwork.slug}`} className={styles.artworkLink}>
-        <div className={styles.artworkImageFrame}>
+        <div
+          className={styles.artworkImageFrame}
+          style={isCoverVajra ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+        >
           <ProtectedImage
             src={withImageVersion(image)}
             alt={`${artwork.title.zh} ${artwork.title.en}`}
@@ -81,6 +86,7 @@ function HomeArtwork({ artwork, priority }: { artwork: Artwork; priority: boolea
             sizes="(min-width: 1024px) 42vw, (min-width: 768px) 44vw, 100vw"
             wrapperClassName={styles.artworkImageWrapper}
             className={styles.artworkImage}
+            style={isCoverVajra ? { clipPath: COVER_VAJRA_CLIP } : undefined}
           />
         </div>
         <div className={styles.artworkInfo}>
