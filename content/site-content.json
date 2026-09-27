@@ -5796,10 +5796,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790501839576-vajra-dakini-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790501839576-vajra-dakini-main.jpg",
+        "card": "/uploads/artworks/1790501839576-vajra-dakini-main-card.jpg",
+        "hero": "/uploads/artworks/1790501839576-vajra-dakini-main.jpg",
+        "detail": "/uploads/artworks/1790501839576-vajra-dakini-main.jpg",
+        "width": 2400,
+        "height": 2925
+      }
     }
   ],
   "exhibitions": [
