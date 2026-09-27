@@ -8233,9 +8233,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790518833189-vajramala-offering-goddess-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790518871968-vajramala-offering-goddess-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790518871968-vajramala-offering-goddess-detail-1.jpg",
+          "card": "/uploads/artworks/1790518871968-vajramala-offering-goddess-detail-1.jpg",
+          "hero": "/uploads/artworks/1790518871968-vajramala-offering-goddess-detail-1.jpg",
+          "detail": "/uploads/artworks/1790518871968-vajramala-offering-goddess-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790518833189-vajramala-offering-goddess-main.jpg",
         "card": "/uploads/artworks/1790518833189-vajramala-offering-goddess-main-card.jpg",
