@@ -4653,9 +4653,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790494317011-seated-buddha-main-pdf-match.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790494336542-seated-buddha-detail-1-pdf-match.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790494336542-seated-buddha-detail-1-pdf-match.jpg",
+          "card": "/uploads/artworks/1790494336542-seated-buddha-detail-1-pdf-match.jpg",
+          "hero": "/uploads/artworks/1790494336542-seated-buddha-detail-1-pdf-match.jpg",
+          "detail": "/uploads/artworks/1790494336542-seated-buddha-detail-1-pdf-match.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790494317011-seated-buddha-main-pdf-match.jpg",
         "card": "/uploads/artworks/1790494317011-seated-buddha-main-pdf-match-card.jpg",
