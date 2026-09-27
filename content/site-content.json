@@ -5251,10 +5251,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790499764130-palm-leaf-prajnaparamita-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790499764130-palm-leaf-prajnaparamita-main.jpg",
+        "card": "/uploads/artworks/1790499764130-palm-leaf-prajnaparamita-main-card.jpg",
+        "hero": "/uploads/artworks/1790499764130-palm-leaf-prajnaparamita-main.jpg",
+        "detail": "/uploads/artworks/1790499764130-palm-leaf-prajnaparamita-main.jpg",
+        "width": 2400,
+        "height": 780
+      }
     }
   ],
   "exhibitions": [
