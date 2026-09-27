@@ -4946,10 +4946,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790497779670-buddha-hand-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790497779670-buddha-hand-main.jpg",
+        "card": "/uploads/artworks/1790497779670-buddha-hand-main-card.jpg",
+        "hero": "/uploads/artworks/1790497779670-buddha-hand-main.jpg",
+        "detail": "/uploads/artworks/1790497779670-buddha-hand-main.jpg",
+        "width": 2400,
+        "height": 1396
+      }
     }
   ],
   "exhibitions": [
