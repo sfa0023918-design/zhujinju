@@ -166,6 +166,32 @@ export async function readSiteContentFresh() {
   );
 }
 
+async function readSiteContentForWrite() {
+  if (process.env.NODE_ENV !== "production" && !hasGitHubRepoConfig()) {
+    return await readSiteContentFresh();
+  }
+
+  // A deployed/local snapshot is safe for public reads, never for a remote write.
+  // Do not use readGitHubContentFile here: it intentionally swallows read errors.
+  try {
+    const raw = await getRepoUtf8File(CONTENT_REPO_PATH);
+    const content: unknown = raw ? JSON.parse(raw) : null;
+
+    if (
+      !isPlainObject(content) ||
+      !Array.isArray(content.artworks) ||
+      !Array.isArray(content.exhibitions) ||
+      !Array.isArray(content.articles)
+    ) {
+      throw new Error("远端内容文件缺失或结构不完整。");
+    }
+
+    return normalizeSiteContent(content as Partial<SiteContent>);
+  } catch {
+    throw new Error("无法取得 GitHub 最新完整内容，已停止保存以避免覆盖现有数据。请稍后重试。");
+  }
+}
+
 export async function writeLocalContentFile(content: SiteContent) {
   await fs.mkdir(CONTENT_DIR, { recursive: true });
   await fs.writeFile(CONTENT_FILE_PATH, `${JSON.stringify(toPersistedSiteContent(content), null, 2)}\n`, "utf8");
@@ -477,7 +503,7 @@ export async function saveSiteSection(
     baseValue?: EditableSectionValueMap[EditableSectionKey];
   },
 ) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const baseValue = options?.baseValue;
   const mergedSectionValue = (
     section === "exhibitions"
@@ -639,7 +665,7 @@ function mergeArticleSection(currentArticles: Article[], nextArticles: Article[]
 }
 
 export async function createArtworkDraft(actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const nextContent = normalizeSiteContent(structuredClone(current));
   const artwork = createArtworkDraftRecord();
 
@@ -653,7 +679,7 @@ export async function createArtworkDraft(actor: string) {
 }
 
 export async function duplicateArtworkRecord(artworkId: string, actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
 
   if (artworkIndex < 0) {
@@ -681,7 +707,7 @@ export async function duplicateArtworkRecord(artworkId: string, actor: string) {
 }
 
 export async function createExhibitionDraft(actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const nextContent = normalizeSiteContent(structuredClone(current));
   const exhibition = createExhibitionDraftRecord();
 
@@ -695,7 +721,7 @@ export async function createExhibitionDraft(actor: string) {
 }
 
 export async function duplicateExhibitionRecord(slug: string, actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const exhibitionIndex = current.exhibitions.findIndex((item) => item.slug === slug);
 
   if (exhibitionIndex < 0) {
@@ -722,7 +748,7 @@ export async function duplicateExhibitionRecord(slug: string, actor: string) {
 }
 
 export async function deleteExhibitionRecord(slug: string, actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const exhibitionIndex = current.exhibitions.findIndex((item) => item.slug === slug);
 
   if (exhibitionIndex < 0) {
@@ -739,7 +765,7 @@ export async function deleteExhibitionRecord(slug: string, actor: string) {
 }
 
 export async function createArticleDraft(actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const nextContent = normalizeSiteContent(structuredClone(current));
   const article = createArticleDraftRecord();
 
@@ -753,7 +779,7 @@ export async function createArticleDraft(actor: string) {
 }
 
 export async function duplicateArticleRecord(slug: string, actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const articleIndex = current.articles.findIndex((item) => item.slug === slug);
 
   if (articleIndex < 0) {
@@ -779,7 +805,7 @@ export async function duplicateArticleRecord(slug: string, actor: string) {
 }
 
 export async function deleteArticleRecord(slug: string, actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const articleIndex = current.articles.findIndex((item) => item.slug === slug);
 
   if (articleIndex < 0) {
@@ -803,7 +829,7 @@ export async function saveArtworkRecord(
     baseArtwork?: Artwork;
   },
 ) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
 
   if (artworkIndex < 0) {
@@ -835,7 +861,7 @@ export async function saveArtworkRecord(
 }
 
 export async function deleteArtworkRecord(artworkId: string, actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
 
   if (artworkIndex < 0) {
@@ -852,7 +878,7 @@ export async function deleteArtworkRecord(artworkId: string, actor: string) {
 }
 
 export async function reorderArtworkRecords(orderedIds: string[], actor: string) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const currentById = new Map(current.artworks.map((artwork) => [getArtworkId(artwork), artwork]));
   const ordered = orderedIds
     .map((id) => currentById.get(id))
@@ -877,7 +903,7 @@ export async function saveArtworkMediaField(
   actor: string,
   options?: { galleryIndex?: number; asset?: ImageAsset },
 ) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const artworkIndex = findArtworkIndexById(current.artworks, artworkId);
 
   if (artworkIndex < 0) {
@@ -922,7 +948,7 @@ export async function assertMediaTargetExists(
   section: "artworks" | "exhibitions" | "articles",
   recordId: string,
 ) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
 
   if (section === "artworks") {
     if (findArtworkIndexById(current.artworks, recordId) < 0) {
@@ -953,7 +979,7 @@ export async function saveRecordMediaField(
   actor: string,
   options?: { asset?: ImageAsset },
 ) {
-  const current = await readSiteContentFresh();
+  const current = await readSiteContentForWrite();
   const nextContent = normalizeSiteContent(structuredClone(current));
 
   if (section === "exhibitions") {

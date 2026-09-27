@@ -55,24 +55,6 @@ async function getExistingSha(config: GitHubRepoConfig, repoPath: string) {
   throw new Error("无法读取 GitHub 当前文件。");
 }
 
-async function getRepoFilePayload(config: GitHubRepoConfig, repoPath: string) {
-  const endpoint = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${repoPath}`;
-  const response = await fetch(`${endpoint}?ref=${config.branch}`, {
-    headers: buildHeaders(config),
-    cache: "no-store",
-  });
-
-  if (response.ok) {
-    return (await response.json()) as { sha?: string; content?: string; encoding?: string };
-  }
-
-  if (response.status === 404) {
-    return null;
-  }
-
-  throw new Error("无法读取 GitHub 当前文件。");
-}
-
 async function putRepoFileBase64(
   repoPath: string,
   base64Content: string,
@@ -160,18 +142,29 @@ export async function getRepoUtf8File(repoPath: string) {
     return await response.text();
   }
 
-  const payload = await getRepoFilePayload(config, repoPath);
+  // The JSON envelope omits inline content for files larger than 1 MB.
+  // Read the raw body through the authenticated API for both small and large files.
+  const endpoint = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${repoPath}`;
+  const response = await fetch(`${endpoint}?ref=${encodeURIComponent(config.branch)}`, {
+    headers: { ...buildHeaders(config), Accept: "application/vnd.github.raw+json" },
+    cache: "no-store",
+  });
 
-  if (!payload) {
+  if (response.status === 404) {
     return null;
   }
 
-  if (!payload.content) {
+  if (!response.ok) {
+    throw new Error("无法读取 GitHub 当前文件。");
+  }
+
+  const content = await response.text();
+
+  if (!content.trim()) {
     throw new Error("GitHub 返回的文件内容为空。");
   }
 
-  const normalized = payload.content.replace(/\n/g, "");
-  return Buffer.from(normalized, payload.encoding === "base64" ? "base64" : "utf8").toString("utf8");
+  return content;
 }
 
 export function hasGitHubRepoConfig() {
