@@ -8625,7 +8625,8 @@
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790520268962-buddha-hand-13c-main.jpg",
       "gallery": [
-        "/uploads/artworks/1790520843595-buddha-hand-13c-detail-1.jpg"
+        "/uploads/artworks/1790520843595-buddha-hand-13c-detail-1.jpg",
+        "/uploads/artworks/1790521073056-buddha-hand-13c-detail-2.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -8634,6 +8635,12 @@
           "card": "/uploads/artworks/1790520843595-buddha-hand-13c-detail-1.jpg",
           "hero": "/uploads/artworks/1790520843595-buddha-hand-13c-detail-1.jpg",
           "detail": "/uploads/artworks/1790520843595-buddha-hand-13c-detail-1.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790521073056-buddha-hand-13c-detail-2.jpg",
+          "card": "/uploads/artworks/1790521073056-buddha-hand-13c-detail-2.jpg",
+          "hero": "/uploads/artworks/1790521073056-buddha-hand-13c-detail-2.jpg",
+          "detail": "/uploads/artworks/1790521073056-buddha-hand-13c-detail-2.jpg"
         }
       ],
       "imageAsset": {
