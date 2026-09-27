@@ -7991,9 +7991,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790517655231-garuda-embroidery-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790518070711-garuda-embroidery-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790518070711-garuda-embroidery-detail-1.jpg",
+          "card": "/uploads/artworks/1790518070711-garuda-embroidery-detail-1.jpg",
+          "hero": "/uploads/artworks/1790518070711-garuda-embroidery-detail-1.jpg",
+          "detail": "/uploads/artworks/1790518070711-garuda-embroidery-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790517655231-garuda-embroidery-main.jpg",
         "card": "/uploads/artworks/1790517655231-garuda-embroidery-main-card.jpg",
