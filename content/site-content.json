@@ -8492,7 +8492,8 @@
       "gallery": [
         "/uploads/artworks/1790519663293-painted-tibetan-cabinet-detail-1.jpg",
         "/uploads/artworks/1790519766717-painted-tibetan-cabinet-detail-2.jpg",
-        "/uploads/artworks/1790519961532-painted-tibetan-cabinet-detail-3.jpg"
+        "/uploads/artworks/1790519961532-painted-tibetan-cabinet-detail-3.jpg",
+        "/uploads/artworks/1790520066191-painted-tibetan-cabinet-detail-4.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -8513,6 +8514,12 @@
           "card": "/uploads/artworks/1790519961532-painted-tibetan-cabinet-detail-3.jpg",
           "hero": "/uploads/artworks/1790519961532-painted-tibetan-cabinet-detail-3.jpg",
           "detail": "/uploads/artworks/1790519961532-painted-tibetan-cabinet-detail-3.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790520066191-painted-tibetan-cabinet-detail-4.jpg",
+          "card": "/uploads/artworks/1790520066191-painted-tibetan-cabinet-detail-4.jpg",
+          "hero": "/uploads/artworks/1790520066191-painted-tibetan-cabinet-detail-4.jpg",
+          "detail": "/uploads/artworks/1790520066191-painted-tibetan-cabinet-detail-4.jpg"
         }
       ],
       "imageAsset": {
