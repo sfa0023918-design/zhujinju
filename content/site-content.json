@@ -7365,10 +7365,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790514051311-shakyamuni-tsang-13-14c-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790514051311-shakyamuni-tsang-13-14c-main.jpg",
+        "card": "/uploads/artworks/1790514051311-shakyamuni-tsang-13-14c-main-card.jpg",
+        "hero": "/uploads/artworks/1790514051311-shakyamuni-tsang-13-14c-main.jpg",
+        "detail": "/uploads/artworks/1790514051311-shakyamuni-tsang-13-14c-main.jpg",
+        "width": 2113,
+        "height": 3000
+      }
     }
   ],
   "exhibitions": [
