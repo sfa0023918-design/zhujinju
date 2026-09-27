@@ -97,7 +97,7 @@ function isBilingualTextRecord(value: unknown): value is BilingualText {
   return keys.length === 2 && keys.includes("zh") && keys.includes("en") && typeof record.zh === "string" && typeof record.en === "string";
 }
 
-function normalizeBilingualTextValue(value: BilingualText) {
+function normalizeBilingualTextValue(value: BilingualText, preserveEnglishTerms = false) {
   const stats = emptyStats();
   let zh = value.zh.trim();
   let en = value.en.trim();
@@ -111,7 +111,7 @@ function normalizeBilingualTextValue(value: BilingualText) {
     zh,
     KNOWN_ZH_COPY_TYPO_FIXES.map((item) => ({ pattern: item.pattern, replacement: item.correct })),
   );
-  const enFixed = applyTextFixRules(en, KNOWN_ENGLISH_TERM_FIXES);
+  const enFixed = applyTextFixRules(en, preserveEnglishTerms ? [] : KNOWN_ENGLISH_TERM_FIXES);
 
   stats.typoFixes += zhFixed.replacements;
   stats.englishTermFixes += enFixed.replacements;
@@ -126,11 +126,11 @@ function normalizeBilingualTextValue(value: BilingualText) {
   };
 }
 
-function normalizeAny(value: unknown): { value: unknown; stats: CopyCleanupStats } {
+function normalizeAny(value: unknown, path: Array<string | number> = []): { value: unknown; stats: CopyCleanupStats } {
   if (Array.isArray(value)) {
     const stats = emptyStats();
-    const next = value.map((item) => {
-      const normalized = normalizeAny(item);
+    const next = value.map((item, index) => {
+      const normalized = normalizeAny(item, [...path, index]);
       mergeStats(stats, normalized.stats);
       return normalized.value;
     });
@@ -143,14 +143,19 @@ function normalizeAny(value: unknown): { value: unknown; stats: CopyCleanupStats
   }
 
   if (isBilingualTextRecord(value)) {
-    return normalizeBilingualTextValue(value);
+    // Published book titles are citations, not geographical labels. Keep their
+    // original English terminology while retaining the other cleanup rules.
+    const isPublicationTitle = path.at(-3) === "publications"
+      && typeof path.at(-2) === "number"
+      && path.at(-1) === "title";
+    return normalizeBilingualTextValue(value, isPublicationTitle);
   }
 
   const stats = emptyStats();
   const next: Record<string, unknown> = {};
 
   for (const [key, item] of Object.entries(value)) {
-    const normalized = normalizeAny(item);
+    const normalized = normalizeAny(item, [...path, key]);
     next[key] = normalized.value;
     mergeStats(stats, normalized.stats);
   }

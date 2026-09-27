@@ -73,8 +73,63 @@ function harness({ failure, env = {} } = {}) {
     vm.runInContext(`(function(exports, require, module) {${compiled.get(filename)}\n})`, context, { filename })(loaded.exports, scopedRequire, loaded);
     return loaded.exports;
   }
-  return { state, store: load(path.join(root, "lib/content-store.ts")), github: load(path.join(root, "lib/github-repo.ts")) };
+  return {
+    state,
+    store: load(path.join(root, "lib/content-store.ts")),
+    github: load(path.join(root, "lib/github-repo.ts")),
+    copyQuality: load(path.join(root, "lib/copy-quality.ts")),
+  };
 }
+
+test("publication titles preserve original English terms without changing region rules", () => {
+  const { copyQuality } = harness();
+  const artwork = {
+    title: { zh: "西藏艺术", en: "Art of Tibet" },
+    region: { zh: "西藏", en: "Tibet" },
+    publications: [{
+      title: { zh: "《西藏佛教仪式艺术》", en: "Buddhist Ritual Art of Tibet" },
+      note: { zh: "西藏", en: "Tibet" },
+    }],
+  };
+  for (const source of [artwork, { artworks: [artwork] }]) {
+    const before = JSON.stringify(source);
+    const result = copyQuality.normalizeBilingualFieldsDeep(source);
+    const normalized = result.value.artworks?.[0] ?? result.value;
+    assert.equal(normalized.publications[0].title.en, "Buddhist Ritual Art of Tibet");
+    assert.equal(normalized.publications[0].title.zh, artwork.publications[0].title.zh);
+    assert.equal(normalized.region.en, "Xizang");
+    assert.equal(normalized.title.en, "Art of Xizang");
+    assert.equal(normalized.publications[0].note.en, "Xizang");
+    assert.equal(result.stats.englishTermFixes, 3);
+    assert.equal(JSON.stringify(source), before);
+    assert.equal(JSON.stringify(copyQuality.normalizeBilingualFieldsDeep(result.value).value), JSON.stringify(result.value));
+  }
+});
+
+test("saving a corrected publication title and then media retains the exact book title", async () => {
+  const { store, state } = harness();
+  const normalized = await store.readSiteContentFresh();
+  state.body = JSON.stringify({ artworks: normalized.artworks, exhibitions: normalized.exhibitions, articles: normalized.articles });
+  const before = JSON.parse(state.body);
+  const target = before.artworks.find((a) => a.publicationStatus === "draft");
+  assert.ok(target);
+  const updated = structuredClone(target);
+  updated.publications = [{
+    title: { zh: "《西藏佛教仪式艺术》", en: "Buddhist Ritual Art of Tibet" },
+    year: "", pages: { zh: "第29页", en: "p. 29" },
+  }];
+  await store.saveArtworkRecord(target.id, updated, "test");
+  await store.saveArtworkMediaField(target.id, "image", "/uploads/test-main.jpg", "test");
+  const after = JSON.parse(state.body);
+  const result = after.artworks.find((a) => a.id === target.id);
+  assert.equal(result.publications[0].title.en, "Buddhist Ritual Art of Tibet");
+  assert.equal(result.publications[0].title.zh, "《西藏佛教仪式艺术》");
+  assert.deepEqual(after.artworks.filter((a) => a.id !== target.id), before.artworks.filter((a) => a.id !== target.id));
+  assert.deepEqual(after.exhibitions, before.exhibitions);
+  assert.deepEqual(after.articles, before.articles);
+  assert.equal(state.puts, 2);
+  assert.equal(state.localWrites, 0);
+});
 
 const mutations = [
   ["saveSiteSection", ["artworks", [], "test"]],
