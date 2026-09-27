@@ -6073,10 +6073,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790507747400-achala-western-xizang-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790507747400-achala-western-xizang-main.jpg",
+        "card": "/uploads/artworks/1790507747400-achala-western-xizang-main-card.jpg",
+        "hero": "/uploads/artworks/1790507747400-achala-western-xizang-main.jpg",
+        "detail": "/uploads/artworks/1790507747400-achala-western-xizang-main.jpg",
+        "width": 2400,
+        "height": 2564
+      }
     }
   ],
   "exhibitions": [
