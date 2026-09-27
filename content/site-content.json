@@ -8361,9 +8361,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790519120641-kadampa-sutra-cover-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790519195551-kadampa-sutra-cover-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790519195551-kadampa-sutra-cover-detail-1.jpg",
+          "card": "/uploads/artworks/1790519195551-kadampa-sutra-cover-detail-1.jpg",
+          "hero": "/uploads/artworks/1790519195551-kadampa-sutra-cover-detail-1.jpg",
+          "detail": "/uploads/artworks/1790519195551-kadampa-sutra-cover-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790519120641-kadampa-sutra-cover-main.jpg",
         "card": "/uploads/artworks/1790519120641-kadampa-sutra-cover-main-card.jpg",
