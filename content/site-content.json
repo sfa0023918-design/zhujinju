@@ -7487,9 +7487,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790514469419-vajrakilaya-phurba-11-12c-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790514503281-vajrakilaya-phurba-11-12c-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790514503281-vajrakilaya-phurba-11-12c-detail-1.jpg",
+          "card": "/uploads/artworks/1790514503281-vajrakilaya-phurba-11-12c-detail-1.jpg",
+          "hero": "/uploads/artworks/1790514503281-vajrakilaya-phurba-11-12c-detail-1.jpg",
+          "detail": "/uploads/artworks/1790514503281-vajrakilaya-phurba-11-12c-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790514469419-vajrakilaya-phurba-11-12c-main.jpg",
         "card": "/uploads/artworks/1790514469419-vajrakilaya-phurba-11-12c-main-card.jpg",
