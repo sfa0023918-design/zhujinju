@@ -5938,10 +5938,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790502627516-vajravarahi-western-xia-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790502627516-vajravarahi-western-xia-main.jpg",
+        "card": "/uploads/artworks/1790502627516-vajravarahi-western-xia-main-card.jpg",
+        "hero": "/uploads/artworks/1790502627516-vajravarahi-western-xia-main.jpg",
+        "detail": "/uploads/artworks/1790502627516-vajravarahi-western-xia-main.jpg",
+        "width": 2334,
+        "height": 3000
+      }
     }
   ],
   "exhibitions": [
