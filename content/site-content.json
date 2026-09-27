@@ -5410,7 +5410,8 @@
       "image": "/uploads/artworks/1790500322048-buddha-mother-main.jpg",
       "gallery": [
         "/uploads/artworks/1790500564803-buddha-mother-detail-1.jpg",
-        "/uploads/artworks/1790500600524-buddha-mother-detail-2.jpg"
+        "/uploads/artworks/1790500600524-buddha-mother-detail-2.jpg",
+        "/uploads/artworks/1790500651254-buddha-mother-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -5425,6 +5426,12 @@
           "card": "/uploads/artworks/1790500600524-buddha-mother-detail-2.jpg",
           "hero": "/uploads/artworks/1790500600524-buddha-mother-detail-2.jpg",
           "detail": "/uploads/artworks/1790500600524-buddha-mother-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790500651254-buddha-mother-detail-3.jpg",
+          "card": "/uploads/artworks/1790500651254-buddha-mother-detail-3.jpg",
+          "hero": "/uploads/artworks/1790500651254-buddha-mother-detail-3.jpg",
+          "detail": "/uploads/artworks/1790500651254-buddha-mother-detail-3.jpg"
         }
       ],
       "imageAsset": {
