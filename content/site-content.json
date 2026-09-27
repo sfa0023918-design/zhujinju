@@ -4825,10 +4825,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790496986483-yellow-jambhala-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790496986483-yellow-jambhala-main.jpg",
+        "card": "/uploads/artworks/1790496986483-yellow-jambhala-main-card.jpg",
+        "hero": "/uploads/artworks/1790496986483-yellow-jambhala-main.jpg",
+        "detail": "/uploads/artworks/1790496986483-yellow-jambhala-main.jpg",
+        "width": 1892,
+        "height": 2823
+      }
     }
   ],
   "exhibitions": [
