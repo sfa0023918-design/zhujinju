@@ -8112,9 +8112,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790518263553-silver-lama-portrait-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790518341772-silver-lama-portrait-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790518341772-silver-lama-portrait-detail-1.jpg",
+          "card": "/uploads/artworks/1790518341772-silver-lama-portrait-detail-1.jpg",
+          "hero": "/uploads/artworks/1790518341772-silver-lama-portrait-detail-1.jpg",
+          "detail": "/uploads/artworks/1790518341772-silver-lama-portrait-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790518263553-silver-lama-portrait-main.jpg",
         "card": "/uploads/artworks/1790518263553-silver-lama-portrait-main-card.jpg",
