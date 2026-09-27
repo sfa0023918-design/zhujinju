@@ -6982,10 +6982,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790512701400-vajrakila-14c-275mm-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790512701400-vajrakila-14c-275mm-main.jpg",
+        "card": "/uploads/artworks/1790512701400-vajrakila-14c-275mm-main-card.jpg",
+        "hero": "/uploads/artworks/1790512701400-vajrakila-14c-275mm-main.jpg",
+        "detail": "/uploads/artworks/1790512701400-vajrakila-14c-275mm-main.jpg",
+        "width": 1546,
+        "height": 3000
+      }
     }
   ],
   "exhibitions": [
