@@ -111,7 +111,7 @@ export function ArtworkCard({
                 quality={82}
                 sizes={imageSizes}
                 wrapperClassName="block"
-                className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.012]"
+                className="aspect-[4/5] h-full w-full object-contain"
               />
             )}
           </div>
@@ -159,7 +159,7 @@ export function ArtworkCard({
               quality={84}
               sizes={imageSizes}
               wrapperClassName="block"
-              className="aspect-[4/5] h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.008]"
+              className="aspect-[4/5] h-full w-full object-contain"
             />
           )}
         </div>

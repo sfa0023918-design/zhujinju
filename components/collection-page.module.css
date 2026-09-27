@@ -282,8 +282,7 @@
   width: 100%;
   height: 100%;
   aspect-ratio: 4 / 5;
-  object-fit: cover;
-  transition: transform var(--motion-fast);
+  object-fit: contain;
 }
 
 .artworkRecord {
@@ -423,10 +422,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .artworkLink:hover .artworkImage {
-    transform: scale(1.006);
-  }
-
   .filterMenu a:hover,
   .pageLinks a:hover,
   .pageLinks button:hover {

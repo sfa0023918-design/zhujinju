@@ -33,7 +33,7 @@ import type {
 import type { ValidationIssue } from "@/lib/publication-validation";
 import { getArticlePublicationIssues, getArtworkPublicationIssues, getExhibitionPublicationIssues } from "@/lib/publication-validation";
 
-import { AdminMediaField, prepareAdminImageUpload, readAdminUploadResponse } from "./admin-media-field";
+import { AdminMediaField, ARTWORK_UPLOAD_SIZE, prepareAdminImageUpload, readAdminUploadResponse } from "./admin-media-field";
 import { getLocalizedText, getParagraphsByLocale, type ReadingLocale } from "./bilingual-prose";
 
 type AdminCmsEditorProps = {
@@ -2341,7 +2341,7 @@ function ArtworkDetailGalleryGrid({
     onSaveStateChange({ phase: "saving", message: "正在上传并保存细节图。" });
 
     try {
-      const prepared = await prepareAdminImageUpload(file, { width: 1200, height: 1500 });
+      const prepared = await prepareAdminImageUpload(file, ARTWORK_UPLOAD_SIZE, "inside");
       const formData = new FormData();
       formData.append("file", prepared.file);
       formData.append("folder", "artworks");
@@ -2487,7 +2487,7 @@ function ArtworkDetailGalleryGrid({
                 width={1200}
                 height={1500}
                 unoptimized
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             </div>
             <div className="flex gap-2">
@@ -2520,7 +2520,7 @@ function ArtworkDetailGalleryGrid({
         {gallery.length < 8 ? (
           <label data-field-key="gallery.add" className="flex min-h-[260px] cursor-pointer flex-col items-center justify-center gap-3 border border-dashed border-[var(--line-strong)] bg-white/20 p-4 text-center transition-colors hover:bg-[var(--surface-strong)]">
             <span className="text-sm text-[var(--ink)]">{uploadingSlot === "append" ? "处理中..." : "新增细节图"}</span>
-            <span className="text-xs leading-6 text-[var(--muted)]">系统会自动裁切并压缩为前台适用尺寸。</span>
+            <span className="text-xs leading-6 text-[var(--muted)]">保留原图比例与完整构图，不裁切、不补边；仅在必要时缩小和压缩。</span>
             <input
               type="file"
               accept="image/*"
@@ -3067,8 +3067,9 @@ function ArtworkEditor({
                     folder="artworks"
                     value={selectedArtwork.image}
                     recommendedUse="藏品列表与详情页主图"
-                    recommendedSize="1200 x 1500 像素以上，竖图 4:5"
-                    targetSize={{ width: 1200, height: 1500 }}
+                    recommendedSize="保留原比例，最大2400 × 3000像素；小图不放大"
+                    targetSize={ARTWORK_UPLOAD_SIZE}
+                    imageFit="inside"
                     saveTarget={{
                       section: "artworks",
                       id: getArtworkId(selectedArtwork),

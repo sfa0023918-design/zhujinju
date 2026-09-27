@@ -141,8 +141,8 @@ export function ArtworkGallery({
     ? "lg:inline-flex lg:w-auto lg:max-w-full lg:justify-center"
     : "lg:inline-flex lg:w-auto lg:max-w-full lg:justify-center";
   const desktopImageClass = isPaintingLike || isVeryTall
-    ? "lg:h-auto lg:w-auto lg:min-w-[34rem] lg:max-h-[84vh] lg:max-w-[46rem] lg:object-contain lg:object-top xl:min-w-[38rem] xl:max-w-[50rem]"
-    : "lg:h-auto lg:w-auto lg:max-h-[78vh] lg:max-w-[54rem] lg:object-contain lg:object-top";
+    ? "lg:w-auto lg:max-h-[84vh] lg:max-w-full lg:object-top"
+    : "lg:w-auto lg:max-h-[78vh] lg:max-w-full lg:object-top";
 
   const canOpenLightbox = !isActivePlaceholder;
 
@@ -212,7 +212,7 @@ export function ArtworkGallery({
                       height={275}
                       unoptimized
                       wrapperClassName="block"
-                      className="aspect-[4/5] h-[90px] w-[68px] object-cover lg:h-[98px] lg:w-[72px]"
+                      className="aspect-[4/5] h-[90px] w-[68px] object-contain lg:h-[98px] lg:w-[72px]"
                     />
                   )}
                 </div>
@@ -249,7 +249,7 @@ export function ArtworkGallery({
                       setNaturalRatio(target.naturalWidth / target.naturalHeight);
                     }
                   }}
-                  className={`aspect-[4/5] h-full w-full object-cover ${desktopImageClass}`}
+                  className={`h-auto w-full object-contain ${desktopImageClass}`}
                 />
               </button>
             )}
