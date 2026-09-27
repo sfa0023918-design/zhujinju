@@ -9,7 +9,7 @@ import styles from "./collection-page.module.css";
 
 const DESKTOP_PAGE_SIZE = 9;
 const TABLET_PAGE_SIZE = 6;
-const MOBILE_PAGE_SIZE = 4;
+const MOBILE_PAGE_SIZE = 6;
 type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
 
 function getPageSize(width: number) {
