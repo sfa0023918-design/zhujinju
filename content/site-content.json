@@ -4949,7 +4949,8 @@
       "image": "/uploads/artworks/1790497779670-buddha-hand-main.jpg",
       "gallery": [
         "/uploads/artworks/1790497819023-buddha-hand-detail-1.jpg",
-        "/uploads/artworks/1790497869728-buddha-hand-detail-2.jpg"
+        "/uploads/artworks/1790497869728-buddha-hand-detail-2.jpg",
+        "/uploads/artworks/1790497913758-buddha-hand-detail-3.jpg"
       ],
       "featured": false,
       "galleryAssets": [
@@ -4964,6 +4965,12 @@
           "card": "/uploads/artworks/1790497869728-buddha-hand-detail-2.jpg",
           "hero": "/uploads/artworks/1790497869728-buddha-hand-detail-2.jpg",
           "detail": "/uploads/artworks/1790497869728-buddha-hand-detail-2.jpg"
+        },
+        {
+          "original": "/uploads/artworks/1790497913758-buddha-hand-detail-3.jpg",
+          "card": "/uploads/artworks/1790497913758-buddha-hand-detail-3.jpg",
+          "hero": "/uploads/artworks/1790497913758-buddha-hand-detail-3.jpg",
+          "detail": "/uploads/artworks/1790497913758-buddha-hand-detail-3.jpg"
         }
       ],
       "imageAsset": {
