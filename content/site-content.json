@@ -5675,10 +5675,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790501330793-doe-nursing-fawn-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790501330793-doe-nursing-fawn-main.jpg",
+        "card": "/uploads/artworks/1790501330793-doe-nursing-fawn-main-card.jpg",
+        "hero": "/uploads/artworks/1790501330793-doe-nursing-fawn-main.jpg",
+        "detail": "/uploads/artworks/1790501330793-doe-nursing-fawn-main.jpg",
+        "width": 2400,
+        "height": 2921
+      }
     }
   ],
   "exhibitions": [
