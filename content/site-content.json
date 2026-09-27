@@ -7237,10 +7237,18 @@
       ],
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
-      "image": "",
+      "image": "/uploads/artworks/1790513550005-prajnaparamita-folio-13c-main.jpg",
       "gallery": [],
       "featured": false,
-      "galleryAssets": []
+      "galleryAssets": [],
+      "imageAsset": {
+        "original": "/uploads/artworks/1790513550005-prajnaparamita-folio-13c-main.jpg",
+        "card": "/uploads/artworks/1790513550005-prajnaparamita-folio-13c-main-card.jpg",
+        "hero": "/uploads/artworks/1790513550005-prajnaparamita-folio-13c-main.jpg",
+        "detail": "/uploads/artworks/1790513550005-prajnaparamita-folio-13c-main.jpg",
+        "width": 2400,
+        "height": 688
+      }
     }
   ],
   "exhibitions": [
