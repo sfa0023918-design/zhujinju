@@ -78,13 +78,17 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
   const sentenceRegex =
     locale === "zh"
       ? /[^。！？!?]+[。！？!?]?/g
-      : /[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g;
+      : /[^.!?]+[.!?]+(?:["'’”）)\]]+)?|[^.!?]+$/g;
   const joiner = locale === "zh" ? "" : " ";
   const targetLength = locale === "zh" ? 180 : 420;
   const maxLength = locale === "zh" ? 300 : 680;
   const sentences = (text.match(sentenceRegex) ?? [])
     .map((sentence) => sentence.trim())
     .filter(Boolean);
+
+  if (sentences.join("").replace(/\s/g, "") !== text.replace(/\s/g, "")) {
+    return [text];
+  }
 
   if (sentences.length <= 1) {
     return [text];
@@ -120,13 +124,17 @@ function splitByClauseGroups(text: string, locale: ReadingLocale) {
   const clauseRegex =
     locale === "zh"
       ? /[^，、；：]+[，、；：]?/g
-      : /[^,;:]+[,;:]?(?:\s+|$)/g;
+      : /[^,;:]+[,;:]?(?:["'’”）)\]]+)?(?:\s+|$)/g;
   const joiner = locale === "zh" ? "" : " ";
   const targetLength = locale === "zh" ? 90 : 150;
   const maxLength = locale === "zh" ? 170 : 260;
   const clauses = (text.match(clauseRegex) ?? [])
     .map((clause) => clause.trim())
     .filter(Boolean);
+
+  if (clauses.join("").replace(/\s/g, "") !== text.replace(/\s/g, "")) {
+    return [text];
+  }
 
   if (clauses.length <= 1) {
     return [text];
