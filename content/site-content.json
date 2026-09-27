@@ -7097,9 +7097,18 @@
       "relatedArticleSlugs": [],
       "relatedExhibitionSlugs": [],
       "image": "/uploads/artworks/1790513157066-drakpa-gyaltsen-silver-main.jpg",
-      "gallery": [],
+      "gallery": [
+        "/uploads/artworks/1790513190529-drakpa-gyaltsen-silver-detail-1.jpg"
+      ],
       "featured": false,
-      "galleryAssets": [],
+      "galleryAssets": [
+        {
+          "original": "/uploads/artworks/1790513190529-drakpa-gyaltsen-silver-detail-1.jpg",
+          "card": "/uploads/artworks/1790513190529-drakpa-gyaltsen-silver-detail-1.jpg",
+          "hero": "/uploads/artworks/1790513190529-drakpa-gyaltsen-silver-detail-1.jpg",
+          "detail": "/uploads/artworks/1790513190529-drakpa-gyaltsen-silver-detail-1.jpg"
+        }
+      ],
       "imageAsset": {
         "original": "/uploads/artworks/1790513157066-drakpa-gyaltsen-silver-main.jpg",
         "card": "/uploads/artworks/1790513157066-drakpa-gyaltsen-silver-main-card.jpg",
