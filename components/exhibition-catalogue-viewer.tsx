@@ -495,6 +495,7 @@ function CataloguePage({
           <ProtectedImage
             src={page}
             alt={`${title.zh || title.en} page ${pageNumber}`}
+            unoptimized
             fill
             sizes={displayMode === "spread" ? "(min-width: 1024px) 84vw, 92vw" : "(min-width: 1024px) 42vw, 88vw"}
             loading="eager"
