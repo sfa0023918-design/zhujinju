@@ -9,7 +9,17 @@ import { ProtectedImage } from "./protected-image";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
-const PRELOAD_GROUP_OFFSETS = [-1, 1, 2] as const;
+const PRELOAD_GROUP_OFFSETS = [-1, 1] as const;
+const FAST_READER_PREFIX = "/uploads/catalogues/himalayan-art-2026/";
+
+function catalogueImageVariant(source: string, variant: "reader" | "thumb") {
+  if (!source.startsWith(FAST_READER_PREFIX) || !source.endsWith(".jpg")) {
+    return source;
+  }
+
+  const name = source.slice(FAST_READER_PREFIX.length, -4);
+  return name.includes("/") ? source : `${FAST_READER_PREFIX}${variant}/${name}.webp`;
+}
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -39,6 +49,7 @@ export function ExhibitionCatalogueViewer({
   viewMode = "single-pages",
 }: ExhibitionCatalogueViewerProps) {
   const cataloguePages = useMemo(() => pages.filter(Boolean), [pages]);
+  const readerPages = useMemo(() => cataloguePages.map((page) => catalogueImageVariant(page, "reader")), [cataloguePages]);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
@@ -92,14 +103,14 @@ export function ExhibitionCatalogueViewer({
   }, [isDesktop, showsSpreadImage, totalPages]);
 
   useEffect(() => {
-    if (!cataloguePages.length || !isLayoutReady) {
+    if (!readerPages.length || !isLayoutReady) {
       return;
     }
 
     const groupSize = usesDesktopPairing ? 2 : 1;
 
     for (let slot = 0; slot < groupSize; slot += 1) {
-      const visibleSource = cataloguePages[currentIndex + slot];
+      const visibleSource = readerPages[currentIndex + slot];
       if (visibleSource) {
         preloadedPagesRef.current.add(visibleSource);
       }
@@ -129,7 +140,7 @@ export function ExhibitionCatalogueViewer({
     });
 
     candidateIndexes.forEach((index) => {
-      const src = cataloguePages[index];
+      const src = readerPages[index];
 
       if (!src || preloadedPagesRef.current.has(src)) {
         return;
@@ -142,7 +153,7 @@ export function ExhibitionCatalogueViewer({
       preloadedPagesRef.current.add(src);
       void image.decode?.().catch(() => {});
     });
-  }, [cataloguePages, currentIndex, isLayoutReady, usesDesktopPairing]);
+  }, [readerPages, currentIndex, isLayoutReady, usesDesktopPairing]);
 
   useEffect(() => {
     const strip = thumbnailStripRef.current;
@@ -218,8 +229,8 @@ export function ExhibitionCatalogueViewer({
   }
 
   const visiblePages = usesDesktopPairing
-    ? [cataloguePages[currentIndex] ?? null, cataloguePages[currentIndex + 1] ?? null]
-    : [cataloguePages[currentIndex] ?? null];
+    ? [readerPages[currentIndex] ?? null, readerPages[currentIndex + 1] ?? null]
+    : [readerPages[currentIndex] ?? null];
   const canGoPrevious = currentIndex > 0;
   const canGoNext = usesDesktopPairing ? currentIndex + 2 < totalPages : currentIndex + 1 < totalPages;
   const currentLabel = usesDesktopPairing
@@ -374,7 +385,7 @@ export function ExhibitionCatalogueViewer({
               ) : null}
               {visiblePages.map((page, index) => (
                 <CataloguePage
-                  key={`slot-${index}`}
+                  key={`slot-${index}-${page}`}
                   page={page}
                   pageNumber={currentIndex + index + 1}
                   title={title}
@@ -432,10 +443,11 @@ export function ExhibitionCatalogueViewer({
                       }`}>
                         {showThumbnail ? (
                           <ProtectedImage
-                            src={page}
+                            src={catalogueImageVariant(page, "thumb")}
                             alt={`${title.zh || title.en} page ${index + 1}`}
                             fill
                             sizes={showsSpreadImage ? "160px" : "80px"}
+                            unoptimized={catalogueImageVariant(page, "thumb") !== page}
                             wrapperClassName="h-full w-full"
                             className="object-cover"
                           />
