@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
 import { withImageVersion } from "@/lib/image-url";
-import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_IMAGE } from "@/lib/artwork-presentation";
+import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_DETAIL_MASKS, COVER_VAJRA_IMAGE } from "@/lib/artwork-presentation";
 
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
@@ -16,6 +16,31 @@ type ArtworkGalleryProps = {
   category?: string;
   gallery?: string[];
 };
+
+function isVajraImage(image: string) {
+  return image === COVER_VAJRA_IMAGE || Boolean(COVER_VAJRA_DETAIL_MASKS[image]);
+}
+
+function vajraImageStyle(image: string): CSSProperties | undefined {
+  if (image === COVER_VAJRA_IMAGE) {
+    return { clipPath: COVER_VAJRA_CLIP };
+  }
+
+  const mask = COVER_VAJRA_DETAIL_MASKS[image];
+  if (!mask) {
+    return undefined;
+  }
+
+  const maskUrl = `url("${mask}")`;
+  return {
+    maskImage: maskUrl,
+    maskSize: "100% 100%",
+    maskRepeat: "no-repeat",
+    WebkitMaskImage: maskUrl,
+    WebkitMaskSize: "100% 100%",
+    WebkitMaskRepeat: "no-repeat",
+  };
+}
 
 export function ArtworkGallery({
   title,
@@ -127,7 +152,7 @@ export function ArtworkGallery({
   const hasMultipleImages = thumbnailImages.length > 1;
   const activeImageIndex = Math.max(thumbnailImages.indexOf(activeImage), 0);
   const activeImageSrc = withImageVersion(activeImage);
-  const isCoverVajraActive = activeImage === COVER_VAJRA_IMAGE;
+  const isVajraActive = isVajraImage(activeImage);
   const isActivePlaceholder = !activeImage || activeImage.startsWith("/api/placeholder/");
   const categoryHint = category.toLowerCase();
   const isPaintingLike =
@@ -197,7 +222,7 @@ export function ArtworkGallery({
                       ? "border-[var(--line-strong)]/72 ring-1 ring-[var(--line-strong)]/12"
                       : "border-[var(--line)]/42 group-hover:border-[var(--line-strong)]/42"
                   }`}
-                  style={image === COVER_VAJRA_IMAGE ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+                  style={isVajraImage(image) ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
                 >
                   {image.startsWith("/api/placeholder/") ? (
                     <div className="flex aspect-[4/5] h-[90px] w-[68px] items-end bg-[linear-gradient(180deg,rgba(239,235,229,0.8)_0%,rgba(233,228,221,0.97)_100%)] p-2.5 lg:h-[98px] lg:w-[72px]">
@@ -209,14 +234,14 @@ export function ArtworkGallery({
                     </div>
                   ) : (
                     <ProtectedImage
-                      src={withImageVersion(image)}
+                      src={withImageVersion(COVER_VAJRA_DETAIL_MASKS[image] ?? image)}
                       alt={title}
                       width={220}
                       height={275}
                       unoptimized
                       wrapperClassName="block"
                       className="aspect-[4/5] h-[90px] w-[68px] object-contain lg:h-[98px] lg:w-[72px]"
-                      style={image === COVER_VAJRA_IMAGE ? { clipPath: COVER_VAJRA_CLIP } : undefined}
+                      style={image === COVER_VAJRA_IMAGE ? vajraImageStyle(image) : undefined}
                     />
                   )}
                 </div>
@@ -227,8 +252,8 @@ export function ArtworkGallery({
         ) : null}
         <div className={`order-1 min-w-0 grid gap-3.5 ${hasMultipleImages ? "" : "lg:justify-items-center"}`}>
           <div
-            className={`relative overflow-hidden lg:flex ${isCoverVajraActive ? "lg:overflow-hidden" : "bg-transparent lg:overflow-visible"} ${desktopContainerClass}`}
-            style={isCoverVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+            className={`relative overflow-hidden lg:flex ${isVajraActive ? "lg:overflow-hidden" : "bg-transparent lg:overflow-visible"} ${desktopContainerClass}`}
+            style={isVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
           >
             {isActivePlaceholder ? (
               <div className="aspect-[4/5] lg:flex lg:min-h-full lg:w-full lg:items-start lg:justify-center">
@@ -257,7 +282,7 @@ export function ArtworkGallery({
                     }
                   }}
                   className={`h-auto w-full object-contain ${desktopImageClass}`}
-                  style={isCoverVajraActive ? { clipPath: COVER_VAJRA_CLIP } : undefined}
+                  style={vajraImageStyle(activeImage)}
                 />
               </button>
             )}
@@ -303,7 +328,7 @@ export function ArtworkGallery({
             </div>
             <div
               className="relative z-20 min-h-[calc(100vh-7.5rem)] flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] md:min-h-[calc(100vh-9rem)]"
-              style={isCoverVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+              style={isVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
             >
               {thumbnailImages.length > 1 ? (
                 <>
@@ -333,7 +358,7 @@ export function ArtworkGallery({
                     unoptimized
                     wrapperClassName="inline-block !h-auto !w-auto"
                     className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
-                    style={isCoverVajraActive ? { clipPath: COVER_VAJRA_CLIP } : undefined}
+                    style={vajraImageStyle(activeImage)}
                   />
                 </div>
               </div>
