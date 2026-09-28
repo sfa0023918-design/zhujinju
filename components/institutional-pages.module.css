@@ -27,20 +27,21 @@
 
 .pageTitle .zh {
   display: block;
-  font-size: clamp(40px, 4.2vw, 64px);
-  line-height: 1.04;
-  letter-spacing: -0.04em;
+  font-size: var(--type-page);
+  line-height: 1.32;
+  letter-spacing: 0;
+  font-weight: 400;
 }
 
 .pageTitle .en {
   display: block;
   margin-top: 12px;
   color: var(--accent-text);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.4;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .aboutHero {
@@ -118,19 +119,20 @@
 
 .sectionTitle .zh {
   display: block;
-  font-size: clamp(30px, 2.75vw, 44px);
-  line-height: 1.15;
-  letter-spacing: -0.04em;
+  font-size: var(--type-section);
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .sectionTitle .en {
   display: block;
   margin-top: 14px;
   color: var(--accent-text);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.55;
-  letter-spacing: 0.04em;
+  font-family: var(--font-editorial);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .philosophyBody {
@@ -613,7 +615,7 @@
 
 @media (max-width: 560px) {
   .pageTitle .zh {
-    font-size: 40px;
+    font-size: var(--type-page);
   }
 
   .aboutHero {
@@ -636,7 +638,7 @@
   }
 
   .sectionTitle .zh {
-    font-size: 31px;
+    font-size: var(--type-section);
   }
 
   .factsGrid {

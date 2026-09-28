@@ -294,8 +294,8 @@ export function ExhibitionCatalogueViewer({
             as="h2"
             text={title}
             className="font-serif text-[var(--ink)]"
-            zhClassName="block max-w-[11ch] text-[2rem] leading-[1.06] tracking-[-0.035em] md:text-[2.82rem]"
-            enClassName="mt-3 block text-[0.8125rem] uppercase tracking-[0.08em] leading-[1.5] text-[var(--accent-text)]"
+            zhClassName="block max-w-[20em] text-[length:var(--type-section)] leading-[1.4] tracking-normal"
+            enClassName="mt-3 block font-[family-name:var(--font-editorial)] text-base tracking-normal leading-[1.5] text-[var(--accent-text)]"
           />
           <div className="flex items-center gap-3 text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">
             <span className="h-px w-12 bg-[var(--line-strong)]/34" aria-hidden="true" />

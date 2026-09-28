@@ -6,7 +6,7 @@
 .inner {
   display: flex;
   width: min(100%, var(--content-width));
-  min-height: 72px;
+  min-height: 64px;
   margin-inline: auto;
   align-items: center;
   justify-content: space-between;
@@ -15,7 +15,7 @@
 }
 
 .brand {
-  width: clamp(146px, 42vw, 168px);
+  width: 136px;
   flex: none;
 }
 
@@ -27,7 +27,8 @@
 
 @media (min-width: 768px) {
   .inner {
-    --page-inline: 40px;
+    --page-inline: 32px;
+    min-height: 72px;
   }
 
   .brand {
@@ -42,5 +43,12 @@
 
   .brand {
     width: 150px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .inner {
+    width: min(100%, 1296px);
+    padding-inline: 48px;
   }
 }

@@ -1,4 +1,9 @@
 .siteTheme {
+  --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
+  --font-editorial: "Source Serif 4", Georgia, serif;
+  --type-page: 30px;
+  --type-section: 26px;
+  --type-artwork: 22px;
   --bg: #eeeae2;
   --surface: #f4f0e8;
   --surface-2: #f4f0e8;
@@ -28,6 +33,30 @@
 
 @media (min-width: 768px) {
   .siteTheme {
+    --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
+    --font-editorial: "Source Serif 4", Georgia, serif;
+    --type-page: 30px;
+    --type-section: 26px;
+    --type-artwork: 22px;
     --page-inline: 40px;
+    --type-page: 36px;
+    --type-section: 30px;
+    --type-artwork: 25px;
   }
+}
+
+@media (min-width: 1100px) {
+  .siteTheme {
+    --type-page: 40px;
+    --type-section: 32px;
+    --type-artwork: 26px;
+  }
+}
+.siteTheme :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 4px;
+}
+.siteTheme input,
+.siteTheme textarea {
+  caret-color: var(--ink);
 }
