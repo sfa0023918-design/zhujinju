@@ -104,23 +104,29 @@
 .titleGroup h1,
 .titleGroup p {
   margin: 0;
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .titleGroup h1 {
   font-family: var(--font-serif);
-  font-size: clamp(2.375rem, 7vw, 3.5rem);
+  font-size: var(--type-page);
   font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  line-height: 1.32;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
 .titleGroup p {
   color: var(--accent-text);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-family: var(--font-editorial);
 }
 
 .subtitle {
@@ -184,8 +190,8 @@
 }
 
 .facts .en {
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .inquiry {
@@ -515,3 +521,9 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+.subtitle .zh, .subtitle .en { font-size: 15px; line-height: 1.8; }
+.facts dt .zh, .facts dt .en { line-height: 1.6; letter-spacing: 0.01em; }
+.facts dd .zh, .facts dd .en { font-size: 14px; line-height: 1.65; }
+.relatedHeading h2 { font-size: var(--type-section); line-height: 1.35; letter-spacing: 0; }
+@media (min-width: 768px) { .titleGroup p { font-size: 16px; } }

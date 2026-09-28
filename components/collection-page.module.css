@@ -55,10 +55,10 @@
 .heroTitleGroup h1 {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-size: var(--type-page);
   font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  line-height: 1.32;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
@@ -69,10 +69,11 @@
 
 .heroTitleGroup p {
   color: var(--accent-text);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-family: var(--font-editorial);
 }
 
 .heroDescription {
@@ -333,17 +334,18 @@
 
 .artworkTitle .zh {
   font-family: var(--font-serif);
-  font-size: clamp(1.625rem, 6vw, 2rem);
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  font-size: var(--type-artwork);
+  line-height: 1.4;
+  letter-spacing: 0;
 }
 
 .artworkTitle .en {
   color: var(--accent-text);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-family: var(--font-editorial);
 }
 
 .pagination {

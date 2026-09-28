@@ -50,22 +50,24 @@
 }
 
 .listTitle .zh {
-  max-width: 8ch;
+  max-width: none;
   font-family: var(--font-serif);
-  font-size: clamp(2.6rem, 5vw, 4.25rem);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
+  font-size: var(--type-page);
+  line-height: 1.32;
+  letter-spacing: 0;
   text-wrap: balance;
+  font-weight: 400;
 }
 
 .listTitle .en {
   margin-top: 12px;
   max-width: 28ch;
-  font-size: 0.8125rem;
+  font-size: 16px;
   line-height: 1.5;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: var(--accent-text);
+  font-family: var(--font-editorial);
 }
 
 .listDescription {
@@ -153,10 +155,10 @@
 }
 
 .year {
-  font-family: var(--font-serif);
-  font-size: clamp(2.25rem, 4vw, 4rem);
+  font-family: var(--font-editorial);
+  font-size: clamp(32px, 3vw, 44px);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .subtitle {
@@ -186,16 +188,20 @@
 }
 
 .exhibitionTitle .zh {
-  font-size: clamp(2rem, 3.4vw, 3.35rem);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  font-size: var(--type-page);
+  line-height: 1.32;
+  letter-spacing: 0;
+  font-weight: 400;
 }
 
 .exhibitionTitle .en {
   margin-top: 10px;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--accent-text);
+  font-family: var(--font-editorial);
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .record {
@@ -334,16 +340,19 @@
 }
 
 .pastTitle .zh {
-  font-size: clamp(1.6rem, 2.2vw, 2.35rem);
-  line-height: 1.12;
-  letter-spacing: -0.03em;
+  font-size: var(--type-artwork);
+  line-height: 1.4;
+  letter-spacing: 0;
 }
 
 .pastTitle .en {
   margin-top: 8px;
-  font-size: 0.8125rem;
-  line-height: 1.55;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--accent-text);
+  font-family: var(--font-editorial);
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .pastImageLink .coverImage {
@@ -390,16 +399,20 @@
 }
 
 .detailTitle .zh {
-  font-size: clamp(2.35rem, 4vw, 4rem);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
+  font-size: var(--type-page);
+  line-height: 1.32;
+  letter-spacing: 0;
+  font-weight: 400;
 }
 
 .detailTitle .en {
   margin-top: 12px;
-  font-size: 0.875rem;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--accent-text);
+  font-family: var(--font-editorial);
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .summaryFacts {
@@ -480,7 +493,7 @@
 }
 
 .highlightTitle .zh {
-  font-size: clamp(2rem, 3.5vw, 3.4rem);
+  font-size: var(--type-section);
   line-height: 1.08;
   letter-spacing: -0.035em;
 }
@@ -548,7 +561,7 @@
   }
 
   .listTitle .zh {
-    font-size: 2.5rem;
+    font-size: var(--type-page);
   }
 
   .recentSection,
@@ -568,7 +581,7 @@
   }
 
   .exhibitionTitle .zh {
-    font-size: 2rem;
+    font-size: var(--type-page);
   }
 
   .pastExhibition,
@@ -606,7 +619,7 @@
   }
 
   .detailTitle .zh {
-    font-size: 2.4rem;
+    font-size: var(--type-page);
   }
 
   .catalogueSection {

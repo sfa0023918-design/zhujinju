@@ -1,6 +1,7 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
+import "./editorial-fonts.css";
 import styles from "./site-layout.module.css";
 
 export default function SiteLayout({
@@ -11,7 +12,7 @@ export default function SiteLayout({
   return (
     <div className={styles.siteTheme}>
       <SiteHeader />
-      <main className="site-fade-in">{children}</main>
+      <main>{children}</main>
       <SiteFooter />
     </div>
   );

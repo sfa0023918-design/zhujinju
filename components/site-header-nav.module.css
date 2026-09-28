@@ -207,3 +207,20 @@
     transition: none;
   }
 }
+
+@media (max-width: 767px) {
+  .menuButton {
+    min-width: 44px;
+    min-height: 44px;
+    border: 0;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .menuButton::before {
+    content: "";
+    position: absolute;
+    inset: 5px 2px;
+    border: 1px solid var(--line-strong);
+    pointer-events: none;
+  }
+}

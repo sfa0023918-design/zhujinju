@@ -1,103 +1,128 @@
 import Link from "next/link";
 
+import { DirectionalArrow } from "@/components/directional-arrow";
+import { HomeHighlights } from "@/components/home-highlights";
 import { ProtectedImage } from "@/components/protected-image";
-import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_IMAGE, COVER_VAJRA_SLUG } from "@/lib/artwork-presentation";
+import {
+  getArticleDisplayExcerpt,
+  resolveArticleCover,
+} from "@/lib/article-content";
+import {
+  COVER_VAJRA_BACKDROP,
+  COVER_VAJRA_CLIP,
+  COVER_VAJRA_IMAGE,
+  COVER_VAJRA_SLUG,
+} from "@/lib/artwork-presentation";
 import { getArtworkStatusText } from "@/lib/bilingual";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import {
   getCurrentExhibition,
   getFeaturedArtworks,
+  getPublicArticles,
   loadSiteContent,
+  type Article,
   type Artwork,
-  type BilingualText as BilingualValue,
+  type BilingualText,
 } from "@/lib/site-data";
 
 import styles from "./home.module.css";
 
-type BilingualPairProps = {
-  text: BilingualValue;
-  className?: string;
-  zhLines?: string[];
-};
-
-const archiveEntryCopy = { zh: "往期展览", en: "Exhibition Archive" };
-const worksSectionCopy = { zh: "部分藏品赏析", en: "Selected Highlights" };
-
-function BilingualPair({ text, className = "", zhLines }: BilingualPairProps) {
+function HomeAction({
+  href,
+  text,
+  subtle = false,
+  catalogue = false,
+}: {
+  href: string;
+  text: BilingualText;
+  subtle?: boolean;
+  catalogue?: boolean;
+}) {
   return (
-    <span className={`${styles.bilingualPair} ${className}`}>
-      <span className={styles.zh}>
-        {zhLines?.length
-          ? zhLines.map((line) => (
-              <span key={line} className={styles.zhLine}>
-                {line}
-              </span>
-            ))
-          : text.zh}
+    <Link
+      href={href}
+      className={`${subtle ? styles.textLink : styles.action} ${catalogue ? styles.catalogueLink : ""}`}
+    >
+      <span>
+        {text.zh}
+        <small lang="en">{text.en}</small>
       </span>
-      <span className={styles.en}>{text.en}</span>
-    </span>
-  );
-}
-
-function getExhibitionTitleLines(title: string) {
-  const normalizedTitle = title.trim();
-  const separatedTitle = normalizedTitle.match(/^(.+?[|｜])\s*(.+)$/);
-
-  if (!separatedTitle) {
-    return [normalizedTitle];
-  }
-
-  const [, prefix, remainder] = separatedTitle;
-  const datedTitle = remainder.match(/^(.*?)\s+(\d{4})$/);
-
-  return datedTitle
-    ? [prefix.trim(), datedTitle[1].trim(), datedTitle[2]]
-    : [prefix.trim(), remainder.trim()];
-}
-
-function HomeAction({ href, text }: { href: string; text: BilingualValue }) {
-  return (
-    <Link href={href} className={styles.action}>
-      <BilingualPair text={text} />
+      <DirectionalArrow />
     </Link>
   );
 }
 
-function HomeArtwork({ artwork, priority }: { artwork: Artwork; priority: boolean }) {
-  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
-  const image = isCoverVajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(artwork);
-  const status = getArtworkStatusText(artwork.status);
+function SectionHeading({
+  title,
+  href,
+  action,
+}: {
+  title: BilingualText;
+  href: string;
+  action: BilingualText;
+}) {
+  return (
+    <div className={styles.sectionHeading}>
+      <div>
+        <h2>{title.zh}</h2>
+        <p lang="en">{title.en}</p>
+      </div>
+      <HomeAction href={href} text={action} subtle />
+    </div>
+  );
+}
 
+function HomeArtwork({ artwork }: { artwork: Artwork }) {
+  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
+  const image = isCoverVajra
+    ? COVER_VAJRA_IMAGE
+    : resolveArtworkPrimaryImage(artwork);
+  const status = getArtworkStatusText(artwork.status);
   return (
     <article className={styles.artwork}>
-      <Link href={`/collection/${artwork.slug}`} className={styles.artworkLink}>
+      <Link href={`/collection/${artwork.slug}`}>
         <div
           className={styles.artworkImageFrame}
-          style={isCoverVajra ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
+          style={
+            isCoverVajra ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined
+          }
         >
           <ProtectedImage
             src={withImageVersion(image)}
             alt={`${artwork.title.zh} ${artwork.title.en}`}
             width={960}
             height={1200}
-            priority={priority}
             quality={84}
-            sizes="(min-width: 1024px) 42vw, (min-width: 768px) 44vw, 100vw"
-            wrapperClassName={styles.artworkImageWrapper}
+            sizes="(min-width: 1100px) 300px, (min-width: 768px) 360px, 300px"
             className={styles.artworkImage}
             style={isCoverVajra ? { clipPath: COVER_VAJRA_CLIP } : undefined}
           />
         </div>
         <div className={styles.artworkInfo}>
-          <div className={styles.artworkMeta}>
-            <BilingualPair text={artwork.period} className={styles.period} />
-            <BilingualPair text={status} className={styles.status} />
-          </div>
-          <BilingualPair text={artwork.title} className={styles.artworkTitle} />
+          <h3>{artwork.title.zh}</h3>
+          <p className={styles.artworkEnglish} lang="en">
+            {artwork.title.en}
+          </p>
+          <p className={styles.artworkPeriod}>
+            <span>{artwork.period.zh}</span>
+            <span lang="en">{artwork.period.en}</span>
+          </p>
+          <p className={styles.artworkStatus}>
+            <span>{status.zh}</span>
+            <span lang="en">{status.en}</span>
+          </p>
         </div>
       </Link>
     </article>
+  );
+}
+
+function ReadingMeta({ article }: { article: Article }) {
+  return (
+    <div className={styles.readingMeta}>
+      <time dateTime={article.date}>{article.date.replaceAll("-", ".")}</time>
+      <DirectionalArrow />
+    </div>
   );
 }
 
@@ -105,108 +130,219 @@ export default async function HomePage() {
   const content = await loadSiteContent();
   const { brandIntro, homeContent } = content;
   const exhibition = getCurrentExhibition(content);
-  const exhibitionImage = exhibition
-    ? exhibition.coverAsset?.card ?? exhibition.cover
-    : "";
-  const featuredArtworks = getFeaturedArtworks(content);
-  const focusCopy = exhibition?.current
-    ? homeContent.focusCurrent
-    : homeContent.focusRecent;
-  const heroTitleLines = homeContent.heroTitle.zh
+  const artworks = getFeaturedArtworks(content).slice(0, 4);
+  const heroLines = homeContent.heroTitle.zh
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+  const heroEnglish =
+    homeContent.heroTitle.en === "LET THE WORK SPEAK FOR ITSELF"
+      ? "Let the work speak for itself"
+      : homeContent.heroTitle.en;
+  const publicArticles = getPublicArticles(content);
+  // Retain the approved editorial selection, falling back to other published articles.
+  const preferredSlugs = [
+    "why-exhibitions-matter",
+    "article-1773838559083",
+    "article-1773826628311",
+  ];
+  const preferredArticles = preferredSlugs.flatMap((slug) =>
+    publicArticles.filter((article) => article.slug === slug),
+  );
+  const [feature, ...readingList] = [
+    ...preferredArticles,
+    ...publicArticles.filter(
+      (article) => !preferredSlugs.includes(article.slug),
+    ),
+  ].slice(0, 3);
+  const cover = feature ? resolveArticleCover(feature) : "";
+  const exhibitionTitle = exhibition?.title.zh.replace(
+    /^竹[瑾璟]居\s*[|｜]\s*/,
+    "",
+  );
+  const exhibitionEnglish = exhibition?.title.en.replace(
+    /^Zhu\s*Jin\s*Ju\s*[|｜]\s*/i,
+    "",
+  );
 
   return (
     <div className={styles.home}>
-      <section className={`${styles.section} ${styles.hero}`}>
-        <div className={styles.heroGrid}>
-          <div className={styles.heroImageFrame}>
-            <ProtectedImage
-              src={brandIntro.heroImage ?? "/api/placeholder/home-hero?kind=landscape"}
-              alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
-              width={1600}
-              height={1080}
-              priority
-              quality={85}
-              sizes="(min-width: 1024px) 58vw, 100vw"
-              wrapperClassName={styles.heroImageWrapper}
-              className={styles.heroImage}
-            />
-          </div>
-          <div className={styles.heroCopy}>
-            <BilingualPair text={homeContent.heroEyebrow} className={styles.eyebrow} />
-            <div className={styles.heroTitleGroup}>
-              <h1 className={styles.heroTitle}>
-                {(heroTitleLines.length > 0 ? heroTitleLines : [homeContent.heroTitle.zh]).map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </h1>
-              <p className={styles.heroTitleEn}>{homeContent.heroTitle.en}</p>
-            </div>
-            <div className={styles.actions}>
-              <HomeAction href="/collection" text={homeContent.heroPrimaryAction} />
-              <HomeAction href="/exhibitions" text={homeContent.heroSecondaryAction} />
-            </div>
-          </div>
+      <section className={`${styles.wrap} ${styles.hero}`}>
+        <div className={styles.heroPicture}>
+          <ProtectedImage
+            src={
+              brandIntro.heroImage ??
+              "/api/placeholder/home-hero?kind=landscape"
+            }
+            alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
+            width={1600}
+            height={1080}
+            priority
+            quality={85}
+            sizes="(min-width: 1366px) 648px, (min-width: 768px) 55vw, 100vw"
+            className={styles.heroImage}
+          />
+        </div>
+        <div className={styles.heroCopy}>
+          <h1>
+            {heroLines.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </h1>
+          <p className={styles.heroEnglish} lang="en">
+            {heroEnglish}
+          </p>
+          <p className={styles.heroDescription}>
+            {homeContent.heroEyebrow.zh}
+            <span lang="en">{homeContent.heroEyebrow.en}</span>
+          </p>
+          <HomeAction
+            href="/collection"
+            text={{
+              zh: homeContent.heroPrimaryAction.zh,
+              en: "Explore the collection",
+            }}
+          />
         </div>
       </section>
 
       {exhibition ? (
-        <section className={`${styles.section} ${styles.exhibition}`}>
+        <section
+          className={`${styles.wrap} ${styles.exhibition}`}
+          id="exhibition"
+        >
+          <SectionHeading
+            title={{ zh: "近期展览", en: "Recent Exhibition" }}
+            href="/exhibitions"
+            action={{ zh: "往期展览", en: "Exhibition archive" }}
+          />
           <div className={styles.exhibitionGrid}>
-            <div className={styles.exhibitionImageFrame}>
+            <Link
+              href={`/exhibitions/${exhibition.slug}`}
+              className={styles.coverLink}
+            >
               <ProtectedImage
-                src={exhibitionImage}
+                src={exhibition.coverAsset?.card ?? exhibition.cover}
                 alt={`${exhibition.title.zh} ${exhibition.title.en}`}
                 width={1600}
                 height={1000}
                 quality={86}
-                sizes="(min-width: 1024px) 62vw, 100vw"
-                wrapperClassName={styles.exhibitionImageWrapper}
-                className={styles.exhibitionImage}
+                sizes="(min-width: 1366px) 648px, (min-width: 768px) 55vw, 100vw"
+                className={styles.cover}
               />
-            </div>
+            </Link>
             <div className={styles.exhibitionCopy}>
-              <BilingualPair text={focusCopy.eyebrow} className={styles.eyebrow} />
-              <h2 className={styles.exhibitionHeading}>
-                <BilingualPair
-                  text={exhibition.title}
-                  className={styles.exhibitionTitle}
-                  zhLines={getExhibitionTitleLines(exhibition.title.zh)}
-                />
-              </h2>
+              <h3>
+                {exhibitionTitle?.replace(/\s*\d{4}$/, "")}{" "}
+                <span>{exhibitionTitle?.match(/\d{4}$/)?.[0]}</span>
+              </h3>
+              <p className={styles.exhibitionEnglish} lang="en">
+                {exhibitionEnglish}
+              </p>
               <div className={styles.exhibitionFacts}>
-                <BilingualPair text={exhibition.period} className={styles.fact} />
-                <BilingualPair text={exhibition.venue} className={styles.fact} />
+                <p>
+                  {exhibition.period.zh}
+                  <span lang="en">{exhibition.period.en}</span>
+                </p>
+                <p>
+                  {exhibition.venue.zh}
+                  <span lang="en">{exhibition.venue.en}</span>
+                </p>
               </div>
-              <div className={styles.actions}>
+              <div className={styles.exhibitionActions}>
                 <HomeAction
                   href={`/exhibitions/${exhibition.slug}`}
-                  text={homeContent.focusAction}
+                  text={{ zh: "查看展览", en: "View exhibition" }}
                 />
-                <HomeAction href="/exhibitions" text={archiveEntryCopy} />
+                {exhibition.cataloguePages > 0 ? (
+                  <HomeAction
+                    href={`/exhibitions/${exhibition.slug}#catalogue`}
+                    text={{ zh: "阅读电子图录", en: "Read the catalogue" }}
+                    catalogue
+                  />
+                ) : null}
               </div>
             </div>
           </div>
         </section>
       ) : null}
 
-      <section className={`${styles.section} ${styles.works}`}>
-        <div className={styles.sectionHeading}>
-          <h2>{worksSectionCopy.zh}</h2>
-          <p>{worksSectionCopy.en}</p>
-        </div>
-        <div className={styles.artworksGrid}>
-          {featuredArtworks.slice(0, 4).map((artwork, index) => (
-            <HomeArtwork key={artwork.slug} artwork={artwork} priority={index < 2} />
-          ))}
-        </div>
-      </section>
+      {artworks.length ? (
+        <section
+          className={`${styles.wrap} ${styles.highlights}`}
+          id="highlights"
+        >
+          <SectionHeading
+            title={{ zh: "部分藏品赏析", en: "Selected Highlights" }}
+            href="/collection"
+            action={{ zh: "全部藏品", en: "View collection" }}
+          />
+          <HomeHighlights count={artworks.length}>
+            {artworks.map((artwork) => (
+              <HomeArtwork key={artwork.slug} artwork={artwork} />
+            ))}
+          </HomeHighlights>
+        </section>
+      ) : null}
 
-      <section className={`${styles.section} ${styles.contact}`}>
-        <BilingualPair text={homeContent.contact.eyebrow} className={styles.contactLabel} />
-        <HomeAction href="/contact" text={homeContent.contactPrimaryAction} />
+      {feature ? (
+        <section className={`${styles.wrap} ${styles.journal}`} id="reading">
+          <SectionHeading
+            title={{ zh: "文章与动态", en: "Journal" }}
+            href="/journal"
+            action={{ zh: "更多阅读", en: "Read more" }}
+          />
+          <div className={styles.journalGrid}>
+            <article className={styles.readingFeature}>
+              <Link href={`/journal/${feature.slug}`}>
+                {cover ? (
+                  <div className={styles.readingImage}>
+                    <ProtectedImage
+                      src={cover}
+                      alt={feature.title.zh}
+                      width={900}
+                      height={580}
+                      sizes="(min-width: 1100px) 380px, (min-width: 768px) 50vw, 100vw"
+                      quality={84}
+                    />
+                  </div>
+                ) : null}
+                <div>
+                  <h3>{feature.title.zh}</h3>
+                  <p className={styles.readingEnglish} lang="en">
+                    {feature.title.en}
+                  </p>
+                  <p className={styles.readingExcerpt}>
+                    {getArticleDisplayExcerpt(feature).zh}
+                  </p>
+                  <ReadingMeta article={feature} />
+                </div>
+              </Link>
+            </article>
+            <div className={styles.readingList}>
+              {readingList.map((article) => (
+                <article className={styles.readingSmall} key={article.slug}>
+                  <Link href={`/journal/${article.slug}`}>
+                    <h3>{article.title.zh}</h3>
+                    <p lang="en">{article.title.en}</p>
+                    <ReadingMeta article={article} />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className={`${styles.wrap} ${styles.contact}`}>
+        <div>
+          <h2>与竹瑾居联系</h2>
+          <p lang="en">Contact Zhu Jin Ju</p>
+        </div>
+        <HomeAction
+          href="/contact"
+          text={{ zh: "作品洽询与联系", en: "Inquiries & contact" }}
+        />
       </section>
     </div>
   );
