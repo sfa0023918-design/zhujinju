@@ -664,3 +664,22 @@
     margin-top: 52px;
   }
 }
+
+/* Match the visual height of the journal's landscape covers without cropping this portrait. */
+.card[data-editorial="exhibition"] .cardMedia {
+  width: min(100%, 320px);
+  justify-self: center;
+  align-self: center;
+}
+@media (min-width: 1100px) {
+  .card[data-layout="lead"][data-editorial="exhibition"] {
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+    gap: 64px;
+  }
+}
+@media (min-width: 681px) and (max-width: 1099px) {
+  .card[data-editorial="exhibition"] .cardMedia { width: min(100%, 270px); }
+}
+@media (max-width: 680px) {
+  .card[data-editorial="exhibition"] .cardMedia { width: min(100%, 240px); }
+}

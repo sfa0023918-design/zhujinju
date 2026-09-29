@@ -62,7 +62,7 @@ function ArticleCard({
   const excerpt = getArticleDisplayExcerpt(article);
 
   return (
-    <article className={styles.card} data-layout={index === 0 ? "lead" : "regular"}>
+    <article className={styles.card} data-layout={index === 0 ? "lead" : "regular"} data-editorial={article.editorial ? "exhibition" : undefined}>
       <Link href={href} className={styles.cardMedia} aria-label={article.title.zh}>
         <JournalCover article={article} priority={index === 0} />
       </Link>

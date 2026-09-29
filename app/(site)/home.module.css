@@ -540,3 +540,8 @@
     transition: none;
   }
 }
+
+/* Continue the photograph's sampled edge tones into the contain frame. */
+.readingImage[data-editorial="exhibition"] {
+  background: linear-gradient(180deg, #242732 0%, #272834 25%, #21232f 50%, #171922 75%, #14161e 100%);
+}

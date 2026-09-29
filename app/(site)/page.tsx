@@ -284,7 +284,7 @@ export default async function HomePage() {
             <article className={styles.readingFeature}>
               <Link href={`/journal/${feature.slug}`}>
                 {cover ? (
-                  <div className={styles.readingImage}>
+                  <div className={styles.readingImage} data-editorial={feature.editorial ? "exhibition" : undefined}>
                     <ProtectedImage
                       src={cover}
                       alt={feature.title.zh}
