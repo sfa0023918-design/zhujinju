@@ -4,7 +4,7 @@ import type { EditorialImage, ExhibitionEditorial } from "@/lib/data/exhibition-
 import { ProtectedImage } from "@/components/protected-image";
 import styles from "./exhibition-journal.module.css";
 
-function Plate({ image, priority = false, sizes = "(min-width: 1000px) 540px, (min-width: 768px) 680px, 100vw" }: {
+function Plate({ image, priority = false, sizes = "(min-width: 1050px) 360px, (min-width: 768px) 300px, 85vw" }: {
   image: EditorialImage;
   priority?: boolean;
   sizes?: string;
@@ -31,7 +31,7 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
           </div>
         </div>
         <figure className={styles.coverPlate}>
-          <Plate image={e.cover} priority sizes="(min-width: 1000px) 560px, (min-width: 768px) 45vw, 90vw" />
+          <Plate image={e.cover} priority sizes="(min-width: 768px) 260px, 200px" />
           <figcaption>{e.cover.alt}</figcaption>
         </figure>
       </header>
@@ -42,13 +42,13 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
       <section className={styles.preface} id="preface" aria-labelledby="preface-title">
         <h2 id="preface-title">{e.prefaceTitle}</h2>
         <div className={styles.prefaceOpening}>
-          <figure><Plate image={e.prefacePortrait} sizes="(min-width: 768px) 270px, 58vw" /></figure>
+          <figure><Plate image={e.prefacePortrait} sizes="(min-width: 1050px) 220px, 200px" /></figure>
           <div className={styles.prose}>
             <p className={styles.lead}>{e.prefaceLead}</p>
             {e.prefaceFirst.map(p => <p key={p}>{p}</p>)}
           </div>
         </div>
-        <figure className={styles.prefaceWalk}><Plate image={e.prefaceLandscape} sizes="(min-width: 1000px) 980px, 95vw" /></figure>
+        <figure className={styles.prefaceWalk}><Plate image={e.prefaceLandscape} sizes="(min-width: 768px) 600px, 95vw" /></figure>
         <div className={`${styles.prose} ${styles.prefaceClosing}`}>
           {e.prefaceSecond.map(p => <p key={p}>{p}</p>)}
           <p className={styles.introduction}>{e.introduction}</p>
@@ -81,7 +81,7 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
                 {work.paragraphs.map(p => <p key={p}>{p}</p>)}
                 {work.collectionSlug && <Link className={styles.textLink} href={`/collection/${work.collectionSlug}`}>作品详情 <span lang="en">View artwork</span><span aria-hidden="true"> ↗</span></Link>}
               </div>
-              {work.detail && <figure className={styles.detailPlate}><Plate image={work.detail} sizes="(min-width: 1000px) 900px, 95vw" /><figcaption>{work.detail.alt}</figcaption></figure>}
+              {work.detail && <figure className={styles.detailPlate}><Plate image={work.detail} sizes="(min-width: 768px) 600px, 95vw" /><figcaption>{work.detail.alt}</figcaption></figure>}
             </section>
           ))}
         </section>
