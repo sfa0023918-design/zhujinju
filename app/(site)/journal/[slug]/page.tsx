@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Fragment } from "react";
 
 import { ActionLabel } from "@/components/action-label";
+import { ExhibitionJournal } from "@/components/exhibition-journal";
 import { ArticleReadingContent } from "@/components/article-reading-content";
 import { BilingualText } from "@/components/bilingual-text";
 import { HistoryBackLink } from "@/components/history-back-link";
@@ -136,6 +137,10 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
 
   if (!article) {
     notFound();
+  }
+
+  if (article.editorial) {
+    return <ExhibitionJournal article={article} editorial={article.editorial} />;
   }
 
   const relatedExhibitions = getExhibitionsBySlugs(content, article.relatedExhibitionSlugs);

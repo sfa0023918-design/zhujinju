@@ -141,7 +141,7 @@ export default async function HomePage() {
       : homeContent.heroTitle.en;
   const publicArticles = getPublicArticles(content);
   // Keep one editorial recommendation; all published articles remain in the journal.
-  const feature = publicArticles.find((article) => article.slug === "why-exhibitions-matter")
+  const feature = publicArticles.find((article) => article.slug === "form-and-devotion-2026")
     ?? publicArticles[0];
   const cover = feature ? resolveArticleCover(feature) : "";
   const exhibitionTitle = exhibition?.title.zh.replace(
