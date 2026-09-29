@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Fragment } from "react";
 
-import { ActionLabel } from "@/components/action-label";
+import { DirectionalArrow } from "@/components/directional-arrow";
 import { BilingualText } from "@/components/bilingual-text";
 import { ExpandableBilingualCopy } from "@/components/expandable-bilingual-copy";
 import { MediaPlaceholder } from "@/components/media-placeholder";
@@ -41,60 +40,13 @@ function JournalCover({ article, priority = false }: { article: Article; priorit
       height={1050}
       priority={priority}
       quality={84}
-      sizes="(min-width: 1100px) 52vw, (min-width: 720px) 60vw, 100vw"
+      sizes={priority
+        ? "(min-width: 1480px) 650px, (min-width: 681px) 46vw, 100vw"
+        : "(min-width: 1480px) 445px, (min-width: 1100px) 31vw, (min-width: 681px) 46vw, 100vw"}
       wrapperClassName={styles.coverImage}
       className={styles.coverImageElement}
     />
   );
-}
-
-function ArticleMeta({ article }: { article: Article }) {
-  const items = [
-    article.date.trim() ? <span key="date">{article.date}</span> : null,
-    article.author.zh.trim() || article.author.en.trim() ? (
-      <BilingualText
-        key="author"
-        as="span"
-        text={article.author}
-        mode="inline"
-        zhClassName={styles.inlineZh}
-        enClassName={styles.inlineEn}
-      />
-    ) : null,
-    article.column.zh.trim() || article.column.en.trim() ? (
-      <BilingualText
-        key="column"
-        as="span"
-        text={article.column}
-        mode="inline"
-        zhClassName={styles.inlineZh}
-        enClassName={styles.inlineEn}
-      />
-    ) : null,
-  ].filter(Boolean);
-
-  return (
-    <div className={styles.metaLine}>
-      {items.map((item, index) => (
-        <Fragment key={index}>
-          {index > 0 ? <span className={styles.metaDivider} aria-hidden="true" /> : null}
-          {item}
-        </Fragment>
-      ))}
-    </div>
-  );
-}
-
-function collapsedExcerptClass(index: number) {
-  if (index === 0) {
-    return "max-h-[10.5rem] md:max-h-[11rem]";
-  }
-
-  if (index < 3) {
-    return "max-h-[8.8rem] md:max-h-[9.4rem]";
-  }
-
-  return "max-h-[7.2rem] md:max-h-[7.8rem]";
 }
 
 function ArticleCard({
@@ -110,19 +62,11 @@ function ArticleCard({
   const excerpt = getArticleDisplayExcerpt(article);
 
   return (
-    <article className={styles.card} data-layout={index === 0 ? "lead" : index < 3 ? "paired" : "index"}>
+    <article className={styles.card} data-layout={index === 0 ? "lead" : "regular"}>
       <Link href={href} className={styles.cardMedia} aria-label={article.title.zh}>
         <JournalCover article={article} priority={index === 0} />
       </Link>
       <div className={styles.cardCopy}>
-        <BilingualText
-          as="p"
-          text={article.category}
-          mode="inline"
-          className={styles.kicker}
-          zhClassName={styles.inlineZh}
-          enClassName={styles.inlineEn}
-        />
         <Link href={href} className={styles.titleLink}>
           <BilingualText
             as="h2"
@@ -132,18 +76,29 @@ function ArticleCard({
             enClassName={styles.en}
           />
         </Link>
+        <div className={styles.cardInfo}>
+          {article.date.trim() ? <time dateTime={article.date}>{article.date}</time> : null}
+          <BilingualText
+            as="span"
+            text={article.category}
+            mode="inline"
+            className={styles.cardCategory}
+            zhClassName={styles.inlineZh}
+            enClassName={styles.inlineEn}
+          />
+        </div>
         <div className={styles.expandableExcerpt}>
           <ExpandableBilingualCopy
             text={excerpt}
-            collapsedClassName={collapsedExcerptClass(index)}
+            collapsedClassName={index === 0 ? "max-h-[10.5rem] md:max-h-[11rem]" : "max-h-[8.8rem] md:max-h-[9.4rem]"}
             zhClassName={styles.zh}
             enClassName={styles.en}
           />
         </div>
         <div className={styles.cardFooter}>
-          <ArticleMeta article={article} />
           <Link href={href} className={styles.readLink}>
-            <ActionLabel text={readAction} align="start" />
+            <span>{readAction.zh}<small lang="en">{readAction.en}</small></span>
+            <DirectionalArrow />
           </Link>
         </div>
       </div>
@@ -161,16 +116,8 @@ export default async function JournalPage() {
       <section className={styles.indexHero}>
         <div>
           <BilingualText
-            as="p"
-            text={pageCopy.journal.hero.eyebrow}
-            mode="inline"
-            className={styles.kicker}
-            zhClassName={styles.inlineZh}
-            enClassName={styles.inlineEn}
-          />
-          <BilingualText
             as="h1"
-            text={pageCopy.journal.hero.title}
+            text={bt("文章与动态", "Journal")}
             className={styles.pageTitle}
             zhClassName={styles.zh}
             enClassName={styles.en}
