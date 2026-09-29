@@ -3974,14 +3974,21 @@ function ArticlesEditor({
                   />
                 </div>
 
-                <ArticleBodyFlowEditor
-                  value={bodyFlowValue}
-                  onChange={updateBodyByFlow}
-                  activeLocale={editorLocale}
-                  onActiveLocaleChange={setEditorLocale}
-                  previewMap={articleImagePreviewMap}
-                  onPreviewResolve={setArticleImagePreview}
-                />
+                {article.editorial ? (
+                  <div className="border border-[var(--line)] bg-[var(--surface)] p-5 text-sm leading-7 text-[var(--muted)]">
+                    这篇文章采用展览专题排版，正文与作品资料需在专题源稿中统一修改。
+                    此处可调整列表标题、摘要、封面、日期及发布状态；普通正文画布不适用于这篇文章。
+                  </div>
+                ) : (
+                  <ArticleBodyFlowEditor
+                    value={bodyFlowValue}
+                    onChange={updateBodyByFlow}
+                    activeLocale={editorLocale}
+                    onActiveLocaleChange={setEditorLocale}
+                    previewMap={articleImagePreviewMap}
+                    onPreviewResolve={setArticleImagePreview}
+                  />
+                )}
               </div>
             </section>
 
@@ -4249,74 +4256,76 @@ function ArticlesEditor({
                   </div>
                 </details>
 
-                <details className="border border-dashed border-[var(--line)]/70 bg-[var(--surface-strong)]/36 p-4">
-                  <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <p className="text-xs tracking-[0.14em] text-[var(--accent)]">高级调整（仅特殊排版时使用）</p>
-                        <p className="text-xs leading-6 text-[var(--muted)]/84">
-                          平时直接在“正文画布”里写就够了。只有需要逐块排序、做双图组或精修图片版式时再打开。
-                        </p>
+                {!article.editorial && (
+                  <details className="border border-dashed border-[var(--line)]/70 bg-[var(--surface-strong)]/36 p-4">
+                    <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-xs tracking-[0.14em] text-[var(--accent)]">高级调整（仅特殊排版时使用）</p>
+                          <p className="text-xs leading-6 text-[var(--muted)]/84">
+                            平时直接在“正文画布”里写就够了。只有需要逐块排序、做双图组或精修图片版式时再打开。
+                          </p>
+                        </div>
+                        <span className="text-xs leading-6 text-[var(--accent)]/84">{structuredEditorSummary}</span>
                       </div>
-                      <span className="text-xs leading-6 text-[var(--accent)]/84">{structuredEditorSummary}</span>
+                    </summary>
+                    <div data-field-key="body" className="mt-4 grid gap-4">
+                      <p className="text-xs leading-6 text-[var(--muted)]/84">
+                        这里的修改会同步回上面的正文画布，适合做最后一步精修，不建议作为日常主编辑方式。
+                      </p>
+                      {normalizedBodyBlocks.map((block, index, blocks) => (
+                        <ArticleContentBlockEditor
+                          key={`article-content-block-${index}`}
+                          block={block}
+                          index={index}
+                          total={blocks.length}
+                          onChange={(updater) =>
+                            updateContentBlocks((currentBlocks) =>
+                              updateArrayItem(currentBlocks, index, (currentBlock) => Object.assign(currentBlock, updater(currentBlock))),
+                            )
+                          }
+                          onMove={(direction) =>
+                            updateContentBlocks((currentBlocks) =>
+                              moveArrayItem(currentBlocks, index, direction === "up" ? index - 1 : index + 1),
+                            )
+                          }
+                          onRemove={() =>
+                            updateContentBlocks((currentBlocks) => {
+                              const nextBlocks = removeArrayItem(currentBlocks, index);
+                              return nextBlocks.length ? nextBlocks : [createArticleParagraphBlock()];
+                            })
+                          }
+                        />
+                      ))}
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          data-field-key="body.addParagraph"
+                          type="button"
+                          onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleParagraphBlock()])}
+                          className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                        >
+                          新增正文段落
+                        </button>
+                        <button
+                          data-field-key="body.addImage"
+                          type="button"
+                          onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImageBlock()])}
+                          className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                        >
+                          新增单图
+                        </button>
+                        <button
+                          data-field-key="body.addImagePair"
+                          type="button"
+                          onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImagePairBlock()])}
+                          className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
+                        >
+                          新增双图
+                        </button>
+                      </div>
                     </div>
-                  </summary>
-                  <div data-field-key="body" className="mt-4 grid gap-4">
-                    <p className="text-xs leading-6 text-[var(--muted)]/84">
-                      这里的修改会同步回上面的正文画布，适合做最后一步精修，不建议作为日常主编辑方式。
-                    </p>
-                    {normalizedBodyBlocks.map((block, index, blocks) => (
-                      <ArticleContentBlockEditor
-                        key={`article-content-block-${index}`}
-                        block={block}
-                        index={index}
-                        total={blocks.length}
-                        onChange={(updater) =>
-                          updateContentBlocks((currentBlocks) =>
-                            updateArrayItem(currentBlocks, index, (currentBlock) => Object.assign(currentBlock, updater(currentBlock))),
-                          )
-                        }
-                        onMove={(direction) =>
-                          updateContentBlocks((currentBlocks) =>
-                            moveArrayItem(currentBlocks, index, direction === "up" ? index - 1 : index + 1),
-                          )
-                        }
-                        onRemove={() =>
-                          updateContentBlocks((currentBlocks) => {
-                            const nextBlocks = removeArrayItem(currentBlocks, index);
-                            return nextBlocks.length ? nextBlocks : [createArticleParagraphBlock()];
-                          })
-                        }
-                      />
-                    ))}
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        data-field-key="body.addParagraph"
-                        type="button"
-                        onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleParagraphBlock()])}
-                        className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                      >
-                        新增正文段落
-                      </button>
-                      <button
-                        data-field-key="body.addImage"
-                        type="button"
-                        onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImageBlock()])}
-                        className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                      >
-                        新增单图
-                      </button>
-                      <button
-                        data-field-key="body.addImagePair"
-                        type="button"
-                        onClick={() => updateContentBlocks((currentBlocks) => [...currentBlocks, createArticleImagePairBlock()])}
-                        className="inline-flex min-h-11 items-center justify-center border border-[var(--line-strong)] px-4 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-strong)]"
-                      >
-                        新增双图
-                      </button>
-                    </div>
-                  </div>
-                </details>
+                  </details>
+                )}
               </section>
             </aside>
           </div>

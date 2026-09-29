@@ -1,3 +1,5 @@
+import type { ExhibitionEditorial } from "./exhibition-editorial";
+
 export type BilingualText = {
   zh: string;
   en: string;
@@ -102,6 +104,7 @@ export type Article = {
   excerpt: BilingualText;
   body: BilingualText[];
   contentBlocks?: ArticleContentBlock[];
+  editorial?: ExhibitionEditorial;
   keywords: BilingualText[];
   relatedArtworkSlugs: string[];
   relatedExhibitionSlugs: string[];
