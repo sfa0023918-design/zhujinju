@@ -4,6 +4,7 @@ import { bt } from "@/lib/bilingual";
 import { loadSiteContent } from "@/lib/site-data";
 
 import { SiteHeaderNav } from "./site-header-nav";
+import { SiteHeaderFrame } from "./site-header-frame";
 import styles from "./site-header.module.css";
 
 const navigation = [
@@ -19,26 +20,24 @@ export async function SiteHeader() {
   const { siteConfig } = await loadSiteContent();
 
   return (
-    <header className={styles.header}>
-      <div className={styles.inner}>
-        <Link
-          href="/"
-          className={styles.brand}
-          aria-label={siteConfig.siteName.zh}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/zhujinju-header-v20260317d.png"
-            alt={siteConfig.siteName.zh}
-            width={908}
-            height={322}
-            draggable="false"
-            data-protect="true"
-            className={styles.logo}
-          />
-        </Link>
-        <SiteHeaderNav items={navigation} />
-      </div>
-    </header>
+    <SiteHeaderFrame>
+      <Link
+        href="/"
+        className={styles.brand}
+        aria-label={siteConfig.siteName.zh}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/zhujinju-header-v20260317d.png"
+          alt={siteConfig.siteName.zh}
+          width={908}
+          height={322}
+          draggable="false"
+          data-protect="true"
+          className={styles.logo}
+        />
+      </Link>
+      <SiteHeaderNav items={navigation} />
+    </SiteHeaderFrame>
   );
 }

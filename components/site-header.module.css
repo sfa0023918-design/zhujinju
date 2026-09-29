@@ -27,8 +27,11 @@
 
 @media (min-width: 768px) {
   .inner {
-    --page-inline: 32px;
     min-height: 72px;
+  }
+
+  .homeInner {
+    --page-inline: 32px;
   }
 
   .brand {
@@ -47,7 +50,7 @@
 }
 
 @media (min-width: 1100px) {
-  .inner {
+  .homeInner {
     width: min(100%, 1296px);
     padding-inline: 48px;
   }

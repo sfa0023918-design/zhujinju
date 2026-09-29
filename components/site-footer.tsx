@@ -6,6 +6,14 @@ import { FooterSocialLinks } from "./footer-social-links";
 import type { FooterPlatform } from "./footer-social-icon";
 import styles from "./site-footer.module.css";
 
+function DisclosureChevron() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path d="m5 7.5 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
 export async function SiteFooter() {
   const { siteConfig } = await loadSiteContent();
   const year = new Date().getFullYear();
@@ -28,6 +36,27 @@ export async function SiteFooter() {
     { key: "youtube", label: "YouTube", href: youtubeHref },
     { key: "instagram", label: "Instagram", href: instagramHref },
   ];
+
+  const address = (
+    <div className={styles.addressBlock}>
+      <BilingualText
+        as="p"
+        text={{ zh: "成都竹瑾居艺术空间", en: "Chengdu Zhu Jin Ju Art Space" }}
+        className={styles.spaceName}
+        zhClassName={styles.headingZh}
+        enClassName={styles.spaceNameEn}
+      />
+      <p className={styles.contactLine}>成都市青羊区草堂东路88号</p>
+      <p className={styles.contactLine}>邮编 610000</p>
+    </div>
+  );
+  const socialLinks = (
+    <FooterSocialLinks
+      platforms={footerPlatforms}
+      wechatQrSrc="/contact/wechat-qr.jpg"
+      wechatLabel={siteConfig.contact.wechat}
+    />
+  );
 
   return (
     <footer className={styles.footer}>
@@ -72,23 +101,55 @@ export async function SiteFooter() {
           <p className={styles.contactLine}>Instagram: {siteConfig.contact.instagram}</p>
         </div>
         <div className={styles.spaceBlock}>
-          <div className={styles.addressBlock}>
-            <BilingualText
-              as="p"
-              text={{ zh: "成都竹瑾居艺术空间", en: "Chengdu Zhu Jin Ju Art Space" }}
-              className={styles.spaceName}
-              zhClassName={styles.headingZh}
-              enClassName={styles.spaceNameEn}
-            />
-            <p className={styles.contactLine}>成都市青羊区草堂东路88号</p>
-            <p className={styles.contactLine}>邮编 610000</p>
-          </div>
-          <FooterSocialLinks
-            platforms={footerPlatforms}
-            wechatQrSrc="/contact/wechat-qr.jpg"
-            wechatLabel={siteConfig.contact.wechat}
-          />
+          {address}
+          {socialLinks}
         </div>
+      </div>
+      <div className={styles.mobile}>
+        <p className={styles.mobileBrand}>
+          <span>{siteConfig.siteName.zh}</span>
+          <span lang="en">{siteConfig.siteName.en}</span>
+        </p>
+        <div className={styles.primaryContact}>
+          <a href={`mailto:${siteConfig.contact.email}`} className={styles.primaryLink}>
+            {siteConfig.contact.email}
+          </a>
+          {phoneHref ? (
+            <a href={phoneHref} className={styles.primaryLink}>{siteConfig.contact.phone}</a>
+          ) : (
+            <span className={styles.primaryLink}>{siteConfig.contact.phone}</span>
+          )}
+        </div>
+        <div className={styles.disclosures}>
+          <details>
+            <summary>
+              <span>更多联络方式 <small lang="en">More ways to connect</small></span>
+              <DisclosureChevron />
+            </summary>
+            <div className={styles.detailContent}>
+              {showWhatsApp ? (
+                <a className={styles.detailLine} href={whatsappHref ?? undefined}>
+                  WhatsApp: {whatsappValue}
+                </a>
+              ) : null}
+              <p className={styles.detailLine}>WeChat: {siteConfig.contact.wechat}</p>
+              <a className={styles.detailLine} href={instagramHref} target="_blank" rel="noreferrer">
+                Instagram: {siteConfig.contact.instagram}
+              </a>
+            </div>
+          </details>
+          <details>
+            <summary>
+              <span>艺术空间与地址 <small lang="en">Visit us</small></span>
+              <DisclosureChevron />
+            </summary>
+            <div className={styles.detailContent}>{address}</div>
+          </details>
+        </div>
+        <div className={styles.mobileSocial}>{socialLinks}</div>
+        <p className={styles.mobileCopyright}>
+          {siteConfig.footer.copyrightLabel.zh} © {year} {siteConfig.siteName.zh} {siteConfig.siteName.en}
+        </p>
       </div>
     </footer>
   );

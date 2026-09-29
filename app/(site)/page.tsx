@@ -140,21 +140,9 @@ export default async function HomePage() {
       ? "Let the work speak for itself"
       : homeContent.heroTitle.en;
   const publicArticles = getPublicArticles(content);
-  // Retain the approved editorial selection, falling back to other published articles.
-  const preferredSlugs = [
-    "why-exhibitions-matter",
-    "article-1773838559083",
-    "article-1773826628311",
-  ];
-  const preferredArticles = preferredSlugs.flatMap((slug) =>
-    publicArticles.filter((article) => article.slug === slug),
-  );
-  const [feature, ...readingList] = [
-    ...preferredArticles,
-    ...publicArticles.filter(
-      (article) => !preferredSlugs.includes(article.slug),
-    ),
-  ].slice(0, 3);
+  // Keep one editorial recommendation; all published articles remain in the journal.
+  const feature = publicArticles.find((article) => article.slug === "why-exhibitions-matter")
+    ?? publicArticles[0];
   const cover = feature ? resolveArticleCover(feature) : "";
   const exhibitionTitle = exhibition?.title.zh.replace(
     /^竹[瑾璟]居\s*[|｜]\s*/,
@@ -302,7 +290,7 @@ export default async function HomePage() {
                       alt={feature.title.zh}
                       width={900}
                       height={580}
-                      sizes="(min-width: 1100px) 380px, (min-width: 768px) 50vw, 100vw"
+                      sizes="(min-width: 1366px) 540px, (min-width: 768px) 45vw, 100vw"
                       quality={84}
                     />
                   </div>
@@ -319,17 +307,7 @@ export default async function HomePage() {
                 </div>
               </Link>
             </article>
-            <div className={styles.readingList}>
-              {readingList.map((article) => (
-                <article className={styles.readingSmall} key={article.slug}>
-                  <Link href={`/journal/${article.slug}`}>
-                    <h3>{article.title.zh}</h3>
-                    <p lang="en">{article.title.en}</p>
-                    <ReadingMeta article={article} />
-                  </Link>
-                </article>
-              ))}
-            </div>
+
           </div>
         </section>
       ) : null}
