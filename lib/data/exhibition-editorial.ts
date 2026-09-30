@@ -24,6 +24,7 @@ export type ExhibitionEditorial = {
     title: BilingualText;
     introduction: string;
     tone: "cinnabar" | "plum" | "green";
+    image?: EditorialImage;
     works: {
       id: string;
       title: BilingualText;
@@ -31,7 +32,8 @@ export type ExhibitionEditorial = {
       region: BilingualText;
       material: BilingualText;
       dimensions: string;
-      records: { label: BilingualText; lines: string[] }[];
+      basicFacts?: BilingualText[];
+      records: { label: BilingualText; lines: string[]; translations?: (string | null)[] }[];
       image: EditorialImage;
       detail?: EditorialImage;
       heading: string;
@@ -43,6 +45,8 @@ export type ExhibitionEditorial = {
   closing: string[];
   exhibitionSlug: string;
   event: string[];
+  eventDetails?: { label: BilingualText; value: BilingualText }[];
+  pdf?: string;
   contactImage: EditorialImage;
   contactText: string;
 };

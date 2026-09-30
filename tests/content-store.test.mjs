@@ -106,6 +106,29 @@ test("publication titles preserve original English terms without changing region
   }
 });
 
+test("approved editorial facts retain source English while region labels stay normalized", () => {
+  const { copyQuality } = harness();
+  const article = {
+    editorial: { chapters: [{ works: [{
+      region: { zh: "西藏", en: "Tibet" },
+      basicFacts: [
+        { zh: "14世纪 · 西藏", en: "Tibet, 14th century" },
+        { zh: "高 40 厘米", en: "H. 40 cm" },
+      ],
+    }] }] },
+  };
+  const original = JSON.stringify(article);
+  for (const source of [article, { articles: [article] }]) {
+    const result = copyQuality.normalizeBilingualFieldsDeep(source).value;
+    const work = (result.articles?.[0] ?? result).editorial.chapters[0].works[0];
+    assert.equal(work.region.en, "Xizang");
+    assert.equal(work.basicFacts[0].en, "Tibet, 14th century");
+    assert.equal(work.basicFacts[1].en, "H. 40 cm");
+    assert.equal(JSON.stringify(copyQuality.normalizeBilingualFieldsDeep(result).value), JSON.stringify(result));
+  }
+  assert.equal(JSON.stringify(article), original);
+});
+
 test("saving a corrected publication title and then media retains the exact book title", async () => {
   const { store, state } = harness();
   const normalized = await store.readSiteContentFresh();
