@@ -148,7 +148,12 @@ function normalizeAny(value: unknown, path: Array<string | number> = []): { valu
     const isPublicationTitle = path.at(-3) === "publications"
       && typeof path.at(-2) === "number"
       && path.at(-1) === "title";
-    return normalizeBilingualTextValue(value, isPublicationTitle);
+    // These paired facts reproduce the approved exhibition PDF verbatim.
+    // Ordinary region fields still follow the site's geographical naming rules.
+    const isEditorialSourceFact = path.includes("editorial")
+      && path.at(-2) === "basicFacts"
+      && typeof path.at(-1) === "number";
+    return normalizeBilingualTextValue(value, isPublicationTitle || isEditorialSourceFact);
   }
 
   const stats = emptyStats();
