@@ -21,10 +21,6 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
         <time dateTime={article.date}>{article.date}</time>
       </div>
       <header className={styles.cover}>
-        <figure className={styles.coverPlate}>
-          <Plate image={e.cover} priority sizes="(min-width: 1050px) 360px, (min-width: 768px) 280px, 220px" />
-          <figcaption>{e.cover.alt}</figcaption>
-        </figure>
         <div className={styles.coverCopy}>
           <h1>{e.title.zh}</h1>
           <p className={styles.coverEnglish} lang="en">{e.title.en}</p>
@@ -34,14 +30,21 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
             <p>{e.eventLine}</p>
           </div>
         </div>
+        <figure className={styles.coverPlate}>
+          <Plate image={e.cover} priority sizes="(min-width: 768px) 260px, 200px" />
+          <figcaption>{e.cover.alt}</figcaption>
+        </figure>
       </header>
+      <nav className={styles.contents} aria-label="本文章节">
+        <a href="#preface">序 <span lang="en">Preface</span></a>
+        {e.chapters.map(c => <a key={c.id} href={`#${c.id}`}>{c.title.zh}<span lang="en">{c.title.en}</span></a>)}
+      </nav>
       <section className={styles.preface} id="preface" aria-labelledby="preface-title">
         <h2 id="preface-title">{e.prefaceTitle}</h2>
         <div className={styles.prefaceOpening}>
           <figure><Plate image={e.prefacePortrait} sizes="(min-width: 1050px) 220px, 200px" /></figure>
           <div className={styles.prose}>
             <p className={styles.lead}>{e.prefaceLead}</p>
-            <p className={styles.byline}>—— 竹瑾居</p>
             {e.prefaceFirst.map(p => <p key={p}>{p}</p>)}
           </div>
         </div>
@@ -54,11 +57,8 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
       {e.chapters.map(chapter => (
         <section key={chapter.id} id={chapter.id} className={styles.chapter} aria-labelledby={`${chapter.id}-title`}>
           <header className={`${styles.chapterHeading} ${styles[chapter.tone]}`}>
-            {chapter.image && <figure className={styles.transitionPlate}>
-              <Plate image={chapter.image} sizes="(min-width: 1050px) 470px, (min-width: 768px) 360px, 90vw" />
-              <figcaption>{chapter.image.alt}</figcaption>
-            </figure>}
-            <h2 id={`${chapter.id}-title`} className={styles.chapterIntro}>{chapter.introduction}</h2>
+            <div><h2 id={`${chapter.id}-title`}>{chapter.title.zh}</h2><p lang="en">{chapter.title.en}</p></div>
+            <p className={styles.chapterIntro}>{chapter.introduction}</p>
           </header>
           {chapter.works.map(work => (
             <section key={work.id} id={work.id} className={styles.work} aria-labelledby={`${work.id}-title`}>
@@ -66,20 +66,13 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
                 <h3 id={`${work.id}-title`}>{work.title.zh}</h3>
                 <p className={styles.workEnglish} lang="en">{work.title.en}</p>
                 <div className={styles.facts}>
-                  {work.basicFacts ? work.basicFacts.map((fact, i) => <p key={i}>
-                    {i === 1 && "材质　"}{i === 2 && "尺寸　"}{fact.zh}
-                    <span lang="en">{i === 1 && "Medium　"}{i === 2 && "Dimensions　"}{fact.en}</span>
-                  </p>) : <>
-                    <p>{work.period.zh} · {work.region.zh}<span lang="en">{work.period.en} · {work.region.en}</span></p>
-                    <p>材质　{work.material.zh}<span lang="en">Medium　{work.material.en}</span></p>
-                    <p>尺寸 <span className={styles.inline} lang="en">Dimensions　{work.dimensions}</span></p>
-                  </>}
+                  <p>{work.basicFacts?.[0]?.zh ?? `${work.period.zh} · ${work.region.zh}`}<span lang="en">{work.basicFacts?.[0]?.en ?? `${work.period.en} · ${work.region.en}`}</span></p>
+                  <p>材质　{work.basicFacts?.[1]?.zh ?? work.material.zh}<span lang="en">Medium　{work.basicFacts?.[1]?.en ?? work.material.en}</span></p>
+                  <p>尺寸 <span className={styles.inline} lang="en">Dimensions　{work.dimensions}</span></p>
                 </div>
                 {work.records.length > 0 && <dl className={styles.records}>
                   {work.records.map((r, i) => <div key={i}><dt>{r.label.zh}<span lang="en">{r.label.en}</span></dt>
-                    <dd>{r.lines.map((line, j) => <p key={j}>{line}
-                      {r.translations?.[j] && <span className={styles.recordTranslation}>{r.translations[j]}</span>}
-                    </p>)}</dd></div>)}
+                    <dd>{r.lines.map((line, j) => <p key={j}>{line}</p>)}</dd></div>)}
                 </dl>}
               </header>
               <figure className={styles.workPlate}><Plate image={work.image} /></figure>
@@ -95,15 +88,9 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
       ))}
       <section className={styles.closing} aria-labelledby="closing-title">
         <div className={styles.prose}><h2 id="closing-title">{e.closingTitle}</h2>{e.closing.map(p => <p key={p}>{p}</p>)}</div>
-        <div className={styles.event}>
-          {e.eventDetails ? <dl className={styles.eventFacts}>
-            {e.eventDetails.map((fact, i) => <div key={i}>
-              <dt>{fact.label.zh}<span lang="en">{fact.label.en}</span></dt>
-              <dd>{fact.value.zh}{fact.value.en && <span lang="en">{fact.value.en}</span>}</dd>
-            </div>)}
-          </dl> : <><h3>{e.subtitle.zh}</h3>{e.event.map(p => <p key={p}>{p}</p>)}</>}
+        <div className={styles.event}><h3>{e.subtitle.zh}</h3>{e.event.map(p => <p key={p}>{p}</p>)}
           <Link className={styles.eventLink} href={`/exhibitions/${e.exhibitionSlug}#catalogue`}>展览与电子图录<span lang="en">Exhibition & Catalogue ↗</span></Link>
-          {e.pdf && <a className={styles.textLink} href={e.pdf} download>下载本文 PDF <span lang="en">Download article · 23 MB</span></a>}
+          {e.pdf && <a className={styles.textLink} href={e.pdf} download>下载本文 PDF <span lang="en">Download article</span></a>}
         </div>
       </section>
       <section className={styles.contact} aria-label="竹瑾居艺术空间地图与联系方式">
