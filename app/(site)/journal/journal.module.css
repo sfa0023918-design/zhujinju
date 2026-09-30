@@ -665,21 +665,16 @@
   }
 }
 
-/* Match the visual height of the journal's landscape covers without cropping this portrait. */
+/* Match the journal's 14:9 landscape cover and continue the photograph's edge tones. */
 .card[data-editorial="exhibition"] .cardMedia {
-  width: min(100%, 320px);
-  justify-self: center;
-  align-self: center;
+  width: 100%;
+  aspect-ratio: 14 / 9;
+  background: linear-gradient(180deg, #242732 0%, #272834 25%, #21232f 50%, #171922 75%, #14161e 100%);
 }
-@media (min-width: 1100px) {
-  .card[data-layout="lead"][data-editorial="exhibition"] {
-    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
-    gap: 64px;
-  }
+.card[data-editorial="exhibition"] .coverImage,
+.card[data-editorial="exhibition"] .coverImageElement {
+  height: 100%;
 }
-@media (min-width: 681px) and (max-width: 1099px) {
-  .card[data-editorial="exhibition"] .cardMedia { width: min(100%, 270px); }
-}
-@media (max-width: 680px) {
-  .card[data-editorial="exhibition"] .cardMedia { width: min(100%, 240px); }
+.card[data-editorial="exhibition"] .coverImageElement {
+  object-fit: contain;
 }
