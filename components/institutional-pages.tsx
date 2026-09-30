@@ -22,7 +22,7 @@ type ContactPageContentProps = {
   initialArtwork?: string;
 };
 
-const aboutSpaceImage = "/uploads/branding/about-space-staircase-daylight.jpg";
+const aboutSpaceImage = "/uploads/branding/about-space-himalayan-art-20260930.png";
 
 export function AboutPageContent({
   siteConfig,
