@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { getArtworkStatusText } from "@/lib/bilingual";
+import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_IMAGE, COVER_VAJRA_SLUG } from "@/lib/artwork-presentation";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import type { Artwork } from "@/lib/site-data";
 
@@ -28,7 +29,10 @@ export function ArtworkCard({
   priority = false,
   variant = "editorial",
 }: ArtworkCardProps) {
-  const cardImage = resolveArtworkPrimaryImage(artwork);
+  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
+  const cardImage = isCoverVajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(artwork);
+  const frameStyle = isCoverVajra ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined;
+  const imageStyle = isCoverVajra ? { clipPath: COVER_VAJRA_CLIP } : undefined;
   const isPlaceholderImage = !cardImage || cardImage.startsWith("/api/placeholder/");
   const imageSizes =
     variant === "catalogue"
@@ -43,7 +47,7 @@ export function ArtworkCard({
     return (
       <article className={styles.artworkCard}>
         <Link href={`/collection/${artwork.slug}`} className={styles.artworkLink}>
-          <div className={styles.artworkImageFrame}>
+          <div className={styles.artworkImageFrame} style={frameStyle}>
             {isPlaceholderImage ? (
               <div className="aspect-[4/5]">
                 <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
@@ -59,6 +63,7 @@ export function ArtworkCard({
                 sizes="(min-width: 1280px) 27vw, (min-width: 768px) 44vw, 100vw"
                 wrapperClassName={styles.artworkImageWrapper}
                 className={styles.artworkImage}
+                style={imageStyle}
               />
             )}
           </div>
@@ -96,7 +101,7 @@ export function ArtworkCard({
     return (
       <article className="group">
         <Link href={`/collection/${artwork.slug}`} className="block space-y-3.5">
-          <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+          <div className="relative overflow-hidden bg-[var(--surface-strong)]" style={frameStyle}>
             {isPlaceholderImage ? (
               <div className="aspect-[4/5]">
                 <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} compact />
@@ -112,6 +117,7 @@ export function ArtworkCard({
                 sizes={imageSizes}
                 wrapperClassName="block"
                 className="aspect-[4/5] h-full w-full object-contain"
+                style={imageStyle}
               />
             )}
           </div>
@@ -144,7 +150,7 @@ export function ArtworkCard({
   return (
     <article className="group border-t border-[var(--line)] pt-6 md:pt-7">
       <Link href={`/collection/${artwork.slug}`} className="grid gap-6 md:grid-cols-[minmax(0,0.92fr)_minmax(260px,0.52fr)] md:gap-10">
-        <div className="relative overflow-hidden bg-[var(--surface-strong)]">
+        <div className="relative overflow-hidden bg-[var(--surface-strong)]" style={frameStyle}>
           {isPlaceholderImage ? (
             <div className="aspect-[4/5]">
               <MediaPlaceholder eyebrow="Artwork Image" title={artwork.title.zh} />
@@ -160,6 +166,7 @@ export function ArtworkCard({
               sizes={imageSizes}
               wrapperClassName="block"
               className="aspect-[4/5] h-full w-full object-contain"
+              style={imageStyle}
             />
           )}
         </div>
