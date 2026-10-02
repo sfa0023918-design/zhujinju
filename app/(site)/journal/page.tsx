@@ -108,7 +108,11 @@ function ArticleCard({
 
 export default async function JournalPage() {
   const content = await loadSiteContent();
-  const articles = getPublicArticles(content);
+  const publicArticles = getPublicArticles(content);
+  const featuredArticle = publicArticles.find((article) => article.slug === "form-and-devotion-2026");
+  const articles = featuredArticle
+    ? [featuredArticle, ...publicArticles.filter((article) => article.slug !== featuredArticle.slug)]
+    : publicArticles;
   const { pageCopy } = content;
 
   return (
