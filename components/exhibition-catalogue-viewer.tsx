@@ -3,23 +3,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
+import { catalogueImageVariant, cataloguePageGeometry } from "@/lib/catalogue-media";
 
 import { BilingualText } from "./bilingual-text";
 import { ProtectedImage } from "./protected-image";
+import { MobileCatalogueReader } from "./mobile-catalogue-reader";
 
-const DESKTOP_BREAKPOINT = "(min-width: 1024px)";
-const MOBILE_PORTRAIT_BREAKPOINT = "(max-width: 767px) and (orientation: portrait)";
+const DESKTOP_BREAKPOINT = "(min-width: 1181px) and (pointer: fine)";
+const MOBILE_PORTRAIT_BREAKPOINT = "(orientation: portrait)";
 const PRELOAD_GROUP_OFFSETS = [-1, 1] as const;
-const FAST_READER_PREFIX = "/uploads/catalogues/himalayan-art-2026/";
-
-function catalogueImageVariant(source: string, variant: "reader" | "thumb") {
-  if (!source.startsWith(FAST_READER_PREFIX) || !source.endsWith(".jpg")) {
-    return source;
-  }
-
-  const name = source.slice(FAST_READER_PREFIX.length, -4);
-  return name.includes("/") ? source : `${FAST_READER_PREFIX}${variant}/${name}.webp`;
-}
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -50,10 +42,13 @@ export function ExhibitionCatalogueViewer({
 }: ExhibitionCatalogueViewerProps) {
   const cataloguePages = useMemo(() => pages.filter(Boolean), [pages]);
   const readerPages = useMemo(() => cataloguePages.map((page) => catalogueImageVariant(page, "reader")), [cataloguePages]);
+  const thumbPages = useMemo(() => cataloguePages.map((page) => catalogueImageVariant(page, "thumb")), [cataloguePages]);
+  const geometries = useMemo(() => cataloguePages.map((page) => cataloguePageGeometry(page, viewMode === "spread-images")), [cataloguePages, viewMode]);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullscreenReading, setIsFullscreenReading] = useState(false);
   const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<Set<number>>(() => new Set([0]));
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
@@ -61,7 +56,9 @@ export function ExhibitionCatalogueViewer({
   const selectedThumbnailRef = useRef<HTMLButtonElement | null>(null);
   const totalPages = cataloguePages.length;
   const showsSpreadImage = viewMode === "spread-images";
-  const usesDesktopPairing = isDesktop && !showsSpreadImage;
+  const usesMobileReader = isLayoutReady && (!isDesktop || isFullscreenReading);
+  const usesDesktopPairing = isDesktop && !showsSpreadImage && !usesMobileReader;
+  const preloadsPairedPages = usesDesktopPairing || (usesMobileReader && !isMobilePortrait && !showsSpreadImage);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_BREAKPOINT);
@@ -94,20 +91,16 @@ export function ExhibitionCatalogueViewer({
         return 0;
       }
 
-      return isDesktop
-        ? showsSpreadImage
-          ? clamp(previous, 0, totalPages - 1)
-          : getDesktopStartIndex(previous, totalPages)
-        : clamp(previous, 0, totalPages - 1);
+      return usesDesktopPairing ? getDesktopStartIndex(previous, totalPages) : clamp(previous, 0, totalPages - 1);
     });
-  }, [isDesktop, showsSpreadImage, totalPages]);
+  }, [usesDesktopPairing, totalPages]);
 
   useEffect(() => {
     if (!readerPages.length || !isLayoutReady) {
       return;
     }
 
-    const groupSize = usesDesktopPairing ? 2 : 1;
+    const groupSize = preloadsPairedPages ? 2 : 1;
 
     for (let slot = 0; slot < groupSize; slot += 1) {
       const visibleSource = readerPages[currentIndex + slot];
@@ -153,7 +146,7 @@ export function ExhibitionCatalogueViewer({
       preloadedPagesRef.current.add(src);
       void image.decode?.().catch(() => {});
     });
-  }, [readerPages, currentIndex, isLayoutReady, usesDesktopPairing]);
+  }, [readerPages, currentIndex, isLayoutReady, preloadsPairedPages]);
 
   useEffect(() => {
     const strip = thumbnailStripRef.current;
@@ -236,7 +229,9 @@ export function ExhibitionCatalogueViewer({
   const currentLabel = usesDesktopPairing
     ? `${currentIndex + 1}${cataloguePages[currentIndex + 1] ? ` - ${currentIndex + 2}` : ""}`
     : `${currentIndex + 1}`;
-  const readingModeLabel = showsSpreadImage
+  const readingModeLabel = usesMobileReader
+    ? isMobilePortrait ? "单页阅读 / Single Page" : "跨页阅读 / Facing Pages"
+    : showsSpreadImage
     ? "图录页 / Catalogue Page"
     : isDesktop
       ? "双页浏览 / Facing Pages"
@@ -286,7 +281,7 @@ export function ExhibitionCatalogueViewer({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">
             <span>电子图录 / DIGITAL CATALOGUE</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
-            <span>{`Page Count / ${totalPages}`}</span>
+            <span>{`${usesMobileReader ? "Plate Count" : "Page Count"} / ${totalPages}`}</span>
             <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
             <span>{readingModeLabel}</span>
           </div>
@@ -307,7 +302,7 @@ export function ExhibitionCatalogueViewer({
           <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-3">
             <p className="text-[0.75rem] uppercase tracking-[0.08em] text-[var(--accent-text)]">Reading Note</p>
             <p className="text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
-              {visiblePageNumbers.length > 1 ? `Current Pages · ${stageSummary}` : `Current Page · ${stageSummary}`}
+              {usesMobileReader ? `Current Plate · ${stageSummary}` : visiblePageNumbers.length > 1 ? `Current Pages · ${stageSummary}` : `Current Page · ${stageSummary}`}
             </p>
           </div>
           <BilingualText
@@ -320,7 +315,9 @@ export function ExhibitionCatalogueViewer({
         </div>
       </div>
 
-      <div className="rounded-[4px] border border-[var(--line-strong)] bg-[var(--surface)] p-4 md:p-5 lg:p-7">
+      {usesMobileReader ? (
+        <MobileCatalogueReader title={title} pages={cataloguePages} readerPages={readerPages} thumbPages={thumbPages} geometries={geometries} pairSingleImages={!showsSpreadImage} currentIndex={currentIndex} onIndexChange={jumpTo} onFullscreenChange={setIsFullscreenReading} />
+      ) : <div id="catalogue-reader" className="scroll-mt-24 rounded-[4px] border border-[var(--line-strong)] bg-[var(--surface)] p-4 md:p-5 lg:p-7">
         <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--line)] pb-4 text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span>
@@ -468,7 +465,7 @@ export function ExhibitionCatalogueViewer({
             </div>
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

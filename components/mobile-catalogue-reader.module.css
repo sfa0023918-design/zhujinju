@@ -1,0 +1,46 @@
+.reader { min-width: 0; color: var(--ink); scroll-margin-top: 96px; }
+.preview { display: block; width: 100%; padding: 0; border: 1px solid var(--line); background: white; cursor: zoom-in; touch-action: pan-y; }
+.sheet { position: relative; overflow: hidden; width: 100%; aspect-ratio: var(--catalogue-ratio); background: white; }
+.imageWindow { position: absolute; inset: 0; }
+.doubleWidth { width: 200%; right: auto; }
+.image { object-fit: fill; }
+.controls { display: flex; align-items: center; gap: 4px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.controls > span { flex: 1; text-align: center; font-size: 12px; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+.reader button, .dialog button { min-height: 44px; min-width: 44px; }
+.controls button { display: inline-flex; align-items: center; justify-content: center; color: var(--accent-text); }
+.reader button:disabled, .dialog button:disabled { opacity: 0.3; cursor: default; }
+.open { font-size: 12px; border-left: 1px solid var(--line); margin-left: 4px; padding-left: 8px; }
+.hint { font-size: 12px; line-height: 1.6; color: var(--muted); text-align: center; margin: 10px 0 18px; }
+.index { border-block: 1px solid var(--line); color: var(--accent-text); }
+.index summary { cursor: pointer; padding: 14px 0; min-height: 48px; font-size: 12px; }
+.index summary span { font-size: 12px; color: var(--muted); margin-left: 10px; }
+.jump { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 0 16px; font-size: 12px; }
+.jump select { min-width: 120px; min-height: 44px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px; }
+.reader button:focus-visible, .dialog button:focus-visible, .index summary:focus-visible, .jump select:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+.dialog { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--surface); color: var(--ink); overscroll-behavior: contain; }
+.dialog::backdrop { background: var(--surface); }
+.fullReader { height: 100%; display: flex; flex-direction: column; padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(12px, env(safe-area-inset-left)); }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 52px; border-bottom: 1px solid var(--line); font-size: 12px; }
+.toolbar > span { font-family: var(--font-editorial); }
+.toolbar button { color: var(--accent-text); font-size: 12px; }
+.canvas { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; touch-action: none; user-select: none; container-type: size; }
+.canvas :global(.protected-media__shield) { touch-action: none; }
+.fit { flex: none; width: min(100cqw, calc(100cqh * var(--catalogue-ratio))); }
+.zoomControls { display: flex; align-items: center; justify-content: center; gap: 2px; color: var(--accent-text); padding-top: 4px; }
+.zoomControls button { font-size: 16px; }
+.zoomControls button:nth-child(2) { font-size: 12px; min-width: 60px; }
+.zoomControls > span { font-size: 12px; color: var(--muted); margin-left: 8px; }
+.fullProgress { position: relative; min-height: 44px; display: flex; justify-content: center; align-items: center; }
+.fullProgress select { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.fullProgress:focus-within { outline: 2px solid var(--accent-text); outline-offset: -3px; }
+.thumbnails { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 16px; }
+.thumbnails button { flex: 0 0 104px; border: 1px solid var(--line); padding: 4px; font-size: 12px; text-align: left; }
+.thumbnails button[aria-current] { border-color: var(--accent-text); }
+.thumbnail { display: block; position: relative; aspect-ratio: 4000 / 2358; margin-bottom: 4px; background: white; }
+.thumbnail .image { object-fit: contain; }
+.dialog .controls { border-bottom: 0; border-top: 1px solid var(--line); flex: none; padding: 3px 0; }
+@media (orientation: landscape) {
+  .toolbar { min-height: 44px; }
+  .zoomControls { position: absolute; right: 68px; top: env(safe-area-inset-top); height: 44px; padding: 0; }
+  .zoomControls > span { display: none; }
+}
