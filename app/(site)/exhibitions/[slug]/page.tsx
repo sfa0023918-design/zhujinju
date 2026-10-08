@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ExhibitionDetailPageContent } from "@/components/exhibition-pages";
 import { getAdminSession } from "@/lib/admin-auth";
 import { buildMetadata } from "@/lib/metadata";
+import type { BilingualText, Exhibition } from "@/lib/site-data";
 import {
   getArticlesBySlugs,
   getExhibitionBySlug,
@@ -11,6 +12,23 @@ import {
   getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
+
+function summarize(text: string, maxLength: number, joinWith: string) {
+  const flat = text.split(/\s+/).filter(Boolean).join(joinWith).trim();
+  return flat.length > maxLength ? `${flat.slice(0, maxLength).trimEnd()}…` : flat;
+}
+
+// The intro field of some exhibitions holds only the heading "序 / Preface", which
+// makes a poor link preview; use the opening of the preface instead.
+function getExhibitionShareDescription(exhibition: Exhibition): BilingualText {
+  const opening = exhibition.description[0];
+
+  if (exhibition.intro.zh.trim().length > 4 || !opening) {
+    return exhibition.intro;
+  }
+
+  return { zh: summarize(opening.zh, 90, ""), en: summarize(opening.en, 180, " ") };
+}
 
 type ExhibitionDetailPageProps = {
   params: Promise<{
@@ -50,9 +68,10 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: exhibition.title,
-    description: exhibition.intro,
+    description: getExhibitionShareDescription(exhibition),
     path: `/exhibitions/${exhibition.slug}`,
     site: content.siteConfig,
+    image: { path: exhibition.cover || exhibition.coverAsset?.original, alt: exhibition.title },
   });
 }
 
