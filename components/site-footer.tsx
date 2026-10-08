@@ -3,6 +3,7 @@ import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
 
 import { BilingualText } from "./bilingual-text";
 import { FooterSocialLinks } from "./footer-social-links";
+import { SiteFooterRail } from "./site-footer-rail";
 import type { FooterPlatform } from "./footer-social-icon";
 import styles from "./site-footer.module.css";
 
@@ -60,7 +61,7 @@ export async function SiteFooter() {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.inner}>
+      <SiteFooterRail>
         <div className={styles.brandBlock}>
           <BilingualText
             as="p"
@@ -104,7 +105,7 @@ export async function SiteFooter() {
           {address}
           {socialLinks}
         </div>
-      </div>
+      </SiteFooterRail>
       <div className={styles.mobile}>
         <p className={styles.mobileBrand}>
           <span>{siteConfig.siteName.zh}</span>
