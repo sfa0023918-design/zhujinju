@@ -21,6 +21,13 @@ type Props = {
 type Point = { x: number; y: number };
 type Transform = Point & { scale: number };
 const fitted: Transform = { scale: 1, x: 0, y: 0 };
+// The full-screen reader adds one step to the browser history, so the phone's back
+// button or back swipe closes the reader instead of leaving the exhibition page.
+const READER_HISTORY_KEY = "zhujinju:catalogue-reader";
+
+function isReaderHistoryEntry(state: unknown) {
+  return Boolean(state && typeof state === "object" && (state as Record<string, unknown>)[READER_HISTORY_KEY]);
+}
 
 function Chevron({ next = false }: { next?: boolean }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={next ? "m9 5 7 7-7 7" : "m15 5-7 7 7 7"} stroke="currentColor" strokeWidth="1.4" /></svg>;
@@ -61,6 +68,17 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
       returnFocus?.focus({ preventScroll: true });
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handlePopState = (event: PopStateEvent) => {
+      if (isReaderHistoryEntry(event.state)) return;
+      setIsOpen(false);
+      onFullscreenChange(false);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isOpen, onFullscreenChange]);
 
   const position = { index: currentIndex, half };
   const previous = moveCataloguePosition(position, -1, geometries, singlePage, pairSingleImages);
@@ -108,9 +126,17 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
     setTransform(fitted);
     setIsOpen(true);
     onFullscreenChange(true);
+    if (!isReaderHistoryEntry(window.history.state)) {
+      window.history.pushState({ [READER_HISTORY_KEY]: true }, "");
+    }
   }
 
   function closeReader() {
+    if (isReaderHistoryEntry(window.history.state)) {
+      // Step back out of the reader's history entry; the popstate listener closes it.
+      window.history.back();
+      return;
+    }
     setIsOpen(false);
     onFullscreenChange(false);
   }
