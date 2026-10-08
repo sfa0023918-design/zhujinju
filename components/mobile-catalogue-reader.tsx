@@ -17,6 +17,8 @@ type Props = {
   currentIndex: number;
   onIndexChange: (index: number) => void;
   onFullscreenChange: (open: boolean) => void;
+  // "dialog" renders only the full-screen reader, already open (used on desktop).
+  presentation?: "inline" | "dialog";
 };
 type Point = { x: number; y: number };
 type Transform = Point & { scale: number };
@@ -33,11 +35,12 @@ function Chevron({ next = false }: { next?: boolean }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={next ? "m9 5 7 7-7 7" : "m15 5-7 7 7 7"} stroke="currentColor" strokeWidth="1.4" /></svg>;
 }
 
-export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, geometries, pairSingleImages, currentIndex, onIndexChange, onFullscreenChange }: Props) {
+export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, geometries, pairSingleImages, currentIndex, onIndexChange, onFullscreenChange, presentation = "inline" }: Props) {
+  const dialogOnly = presentation === "dialog";
   const hasRightCover = geometries[0]?.openingSide === "right";
   const [half, setHalf] = useState<0 | 1>(hasRightCover ? 1 : 0);
   const [singlePage, setSinglePage] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(dialogOnly);
   const [transform, setTransform] = useState<Transform>(fitted);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -68,6 +71,12 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
       returnFocus?.focus({ preventScroll: true });
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (dialogOnly && !isReaderHistoryEntry(window.history.state)) {
+      window.history.pushState({ [READER_HISTORY_KEY]: true }, "");
+    }
+  }, [dialogOnly]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -218,6 +227,29 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
     </div>;
   }
 
+  const dialog = isOpen && <dialog ref={dialogRef} className={styles.dialog} aria-label="全屏图录阅读" onCancel={closeReader} onKeyDown={(event) => {
+      if (["INPUT", "SELECT"].includes((event.target as HTMLElement).tagName)) return;
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); }
+    }}>
+      <div className={styles.fullReader}>
+        <header className={styles.toolbar}><span>图录阅读 / Catalogue</span><button type="button" onClick={closeReader}>关闭 Close</button></header>
+        <div className={styles.canvas} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={(event) => pointerUp(event)} onPointerCancel={(event) => pointerUp(event, true)}>
+          <div ref={pageRef} className={styles.fit}>{sheet(pages[currentIndex], true)}</div>
+        </div>
+        <div className={styles.zoomControls}>
+          <button type="button" aria-label="缩小" disabled={transform.scale === 1} onClick={() => zoom(transform.scale - 0.5)}>−</button>
+          <button type="button" aria-label="恢复适屏" onClick={() => setTransform(fitted)}>{Math.round(transform.scale * 100)}%</button>
+          <button type="button" aria-label="放大" disabled={transform.scale === 5} onClick={() => zoom(transform.scale + 0.5)}>+</button>
+          <span>双指缩放 · 双击放大 · 拖动查看</span>
+        </div>
+        {controls(true)}
+      </div>
+    </dialog>;
+
+  if (dialogOnly) {
+    return <div style={{ display: "contents", "--catalogue-ratio": displayRatio } as CSSProperties}>{dialog}</div>;
+  }
+
   return <div id="catalogue-reader" className={styles.reader} data-mobile-catalogue="true" style={{ "--catalogue-ratio": displayRatio } as CSSProperties}>
     <button type="button" ref={openButtonRef} className={styles.preview} aria-label="打开全屏图录阅读" onClick={openReader}
       onTouchStart={(event) => { inlineTouch.current = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null; }}
@@ -247,23 +279,6 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
         </button>)}
       </div>
     </details>
-    {isOpen && <dialog ref={dialogRef} className={styles.dialog} aria-label="全屏图录阅读" onCancel={closeReader} onKeyDown={(event) => {
-      if (["INPUT", "SELECT"].includes((event.target as HTMLElement).tagName)) return;
-      if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); }
-    }}>
-      <div className={styles.fullReader}>
-        <header className={styles.toolbar}><span>图录阅读 / Catalogue</span><button type="button" onClick={closeReader}>关闭 Close</button></header>
-        <div className={styles.canvas} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={(event) => pointerUp(event)} onPointerCancel={(event) => pointerUp(event, true)}>
-          <div ref={pageRef} className={styles.fit}>{sheet(pages[currentIndex], true)}</div>
-        </div>
-        <div className={styles.zoomControls}>
-          <button type="button" aria-label="缩小" disabled={transform.scale === 1} onClick={() => zoom(transform.scale - 0.5)}>−</button>
-          <button type="button" aria-label="恢复适屏" onClick={() => setTransform(fitted)}>{Math.round(transform.scale * 100)}%</button>
-          <button type="button" aria-label="放大" disabled={transform.scale === 5} onClick={() => zoom(transform.scale + 0.5)}>+</button>
-          <span>双指缩放 · 双击放大 · 拖动查看</span>
-        </div>
-        {controls(true)}
-      </div>
-    </dialog>}
+    {dialog}
   </div>;
 }
