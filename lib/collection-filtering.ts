@@ -1,3 +1,4 @@
+import { artworkMatchesFilter } from "./collection-facets";
 import type { Artwork } from "./data/types";
 
 // Shared by the collection page on the server and in the browser, so filtering and
@@ -62,15 +63,12 @@ export function filterCollectionArtworks<T extends CollectionArtworkSummary>(
   artworks: T[],
   filters: CollectionFilterState,
 ) {
-  return artworks.filter((artwork) => {
-    const categoryMatch = !isActiveValue(filters.category) || artwork.category.zh === filters.category;
-    const regionMatch = !isActiveValue(filters.region) || artwork.region.zh === filters.region;
-    const periodMatch = !isActiveValue(filters.period) || artwork.period.zh === filters.period;
-    const materialMatch = !isActiveValue(filters.material) || artwork.material.zh === filters.material;
-    const statusMatch = !isActiveValue(filters.status) || artwork.status === filters.status;
-
-    return categoryMatch && regionMatch && periodMatch && materialMatch && statusMatch;
-  });
+  return artworks.filter((artwork) =>
+    COLLECTION_FILTER_KEYS.every((key) => {
+      const value = filters[key];
+      return !isActiveValue(value) || artworkMatchesFilter(artwork, key, value);
+    }),
+  );
 }
 
 export function buildCollectionHref(filters: CollectionFilterState) {

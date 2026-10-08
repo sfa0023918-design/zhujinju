@@ -5,7 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 
 import { bt } from "@/lib/bilingual";
-import { buildCollectionHref } from "@/lib/collection-filtering";
+import type { CollectionFacets } from "@/lib/collection-facets";
+import { buildCollectionHref, COLLECTION_FILTER_KEYS } from "@/lib/collection-filtering";
 import type { CollectionFilterKey } from "@/lib/collection-filtering";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -22,11 +23,7 @@ type CollectionFiltersProps = {
   };
   options: {
     all: BilingualValue;
-    categories: BilingualValue[];
-    regions: BilingualValue[];
-    periods: BilingualValue[];
-    materials: BilingualValue[];
-    statuses: Array<{ value: string; label: BilingualValue }>;
+    facets: CollectionFacets;
   };
   labels: {
     category: BilingualValue;
@@ -45,16 +42,6 @@ type CollectionFiltersProps = {
 };
 
 type FilterKey = CollectionFilterKey;
-type FilterOption = {
-  value?: string;
-  label: BilingualValue;
-};
-
-function getPeriodStartCentury(option: BilingualValue) {
-  const source = `${option.zh} ${option.en}`;
-  const match = source.match(/(\d{1,2})/);
-  return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
-}
 
 function buildFilterHref(
   current: CollectionFiltersProps["current"],
@@ -132,35 +119,12 @@ export function CollectionFilters({
 
   const filterFields = useMemo(
     () =>
-      [
-        {
-          name: "category" as const,
-          label: labels.category,
-          options: options.categories.map((item) => ({ value: item.zh, label: item })),
-        },
-        {
-          name: "region" as const,
-          label: labels.region,
-          options: options.regions.map((item) => ({ value: item.zh, label: item })),
-        },
-        {
-          name: "period" as const,
-          label: labels.period,
-          options: [...options.periods]
-            .sort((left, right) => getPeriodStartCentury(left) - getPeriodStartCentury(right))
-            .map((item) => ({ value: item.zh, label: item })),
-        },
-        {
-          name: "material" as const,
-          label: labels.material,
-          options: options.materials.map((item) => ({ value: item.zh, label: item })),
-        },
-        {
-          name: "status" as const,
-          label: labels.status,
-          options: options.statuses.map((item) => ({ value: item.value, label: item.label })),
-        },
-      ] satisfies Array<{ name: FilterKey; label: BilingualValue; options: FilterOption[] }>,
+      COLLECTION_FILTER_KEYS.map((name) => ({
+        name,
+        label: labels[name],
+        total: options.facets[name].total,
+        options: options.facets[name].options,
+      })),
     [labels, options],
   );
 
@@ -233,10 +197,11 @@ export function CollectionFilters({
                     onClick={(event) => handleFilterLinkClick(event, buildFilterHref(current, field.name))}
                   >
                     <FilterBilingualPair text={options.all} />
+                    <span className={styles.filterCount}>{field.total}</span>
                   </Link>
                   {field.options.map((option) => (
                     <Link
-                      key={`${field.name}-${option.value ?? "all"}`}
+                      key={`${field.name}-${option.value}`}
                       href={buildFilterHref(current, field.name, option.value)}
                       aria-current={current[field.name] === option.value ? "true" : undefined}
                       onClick={(event) =>
@@ -244,6 +209,7 @@ export function CollectionFilters({
                       }
                     >
                       <FilterBilingualPair text={option.label} />
+                      <span className={styles.filterCount}>{option.count}</span>
                     </Link>
                   ))}
                 </div>

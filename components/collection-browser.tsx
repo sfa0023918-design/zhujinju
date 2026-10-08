@@ -4,7 +4,10 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import type { ComponentProps } from "react";
 
+import { bt } from "@/lib/bilingual";
+import { buildCollectionFacets } from "@/lib/collection-facets";
 import {
+  COLLECTION_FILTER_KEYS,
   filterCollectionArtworks,
   getCollectionFilterSignature,
   readCollectionFilters,
@@ -21,19 +24,24 @@ type CollectionFiltersProps = ComponentProps<typeof CollectionFilters>;
 
 type CollectionBrowserProps = {
   artworks: CollectionArtworkSummary[];
-  options: CollectionFiltersProps["options"];
   labels: CollectionFiltersProps["labels"];
   emptyState: BilingualValue;
 };
 
+const ALL_LABEL = bt("全部", "All");
+
 // Reads the filters from the address and narrows the list in the browser, so choosing
 // a filter or a page no longer waits for the server to rebuild the whole page.
-export function CollectionBrowser({ artworks, options, labels, emptyState }: CollectionBrowserProps) {
+export function CollectionBrowser({ artworks, labels, emptyState }: CollectionBrowserProps) {
   const searchParams = useSearchParams();
   const filters = useMemo(() => readCollectionFilters(searchParams), [searchParams]);
   const filterSignature = getCollectionFilterSignature(filters);
   const filteredArtworks = useMemo(
     () => filterCollectionArtworks(artworks, filters),
+    [artworks, filters],
+  );
+  const options = useMemo(
+    () => ({ all: ALL_LABEL, facets: buildCollectionFacets(artworks, filters, COLLECTION_FILTER_KEYS) }),
     [artworks, filters],
   );
 

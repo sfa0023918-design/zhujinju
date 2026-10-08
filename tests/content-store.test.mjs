@@ -78,31 +78,34 @@ function harness({ failure, env = {} } = {}) {
     store: load(path.join(root, "lib/content-store.ts")),
     github: load(path.join(root, "lib/github-repo.ts")),
     copyQuality: load(path.join(root, "lib/copy-quality.ts")),
-    collectionFiltering: load(path.join(root, "lib/collection-filtering.ts")),
+    collectionFiltering: {
+      ...load(path.join(root, "lib/collection-filtering.ts")),
+      facets: load(path.join(root, "lib/collection-facets.ts")),
+    },
   };
 }
 
-test("collection filtering in the browser returns the same works as the server did", async () => {
+test("collection filtering keeps category and status results and old links unchanged", async () => {
   const { store, collectionFiltering: filtering } = harness();
   const content = await store.readSiteContentFresh();
   const publicArtworks = store.getPublicArtworks(content);
   const summaries = publicArtworks.map(filtering.toCollectionArtworkSummary);
   const options = store.getFilterOptions(content);
-  const cases = [{}, { category: "全部" }, { category: "唐卡", material: "石雕" }];
-  for (const [key, list] of [
-    ["category", options.categories],
-    ["region", options.regions],
-    ["period", options.periods],
-    ["material", options.materials],
-  ]) {
-    for (const option of list) cases.push({ [key]: option.zh });
-  }
+  const groupValues = new Set([
+    ...filtering.facets.PERIOD_GROUPS,
+    ...filtering.facets.REGION_GROUPS,
+    ...filtering.facets.MATERIAL_GROUPS,
+  ].map((group) => group.value));
+  const cases = [{}, { category: "全部" }];
+  for (const option of options.categories) cases.push({ category: option.zh });
   for (const status of new Set(publicArtworks.map((artwork) => artwork.status))) cases.push({ status });
-  cases.push({ category: options.categories[0].zh, status: publicArtworks[0].status });
+  // Links shared before the grouping still find exactly the same works.
+  for (const [key, list] of [["region", options.regions], ["period", options.periods], ["material", options.materials]]) {
+    for (const option of list) if (!groupValues.has(option.zh)) cases.push({ [key]: option.zh });
+  }
 
   for (const filters of cases) {
     const { status, ...rest } = filters;
-    // The previous server-side behaviour of the collection page.
     const expected = store.getFilteredArtworks(content, rest)
       .filter((artwork) => !status || artwork.status === status)
       .map((artwork) => artwork.slug);
@@ -114,6 +117,42 @@ test("collection filtering in the browser returns the same works as the server d
 
   assert.equal(filtering.buildCollectionHref({ category: "全部" }), "/collection");
   assert.ok(JSON.stringify(summaries).length * 5 < JSON.stringify(publicArtworks).length);
+});
+
+test("collection filter groups cover every work and their counts match the results", async () => {
+  const { store, collectionFiltering: filtering } = harness();
+  const { facets } = filtering;
+  const content = await store.readSiteContentFresh();
+  const summaries = store.getPublicArtworks(content).map(filtering.toCollectionArtworkSummary);
+
+  for (const key of ["period", "region", "material"]) {
+    for (const artwork of summaries) {
+      assert.ok(facets.getArtworkGroups(artwork, key).length > 0, `${key}: ${artwork[key].zh}`);
+    }
+  }
+  assert.deepEqual([...facets.getCenturies("14-15世纪")], [14, 15]);
+  assert.deepEqual([...facets.getCenturies("约1–2世纪")], [1, 2]);
+  assert.deepEqual([...facets.getCenturies("清代")], [17, 18, 19]);
+
+  const scenarios = [{}, { category: "造像" }, { region: "西藏", status: "inquiry" }, { category: "唐卡", material: "石" }];
+  for (const filters of scenarios) {
+    const built = facets.buildCollectionFacets(summaries, filters, filtering.COLLECTION_FILTER_KEYS);
+    for (const key of filtering.COLLECTION_FILTER_KEYS) {
+      const others = { ...filters };
+      delete others[key];
+      assert.equal(built[key].total, filtering.filterCollectionArtworks(summaries, others).length, `${key} total`);
+      for (const option of built[key].options) {
+        const results = filtering.filterCollectionArtworks(summaries, { ...others, [key]: option.value });
+        assert.equal(option.count, results.length, `${key}=${option.value}`);
+        assert.ok(option.count > 0 || option.value === filters[key], `${key}=${option.value} is empty`);
+      }
+      if (filters[key]) assert.ok(built[key].options.some((option) => option.value === filters[key]));
+    }
+  }
+
+  const tibet = filtering.filterCollectionArtworks(summaries, { region: "西藏" });
+  assert.ok(tibet.some((artwork) => artwork.region.zh === "西藏西部"));
+  assert.ok(tibet.every((artwork) => artwork.region.zh.includes("西藏")));
 });
 
 test("publication titles preserve original English terms without changing region rules", () => {

@@ -1,14 +1,10 @@
 import { BilingualText } from "@/components/bilingual-text";
 import { CollectionBrowser } from "@/components/collection-browser";
 import styles from "@/components/collection-page.module.css";
-import { bt, getArtworkStatusText } from "@/lib/bilingual";
+import { bt } from "@/lib/bilingual";
 import { toCollectionArtworkSummary } from "@/lib/collection-filtering";
 import { buildMetadata } from "@/lib/metadata";
-import {
-  getFilterOptions,
-  getPublicArtworks,
-  loadSiteContent,
-} from "@/lib/site-data";
+import { getPublicArtworks, loadSiteContent } from "@/lib/site-data";
 
 // Filters and pages are read from the address in the browser, so every request
 // renders with its own query (same as before) while later changes stay client-side.
@@ -31,13 +27,6 @@ export default async function CollectionPage() {
   const content = await loadSiteContent();
   const publicArtworks = getPublicArtworks(content);
   const artworkSummaries = publicArtworks.map(toCollectionArtworkSummary);
-  const filterOptions = {
-    ...getFilterOptions(content),
-    statuses: Array.from(new Set(publicArtworks.map((artwork) => artwork.status))).map((status) => ({
-      value: status,
-      label: getArtworkStatusText(status),
-    })),
-  };
   const { pageCopy } = content;
   const collectionHeroDescriptionEn =
     "FILTER BY CATEGORY, REGION, PERIOD, AND MATERIAL FOR AN ENHANCED VIEWING EXPERIENCE";
@@ -72,7 +61,6 @@ export default async function CollectionPage() {
       <section className={styles.collectionBody}>
         <CollectionBrowser
           artworks={artworkSummaries}
-          options={filterOptions}
           labels={filterLabels}
           emptyState={pageCopy.collection.emptyState}
         />
