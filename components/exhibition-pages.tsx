@@ -3,6 +3,7 @@ import Link from "next/link";
 import type {
   Article,
   Artwork,
+  BilingualText as BilingualValue,
   Exhibition,
   PageCopyContent,
 } from "@/lib/site-data";
@@ -28,6 +29,39 @@ type ExhibitionDetailPageContentProps = {
   highlightedArtworks: Artwork[];
   relatedArticles: Article[];
 };
+
+// Some exhibitions store only a heading such as "序 / Preface" in the intro field.
+// That heading belongs with the preface text, so lists and the masthead skip it.
+function hasIntroSummary(exhibition: Exhibition) {
+  return exhibition.intro.zh.trim().length > 4 || exhibition.intro.en.trim().split(/\s+/).length > 3;
+}
+
+// Keep "竹瑾居｜" and the rest of a title together on their own lines, so a title
+// wraps at the divider instead of inside a word such as 喜马拉雅.
+function ExhibitionTitle({
+  as: Tag,
+  text,
+  className,
+}: {
+  as: "h1" | "h3";
+  text: BilingualValue;
+  className: string;
+}) {
+  const parts = text.zh.split("｜");
+
+  return (
+    <Tag className={className}>
+      <span className={styles.zh}>
+        {parts.map((part, index) => (
+          <span key={`${index}-${part}`} className={styles.titleSegment}>
+            {index < parts.length - 1 ? `${part}｜` : part}
+          </span>
+        ))}
+      </span>
+      <span className={styles.en}>{text.en}</span>
+    </Tag>
+  );
+}
 
 function getYear(exhibition: Exhibition) {
   return exhibition.period.zh.match(/\d{4}/)?.[0]
@@ -195,21 +229,21 @@ export function ExhibitionsPageContent({
                 zhClassName={styles.zh}
                 enClassName={styles.en}
               />
-              <BilingualText
+              <ExhibitionTitle
                 as="h3"
                 text={recentExhibition.title}
                 className={`${styles.bilingualPair} ${styles.exhibitionTitle}`}
-                zhClassName={styles.zh}
-                enClassName={styles.en}
               />
               <ExhibitionRecord exhibition={recentExhibition} />
-              <BilingualText
-                as="div"
-                text={recentExhibition.intro}
-                className={`${styles.bilingualPair} ${styles.intro}`}
-                zhClassName={styles.zh}
-                enClassName={styles.en}
-              />
+              {hasIntroSummary(recentExhibition) ? (
+                <BilingualText
+                  as="div"
+                  text={recentExhibition.intro}
+                  className={`${styles.bilingualPair} ${styles.intro}`}
+                  zhClassName={styles.zh}
+                  enClassName={styles.en}
+                />
+              ) : null}
               <CatalogueFact exhibition={recentExhibition} />
               <Link
                 href={`/exhibitions/${recentExhibition.slug}`}
@@ -245,12 +279,10 @@ export function ExhibitionsPageContent({
               >
                 <div className={styles.pastRecord}>
                   <p className={styles.year}>{getYear(exhibition)}</p>
-                  <BilingualText
+                  <ExhibitionTitle
                     as="h3"
                     text={exhibition.title}
                     className={`${styles.bilingualPair} ${styles.pastTitle}`}
-                    zhClassName={styles.zh}
-                    enClassName={styles.en}
                   />
                   <ExhibitionRecord exhibition={exhibition} />
                   <CatalogueFact exhibition={exhibition} />
@@ -262,13 +294,15 @@ export function ExhibitionsPageContent({
                   <ExhibitionImage exhibition={exhibition} />
                 </Link>
                 <div className={styles.pastIntro}>
-                  <BilingualText
-                    as="div"
-                    text={exhibition.intro}
-                    className={`${styles.bilingualPair} ${styles.intro}`}
-                    zhClassName={styles.zh}
-                    enClassName={styles.en}
-                  />
+                  {hasIntroSummary(exhibition) ? (
+                    <BilingualText
+                      as="div"
+                      text={exhibition.intro}
+                      className={`${styles.bilingualPair} ${styles.intro}`}
+                      zhClassName={styles.zh}
+                      enClassName={styles.en}
+                    />
+                  ) : null}
                   <Link
                     href={`/exhibitions/${exhibition.slug}`}
                     className={styles.viewLink}
@@ -327,12 +361,10 @@ export function ExhibitionDetailPageContent({
             zhClassName={styles.zh}
             enClassName={styles.en}
           />
-          <BilingualText
+          <ExhibitionTitle
             as="h1"
             text={exhibition.title}
             className={`${styles.bilingualPair} ${styles.detailTitle}`}
-            zhClassName={styles.zh}
-            enClassName={styles.en}
           />
           <ExhibitionRecord exhibition={exhibition} />
           <dl className={styles.summaryFacts}>
@@ -345,13 +377,15 @@ export function ExhibitionDetailPageContent({
               <dd>{pageCount}</dd>
             </div>
           </dl>
-          <BilingualText
-            as="div"
-            text={exhibition.intro}
-            className={`${styles.bilingualPair} ${styles.detailIntro}`}
-            zhClassName={styles.zh}
-            enClassName={styles.en}
-          />
+          {hasIntroSummary(exhibition) ? (
+            <BilingualText
+              as="div"
+              text={exhibition.intro}
+              className={`${styles.bilingualPair} ${styles.detailIntro}`}
+              zhClassName={styles.zh}
+              enClassName={styles.en}
+            />
+          ) : null}
           {cataloguePages.length ? (
             <Link href="#catalogue" className={styles.catalogueLink}>
               <BilingualText
