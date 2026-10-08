@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
-import type { Artwork } from "@/lib/site-data";
+import { getCollectionFilterSignature, readCollectionFilters } from "@/lib/collection-filtering";
+import type { CollectionArtworkSummary } from "@/lib/collection-filtering";
 
 import { ArtworkCard } from "./artwork-card";
 import styles from "./collection-page.module.css";
@@ -48,12 +49,11 @@ function getPaginationItems(currentPage: number, totalPages: number): Pagination
 }
 
 type CollectionResultsProps = {
-  artworks: Artwork[];
+  artworks: CollectionArtworkSummary[];
   filterSignature: string;
 };
 
 export function CollectionResults({ artworks, filterSignature }: CollectionResultsProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -67,9 +67,7 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
   }, [searchParams]);
   const activeFilterSignature = useMemo(
-    () => ["category", "region", "period", "material", "status"]
-      .map((key) => searchParams.get(key) ?? "")
-      .join("|"),
+    () => getCollectionFilterSignature(readCollectionFilters(searchParams)),
     [searchParams],
   );
 
@@ -107,7 +105,9 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
       params.set("page", String(currentPage));
     }
     const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // Page numbers only change what the browser shows, so update the address in place
+    // rather than asking the server to render the page again.
+    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
   }, [
     activeFilterSignature,
     currentPage,
@@ -115,7 +115,6 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
     pageSizeReady,
     pathname,
     requestedPage,
-    router,
     searchParams,
   ]);
 
@@ -144,7 +143,7 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
     }
 
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    window.history.pushState(null, "", query ? `${pathname}?${query}` : pathname);
   }
 
   return (

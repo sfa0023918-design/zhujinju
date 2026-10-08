@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 
 import { bt } from "@/lib/bilingual";
+import { buildCollectionHref } from "@/lib/collection-filtering";
+import type { CollectionFilterKey } from "@/lib/collection-filtering";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
 import { BilingualText } from "./bilingual-text";
@@ -36,10 +39,12 @@ type CollectionFiltersProps = {
     reset: BilingualValue;
   };
   resultCount: number;
+  // When provided, plain clicks update the address in place instead of asking the
+  // server for a new page. Modified clicks (new tab, etc.) keep the normal link.
+  onNavigate?: (href: string) => void;
 };
 
-const filterKeys = ["category", "region", "period", "material", "status"] as const;
-type FilterKey = (typeof filterKeys)[number];
+type FilterKey = CollectionFilterKey;
 type FilterOption = {
   value?: string;
   label: BilingualValue;
@@ -56,18 +61,18 @@ function buildFilterHref(
   fieldName: FilterKey,
   nextValue?: string,
 ) {
-  const params = new URLSearchParams();
+  return buildCollectionHref({ ...current, [fieldName]: nextValue });
+}
 
-  filterKeys.forEach((key) => {
-    const value = key === fieldName ? nextValue : current[key];
-
-    if (value && value !== "全部") {
-      params.set(key, value);
-    }
-  });
-
-  const query = params.toString();
-  return query ? `/collection?${query}` : "/collection";
+function isPlainLeftClick(event: MouseEvent<HTMLAnchorElement>) {
+  return !(
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  );
 }
 
 function FilterBilingualPair({
@@ -93,6 +98,7 @@ export function CollectionFilters({
   options,
   labels,
   resultCount,
+  onNavigate,
 }: CollectionFiltersProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<number | null>(null);
@@ -103,6 +109,16 @@ export function CollectionFilters({
     if (closeTimerRef.current !== null) {
       window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
+    }
+  };
+
+  const handleFilterLinkClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    cancelClose();
+    setOpenKey(null);
+
+    if (onNavigate && isPlainLeftClick(event)) {
+      event.preventDefault();
+      onNavigate(href);
     }
   };
 
@@ -214,10 +230,7 @@ export function CollectionFilters({
                   <Link
                     href={buildFilterHref(current, field.name)}
                     aria-current={!current[field.name] ? "true" : undefined}
-                    onClick={() => {
-                      cancelClose();
-                      setOpenKey(null);
-                    }}
+                    onClick={(event) => handleFilterLinkClick(event, buildFilterHref(current, field.name))}
                   >
                     <FilterBilingualPair text={options.all} />
                   </Link>
@@ -226,10 +239,9 @@ export function CollectionFilters({
                       key={`${field.name}-${option.value ?? "all"}`}
                       href={buildFilterHref(current, field.name, option.value)}
                       aria-current={current[field.name] === option.value ? "true" : undefined}
-                      onClick={() => {
-                        cancelClose();
-                        setOpenKey(null);
-                      }}
+                      onClick={(event) =>
+                        handleFilterLinkClick(event, buildFilterHref(current, field.name, option.value))
+                      }
                     >
                       <FilterBilingualPair text={option.label} />
                     </Link>
@@ -243,7 +255,7 @@ export function CollectionFilters({
 
       <div className={styles.filterSummary}>
         <FilterBilingualPair text={resultCountLabel} />
-        <Link href="/collection">
+        <Link href="/collection" onClick={(event) => handleFilterLinkClick(event, "/collection")}>
           <FilterBilingualPair text={labels.reset} />
         </Link>
       </div>

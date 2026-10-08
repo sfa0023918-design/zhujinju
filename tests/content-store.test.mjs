@@ -29,7 +29,7 @@ function harness({ failure, env = {} } = {}) {
     },
   };
   const context = vm.createContext({
-    Buffer, URL, console, structuredClone, process: fakeProcess,
+    Buffer, URL, URLSearchParams, console, structuredClone, process: fakeProcess,
     fetch: async (url, options) => {
       assert.equal(new URL(url).hostname, "api.github.com");
       if (options.method === "PUT") {
@@ -78,8 +78,43 @@ function harness({ failure, env = {} } = {}) {
     store: load(path.join(root, "lib/content-store.ts")),
     github: load(path.join(root, "lib/github-repo.ts")),
     copyQuality: load(path.join(root, "lib/copy-quality.ts")),
+    collectionFiltering: load(path.join(root, "lib/collection-filtering.ts")),
   };
 }
+
+test("collection filtering in the browser returns the same works as the server did", async () => {
+  const { store, collectionFiltering: filtering } = harness();
+  const content = await store.readSiteContentFresh();
+  const publicArtworks = store.getPublicArtworks(content);
+  const summaries = publicArtworks.map(filtering.toCollectionArtworkSummary);
+  const options = store.getFilterOptions(content);
+  const cases = [{}, { category: "全部" }, { category: "唐卡", material: "石雕" }];
+  for (const [key, list] of [
+    ["category", options.categories],
+    ["region", options.regions],
+    ["period", options.periods],
+    ["material", options.materials],
+  ]) {
+    for (const option of list) cases.push({ [key]: option.zh });
+  }
+  for (const status of new Set(publicArtworks.map((artwork) => artwork.status))) cases.push({ status });
+  cases.push({ category: options.categories[0].zh, status: publicArtworks[0].status });
+
+  for (const filters of cases) {
+    const { status, ...rest } = filters;
+    // The previous server-side behaviour of the collection page.
+    const expected = store.getFilteredArtworks(content, rest)
+      .filter((artwork) => !status || artwork.status === status)
+      .map((artwork) => artwork.slug);
+    const href = filtering.buildCollectionHref(filters);
+    const fromAddress = filtering.readCollectionFilters(new URL(href, "https://www.zhujinju.com").searchParams);
+    const actual = filtering.filterCollectionArtworks(summaries, fromAddress).map((artwork) => artwork.slug);
+    assert.deepEqual(actual, expected, JSON.stringify(filters));
+  }
+
+  assert.equal(filtering.buildCollectionHref({ category: "全部" }), "/collection");
+  assert.ok(JSON.stringify(summaries).length * 5 < JSON.stringify(publicArtworks).length);
+});
 
 test("publication titles preserve original English terms without changing region rules", () => {
   const { copyQuality } = harness();
