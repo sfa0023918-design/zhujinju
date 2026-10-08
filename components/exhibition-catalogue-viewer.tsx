@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 import { catalogueImageVariant, cataloguePageGeometry } from "@/lib/catalogue-media";
@@ -12,6 +12,8 @@ import { MobileCatalogueReader } from "./mobile-catalogue-reader";
 const DESKTOP_BREAKPOINT = "(min-width: 1181px) and (pointer: fine)";
 const MOBILE_PORTRAIT_BREAKPOINT = "(orientation: portrait)";
 const PRELOAD_GROUP_OFFSETS = [-1, 1] as const;
+// A page can be shared as /exhibitions/<slug>#catalogue-p37.
+const PAGE_HASH_PATTERN = /^#catalogue-p(\d+)$/;
 
 type ExhibitionCatalogueViewerProps = {
   title: BilingualValue;
@@ -22,6 +24,21 @@ type ExhibitionCatalogueViewerProps = {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+function writePageHash(index: number) {
+  const hash = `#catalogue-p${index + 1}`;
+
+  if (window.location.hash === hash) {
+    return;
+  }
+
+  // Keep the existing history state (return-to-position data) and only change the hash.
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${window.location.search}${hash}`,
+  );
 }
 
 function getDesktopStartIndex(index: number, totalPages: number) {
@@ -49,6 +66,9 @@ export function ExhibitionCatalogueViewer({
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreenReading, setIsFullscreenReading] = useState(false);
+  const [isDesktopReaderOpen, setIsDesktopReaderOpen] = useState(false);
+  const hasNavigatedRef = useRef(false);
+  const desktopFullscreenButtonRef = useRef<HTMLButtonElement | null>(null);
   const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<Set<number>>(() => new Set([0]));
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
@@ -94,6 +114,42 @@ export function ExhibitionCatalogueViewer({
       return usesDesktopPairing ? getDesktopStartIndex(previous, totalPages) : clamp(previous, 0, totalPages - 1);
     });
   }, [usesDesktopPairing, totalPages]);
+
+  useEffect(() => {
+    const match = window.location.hash.match(PAGE_HASH_PATTERN);
+
+    if (!match || !totalPages) {
+      return;
+    }
+
+    setCurrentIndex(clamp(Number(match[1]) - 1, 0, totalPages - 1));
+    document.getElementById("catalogue")?.scrollIntoView();
+  }, [totalPages]);
+
+  useEffect(() => {
+    if (hasNavigatedRef.current) {
+      writePageHash(currentIndex);
+    }
+  }, [currentIndex]);
+
+  const handleMobileFullscreenChange = useCallback((open: boolean) => {
+    setIsFullscreenReading(open);
+    if (!open && hasNavigatedRef.current) {
+      writePageHash(currentIndex);
+    }
+  }, [currentIndex]);
+
+  const handleDesktopFullscreenChange = useCallback((open: boolean) => {
+    if (open) {
+      return;
+    }
+
+    setIsDesktopReaderOpen(false);
+    desktopFullscreenButtonRef.current?.focus({ preventScroll: true });
+    if (hasNavigatedRef.current) {
+      writePageHash(currentIndex);
+    }
+  }, [currentIndex]);
 
   useEffect(() => {
     if (!readerPages.length || !isLayoutReady) {
@@ -247,6 +303,7 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
+    hasNavigatedRef.current = true;
     setCurrentIndex(
       usesDesktopPairing ? getDesktopStartIndex(index, totalPages) : clamp(index, 0, totalPages - 1),
     );
@@ -257,6 +314,7 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
+    hasNavigatedRef.current = true;
     setCurrentIndex((previous) => (usesDesktopPairing ? Math.max(0, previous - 2) : Math.max(0, previous - 1)));
   }
 
@@ -265,6 +323,7 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
+    hasNavigatedRef.current = true;
     setCurrentIndex((previous) => {
       if (usesDesktopPairing) {
         return getDesktopStartIndex(Math.min(totalPages - 1, previous + 2), totalPages);
@@ -316,9 +375,9 @@ export function ExhibitionCatalogueViewer({
       </div>
 
       {usesMobileReader ? (
-        <MobileCatalogueReader title={title} pages={cataloguePages} readerPages={readerPages} thumbPages={thumbPages} geometries={geometries} pairSingleImages={!showsSpreadImage} currentIndex={currentIndex} onIndexChange={jumpTo} onFullscreenChange={setIsFullscreenReading} />
+        <MobileCatalogueReader title={title} pages={cataloguePages} readerPages={readerPages} thumbPages={thumbPages} geometries={geometries} pairSingleImages={!showsSpreadImage} currentIndex={currentIndex} onIndexChange={jumpTo} onFullscreenChange={handleMobileFullscreenChange} />
       ) : <div id="catalogue-reader" className="scroll-mt-24 rounded-[4px] border border-[var(--line-strong)] bg-[var(--surface)] p-4 md:p-5 lg:p-7">
-        <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--line)] pb-4 text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-[var(--line)] pb-4 text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span>
               {`第 ${currentLabel} 页 / 共 ${totalPages} 页`}
@@ -326,6 +385,14 @@ export function ExhibitionCatalogueViewer({
             <span className="h-px w-6 bg-[var(--line-strong)]/26" aria-hidden="true" />
             <span>当前展开 / {stageSummary}</span>
           </div>
+          <button
+            ref={desktopFullscreenButtonRef}
+            type="button"
+            onClick={() => setIsDesktopReaderOpen(true)}
+            className="inline-flex min-h-9 items-center rounded-[2px] border border-[var(--line)] px-3 text-[var(--accent-text)] transition-colors duration-150 hover:border-[var(--line-strong)] hover:bg-[var(--surface-strong)]"
+          >
+            全屏阅读 / Full Screen
+          </button>
         </div>
 
         <div className="grid gap-3 lg:grid-cols-[48px_minmax(0,1fr)_48px] lg:items-center">
@@ -465,6 +532,20 @@ export function ExhibitionCatalogueViewer({
             </div>
           </div>
         </div>
+        {isDesktopReaderOpen ? (
+          <MobileCatalogueReader
+            presentation="dialog"
+            title={title}
+            pages={cataloguePages}
+            readerPages={readerPages}
+            thumbPages={thumbPages}
+            geometries={geometries}
+            pairSingleImages={!showsSpreadImage}
+            currentIndex={currentIndex}
+            onIndexChange={jumpTo}
+            onFullscreenChange={handleDesktopFullscreenChange}
+          />
+        ) : null}
       </div>}
     </div>
   );
@@ -500,7 +581,13 @@ function CataloguePage({
     <div className={`group relative ${minHeightClass} rounded-[2px] border border-[var(--line)] bg-[var(--surface)] p-2 md:p-3`}>
       <div className={`absolute inset-y-8 hidden w-px bg-[var(--line)]/24 lg:block ${side === "right" ? "left-0" : side === "left" ? "right-0" : "left-0"}`} />
       <div className="relative overflow-hidden rounded-[1px] border border-[var(--line)] bg-[var(--surface)]">
-        <div className={`relative bg-[var(--surface)] ${displayMode === "spread" ? "aspect-[1.7/1]" : "aspect-[0.72/1]"}`}>
+        <div
+          className={`relative bg-[var(--surface)] ${displayMode === "spread" ? "aspect-[1.7/1]" : "aspect-[0.72/1]"} ${
+            side === "left" ? "ml-auto" : side === "right" ? "mr-auto" : "mx-auto"
+          }`}
+          // Keep the whole page or spread within a laptop screen's height.
+          style={{ maxWidth: `calc((100svh - 220px) * ${displayMode === "spread" ? 1.7 : 0.72})` }}
+        >
           <ProtectedImage
             src={page}
             alt={`${title.zh || title.en} page ${pageNumber}`}

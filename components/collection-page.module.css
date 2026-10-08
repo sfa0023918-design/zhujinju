@@ -203,10 +203,27 @@
 }
 
 .filterMenu a {
-  display: block;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
   color: var(--muted);
+}
+
+.filterMenu a .bilingualPair {
+  flex: 1;
+  min-width: 0;
+}
+
+.filterCount {
+  flex: none;
+  min-width: 1.5em;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  text-align: right;
 }
 
 .filterMenu a:last-child {

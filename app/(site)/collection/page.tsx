@@ -1,26 +1,14 @@
 import { BilingualText } from "@/components/bilingual-text";
-import { CollectionFilters } from "@/components/collection-filters";
+import { CollectionBrowser } from "@/components/collection-browser";
 import styles from "@/components/collection-page.module.css";
-import { CollectionResults } from "@/components/collection-results";
-import { bt, getArtworkStatusText } from "@/lib/bilingual";
+import { bt } from "@/lib/bilingual";
+import { toCollectionArtworkSummary } from "@/lib/collection-filtering";
 import { buildMetadata } from "@/lib/metadata";
-import {
-  getFilterOptions,
-  getFilteredArtworks,
-  getPublicArtworks,
-  loadSiteContent,
-} from "@/lib/site-data";
+import { getPublicArtworks, loadSiteContent } from "@/lib/site-data";
 
-type CollectionPageProps = {
-  searchParams?: Promise<{
-    category?: string;
-    region?: string;
-    period?: string;
-    material?: string;
-    status?: string;
-    page?: string;
-  }>;
-};
+// Filters and pages are read from the address in the browser, so every request
+// renders with its own query (same as before) while later changes stay client-side.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
@@ -35,22 +23,10 @@ export async function generateMetadata() {
   });
 }
 
-export default async function CollectionPage({ searchParams }: CollectionPageProps) {
-  const params = (await searchParams) ?? {};
-  const { page: _page, ...filters } = params;
+export default async function CollectionPage() {
   const content = await loadSiteContent();
-  const baseArtworks = getFilteredArtworks(content, filters);
   const publicArtworks = getPublicArtworks(content);
-  const filteredArtworks = !filters.status
-    ? baseArtworks
-    : baseArtworks.filter((artwork) => artwork.status === filters.status);
-  const filterOptions = {
-    ...getFilterOptions(content),
-    statuses: Array.from(new Set(publicArtworks.map((artwork) => artwork.status))).map((status) => ({
-      value: status,
-      label: getArtworkStatusText(status),
-    })),
-  };
+  const artworkSummaries = publicArtworks.map(toCollectionArtworkSummary);
   const { pageCopy } = content;
   const collectionHeroDescriptionEn =
     "FILTER BY CATEGORY, REGION, PERIOD, AND MATERIAL FOR AN ENHANCED VIEWING EXPERIENCE";
@@ -58,13 +34,6 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
     ...pageCopy.collection.filters,
     status: bt("状态", "Status"),
   };
-  const filterKey = [
-    filters.category,
-    filters.region,
-    filters.period,
-    filters.material,
-    filters.status,
-  ].map((value) => value ?? "").join("|");
 
   return (
     <div className={styles.collectionPage}>
@@ -90,29 +59,11 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
       </section>
 
       <section className={styles.collectionBody}>
-        <CollectionFilters
-          current={filters}
-          options={filterOptions}
+        <CollectionBrowser
+          artworks={artworkSummaries}
           labels={filterLabels}
-          resultCount={filteredArtworks.length}
+          emptyState={pageCopy.collection.emptyState}
         />
-        {filteredArtworks.length > 0 ? (
-          <CollectionResults
-            key={filterKey}
-            artworks={filteredArtworks}
-            filterSignature={filterKey}
-          />
-        ) : (
-          <div className={styles.emptyState}>
-            <BilingualText
-              as="p"
-              text={pageCopy.collection.emptyState}
-              className={styles.bilingualPair}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-          </div>
-        )}
       </section>
     </div>
   );

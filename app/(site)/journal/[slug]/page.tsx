@@ -67,6 +67,7 @@ export async function generateMetadata({
     path: `/journal/${article.slug}`,
     type: "article",
     site: content.siteConfig,
+    image: { path: resolveArticleCover(article), alt: article.title },
   });
 }
 

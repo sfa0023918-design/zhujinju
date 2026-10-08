@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ArtworkDetailTemplate } from "@/components/artwork-detail-template";
 import { getAdminSession } from "@/lib/admin-auth";
+import { resolveArtworkPrimaryImage } from "@/lib/image-url";
 import { buildMetadata } from "@/lib/metadata";
 import {
   getArticlesBySlugs,
@@ -54,6 +55,7 @@ export async function generateMetadata({
     description: artwork.excerpt,
     path: `/collection/${artwork.slug}`,
     site: content.siteConfig,
+    image: { path: resolveArtworkPrimaryImage(artwork), alt: artwork.title },
   });
 }
 

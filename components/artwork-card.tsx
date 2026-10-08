@@ -11,11 +11,21 @@ import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
 import { StatusPill } from "./status-pill";
 
-type ArtworkCardProps = {
-  artwork: Artwork;
-  priority?: boolean;
-  variant?: "editorial" | "compact" | "catalogue";
-};
+// The catalogue card only needs a handful of fields, so lists such as the collection
+// page can send a light summary to the browser instead of every artwork's full record.
+type CatalogueCardArtwork = Pick<Artwork, "slug" | "title" | "period" | "status" | "image" | "imageAsset">;
+
+type ArtworkCardProps =
+  | {
+      artwork: CatalogueCardArtwork;
+      priority?: boolean;
+      variant: "catalogue";
+    }
+  | {
+      artwork: Artwork;
+      priority?: boolean;
+      variant?: "editorial" | "compact";
+    };
 
 const fieldLabels = {
   period: { zh: "年代", en: "Period" },
@@ -24,13 +34,11 @@ const fieldLabels = {
   dimensions: { zh: "尺寸", en: "Dimensions" },
 } as const;
 
-export function ArtworkCard({
-  artwork,
-  priority = false,
-  variant = "editorial",
-}: ArtworkCardProps) {
-  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
-  const cardImage = isCoverVajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(artwork);
+export function ArtworkCard(props: ArtworkCardProps) {
+  const { artwork: cardArtwork, priority = false } = props;
+  const variant = props.variant ?? "editorial";
+  const isCoverVajra = cardArtwork.slug === COVER_VAJRA_SLUG;
+  const cardImage = isCoverVajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(cardArtwork);
   const frameStyle = isCoverVajra ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined;
   const imageStyle = isCoverVajra ? { clipPath: COVER_VAJRA_CLIP } : undefined;
   const isPlaceholderImage = !cardImage || cardImage.startsWith("/api/placeholder/");
@@ -41,7 +49,8 @@ export function ArtworkCard({
         ? "(min-width: 1280px) 22vw, (min-width: 640px) 44vw, 92vw"
         : "(min-width: 768px) 44vw, 92vw";
 
-  if (variant === "catalogue") {
+  if (props.variant === "catalogue") {
+    const artwork = props.artwork;
     const status = getArtworkStatusText(artwork.status);
 
     return (
@@ -96,6 +105,8 @@ export function ArtworkCard({
       </article>
     );
   }
+
+  const artwork = props.artwork;
 
   if (variant === "compact") {
     return (

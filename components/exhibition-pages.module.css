@@ -187,6 +187,10 @@
   text-wrap: balance;
 }
 
+.titleSegment {
+  display: inline-block;
+}
+
 .exhibitionTitle .zh {
   font-size: var(--type-page);
   line-height: 1.32;

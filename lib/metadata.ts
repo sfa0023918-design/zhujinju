@@ -11,7 +11,23 @@ type MetadataOptions = {
   path?: string;
   type?: "website" | "article";
   site?: SiteConfigContent;
+  // A page's own picture for link previews (artwork, article cover, exhibition cover).
+  image?: { path?: string | null; alt: string | BilingualText };
 };
+
+function getShareImage(image: MetadataOptions["image"], site: SiteConfigContent) {
+  const path = image?.path?.trim();
+
+  if (!image || !path || !path.startsWith("/uploads/")) {
+    return null;
+  }
+
+  // Served through the image optimiser at 1200 px so previews stay light.
+  return {
+    url: absoluteUrl(`/_next/image?url=${encodeURIComponent(path)}&w=1200&q=75`, site),
+    alt: formatMetadataText(image.alt),
+  };
+}
 
 export function buildMetadata({
   title,
@@ -19,7 +35,9 @@ export function buildMetadata({
   path = "/",
   type = "website",
   site = siteConfig,
+  image,
 }: MetadataOptions = {}): Metadata {
+  const shareImage = getShareImage(image, site);
   const fullTitle = title
     ? `${formatMetadataText(title)} | ${formatMetadataText(site.siteName)}`
     : formatMetadataText(site.title);
@@ -72,20 +90,22 @@ export function buildMetadata({
       type,
       url: absoluteUrl(path, site),
       siteName: formatMetadataText(site.siteName),
-      images: [
-        {
-          url: absoluteUrl(site.ogImagePath, site),
-          width: 1200,
-          height: 630,
-          alt: formatMetadataText(site.siteName),
-        },
-      ],
+      images: shareImage
+        ? [shareImage]
+        : [
+            {
+              url: absoluteUrl(site.ogImagePath, site),
+              width: 1200,
+              height: 630,
+              alt: formatMetadataText(site.siteName),
+            },
+          ],
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description: resolvedDescription,
-      images: [absoluteUrl(site.ogImagePath, site)],
+      images: [shareImage?.url ?? absoluteUrl(site.ogImagePath, site)],
     },
   };
 }
