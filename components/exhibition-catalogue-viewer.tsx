@@ -10,7 +10,6 @@ import { ProtectedImage } from "./protected-image";
 import { MobileCatalogueReader } from "./mobile-catalogue-reader";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1181px) and (pointer: fine)";
-const MOBILE_PORTRAIT_BREAKPOINT = "(orientation: portrait)";
 const PRELOAD_GROUP_OFFSETS = [-1, 1] as const;
 // A page can be shared as /exhibitions/<slug>#catalogue-p37.
 const PAGE_HASH_PATTERN = /^#catalogue-p(\d+)$/;
@@ -63,7 +62,6 @@ export function ExhibitionCatalogueViewer({
   const geometries = useMemo(() => cataloguePages.map((page) => cataloguePageGeometry(page, viewMode === "spread-images")), [cataloguePages, viewMode]);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
-  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreenReading, setIsFullscreenReading] = useState(false);
   const [isDesktopReaderOpen, setIsDesktopReaderOpen] = useState(false);
@@ -78,7 +76,8 @@ export function ExhibitionCatalogueViewer({
   const showsSpreadImage = viewMode === "spread-images";
   const usesMobileReader = isLayoutReady && (!isDesktop || isFullscreenReading);
   const usesDesktopPairing = isDesktop && !showsSpreadImage && !usesMobileReader;
-  const preloadsPairedPages = usesDesktopPairing || (usesMobileReader && !isMobilePortrait && !showsSpreadImage);
+  const usesPairedPages = !showsSpreadImage;
+  const preloadsPairedPages = usesPairedPages;
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_BREAKPOINT);
@@ -94,26 +93,14 @@ export function ExhibitionCatalogueViewer({
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(MOBILE_PORTRAIT_BREAKPOINT);
-
-    function updateOrientation() {
-      setIsMobilePortrait(mediaQuery.matches);
-    }
-
-    updateOrientation();
-    mediaQuery.addEventListener("change", updateOrientation);
-    return () => mediaQuery.removeEventListener("change", updateOrientation);
-  }, []);
-
-  useEffect(() => {
     setCurrentIndex((previous) => {
       if (!totalPages) {
         return 0;
       }
 
-      return usesDesktopPairing ? getDesktopStartIndex(previous, totalPages) : clamp(previous, 0, totalPages - 1);
+      return usesPairedPages ? getDesktopStartIndex(previous, totalPages) : clamp(previous, 0, totalPages - 1);
     });
-  }, [usesDesktopPairing, totalPages]);
+  }, [usesPairedPages, totalPages]);
 
   useEffect(() => {
     const match = window.location.hash.match(PAGE_HASH_PATTERN);
@@ -122,9 +109,10 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
-    setCurrentIndex(clamp(Number(match[1]) - 1, 0, totalPages - 1));
+    const requestedIndex = clamp(Number(match[1]) - 1, 0, totalPages - 1);
+    setCurrentIndex(usesPairedPages ? getDesktopStartIndex(requestedIndex, totalPages) : requestedIndex);
     document.getElementById("catalogue")?.scrollIntoView();
-  }, [totalPages]);
+  }, [totalPages, usesPairedPages]);
 
   useEffect(() => {
     if (hasNavigatedRef.current) {
@@ -277,7 +265,7 @@ export function ExhibitionCatalogueViewer({
     return null;
   }
 
-  const visiblePages = usesDesktopPairing
+  const visiblePages = usesPairedPages
     ? [readerPages[currentIndex] ?? null, readerPages[currentIndex + 1] ?? null]
     : [readerPages[currentIndex] ?? null];
   const canGoPrevious = currentIndex > 0;
@@ -285,13 +273,7 @@ export function ExhibitionCatalogueViewer({
   const currentLabel = usesDesktopPairing
     ? `${currentIndex + 1}${cataloguePages[currentIndex + 1] ? ` - ${currentIndex + 2}` : ""}`
     : `${currentIndex + 1}`;
-  const readingModeLabel = usesMobileReader
-    ? isMobilePortrait ? "单页阅读 / Single Page" : "跨页阅读 / Facing Pages"
-    : showsSpreadImage
-    ? "图录页 / Catalogue Page"
-    : isDesktop
-      ? "双页浏览 / Facing Pages"
-      : "单页阅读 / Single Page";
+  const readingModeLabel = "双页浏览 / Facing Pages";
   const visiblePageNumbers = visiblePages
     .map((page, index) => (page ? currentIndex + index + 1 : null))
     .filter((pageNumber): pageNumber is number => pageNumber !== null);
@@ -305,7 +287,7 @@ export function ExhibitionCatalogueViewer({
 
     hasNavigatedRef.current = true;
     setCurrentIndex(
-      usesDesktopPairing ? getDesktopStartIndex(index, totalPages) : clamp(index, 0, totalPages - 1),
+      usesPairedPages ? getDesktopStartIndex(index, totalPages) : clamp(index, 0, totalPages - 1),
     );
   }
 
@@ -455,7 +437,6 @@ export function ExhibitionCatalogueViewer({
                   title={title}
                   side={usesDesktopPairing ? (index === 0 ? "left" : "right") : "single"}
                   displayMode={showsSpreadImage ? "spread" : "page"}
-                  isMobilePortrait={isMobilePortrait}
                 />
               ))}
             </div>
@@ -557,17 +538,14 @@ function CataloguePage({
   title,
   side,
   displayMode,
-  isMobilePortrait,
 }: {
   page: string | null;
   pageNumber: number;
   title: BilingualValue;
   side: "left" | "right" | "single";
   displayMode: "page" | "spread";
-  isMobilePortrait: boolean;
 }) {
-  const compactMobileSpread = isMobilePortrait && displayMode === "spread";
-  const minHeightClass = compactMobileSpread ? "min-h-0" : "min-h-[420px]";
+  const minHeightClass = "min-h-[420px]";
 
   if (!page) {
     return (

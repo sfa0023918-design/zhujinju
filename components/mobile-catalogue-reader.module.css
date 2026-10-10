@@ -11,6 +11,9 @@
 .reader button:disabled, .dialog button:disabled { opacity: 0.3; cursor: default; }
 .open { font-size: 12px; border-left: 1px solid var(--line); margin-left: 4px; padding-left: 8px; }
 .hint { font-size: 12px; line-height: 1.6; color: var(--muted); text-align: center; margin: 10px 0 18px; }
+.hint span { display: block; margin-top: 4px; }
+.orientationHint { margin: 0; padding: 8px 0; flex: none; font-size: 12px; line-height: 1.6; color: var(--accent-text); text-align: center; border-bottom: 1px solid var(--line); }
+.orientationHint span { display: block; }
 .index { border-block: 1px solid var(--line); color: var(--accent-text); }
 .index summary { cursor: pointer; padding: 14px 0; min-height: 48px; font-size: 12px; }
 .index summary span { font-size: 12px; color: var(--muted); margin-left: 10px; }
@@ -40,6 +43,7 @@
 .thumbnail .image { object-fit: contain; }
 .dialog .controls { border-bottom: 0; border-top: 1px solid var(--line); flex: none; padding: 3px 0; }
 @media (orientation: landscape) {
+  .orientationHint { display: none; }
   .toolbar { min-height: 44px; }
   .zoomControls { position: absolute; right: 68px; top: env(safe-area-inset-top); height: 44px; padding: 0; }
   .zoomControls > span { display: none; }

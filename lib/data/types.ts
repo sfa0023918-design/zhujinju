@@ -47,6 +47,7 @@ export type Artwork = {
   region: BilingualText;
   origin: BilingualText;
   material: BilingualText;
+  technique?: BilingualText;
   category: BilingualText;
   dimensions: BilingualText;
   status: ArtworkStatus;

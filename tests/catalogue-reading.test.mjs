@@ -34,6 +34,27 @@ test("landscape traverses complete spreads and respects both boundaries", () => 
   assert.equal(move({ index: 120, half: 1 }, 1, layouts2026, false, false).index, 120);
 });
 
+test("facing-page traversal visits every image exactly once across all annual catalogues", () => {
+  for (const exhibition of content.exhibitions) {
+    const layouts = layoutsFor(exhibition.slug);
+    const paired = exhibition.catalogueViewMode !== "spread-images";
+    let position = { index: 0, half: 0 };
+    const visited = [];
+    for (let step = 0; step < layouts.length; step++) {
+      visited.push(position.index);
+      if (paired && position.index + 1 < layouts.length) visited.push(position.index + 1);
+      const next = move(position, 1, layouts, false, paired);
+      if (next.index === position.index) break;
+      position = next;
+    }
+    assert.deepEqual(visited, Array.from({ length: layouts.length }, (_, index) => index), exhibition.slug);
+    assert.equal(move(position, 1, layouts, false, paired).index, position.index);
+    while (position.index > 0) position = move(position, -1, layouts, false, paired);
+    assert.equal(position.index, 0);
+    assert.equal(move(position, -1, layouts, false, paired).index, 0);
+  }
+});
+
 test("ordinary spreads do not lose the first left page", () => {
   assert.deepEqual(plain(move({ index: 0, half: 1 }, -1, [{ spread: true }, { spread: true }], true, false)), { index: 0, half: 0 });
 });

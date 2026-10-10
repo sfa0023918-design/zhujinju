@@ -39,7 +39,8 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   const dialogOnly = presentation === "dialog";
   const hasRightCover = geometries[0]?.openingSide === "right";
   const [half, setHalf] = useState<0 | 1>(hasRightCover ? 1 : 0);
-  const [singlePage, setSinglePage] = useState(true);
+  // Keep facing pages intact in both orientations; portrait shows a rotate hint.
+  const singlePage = false;
   const [isOpen, setIsOpen] = useState(dialogOnly);
   const [transform, setTransform] = useState<Transform>(fitted);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -52,7 +53,7 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
 
   useEffect(() => {
     const media = window.matchMedia("(orientation: portrait)");
-    const update = () => { setSinglePage(media.matches); setTransform(fitted); };
+    const update = () => { setTransform(fitted); };
     update();
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
@@ -233,6 +234,7 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
     }}>
       <div className={styles.fullReader}>
         <header className={styles.toolbar}><span>图录阅读 / Catalogue</span><button type="button" onClick={closeReader}>关闭 Close</button></header>
+        <p className={styles.orientationHint}>横屏浏览双页更方便 <span lang="en">Rotate for facing pages</span></p>
         <div className={styles.canvas} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={(event) => pointerUp(event)} onPointerCancel={(event) => pointerUp(event, true)}>
           <div ref={pageRef} className={styles.fit}>{sheet(pages[currentIndex], true)}</div>
         </div>
@@ -264,7 +266,7 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
       {sheet(readerPages[currentIndex])}
     </button>
     {controls()}
-    <p className={styles.hint}>点开全屏，双指放大阅读</p>
+    <p className={styles.hint}>横屏浏览双页更方便；点开全屏，双指放大阅读<span lang="en">Rotate for facing pages. Open full screen to pinch and zoom.</span></p>
     <details className={styles.index}>
       <summary>图版索引 <span>Plate index</span></summary>
       <label className={styles.jump}>跳至图版
