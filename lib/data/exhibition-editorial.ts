@@ -31,7 +31,9 @@ export type ExhibitionEditorial = {
       period: BilingualText;
       region: BilingualText;
       material: BilingualText;
+      technique?: BilingualText;
       dimensions: string;
+      dimensionLabel?: "Height" | "Dimensions";
       basicFacts?: BilingualText[];
       records: { label: BilingualText; lines: string[]; translations?: (string | null)[] }[];
       image: EditorialImage;

@@ -337,6 +337,9 @@ export function ArtworkHero({
     { label: detailCopy.fieldLabels.period, value: artwork.period },
     { label: detailCopy.fieldLabels.regionOrigin, value: joinBilingual(artwork.region, artwork.origin) },
     { label: detailCopy.fieldLabels.material, value: artwork.material },
+    ...(artwork.technique && hasText(artwork.technique)
+      ? [{ label: { zh: "工艺", en: "Technique" }, value: artwork.technique }]
+      : []),
     { label: detailCopy.fieldLabels.dimensions, value: artwork.dimensions },
   ];
   const hasLead = hasText(artwork.excerpt);

@@ -68,7 +68,8 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
                 <div className={styles.facts}>
                   <p>{work.basicFacts?.[0]?.zh ?? `${work.period.zh} · ${work.region.zh}`}<span lang="en">{work.basicFacts?.[0]?.en ?? `${work.period.en} · ${work.region.en}`}</span></p>
                   <p>材质　{work.basicFacts?.[1]?.zh ?? work.material.zh}<span lang="en">Medium　{work.basicFacts?.[1]?.en ?? work.material.en}</span></p>
-                  <p>尺寸 <span className={styles.inline} lang="en">Dimensions　{work.dimensions}</span></p>
+                  {work.technique && <p>工艺　{work.technique.zh}<span lang="en">Technique　{work.technique.en}</span></p>}
+                  <p>尺寸 <span className={styles.inline} lang="en">{work.dimensionLabel ?? "Dimensions"}　{work.dimensions}</span></p>
                 </div>
                 {work.records.length > 0 && <dl className={styles.records}>
                   {work.records.map((r, i) => <div key={i}><dt>{r.label.zh}<span lang="en">{r.label.en}</span></dt>
