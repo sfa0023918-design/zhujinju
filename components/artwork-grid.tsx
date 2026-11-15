@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { packArtworkRows } from "@/lib/artwork-rows";
+import { getArtworkGridImageSizes } from "@/lib/artwork-image-sizes";
 import {
   COVER_VAJRA_CLIP,
   COVER_VAJRA_IMAGE,
@@ -32,6 +33,7 @@ export function ArtworkGrid({
       ? 900 / 1198
       : (a.imageAsset?.width ?? 800) / (a.imageAsset?.height ?? 1000),
   );
+  const imageSizes = getArtworkGridImageSizes(ratios, { fillRows, groupWideWorks, swipeOnTablet });
   const grid = (
     <div className={`${styles.grid} ${groupWideWorks ? styles.related : ""} ${swipeOnTablet ? styles.swipe : ""}`}>
       {(["desktop", "tablet", "mobile"] as const).map((mode) => (
@@ -81,7 +83,7 @@ export function ArtworkGrid({
                       height={vajra ? 1198 : (a.imageAsset?.height ?? 1000)}
                       quality={84}
                       priority={priority && i < 3}
-                      sizes="(max-width: 860px) 70vw, (max-width: 1279px) 50vw, 40vw"
+                      sizes={imageSizes[i]}
                       wrapperClassName={`${styles.imageFrame} ${vajra ? styles.vajra : ""}`}
                       className={`${styles.image} ${PAPER_BLEND_ARTWORK_SLUGS.some((slug) => slug === a.slug) ? styles.paperBlend : ""}`}
                       style={vajra ? { clipPath: COVER_VAJRA_CLIP } : undefined}

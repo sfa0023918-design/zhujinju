@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFontPreloads } from "@/components/site-font-preloads";
 
 import "./reading-fonts.css";
+import "./reading-ui-fonts.css";
 import styles from "./site-layout.module.css";
 
 export default function SiteLayout({

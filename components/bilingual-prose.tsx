@@ -319,9 +319,17 @@ export function ExpandableReadingText({
           ?? wrapper.querySelector<HTMLParagraphElement>("p");
         if (!paragraph) continue;
         const style = getComputedStyle(paragraph);
-        context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-        const sample = value === "zh" ? "观看作品的形态与艺术细节" : "The sculpture reveals its form and material through light. ";
-        const average = context.measureText(sample).width / sample.length;
+        // Source Han's full-width CJK characters are one em. Measuring an
+        // unrelated Chinese sentence here used to fetch large fallback fonts
+        // for characters not used anywhere on the current page.
+        let average = Number.parseFloat(style.fontSize);
+        if (value === "en") {
+          // A hidden/absent English column must not borrow the Chinese font.
+          const family = style.getPropertyValue("--font-sans").trim() || style.fontFamily;
+          context.font = `${style.fontWeight} ${style.fontSize} ${family}`;
+          const sample = "The sculpture reveals its form and material through light. ";
+          average = context.measureText(sample).width / sample.length;
+        }
         const contentWidth = width - (showBoth && window.innerWidth > 860 && value === "en" ? 24 : 0);
         next[value] = Math.max(8, Math.floor(contentWidth / average));
       }
