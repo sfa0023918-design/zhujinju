@@ -13,7 +13,6 @@ import {
   COVER_VAJRA_IMAGE,
 } from "@/lib/artwork-presentation";
 import { getArtworkStatusText } from "@/lib/bilingual";
-import { getTelHref } from "@/lib/contact-links";
 import { homeHeroSlides } from "@/lib/data/home-hero-slides";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import {
@@ -119,7 +118,6 @@ export default async function HomePage() {
     exhibition?.featuredWorksCount ?? exhibition?.highlightCount ?? 0;
   const pageCount =
     exhibition?.cataloguePageCount ?? exhibition?.cataloguePages ?? 0;
-  const phoneHref = getTelHref(siteConfig.contact.phone);
 
   return (
     <div className={`${styles.home} zj`}>
@@ -389,104 +387,6 @@ export default async function HomePage() {
           </div>
         </section>
       ) : null}
-
-      <section id="contact" className={`${styles.wrap} ${styles.contact}`}>
-        <div className={styles.contactGrid}>
-          <div className={styles.contactCopy}>
-            <div className={styles.headingCopy}>
-              <h2>与竹瑾居联系</h2>
-              <p lang="en">Contact Zhu Jin Ju</p>
-            </div>
-            <div className={styles.contactIntro}>
-              <p>{siteConfig.contactPage.description.zh}</p>
-              <p lang="en">{siteConfig.contactPage.description.en}</p>
-            </div>
-            <dl className={styles.contactFacts}>
-              <div>
-                <dt>
-                  <HomeLabel
-                    text={siteConfig.contactPage.infoLabels.email}
-                    muted
-                  />
-                </dt>
-                <dd>
-                  <a href={`mailto:${siteConfig.contact.email}`}>
-                    {siteConfig.contact.email}
-                  </a>
-                </dd>
-              </div>
-              <div>
-                <dt>
-                  <HomeLabel
-                    text={siteConfig.contactPage.infoLabels.wechat}
-                    muted
-                  />
-                </dt>
-                <dd>{siteConfig.contact.wechat}</dd>
-              </div>
-              <div>
-                <dt>
-                  <HomeLabel
-                    text={siteConfig.contactPage.infoLabels.phoneWhatsapp}
-                    muted
-                  />
-                </dt>
-                <dd>
-                  <a href={phoneHref ?? undefined}>
-                    {siteConfig.contact.phone}
-                  </a>
-                </dd>
-              </div>
-              <div>
-                <dt>
-                  <HomeLabel text={{ zh: "地址", en: "Address" }} muted />
-                </dt>
-                <dd>
-                  {siteConfig.contact.replyWindow.zh.replace(
-                    /^地址[：:]\s*/,
-                    "",
-                  )}
-                  <span lang="en">
-                    {siteConfig.contact.replyWindow.en.replace(
-                      /^Address:\s*/,
-                      "",
-                    )}
-                  </span>
-                </dd>
-              </div>
-            </dl>
-            <div className={styles.contactActions}>
-              <HomeAction
-                href="/contact"
-                text={{ zh: "作品洽询与联系", en: "Inquiries & contact" }}
-              />
-              <span>
-                {siteConfig.contact.appointmentNote.zh}
-                {siteConfig.contact.appointmentNote.en}
-              </span>
-            </div>
-          </div>
-          <figure className={styles.spacePhoto}>
-            <ProtectedImage
-              src="/uploads/branding/about-space-himalayan-art-20260930.png"
-              alt="竹瑾居艺术空间外景：红墙与旋转楼梯"
-              width={724}
-              height={1086}
-              sizes="(max-width: 860px) 100vw, 33vw"
-              quality={86}
-              wrapperClassName={styles.spacePhotoFrame}
-              className={styles.spaceImage}
-            />
-            <figcaption>
-              <span>竹瑾居艺术空间 · 成都</span>
-              <span lang="en">
-                Zhu Jin Ju Art Space
-                <span className={styles.desktopOnly}>, Chengdu</span>
-              </span>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
     </div>
   );
 }

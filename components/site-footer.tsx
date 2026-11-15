@@ -96,26 +96,23 @@ export async function SiteFooter() {
         <div className={styles.desktopGrid}>
           <div className={styles.brandBlock}>
             {logo}
-            <div className={styles.intro}>
-              <p>{siteConfig.footer.intro.zh}</p>
-              <p lang="en">{siteConfig.footer.intro.en}</p>
-            </div>
+            <nav aria-label="页脚导航" className={styles.informationBlock}>
+              <span className={styles.heading}>
+                {siteConfig.footer.informationHeading.zh}{" "}
+                {siteConfig.footer.informationHeading.en}
+              </span>
+              {informationLinks.map((item) => (
+                <Link
+                  href={item.href}
+                  key={item.href}
+                  className={styles.contactLine}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <p className={styles.copyright}>{copyright}</p>
           </div>
-          <nav aria-label="页脚导航" className={styles.informationBlock}>
-            <span className={styles.heading}>
-              {siteConfig.footer.informationHeading.zh}{" "}
-              {siteConfig.footer.informationHeading.en}
-            </span>
-            {informationLinks.map((item) => (
-              <Link
-                href={item.href}
-                key={item.href}
-                className={styles.contactLine}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
           <div className={styles.contactBlock}>
             <span className={styles.heading}>
               {siteConfig.footer.contactHeading.zh}{" "}
@@ -151,16 +148,9 @@ export async function SiteFooter() {
             <div className={styles.desktopSocial}>{socialLinks}</div>
           </div>
         </div>
-        <div className={styles.copyrightRow}>
-          <span>{copyright}</span>
-          <span>
-            喜马拉雅艺术与亚洲古代艺术 · Himalayan Art &amp; Asian Antiquities
-          </span>
-        </div>
       </div>
       <div className={styles.mobile}>
         {logo}
-        <p className={styles.mobileIntro}>{siteConfig.footer.intro.zh}</p>
         <nav aria-label="页脚导航" className={styles.mobileInformation}>
           {informationLinks.map((item) => (
             <Link href={item.href} key={item.href}>

@@ -15,115 +15,87 @@
   outline-color: var(--dark-ink);
 }
 .inner {
-  max-width: 1600px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 80px 40px 40px;
+  padding: 32px 40px 28px;
 }
 .desktopGrid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 48px 24px;
+  grid-template-columns: 1.1fr 0.9fr 1fr;
+  gap: 32px;
   align-items: start;
 }
 .brandBlock {
-  grid-column: span 4;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 14px;
 }
 .logo {
-  height: 84px;
+  height: 40px;
   width: auto;
   align-self: flex-start;
 }
-.intro {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 460px;
-}
-.intro p,
-.mobileIntro {
-  font-size: 14px;
-  line-height: 1.9;
-}
-.intro p[lang] {
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--dark-muted);
-}
 .informationBlock {
-  grid-column: 6 / span 2;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 320px;
+  column-gap: 16px;
 }
-.contactBlock {
-  grid-column: 8 / span 3;
-  display: flex;
-  flex-direction: column;
+.informationBlock .heading {
+  grid-column: 1 / -1;
+  padding-bottom: 6px;
 }
+.informationBlock a {
+  min-height: 28px;
+}
+.contactBlock,
 .spaceBlock {
-  grid-column: 11 / span 2;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 .heading {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 1.5;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--dark-muted);
-  padding-bottom: 12px;
+  padding-bottom: 6px;
 }
 .contactLine,
 .headingZh {
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  line-height: 1.7;
+  display: block;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.contactLine {
+  padding-block: 2px;
+}
+.addressBlock {
+  display: grid;
+  gap: 4px;
 }
 .spaceName {
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 .spaceNameEn {
-  font-size: 13px;
-  line-height: 1.65;
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--dark-muted);
-  padding-bottom: 6px;
 }
 .desktopSocial {
-  margin-top: 8px;
+  margin-top: 2px;
 }
-.copyrightRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 72px;
-  padding-top: 20px;
-  border-top: 1px solid var(--dark-line);
-  font-size: 13px;
+.copyright {
+  font-size: 11px;
+  line-height: 1.6;
   color: var(--dark-muted);
 }
 .mobile {
   display: none;
-}
-@media (min-width: 861px) and (max-width: 1279px) {
-  .brandBlock {
-    grid-column: 1 / -1;
-  }
-  .informationBlock {
-    grid-column: 1 / span 4;
-  }
-  .contactBlock {
-    grid-column: 5 / span 4;
-  }
-  .spaceBlock {
-    grid-column: 9 / span 4;
-  }
 }
 @media (max-width: 860px) {
   .inner {
@@ -132,57 +104,59 @@
   .mobile {
     display: flex;
     flex-direction: column;
-    padding: 56px 20px 36px;
-    gap: 28px;
+    padding: 28px 20px 24px;
+    gap: 12px;
   }
   .logo {
-    height: 64px;
+    height: 36px;
   }
   .mobileInformation {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    border-top: 1px solid var(--dark-line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 16px;
   }
   .mobileInformation a {
-    min-height: 48px;
+    min-height: 44px;
     display: flex;
     align-items: center;
-    font-size: 14px;
-    border-bottom: 1px solid var(--dark-line);
+    font-size: 13px;
   }
   .primaryContact {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0 16px;
   }
   .primaryLink {
     min-height: 44px;
     display: flex;
     align-items: center;
-    font-size: 15px;
+    font-size: 13px;
   }
   .disclosures {
     border-top: 1px solid var(--dark-line);
   }
   .disclosures summary {
-    min-height: 52px;
+    min-height: 48px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
     border-bottom: 1px solid var(--dark-line);
     font-size: 14px;
     list-style: none;
+    cursor: pointer;
   }
   .disclosures summary::-webkit-details-marker {
     display: none;
   }
   .disclosures summary small {
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--dark-muted);
-    margin-left: 10px;
+    margin-left: 8px;
   }
   .disclosures svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     color: var(--dark-muted);
     flex: none;
   }
@@ -190,19 +164,26 @@
     transform: rotate(180deg);
   }
   .detailContent {
-    padding-block: 12px;
-    font-size: 14px;
+    padding-block: 8px 12px;
+    font-size: 13px;
     border-bottom: 1px solid var(--dark-line);
   }
   .detailLine {
     display: block;
-    padding-block: 8px;
+    padding-block: 6px;
+    overflow-wrap: anywhere;
+  }
+  a.detailLine {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
   }
   .mobileSocial {
-    margin-block: -12px -8px;
+    margin-block: -4px;
   }
   .mobileCopyright {
-    font-size: 13px;
+    font-size: 11px;
+    line-height: 1.6;
     color: var(--dark-muted);
   }
 }

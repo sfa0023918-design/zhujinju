@@ -61,24 +61,16 @@ function Card({ artwork }: { artwork: Artwork }) {
       <span className={styles.cardEnglish} lang="en">
         {artwork.title.en}
       </span>
-      {artwork.subtitle.zh ? (
-        <span className={styles.cardSubtitle}>{artwork.subtitle.zh}</span>
-      ) : (
-        <span className={styles.cardSubtitle} aria-hidden="true" />
-      )}
-      <span className={styles.cardFacts}>
-        {regionPeriod}
-        <span className={styles.cardExtraFacts}>
-          {[artwork.material.zh, artwork.dimensions.zh]
-            .filter(Boolean)
-            .map((part) => ` · ${part}`)}
-        </span>
-      </span>
+      <span className={styles.cardFacts}>{regionPeriod}</span>
       <span className={styles.cardStatus}>
         <i className={styles.statusDot} data-status={artwork.status} />
         <span>{status.zh}</span>
         <span className={styles.cardStatusEnglish} lang="en">
-          {status.en}
+          {artwork.status === "sold"
+            ? "Acquired"
+            : artwork.status === "reserved"
+              ? "On Hold"
+              : "Available"}
         </span>
       </span>
     </Link>

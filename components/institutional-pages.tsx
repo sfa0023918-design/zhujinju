@@ -274,6 +274,22 @@ export function ContactPageContent({
               enClassName={styles.en}
             />
           </div>
+          <figure className={styles.contactSpace}>
+            <ProtectedImage
+              src={aboutSpaceImage}
+              alt="竹瑾居艺术空间外景：红墙与旋转楼梯"
+              width={724}
+              height={1086}
+              sizes="280px"
+              quality={86}
+              wrapperClassName={styles.contactSpaceImage}
+              className={styles.contactSpaceImage}
+            />
+            <figcaption>
+              <span>竹瑾居艺术空间 · 成都</span>
+              <span lang="en">Zhu Jin Ju Art Space, Chengdu</span>
+            </figcaption>
+          </figure>
         </div>
 
         <ContactForm
