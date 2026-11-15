@@ -10,6 +10,8 @@ import type {
   BilingualText as BilingualValue,
 } from "@/lib/site-data";
 import { getArtworkStatusText } from "@/lib/bilingual";
+import type { ArtworkCatalogueReference } from "@/lib/data/catalogue-pages";
+import { cataloguePageGeometry } from "@/lib/catalogue-media";
 import {
   COVER_VAJRA_IMAGE,
   COVER_VAJRA_SLUG,
@@ -25,12 +27,6 @@ import { ContemporaryReading } from "./contemporary-reading";
 import { ProtectedImage } from "./protected-image";
 import styles from "./artwork-detail.module.css";
 
-export type ArtworkCatalogueReference = {
-  title: BilingualValue;
-  href: string;
-  image: string;
-  pages: readonly [number, number];
-};
 type Props = {
   artwork: Artwork;
   detailCopy: PageCopyContent["artworkDetail"];
@@ -100,17 +96,18 @@ export function ArtworkDetailTemplate({
         : artwork.excerpt.en,
   };
   const facts = [
-    { label: detailCopy.fieldLabels.period, value: artwork.period },
+    { key: "period", label: detailCopy.fieldLabels.period, value: artwork.period },
     {
+      key: "region",
       label: detailCopy.fieldLabels.regionOrigin,
       value: joinBilingual(artwork.region, artwork.origin),
     },
-    { label: detailCopy.fieldLabels.material, value: artwork.material },
+    { key: "material", label: detailCopy.fieldLabels.material, value: artwork.material },
     ...(hasText(artwork.technique)
-      ? [{ label: { zh: "工艺", en: "Technique" }, value: artwork.technique! }]
+      ? [{ key: "technique", label: { zh: "工艺", en: "Technique" }, value: artwork.technique! }]
       : []),
-    { label: detailCopy.fieldLabels.dimensions, value: artwork.dimensions },
-    { label: { zh: "状态", en: "Status" }, value: status },
+    { key: "dimensions", label: detailCopy.fieldLabels.dimensions, value: artwork.dimensions },
+    { key: "status", label: { zh: "状态", en: "Status" }, value: status },
   ].filter((item) => hasText(item.value));
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
   const viewingNote = artwork.viewingNote;
@@ -160,22 +157,19 @@ export function ArtworkDetailTemplate({
             <h1>{artwork.title.zh}</h1>
             <p lang="en">{artwork.title.en}</p>
           </div>
-          {hasText(artwork.subtitle) ? (
-            <Pair text={artwork.subtitle} className={styles.subtitle} />
-          ) : null}
           {hasText(excerpt) ? (
             <Pair text={excerpt} className={styles.excerpt} />
           ) : null}
         </div>
         <div className={styles.recordFacts}>
           <dl className={styles.facts}>
-            {facts.map(({ label, value }) => (
-              <div key={label.zh}>
+            {facts.map(({ key, label, value }) => (
+              <div key={key} data-fact={key}>
                 <dt>
                   {label.zh}
                   <span lang="en">{label.en}</span>
                 </dt>
-                <dd data-artwork-status={label.en === "Status" ? artwork.status : undefined}>
+                <dd data-artwork-status={key === "status" ? artwork.status : undefined}>
                   {value.zh}
                   {value.en && value.en !== value.zh ? (
                     <span lang="en">{value.en}</span>
@@ -184,7 +178,7 @@ export function ArtworkDetailTemplate({
               </div>
             ))}
           </dl>
-          <div className={styles.inquiry}>
+          <div className={styles.inquiry} data-status={artwork.status}>
             {artwork.status === "sold" ? (
               <div className={styles.inquiryAction} data-artwork-status="sold">
                 {status.zh}
@@ -322,7 +316,10 @@ export function ArtworkDetailTemplate({
         </div>
       ) : null}
       {catalogue ? (
-        <section className={styles.catalogue}>
+        <section
+          className={styles.catalogue}
+          aria-label="图录中的这件作品 / In the Catalogue"
+        >
           <div className={styles.catalogueGrid}>
             <div>
               <p className={styles.category}>
@@ -330,24 +327,51 @@ export function ArtworkDetailTemplate({
               </p>
               <Pair text={catalogue.title} className={styles.catalogueTitle} />
               <p className={styles.cataloguePages}>
-                第 {catalogue.pages[0]}–{catalogue.pages[1]} 页 · pp.{" "}
-                {catalogue.pages[0]}–{catalogue.pages[1]}
+                第 {catalogue.pages[0]}
+                {catalogue.pages[1] !== catalogue.pages[0]
+                  ? `–${catalogue.pages[1]}`
+                  : ""}{" "}
+                页 · {catalogue.pages[1] !== catalogue.pages[0] ? "pp." : "p."}{" "}
+                {catalogue.pages[0]}
+                {catalogue.pages[1] !== catalogue.pages[0]
+                  ? `–${catalogue.pages[1]}`
+                  : ""}
               </p>
-              <Link href={catalogue.href} className={styles.catalogueLink}>
+              {/* Use document navigation for catalogue deep links so WebKit does
+                  not stall this entry while client-route styles are preloaded. */}
+              <a href={catalogue.href} className={styles.catalogueLink}>
                 翻到此页阅读 <span lang="en">Open at this page</span> →
-              </Link>
+              </a>
             </div>
-            <Link href={catalogue.href}>
-              <ProtectedImage
-                src={catalogue.image}
-                alt={`${catalogue.title.zh}，第 ${catalogue.pages[0]} 页起`}
-                width={4000}
-                height={2358}
-                sizes="(max-width: 860px) 100vw, 75vw"
-                className={styles.catalogueImage}
-                wrapperClassName={styles.catalogueImageFrame}
-              />
-            </Link>
+            <a
+              href={catalogue.href}
+              className={styles.cataloguePreview}
+              data-paired={catalogue.images.length > 1}
+              aria-label={`${artwork.title.zh}：翻到图录此页阅读 / Open catalogue at this work`}
+            >
+              {catalogue.images.map((src, index) => {
+                const geometry = cataloguePageGeometry(
+                  src,
+                  catalogue.images.length === 1,
+                );
+                return (
+                  <ProtectedImage
+                    key={src}
+                    src={src}
+                    alt={`${catalogue.title.zh}，${artwork.title.zh}${catalogue.images.length > 1 ? (index === 0 ? "（左页）" : "（右页）") : ""}`}
+                    width={geometry.width}
+                    height={geometry.height}
+                    sizes={
+                      catalogue.images.length > 1
+                        ? "(max-width: 860px) 50vw, 37vw"
+                        : "(max-width: 860px) 100vw, 75vw"
+                    }
+                    className={styles.catalogueImage}
+                    wrapperClassName={styles.catalogueImageFrame}
+                  />
+                );
+              })}
+            </a>
           </div>
         </section>
       ) : null}

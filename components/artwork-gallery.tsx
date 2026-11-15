@@ -26,6 +26,7 @@ import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
 import { ModalDialog } from "./modal-dialog";
 import { useNativeCarousel } from "./use-native-carousel";
+import { DirectionalArrow } from "./directional-arrow";
 
 type ArtworkGalleryProps = {
   title: string;
@@ -444,10 +445,30 @@ export function ArtworkGallery({
                 onClick={(event) => event.stopPropagation()}
               >
                 <div className={styles.lightboxToolbar}>
-                  <div className="min-h-6 text-[0.8rem] tracking-[0.08em]">
-                    {thumbnailImages.length > 1
-                      ? `${activeImageIndex + 1} / ${thumbnailImages.length}`
-                      : null}
+                  <div className={styles.lightboxPagination}>
+                    {hasMultipleImages ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => stepLightboxImage("prev")}
+                          className={styles.lightboxStep}
+                          aria-label="上一张 / Previous image"
+                        >
+                          <DirectionalArrow backwards />
+                        </button>
+                        <span className={styles.lightboxCount}>
+                          {activeImageIndex + 1} / {thumbnailImages.length}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => stepLightboxImage("next")}
+                          className={styles.lightboxStep}
+                          aria-label="下一张 / Next image"
+                        >
+                          <DirectionalArrow />
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                   <button
                     type="button"
@@ -465,24 +486,6 @@ export function ArtworkGallery({
                       : undefined
                   }
                 >
-                  {thumbnailImages.length > 1 ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => stepLightboxImage("prev")}
-                        className={`${styles.lightboxStep} ${styles.previous}`}
-                      >
-                        上一张
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => stepLightboxImage("next")}
-                        className={`${styles.lightboxStep} ${styles.next}`}
-                      >
-                        下一张
-                      </button>
-                    </>
-                  ) : null}
                   <div className={styles.lightboxViewport} ref={lightboxCarousel.ref}
                     role="region" aria-label="作品图片 Artwork images" tabIndex={0}>
                     {lightboxCarousel.indexes.map((index, position) => {

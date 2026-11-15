@@ -44,16 +44,6 @@ function writePageHash(index: number) {
   );
 }
 
-function getDesktopStartIndex(index: number, totalPages: number) {
-  if (totalPages <= 1) {
-    return 0;
-  }
-
-  const aligned = index % 2 === 0 ? index : index - 1;
-  const lastStart = totalPages % 2 === 0 ? totalPages - 2 : totalPages - 1;
-  return clamp(aligned, 0, Math.max(0, lastStart));
-}
-
 export function ExhibitionCatalogueViewer({
   title,
   note,
@@ -134,9 +124,7 @@ export function ExhibitionCatalogueViewer({
         return 0;
       }
 
-      return usesPairedPages
-        ? getDesktopStartIndex(previous, totalPages)
-        : clamp(previous, 0, totalPages - 1);
+      return clamp(previous, 0, totalPages - 1);
     });
   }, [usesPairedPages, totalPages]);
 
@@ -148,11 +136,10 @@ export function ExhibitionCatalogueViewer({
     }
 
     const requestedIndex = clamp(Number(match[1]) - 1, 0, totalPages - 1);
-    setCurrentIndex(
-      usesPairedPages
-        ? getDesktopStartIndex(requestedIndex, totalPages)
-        : requestedIndex,
-    );
+    // A linked entry must remain the first visible page. The 2023 edition starts
+    // at printed page 3, so rounding array indexes to even pairs opens the wrong
+    // spread and hides the facing artwork photograph.
+    setCurrentIndex(requestedIndex);
     document.getElementById("catalogue")?.scrollIntoView();
   }, [totalPages, usesPairedPages]);
 
@@ -269,11 +256,7 @@ export function ExhibitionCatalogueViewer({
     }
 
     hasNavigatedRef.current = true;
-    setCurrentIndex(
-      usesPairedPages
-        ? getDesktopStartIndex(index, totalPages)
-        : clamp(index, 0, totalPages - 1),
-    );
+    setCurrentIndex(clamp(index, 0, totalPages - 1));
   }
 
   function goPrevious() {
@@ -297,10 +280,7 @@ export function ExhibitionCatalogueViewer({
     hasNavigatedRef.current = true;
     setCurrentIndex((previous) => {
       if (usesDesktopPairing) {
-        return getDesktopStartIndex(
-          Math.min(totalPages - 1, previous + 2),
-          totalPages,
-        );
+        return Math.min(totalPages - 1, previous + 2);
       }
 
       return Math.min(totalPages - 1, previous + 1);

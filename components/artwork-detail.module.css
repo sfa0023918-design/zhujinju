@@ -163,21 +163,6 @@
   text-wrap: pretty;
   overflow-wrap: anywhere;
 }
-.subtitle {
-  padding-left: 20px;
-  border-left: 1px solid var(--ink);
-}
-.subtitle p {
-  font: 400 18px/1.6 var(--font-song);
-  letter-spacing: 0.03em;
-  margin: 0;
-}
-.subtitle p[lang="en"] {
-  margin-top: 6px;
-  font: italic 18px/1.4 var(--font-editorial);
-  color: #8c5a12;
-  letter-spacing: normal;
-}
 .excerpt {
   font-size: 14px;
   line-height: 1.8;
@@ -377,29 +362,66 @@
 .sectionNav {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 24px;
+  flex-wrap: nowrap;
+  gap: 32px;
   max-width: 1520px;
-  margin: 32px auto 0;
-  padding: 12px 0;
-  border-block: 1px solid var(--line);
+  margin: 24px auto 0;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
 }
 .sectionNav button {
+  position: relative;
+  flex: none;
   min-width: 44px;
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px;
-  min-height: 44px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 0 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 400 16px/1.4 var(--font-song);
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
   cursor: pointer;
-  font-size: 12px;
 }
 .sectionNav span {
+  display: block;
   color: var(--muted);
-  font-size: 12px;
+  font: italic 15px/1.2 var(--font-editorial);
+  letter-spacing: 0;
 }
-.sectionNav button[aria-current] {
+.sectionNav button[aria-current],
+.sectionNav button[aria-current] span {
   color: var(--accent-text);
+}
+.sectionNav button[aria-current]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: currentColor;
+}
+.sectionNav button:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .sectionNav button:hover,
+  .sectionNav button:hover span {
+    color: var(--accent-text);
+  }
 }
 .records {
   background: var(--panel);
@@ -525,6 +547,13 @@
 .catalogue a:hover {
   color: white;
 }
+.cataloguePreview {
+  display: grid;
+  min-width: 0;
+}
+.cataloguePreview[data-paired="true"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .catalogueImageFrame,
 .catalogueImage {
   display: block;
@@ -627,8 +656,7 @@
   font-size: 12px;
   letter-spacing: 0.1em;
 }
-.lightboxClose,
-.lightboxStep {
+.lightboxClose {
   min-width: 48px;
   min-height: 48px;
   padding: 4px;
@@ -639,17 +667,29 @@
   cursor: pointer;
   font-size: 12px;
 }
+.lightboxPagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lightboxCount {
+  min-width: 40px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
 .lightboxStep {
-  position: absolute;
-  z-index: 40;
-  top: 50%;
-  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  color: #efeae2;
+  background: transparent;
+  cursor: pointer;
 }
-.previous {
-  left: 12px;
-}
-.next {
-  right: 12px;
+.lightboxStep:hover {
+  background: rgba(239, 234, 226, 0.08);
 }
 .lightbox button:focus-visible {
   outline: 2px solid #efeae2;
@@ -767,12 +807,6 @@
   .titleGroup > p {
     font: italic var(--type-page-en)/1.35 var(--font-editorial);
   }
-  .subtitle p {
-    font: 400 18px/1.6 var(--font-song);
-  }
-  .subtitle p[lang="en"] {
-    font: italic 18px/1.4 var(--font-editorial);
-  }
   .category {
     font-size: 12.5px;
   }
@@ -827,11 +861,17 @@
     gap: 4px;
   }
   .sectionNav {
-    margin: 24px 20px 0;
-    gap: 4px 16px;
+    margin: 16px 20px 0;
+    gap: 24px;
+  }
+  .sectionNav button {
+    min-height: 56px;
+    gap: 2px;
+    padding-block: 8px;
+    font-size: 15px;
   }
   .sectionNav span {
-    display: none;
+    font-size: 14px;
   }
   .recordsGrid {
     display: flex;
@@ -893,50 +933,113 @@
 }
 
 @media (max-width: 1279px), (pointer: coarse) and (max-width: 1366px) {
+  .recordColumn,
+  .hero[data-layout="panorama"] .recordColumn {
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+  .recordHeading,
+  .recordFacts {
+    gap: 12px;
+  }
+  .recordHeading .category {
+    margin: 0;
+  }
+  .titleGroup > p {
+    margin-top: 6px;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+  }
+  .facts > div {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding-block: 10px;
+    align-content: start;
+  }
+  .facts dt {
+    gap: 2px;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+  }
+  .facts dt span {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .facts dd {
+    font-size: 15.5px;
+    line-height: 1.45;
+  }
+  .facts dd span {
+    margin-top: 2px;
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+  .facts > div[data-fact="technique"],
+  .facts > div[data-fact="material"]:has(+ [data-fact="technique"]),
+  .facts > div[data-fact="technique"] + [data-fact="dimensions"] {
+    grid-column: 1 / -1;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .facts > div[data-fact="status"] {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px 16px;
+  }
+  .facts [data-fact="status"] dt,
+  .facts [data-fact="status"] dd {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 8px;
+  }
+  .facts [data-fact="status"] dd span {
+    margin-top: 0;
+  }
+  .inquiry[data-status="sold"] {
+    display: none;
+  }
+  .inquiry {
+    gap: 8px;
+  }
+  .inquirySupport {
+    gap: 0 20px;
+  }
   .sectionNav {
     position: sticky;
     top: 0;
     z-index: 15;
-    flex-wrap: nowrap;
-    gap: 6px;
-    padding: 8px;
-    border: 1px solid var(--line);
-    background: var(--paper);
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-    scrollbar-color: var(--muted) var(--panel);
-  }
-  .sectionNav button {
-    flex: none;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
-    min-height: 46px;
-    padding: 8px 12px;
-    border: 1px solid var(--line);
-    background: transparent;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.45;
-    white-space: nowrap;
-  }
-  .sectionNav button[aria-current] {
-    border-color: var(--muted);
-    border-bottom: 2px solid var(--accent-text);
-    background: var(--panel);
-  }
-  .sectionNav button:focus-visible {
-    outline: 2px solid var(--accent-text);
-    outline-offset: -3px;
-  }
-  .sectionNav span {
-    font-weight: 400;
-    font-size: 12px;
   }
   .artworkDetail [id^="artwork-"] {
-    scroll-margin-top: 96px;
+    scroll-margin-top: 80px;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 860px) {
+  .recordColumn,
+  .hero[data-layout="panorama"] .recordColumn {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    column-gap: 32px;
+    align-items: start;
+  }
+  .recordNavigation {
+    grid-column: 1 / -1;
+  }
+  .recordHeading,
+  .hero[data-layout="panorama"] .recordHeading {
+    grid-column: 1;
+  }
+  .recordFacts,
+  .hero[data-layout="panorama"] .recordFacts {
+    grid-column: 2;
   }
 }
