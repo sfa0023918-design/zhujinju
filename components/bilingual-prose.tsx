@@ -42,6 +42,7 @@ type BilingualReadingPanelProps = {
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
   autoSplitLongSingleParagraph?: boolean;
+  collapseAtLineBoundary?: boolean;
 };
 
 type ParagraphSplitOptions = {
@@ -301,17 +302,20 @@ function ExpandableReadingText({
   locale,
   variant,
   paragraphClassName,
+  collapseAtLineBoundary = false,
 }: {
   paragraphs: string[];
   locale: ReadingLocale;
   variant: ProseVariant;
   paragraphClassName?: string;
+  collapseAtLineBoundary?: boolean;
 }) {
   const [expandedByLocale, setExpandedByLocale] = useState<Record<ReadingLocale, boolean>>({
     zh: false,
     en: false,
   });
   const [canExpand, setCanExpand] = useState(false);
+  const [collapsedHeight, setCollapsedHeight] = useState<number>();
   const contentRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -331,24 +335,56 @@ function ExpandableReadingText({
     };
 
     const measure = () => {
-      if (!inner) {
+      if (collapseAtLineBoundary && !inner.getBoundingClientRect().width) {
         return;
       }
-      const nextCanExpand = inner.scrollHeight - getCollapsedHeight() > 8;
+      const limit = getCollapsedHeight();
+      let height = limit;
+      if (collapseAtLineBoundary && inner.scrollHeight > limit + 8) {
+        // Opt-in layouts can change font metrics; end at a complete rendered
+        // line rather than cutting through text at the fixed preview height.
+        const top = inner.getBoundingClientRect().top;
+        let lastLineBottom = 0;
+        let nextLineTop = Infinity;
+        for (const paragraph of inner.querySelectorAll("p")) {
+          const range = document.createRange();
+          range.selectNodeContents(paragraph);
+          for (const rect of range.getClientRects()) {
+            const bottom = rect.bottom - top;
+            if (bottom <= limit) {
+              lastLineBottom = Math.max(lastLineBottom, bottom);
+            } else {
+              nextLineTop = Math.min(nextLineTop, rect.top - top);
+            }
+          }
+        }
+        if (lastLineBottom > 0) {
+          height = Math.min(limit, (lastLineBottom + nextLineTop) / 2);
+        }
+      }
+      if (collapseAtLineBoundary) setCollapsedHeight(height);
+      const nextCanExpand = inner.scrollHeight - height > 8;
       setCanExpand(nextCanExpand);
     };
 
     measure();
+    let active = true;
+    if (collapseAtLineBoundary) {
+      void document.fonts.ready.then(() => {
+        if (active) measure();
+      });
+    }
 
     const observer = new ResizeObserver(measure);
     observer.observe(inner);
     window.addEventListener("resize", measure);
 
     return () => {
+      active = false;
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [locale, paragraphs]);
+  }, [locale, paragraphs, collapseAtLineBoundary]);
 
   function toggleExpanded() {
     const wrapperTop = wrapperRef.current?.getBoundingClientRect().top ?? null;
@@ -373,6 +409,7 @@ function ExpandableReadingText({
       <div
         ref={contentRef}
         data-expanded={expanded ? "true" : "false"}
+        style={collapseAtLineBoundary && !expanded ? { maxHeight: collapsedHeight } : undefined}
         className={`relative overflow-hidden transition-[max-height] duration-300 ease-out ${
           !expanded ? "max-h-[13rem] md:max-h-[19rem]" : "max-h-[999rem]"
         }`}
@@ -485,6 +522,7 @@ export function BilingualReadingPanel({
   manualSplitThresholdZh,
   manualSplitThresholdEn,
   autoSplitLongSingleParagraph = true,
+  collapseAtLineBoundary = false,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -554,6 +592,7 @@ export function BilingualReadingPanel({
                   locale={locale}
                   variant={section.variant ?? "body"}
                   paragraphClassName={mergedParagraphClassName}
+                  collapseAtLineBoundary={collapseAtLineBoundary}
                 />
               ) : (
                 <div className="space-y-3 md:space-y-4">

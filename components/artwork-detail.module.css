@@ -33,10 +33,10 @@
   position: sticky;
   top: 0;
   min-width: 0;
-  padding: 28px 40px 28px 72px;
+  padding: 24px 40px 28px 56px;
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 24px;
 }
 .galleryNavigation {
   display: flex;
@@ -72,7 +72,7 @@
 .recordFacts {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
   min-width: 0;
   max-width: 600px;
 }
@@ -130,23 +130,26 @@
 .excerpt p[lang="en"] {
   margin-top: 8px;
 }
+.excerpt p[lang="en"]:first-child {
+  margin-top: 0;
+}
 .facts {
   border-top: 1px solid var(--ink);
   margin: 0;
 }
 .facts > div {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
+  grid-template-columns: 132px minmax(0, 1fr);
   gap: 16px;
-  padding: 14px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--line);
   align-items: baseline;
 }
 .facts dt {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -163,9 +166,11 @@
   overflow-wrap: anywhere;
 }
 .facts dd span {
-  margin-left: 10px;
+  display: block;
+  margin-top: 3px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 13.5px;
+  line-height: 1.5;
 }
 .inquiry {
   display: flex;
@@ -243,7 +248,7 @@
   position: static;
   max-width: 1600px;
   margin: auto;
-  padding: 56px 40px 28px;
+  padding: 40px 40px 32px;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 24px;
@@ -327,14 +332,14 @@
 .recordsGrid {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 88px 40px 96px;
+  padding: 64px 40px 72px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 48px;
 }
 .recordsGrid h2 {
   margin: 0;
-  padding-bottom: 20px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--ink);
   font: 500 24px/1.7 var(--font-song);
   letter-spacing: 0.08em;
@@ -407,7 +412,7 @@
   display: grid;
   grid-template-columns: 3fr 9fr;
   gap: 40px;
-  padding: 80px 40px;
+  padding: 64px 40px;
   align-items: center;
 }
 .catalogue .category span {
@@ -456,14 +461,14 @@
 .relatedWorks {
   max-width: 1600px;
   margin: auto;
-  padding: 112px 40px 120px;
+  padding: 80px 40px 88px;
 }
 .relatedHeading {
   display: flex;
   justify-content: space-between;
   gap: 24px;
   align-items: end;
-  margin-bottom: 48px;
+  margin-bottom: 36px;
 }
 .relatedHeading h2 {
   margin: 0;
@@ -547,8 +552,8 @@
     grid-template-columns: 50% minmax(0, 1fr);
   }
   .recordColumn {
-    padding: 24px 32px 28px 40px;
-    gap: 28px;
+    padding: 20px 32px 28px;
+    gap: 24px;
   }
   .facts > div {
     grid-template-columns: 112px minmax(0, 1fr);
@@ -583,12 +588,12 @@
     display: flex;
     position: static;
     padding: 0 20px 36px;
-    gap: 28px;
+    gap: 24px;
   }
   .recordHeading,
   .recordFacts {
     max-width: none;
-    gap: 28px;
+    gap: 20px;
   }
   .hero[data-layout="panorama"] .recordNavigation {
     display: block;
@@ -665,7 +670,7 @@
     font-size: 15.5px;
   }
   .facts dd span {
-    font-size: 14px;
+    font-size: 13.5px;
   }
   .inquiryAction span[lang] {
     display: inline;
@@ -707,8 +712,8 @@
   .recordsGrid {
     display: flex;
     flex-direction: column;
-    gap: 40px;
-    padding: 56px 20px 64px;
+    gap: 32px;
+    padding: 48px 20px 56px;
   }
   .recordsGrid h2 {
     font-size: 21px;
@@ -733,7 +738,7 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 56px 0 64px;
+    padding: 48px 0 56px;
     gap: 32px;
   }
   .catalogueGrid > div {
@@ -746,7 +751,7 @@
     font-size: 20px;
   }
   .relatedWorks {
-    padding: 64px 20px 80px;
+    padding: 56px 20px 64px;
   }
   .relatedHeading {
     align-items: start;

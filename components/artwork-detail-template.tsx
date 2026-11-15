@@ -153,6 +153,18 @@ export function ArtworkDetailTemplate({
     "--english-mobile": `${englishLength <= 28 ? 24 : englishLength <= 60 ? 21 : 18}px`,
   } as CSSProperties;
   const status = getArtworkStatusText(artwork.status);
+  // Some records use the title as a placeholder summary. Keep unique copy,
+  // but do not repeat the heading as a second paragraph in either language.
+  const excerpt = {
+    zh:
+      artwork.excerpt.zh.trim() === artwork.title.zh.trim()
+        ? ""
+        : artwork.excerpt.zh,
+    en:
+      artwork.excerpt.en.trim() === artwork.title.en.trim()
+        ? ""
+        : artwork.excerpt.en,
+  };
   const facts = [
     { label: detailCopy.fieldLabels.period, value: artwork.period },
     {
@@ -217,8 +229,8 @@ export function ArtworkDetailTemplate({
           {hasText(artwork.subtitle) ? (
             <Pair text={artwork.subtitle} className={styles.subtitle} />
           ) : null}
-          {hasText(artwork.excerpt) ? (
-            <Pair text={artwork.excerpt} className={styles.excerpt} />
+          {hasText(excerpt) ? (
+            <Pair text={excerpt} className={styles.excerpt} />
           ) : null}
         </div>
         <div className={styles.recordFacts}>

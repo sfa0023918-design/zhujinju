@@ -60,6 +60,7 @@ export function ContemporaryReading({
             manualSplitThresholdZh={260}
             manualSplitThresholdEn={420}
             paragraphClassName={styles.paragraph}
+            collapseAtLineBoundary
           />
         </div>
       ))}
