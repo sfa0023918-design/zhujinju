@@ -28,9 +28,9 @@
 .preface h2 { font-size: 25px; line-height: 1.6; margin-bottom: 28px; }
 .prefaceOpening { display: grid; gap: 28px; }
 .prefaceOpening figure { max-width: 200px; width: 62%; }
-.prose { font: 17px/1.95 var(--font-serif); overflow-wrap: break-word; }
-.prose p + p { margin-top: 20px; }
-.prose .lead { font-size: 21px; line-height: 1.8; margin-bottom: 28px; }
+.prose { font: var(--reading-size)/1.9 var(--font-serif); overflow-wrap: break-word; }
+.prose p + p { margin-top: var(--reading-paragraph-gap); }
+.prose .lead { margin-bottom: var(--reading-paragraph-gap); }
 .prefaceWalk { margin-top: 40px !important; }
 .prefaceClosing { max-width: 640px; margin: 32px auto 0; }
 .prose .introduction { border-top: 1px solid var(--line); margin-top: 30px; padding-top: 24px; font: 14px/1.85 var(--font-sans); color: var(--accent-text); }

@@ -14,13 +14,11 @@ export function ContemporaryReading({
   title,
   content,
   expandable = true,
-  englishLeadSentence = false,
 }: {
   id?: string;
   title: BilingualValue;
   content: BilingualProseContent;
   expandable?: boolean;
-  englishLeadSentence?: boolean;
 }) {
   const [locale, setLocale] = useState<ReadingLocale>("zh");
   const sections = [
@@ -57,13 +55,11 @@ export function ContemporaryReading({
             sections={sections}
             locale={value}
             showToggle={false}
-            singleLineBreakMode="soft"
-            manualParagraphMode="split-long"
-            manualSplitThresholdZh={260}
-            manualSplitThresholdEn={420}
+            singleLineBreakMode="paragraph"
+            manualParagraphMode="preserve"
+            autoSplitLongSingleParagraph={false}
+            repairWrappedLines
             paragraphClassName={styles.paragraph}
-            collapseAtLineBoundary
-            englishLeadSentence={englishLeadSentence}
           />
         </div>
       ))}

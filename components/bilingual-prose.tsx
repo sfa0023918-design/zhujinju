@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -42,12 +42,11 @@ type BilingualReadingPanelProps = {
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
   autoSplitLongSingleParagraph?: boolean;
-  collapseAtLineBoundary?: boolean;
-  englishLeadSentence?: boolean;
+  repairWrappedLines?: boolean;
 };
 
 type ParagraphSplitOptions = {
-  englishLeadSentence?: boolean;
+  repairWrappedLines?: boolean;
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
@@ -123,50 +122,23 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
   return chunks.filter(Boolean);
 }
 
-function splitByClauseGroups(text: string, locale: ReadingLocale) {
-  const clauseRegex =
-    locale === "zh"
-      ? /[^，、；：]+[，、；：]?/g
-      : /[^,;:]+[,;:]?(?:["'’”）)\]]+)?(?:\s+|$)/g;
-  const joiner = locale === "zh" ? "" : " ";
-  const targetLength = locale === "zh" ? 90 : 150;
-  const maxLength = locale === "zh" ? 170 : 260;
-  const clauses = (text.match(clauseRegex) ?? [])
-    .map((clause) => clause.trim())
-    .filter(Boolean);
-
-  if (clauses.join("").replace(/\s/g, "") !== text.replace(/\s/g, "")) {
-    return [text];
-  }
-
-  if (clauses.length <= 1) {
-    return [text];
-  }
-
-  const chunks: string[] = [];
-  let current = "";
-
-  clauses.forEach((clause) => {
-    if (!current) {
-      current = clause;
-      return;
+// Printed/PDF text often stores each typeset line as a paragraph. Join only
+// unfinished prose; retain sentence endings, list items and short headings.
+function repairWrappedParagraphs(paragraphs: string[], locale: ReadingLocale) {
+  const result: string[] = [];
+  const endsParagraph = /[。！？.!?…；;：:~～][”’"'）)\]]*$/;
+  const startsListItem = /^(?:[•●▪-]\s|\d+[.、)]\s*|[一二三四五六七八九十]+[、．])/;
+  for (const paragraph of paragraphs) {
+    const previous = result.at(-1);
+    const isHeading = previous && previous.length <= (locale === "zh" ? 18 : 40)
+      && !/[，,、。.!?！？；;：:]/.test(previous);
+    if (previous && !endsParagraph.test(previous) && !isHeading && !startsListItem.test(paragraph)) {
+      result[result.length - 1] = normalizeParagraphText(`${previous} ${paragraph}`, locale);
+    } else {
+      result.push(paragraph);
     }
-
-    const next = `${current}${joiner}${clause}`;
-    if (current.length >= targetLength || next.length > maxLength) {
-      chunks.push(current);
-      current = clause;
-      return;
-    }
-
-    current = next;
-  });
-
-  if (current) {
-    chunks.push(current);
   }
-
-  return chunks.filter(Boolean);
+  return result;
 }
 
 function splitLongManualParagraphs(
@@ -181,7 +153,6 @@ function splitLongManualParagraphs(
   const threshold = locale === "zh"
     ? options.manualSplitThresholdZh ?? 260
     : options.manualSplitThresholdEn ?? 420;
-  const hardCap = locale === "zh" ? 320 : 520;
 
   return paragraphs.flatMap((paragraph) => {
     if (paragraph.length < threshold) {
@@ -191,14 +162,7 @@ function splitLongManualParagraphs(
     const chunks = splitBySentenceGroups(paragraph, locale);
     const normalizedChunks = chunks.length > 1 ? chunks : [paragraph];
 
-    return normalizedChunks.flatMap((chunk) => {
-      if (chunk.length <= hardCap) {
-        return [chunk];
-      }
-
-      const clauseChunks = splitByClauseGroups(chunk, locale);
-      return clauseChunks.length > 1 ? clauseChunks : [chunk];
-    });
+    return normalizedChunks;
   });
 }
 
@@ -220,15 +184,19 @@ function splitParagraphs(
       ? normalized.split(/\n+/)
       : [normalized];
 
-  const manualParagraphs = rawParagraphs
+  const normalizedParagraphs = rawParagraphs
     .map((paragraph) => normalizeParagraphText(paragraph, locale))
     .filter(Boolean);
+
+  const manualParagraphs = options?.repairWrappedLines
+    ? repairWrappedParagraphs(normalizedParagraphs, locale)
+    : normalizedParagraphs;
 
   if (manualParagraphs.length > 1) {
     return splitLongManualParagraphs(manualParagraphs, locale, options);
   }
 
-  const singleParagraph = normalizeParagraphText(normalized, locale);
+  const singleParagraph = manualParagraphs[0] ?? "";
   if (!singleParagraph) {
     return [];
   }
@@ -266,17 +234,6 @@ export function getParagraphsByLocale(
   const paragraphs = items.flatMap((item) => {
     return splitParagraphs(getLocalizedText(item, locale), locale, singleLineBreakMode, options);
   });
-
-  // Exhibition prefaces use a short editorial lead, followed by body copy.
-  // Keep this opt-in so artwork notes and other reading panels retain their layout.
-  if (locale === "en" && options?.englishLeadSentence && paragraphs.length) {
-    const first = paragraphs[0];
-    const segments = new Intl.Segmenter("en", { granularity: "sentence" }).segment(first);
-    const lead = segments[Symbol.iterator]().next().value?.segment;
-    if (lead && lead.length < first.length) {
-      return [lead.trim(), first.slice(lead.length).trim(), ...paragraphs.slice(1)];
-    }
-  }
 
   return paragraphs;
 }
@@ -317,120 +274,36 @@ function ExpandableReadingText({
   locale,
   variant,
   paragraphClassName,
-  collapseAtLineBoundary = false,
 }: {
   paragraphs: string[];
   locale: ReadingLocale;
   variant: ProseVariant;
   paragraphClassName?: string;
-  collapseAtLineBoundary?: boolean;
 }) {
   const [expandedByLocale, setExpandedByLocale] = useState<Record<ReadingLocale, boolean>>({
     zh: false,
     en: false,
   });
-  const [canExpand, setCanExpand] = useState(false);
-  const [collapsedHeight, setCollapsedHeight] = useState<number>();
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const innerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const contentId = useId();
   const expanded = expandedByLocale[locale];
-
-  useEffect(() => {
-    const element = contentRef.current;
-    const inner = innerRef.current;
-
-    if (!element || !inner) {
-      return;
-    }
-
-    const getCollapsedHeight = () => {
-      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-      return isDesktop ? 304 : 208;
-    };
-
-    const measure = () => {
-      if (collapseAtLineBoundary && !inner.getBoundingClientRect().width) {
-        return;
-      }
-      const limit = getCollapsedHeight();
-      let height = limit;
-      if (collapseAtLineBoundary && inner.scrollHeight > limit + 8) {
-        // Opt-in layouts can change font metrics; end at a complete rendered
-        // line rather than cutting through text at the fixed preview height.
-        const top = inner.getBoundingClientRect().top;
-        let lastLineBottom = 0;
-        let nextLineTop = Infinity;
-        for (const paragraph of inner.querySelectorAll("p")) {
-          const range = document.createRange();
-          range.selectNodeContents(paragraph);
-          for (const rect of range.getClientRects()) {
-            const bottom = rect.bottom - top;
-            if (bottom <= limit) {
-              lastLineBottom = Math.max(lastLineBottom, bottom);
-            } else {
-              nextLineTop = Math.min(nextLineTop, rect.top - top);
-            }
-          }
-        }
-        if (lastLineBottom > 0) {
-          height = Math.min(limit, (lastLineBottom + nextLineTop) / 2);
-        }
-      }
-      if (collapseAtLineBoundary) setCollapsedHeight(height);
-      const nextCanExpand = inner.scrollHeight - height > 8;
-      setCanExpand(nextCanExpand);
-    };
-
-    measure();
-    let active = true;
-    if (collapseAtLineBoundary) {
-      void document.fonts.ready.then(() => {
-        if (active) measure();
-      });
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(inner);
-    window.addEventListener("resize", measure);
-
-    return () => {
-      active = false;
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [locale, paragraphs, collapseAtLineBoundary]);
+  const canExpand = paragraphs.length > 3;
+  const visibleParagraphs = expanded ? paragraphs : paragraphs.slice(0, 3);
 
   function toggleExpanded() {
-    const wrapperTop = wrapperRef.current?.getBoundingClientRect().top ?? null;
-    const nextExpanded = !expanded;
-
-    setExpandedByLocale((current) => ({
-      ...current,
-      [locale]: nextExpanded,
-    }));
-
-    if (!nextExpanded && wrapperTop !== null) {
+    setExpandedByLocale((current) => ({ ...current, [locale]: !expanded }));
+    if (expanded) {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+        wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
   }
 
   return (
     <div ref={wrapperRef} className="space-y-3">
-      <div
-        ref={contentRef}
-        data-expanded={expanded ? "true" : "false"}
-        style={collapseAtLineBoundary && !expanded ? { maxHeight: collapsedHeight } : undefined}
-        className={`relative overflow-hidden transition-[max-height] duration-300 ease-out ${
-          !expanded ? "max-h-[13rem] md:max-h-[19rem]" : "max-h-[999rem]"
-        }`}
-      >
-        <div ref={innerRef} className="space-y-3 md:space-y-4">
-          {paragraphs.map((paragraph, index) => (
+      <div id={contentId} data-expanded={expanded ? "true" : "false"}>
+        <div className="space-y-3 md:space-y-4">
+          {visibleParagraphs.map((paragraph, index) => (
             <p
               key={`${locale}-${index}`}
               lang={locale === "en" ? "en" : "zh-CN"}
@@ -440,13 +313,12 @@ function ExpandableReadingText({
             </p>
           ))}
         </div>
-        {canExpand && !expanded ? (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--bg)] via-[rgba(244,240,232,0.9)] to-transparent" />
-        ) : null}
       </div>
       {canExpand ? (
         <button
           type="button"
+          aria-expanded={expanded}
+          aria-controls={contentId}
           onClick={toggleExpanded}
           className="inline-flex min-h-11 cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)]"
         >
@@ -537,8 +409,7 @@ export function BilingualReadingPanel({
   manualSplitThresholdZh,
   manualSplitThresholdEn,
   autoSplitLongSingleParagraph = true,
-  collapseAtLineBoundary = false,
-  englishLeadSentence = false,
+  repairWrappedLines = false,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -578,7 +449,7 @@ export function BilingualReadingPanel({
             manualSplitThresholdZh,
             manualSplitThresholdEn,
             autoSplitLongSingleParagraph,
-            englishLeadSentence,
+            repairWrappedLines,
           });
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
@@ -609,7 +480,6 @@ export function BilingualReadingPanel({
                   locale={locale}
                   variant={section.variant ?? "body"}
                   paragraphClassName={mergedParagraphClassName}
-                  collapseAtLineBoundary={collapseAtLineBoundary}
                 />
               ) : (
                 <div className="space-y-3 md:space-y-4">

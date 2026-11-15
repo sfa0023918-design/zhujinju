@@ -478,7 +478,7 @@
 
 .readingFrame :global(.article-reading-lead) {
   width: 100%;
-  margin-bottom: 28px;
+  margin-bottom: var(--reading-paragraph-gap);
 }
 
 .readingFrame :global(.article-reading-copy) {
@@ -486,7 +486,7 @@
 }
 
 .readingFrame :global(.article-reading-copy) + :global(.article-reading-copy) {
-  margin-top: 20px;
+  margin-top: var(--reading-paragraph-gap);
 }
 
 .readingFrame :global(.article-reading-lead) + :global(.article-reading-media),
@@ -503,19 +503,19 @@
 
 .readingFrame :global(.article-reading-lead p + p),
 .readingFrame :global(.article-reading-copy p + p) {
-  margin-top: 20px;
+  margin-top: var(--reading-paragraph-gap);
 }
 
 .readingFrame :global(.prose-block--zh) {
   max-width: 40rem;
-  font-size: 17px;
-  line-height: 1.95;
+  font: 400 var(--reading-size)/1.9 var(--font-song);
+  color: var(--ink);
 }
 
 .readingFrame :global(.prose-block--en) {
   max-width: 42rem;
-  font-size: 15px;
-  line-height: 1.82;
+  font: 400 var(--reading-size)/1.8 var(--font-sans);
+  color: var(--ink);
 }
 
 .readingFrame :global(.article-reading-media--group) {
@@ -628,12 +628,12 @@
   }
 
   .readingFrame :global(.article-reading-lead) {
-    margin-bottom: 24px;
+    margin-bottom: var(--reading-paragraph-gap);
   }
 
   .readingFrame :global(.article-reading-lead p + p),
   .readingFrame :global(.article-reading-copy p + p) {
-    margin-top: 18px;
+    margin-top: var(--reading-paragraph-gap);
   }
 
   .readingFrame :global(.article-reading-lead) + :global(.article-reading-media),
@@ -645,14 +645,10 @@
 
   .readingFrame :global(.prose-block--zh) {
     max-width: 40rem;
-    font-size: 16px;
-    line-height: 1.92;
   }
 
   .readingFrame :global(.prose-block--en) {
     max-width: 42rem;
-    font-size: 15px;
-    line-height: 1.78;
   }
 
   .readingFrame figure {

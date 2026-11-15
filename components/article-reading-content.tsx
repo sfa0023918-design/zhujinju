@@ -271,7 +271,7 @@ export function ArticleReadingContent({
   const [locale, setLocale] = useState<ReadingLocale>("zh");
   const hasEnglish = useMemo(() => articleHasCompleteEnglish(excerpt, blocks), [blocks, excerpt]);
   const excerptParagraphs = useMemo(
-    () => getParagraphsByLocale(excerpt, locale, "soft", { autoSplitLongSingleParagraph: false }),
+    () => getParagraphsByLocale(excerpt, locale, "soft", { autoSplitLongSingleParagraph: false, repairWrappedLines: true }),
     [excerpt, locale],
   );
   const excerptLead = excerptParagraphs[0]?.trim() ?? "";
@@ -322,6 +322,7 @@ export function ArticleReadingContent({
           if (block.type === "paragraph") {
             const paragraphs = getParagraphsByLocale(block.content, locale, "paragraph", {
               autoSplitLongSingleParagraph: false,
+              repairWrappedLines: true,
             });
 
             if (!paragraphs.length) {

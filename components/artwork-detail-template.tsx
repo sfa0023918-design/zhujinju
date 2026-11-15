@@ -23,7 +23,6 @@ import { ArtworkGrid } from "./artwork-grid";
 import { ArtworkGallery } from "./artwork-gallery";
 import { ContemporaryReading } from "./contemporary-reading";
 import { ProtectedImage } from "./protected-image";
-import type { ReadingLocale } from "./bilingual-prose";
 import styles from "./artwork-detail.module.css";
 
 export type ArtworkCatalogueReference = {
@@ -47,63 +46,6 @@ function hasText(value?: { zh?: string; en?: string } | null) {
   }
 
   return Boolean(value.zh?.trim() || value.en?.trim());
-}
-
-function normalizeWrappedViewingText(text: string, locale: ReadingLocale) {
-  const normalized = text.replace(/\r\n/g, "\n").trim();
-
-  if (!normalized.includes("\n")) {
-    return normalized;
-  }
-
-  const lines = normalized
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  if (lines.length < 4) {
-    return normalized;
-  }
-
-  const sentenceEndPattern = locale === "zh" ? /[。！？!?；;：:]$/ : /[.!?;:]$/;
-  const avgLineLength =
-    lines.reduce((sum, line) => sum + line.length, 0) / lines.length;
-  const noSentenceEndCount = lines.filter(
-    (line) => !sentenceEndPattern.test(line),
-  ).length;
-  const shouldUnwrap =
-    (avgLineLength <= 42 && noSentenceEndCount / lines.length >= 0.38) ||
-    (lines.length >= 10 && avgLineLength <= 58 && noSentenceEndCount >= 3);
-
-  if (!shouldUnwrap) {
-    return normalized;
-  }
-
-  return lines.join(locale === "zh" ? "" : " ");
-}
-
-function getViewingNoteForRender(artwork: Artwork) {
-  const normalizedZh = normalizeWrappedViewingText(
-    artwork.viewingNote?.zh ?? "",
-    "zh",
-  );
-  const normalizedEn = normalizeWrappedViewingText(
-    artwork.viewingNote?.en ?? "",
-    "en",
-  );
-
-  if (
-    normalizedZh === (artwork.viewingNote?.zh ?? "") &&
-    normalizedEn === (artwork.viewingNote?.en ?? "")
-  ) {
-    return artwork.viewingNote;
-  }
-
-  return {
-    ...artwork.viewingNote,
-    zh: normalizedZh,
-    en: normalizedEn,
-  };
 }
 
 function joinBilingual(
@@ -179,7 +121,7 @@ export function ArtworkDetailTemplate({
     { label: { zh: "状态", en: "Status" }, value: status },
   ].filter((item) => hasText(item.value));
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
-  const viewingNote = getViewingNoteForRender(artwork);
+  const viewingNote = artwork.viewingNote;
   const sections = [
     { id: "artwork-info", label: { zh: "作品信息", en: "Artwork Info" } },
     ...(hasText(viewingNote) || hasText(artwork.comparisonNote)
@@ -241,7 +183,7 @@ export function ArtworkDetailTemplate({
                   {label.zh}
                   <span lang="en">{label.en}</span>
                 </dt>
-                <dd>
+                <dd data-artwork-status={label.en === "Status" ? artwork.status : undefined}>
                   {value.zh}
                   {value.en && value.en !== value.zh ? (
                     <span lang="en">{value.en}</span>
@@ -252,7 +194,7 @@ export function ArtworkDetailTemplate({
           </dl>
           <div className={styles.inquiry}>
             {artwork.status === "sold" ? (
-              <div className={styles.inquiryAction}>
+              <div className={styles.inquiryAction} data-artwork-status="sold">
                 {status.zh}
                 <span lang="en">{status.en}</span>
               </div>

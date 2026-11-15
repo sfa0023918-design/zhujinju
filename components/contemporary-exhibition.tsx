@@ -152,7 +152,6 @@ export function ContemporaryExhibition({
         id="preface"
         title={introIsHeading ? e.intro : { zh: "序", en: "Preface" }}
         content={preface}
-        englishLeadSentence
       />
       {curatorial.zh || curatorial.en ? (
         <ContemporaryReading

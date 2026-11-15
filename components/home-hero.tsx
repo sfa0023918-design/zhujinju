@@ -123,7 +123,7 @@ export function HomeHero({
                 <span lang="en">{slide.title.en}</span>
               </span>
               <span className={styles.captionFacts}>{slide.facts}</span>
-              <span className={styles.captionStatus}>
+              <span className={styles.captionStatus} data-artwork-status={slide.statusKey}>
                 <i className={styles.statusDot} data-status={slide.statusKey} />
                 {slide.status}
                 <span className={styles.mobileCaptionFacts}>

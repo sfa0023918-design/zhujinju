@@ -22,6 +22,10 @@
   --accent-text: #8f3b2b;
   --error: #87372f;
   --success: #356247;
+  --status-available: #356247;
+  --status-acquired: #984438;
+  --reading-size: 18px;
+  --reading-paragraph-gap: 20px;
   --warning: #71521b;
   --line: rgba(20, 19, 17, 0.2);
   --line-strong: #141311;
@@ -86,6 +90,18 @@
 .siteTheme input,
 .siteTheme textarea {
   caret-color: var(--ink);
+}
+.siteTheme [data-artwork-status="inquiry"] {
+  color: var(--status-available);
+}
+.siteTheme [data-artwork-status="sold"] {
+  color: var(--status-acquired);
+}
+@media (max-width: 860px) {
+  .siteTheme {
+    --reading-size: 16px;
+    --reading-paragraph-gap: 18px;
+  }
 }
 
 /* Keep the approved editorial body isolated from the new global palette/type. */

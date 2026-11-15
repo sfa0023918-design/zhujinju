@@ -218,13 +218,13 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--ink);
+  background: currentColor;
   flex: none;
 }
 .statusDot[data-status="sold"],
 .statusDot[data-status="reserved"] {
   background: transparent;
-  border: 1px solid var(--ink);
+  border: 1px solid currentColor;
 }
 .statusDot[data-status="reserved"]::after {
   content: "";
@@ -233,7 +233,7 @@
   height: 3px;
   margin: 1px;
   border-radius: 50%;
-  background: var(--ink);
+  background: currentColor;
 }
 .captionGo {
   display: inline-flex;

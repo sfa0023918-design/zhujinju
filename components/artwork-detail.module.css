@@ -172,6 +172,9 @@
   font-size: 13.5px;
   line-height: 1.5;
 }
+.facts dd[data-artwork-status] span {
+  color: inherit;
+}
 .inquiry {
   display: flex;
   flex-direction: column;
@@ -200,6 +203,14 @@
 .inquiryAction:hover {
   color: var(--paper);
   background: var(--accent-text);
+}
+.inquiryAction[data-artwork-status="sold"] {
+  color: var(--status-acquired);
+  background: transparent;
+  border: 1px solid currentColor;
+}
+.inquiryAction[data-artwork-status="sold"] span[lang] {
+  opacity: 1;
 }
 .inquirySupport {
   display: flex;

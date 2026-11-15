@@ -62,7 +62,7 @@ function Card({ artwork }: { artwork: Artwork }) {
         {artwork.title.en}
       </span>
       <span className={styles.cardFacts}>{regionPeriod}</span>
-      <span className={styles.cardStatus}>
+      <span className={styles.cardStatus} data-artwork-status={artwork.status}>
         <i className={styles.statusDot} data-status={artwork.status} />
         <span>{status.zh}</span>
         <span className={styles.cardStatusEnglish} lang="en">

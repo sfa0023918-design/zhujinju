@@ -81,7 +81,7 @@ export function ArtworkGrid({
                           .map((text) => ` · ${text}`)}
                       </span>
                     </span>
-                    <span className={styles.status}>
+                    <span className={styles.status} data-artwork-status={a.status}>
                       <i data-status={a.status} />
                       {status.zh}
                       <span lang="en">
