@@ -22,7 +22,9 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
-    href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+    href === "/"
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
     if (!open) {
@@ -49,30 +51,26 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
     <>
       <button
         type="button"
+        aria-label={open ? "关闭菜单" : "打开菜单"}
         aria-expanded={open}
         aria-controls="site-mobile-nav"
         onClick={() => setOpen((value) => !value)}
         className={styles.menuButton}
       >
-        <span>{open ? "关闭" : "导航"}</span>
+        <span aria-hidden="true" />
+        <span aria-hidden="true" />
       </button>
 
-      <nav
-        aria-label="主导航"
-        className={styles.desktopNav}
-      >
+      <nav aria-label="主导航" className={styles.desktopNav}>
         {items.map((item) => {
           const active = isActive(item.href);
-          const sectionStart = item.href === "/about";
 
           return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`${styles.navLink} ${active ? styles.navLinkActive : ""} ${
-                sectionStart ? styles.navLinkSectionStart : ""
-              }`}
+              className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
             >
               <BilingualText
                 as="span"

@@ -1,189 +1,135 @@
 import Link from "next/link";
 
-import { DirectionalArrow } from "@/components/directional-arrow";
-import { HomeHighlights } from "@/components/home-highlights";
+import { HomeArtworkGrid } from "@/components/home-artwork-grid";
+import { HomeHero, type HomeHeroSlide } from "@/components/home-hero";
+import { HomeAction, HomeArrow, HomeLabel } from "@/components/home-ui";
 import { ProtectedImage } from "@/components/protected-image";
 import {
   getArticleDisplayExcerpt,
   resolveArticleCover,
 } from "@/lib/article-content";
 import {
-  COVER_VAJRA_BACKDROP,
   COVER_VAJRA_CLIP,
   COVER_VAJRA_IMAGE,
-  COVER_VAJRA_SLUG,
 } from "@/lib/artwork-presentation";
 import { getArtworkStatusText } from "@/lib/bilingual";
+import { getTelHref } from "@/lib/contact-links";
+import { homeHeroSlides } from "@/lib/data/home-hero-slides";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import {
   getCurrentExhibition,
   getFeaturedArtworks,
   getPublicArticles,
+  getPublicArtworks,
   loadSiteContent,
-  type Article,
-  type Artwork,
   type BilingualText,
 } from "@/lib/site-data";
-
 import styles from "./home.module.css";
-
-function HomeAction({
-  href,
-  text,
-  subtle = false,
-  catalogue = false,
-}: {
-  href: string;
-  text: BilingualText;
-  subtle?: boolean;
-  catalogue?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`${subtle ? styles.textLink : styles.action} ${catalogue ? styles.catalogueLink : ""}`}
-    >
-      <span>
-        {text.zh}
-        <small lang="en">{text.en}</small>
-      </span>
-      <DirectionalArrow />
-    </Link>
-  );
-}
 
 function SectionHeading({
   title,
   href,
   action,
+  mobileAction,
 }: {
   title: BilingualText;
   href: string;
   action: BilingualText;
+  mobileAction: string;
 }) {
   return (
     <div className={styles.sectionHeading}>
-      <div>
+      <div className={styles.headingCopy}>
         <h2>{title.zh}</h2>
         <p lang="en">{title.en}</p>
       </div>
-      <HomeAction href={href} text={action} subtle />
-    </div>
-  );
-}
-
-function HomeArtwork({ artwork }: { artwork: Artwork }) {
-  const isCoverVajra = artwork.slug === COVER_VAJRA_SLUG;
-  const image = isCoverVajra
-    ? COVER_VAJRA_IMAGE
-    : resolveArtworkPrimaryImage(artwork);
-  const status = getArtworkStatusText(artwork.status);
-  return (
-    <article className={styles.artwork}>
-      <Link href={`/collection/${artwork.slug}`}>
-        <div
-          className={styles.artworkImageFrame}
-          style={
-            isCoverVajra ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined
-          }
-        >
-          <ProtectedImage
-            src={withImageVersion(image)}
-            alt={`${artwork.title.zh} ${artwork.title.en}`}
-            width={960}
-            height={1200}
-            quality={84}
-            sizes="(min-width: 1100px) 300px, (min-width: 768px) 360px, 300px"
-            className={styles.artworkImage}
-            style={isCoverVajra ? { clipPath: COVER_VAJRA_CLIP } : undefined}
-          />
-        </div>
-        <div className={styles.artworkInfo}>
-          <h3>{artwork.title.zh}</h3>
-          <p className={styles.artworkEnglish} lang="en">
-            {artwork.title.en}
-          </p>
-          <p className={styles.artworkPeriod}>
-            <span>{artwork.period.zh}</span>
-            <span lang="en">{artwork.period.en}</span>
-          </p>
-          <p className={styles.artworkStatus}>
-            <span>{status.zh}</span>
-            <span lang="en">{status.en}</span>
-          </p>
-        </div>
+      <HomeAction
+        href={href}
+        text={action}
+        subtle
+        className={styles.desktopHeadingAction}
+      />
+      <Link href={href} className={styles.mobileHeadingAction}>
+        <span className={styles.labelZh}>{mobileAction}</span>
+        <HomeArrow />
       </Link>
-    </article>
-  );
-}
-
-function ReadingMeta({ article }: { article: Article }) {
-  return (
-    <div className={styles.readingMeta}>
-      <time dateTime={article.date}>{article.date.replaceAll("-", ".")}</time>
-      <DirectionalArrow />
     </div>
   );
 }
 
 export default async function HomePage() {
   const content = await loadSiteContent();
-  const { brandIntro, homeContent } = content;
+  const { homeContent, siteConfig } = content;
   const exhibition = getCurrentExhibition(content);
   const artworks = getFeaturedArtworks(content).slice(0, 4);
-  const heroLines = homeContent.heroTitle.zh
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const publicArtworks = getPublicArtworks(content);
+  const slides: HomeHeroSlide[] = homeHeroSlides.flatMap((config) => {
+    const artwork = publicArtworks.find((work) => work.slug === config.slug);
+    if (!artwork) return [];
+    const regionPeriod = [artwork.region.zh, artwork.period.zh]
+      .filter(Boolean)
+      .join("，");
+    return [
+      {
+        slug: artwork.slug,
+        title: artwork.title,
+        image: withImageVersion(resolveArtworkPrimaryImage(artwork)),
+        width: artwork.imageAsset?.width ?? 800,
+        height: artwork.imageAsset?.height ?? 1000,
+        facts: [regionPeriod, artwork.material.zh, artwork.dimensions.zh]
+          .filter(Boolean)
+          .join(" · "),
+        mobileFacts: regionPeriod,
+        status: getArtworkStatusText(artwork.status).zh,
+        statusKey: artwork.status,
+        background: `linear-gradient(to bottom, ${config.colors.map((color, index) => `${color} ${6 + index * 11}%`).join(", ")})`,
+        mobileColor: config.mobileColor,
+        fade: config.fade,
+        imageHeight: config.height,
+        topFade: "topFade" in config,
+        mobileContain: "mobileContain" in config,
+      },
+    ];
+  });
   const heroEnglish =
     homeContent.heroTitle.en === "LET THE WORK SPEAK FOR ITSELF"
       ? "Let the work speak for itself"
       : homeContent.heroTitle.en;
   const publicArticles = getPublicArticles(content);
-  // Keep one editorial recommendation; all published articles remain in the journal.
-  const feature = publicArticles.find((article) => article.slug === "form-and-devotion-2026")
-    ?? publicArticles[0];
-  const cover = feature ? resolveArticleCover(feature) : "";
+  const feature =
+    publicArticles.find(
+      (article) => article.slug === "form-and-devotion-2026",
+    ) ?? publicArticles[0];
+  const otherArticles = publicArticles
+    .filter((article) => article.slug !== feature?.slug)
+    .slice(0, 3);
+  const featureTitleParts =
+    feature?.slug === "form-and-devotion-2026"
+      ? feature.title.zh.match(/^(.*?)\s+(.+)$/)
+      : null;
+  const excerpt = feature ? getArticleDisplayExcerpt(feature) : undefined;
   const exhibitionTitle = exhibition?.title.zh.replace(
     /^竹[瑾璟]居\s*[|｜]\s*/,
     "",
   );
-  const exhibitionEnglish = exhibition?.title.en.replace(
-    /^Zhu\s*Jin\s*Ju\s*[|｜]\s*/i,
-    "",
-  );
+  const exhibitionHref = exhibition
+    ? `/exhibitions/${exhibition.slug}`
+    : "/exhibitions";
+  const workCount =
+    exhibition?.featuredWorksCount ?? exhibition?.highlightCount ?? 0;
+  const pageCount =
+    exhibition?.cataloguePageCount ?? exhibition?.cataloguePages ?? 0;
+  const phoneHref = getTelHref(siteConfig.contact.phone);
 
   return (
-    <div className={styles.home}>
-      <section className={`${styles.wrap} ${styles.hero}`}>
-        <div className={styles.heroPicture}>
-          <ProtectedImage
-            src={
-              brandIntro.heroImage ??
-              "/api/placeholder/home-hero?kind=landscape"
-            }
-            alt={`${brandIntro.heroAlt?.zh ?? "竹瑾居首页主视觉"} ${brandIntro.heroAlt?.en ?? "Zhu Jin Ju homepage hero"}`}
-            width={1600}
-            height={1080}
-            priority
-            quality={85}
-            sizes="(min-width: 1366px) 648px, (min-width: 768px) 55vw, 100vw"
-            className={styles.heroImage}
-          />
-        </div>
-        <div className={styles.heroCopy}>
-          <h1>
-            {heroLines.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </h1>
-          <p className={styles.heroEnglish} lang="en">
-            {heroEnglish}
-          </p>
-          <p className={styles.heroDescription}>
-            {homeContent.heroEyebrow.zh}
-            <span lang="en">{homeContent.heroEyebrow.en}</span>
-          </p>
+    <div className={`${styles.home} zj`}>
+      <HomeHero slides={slides}>
+        <HomeLabel text={homeContent.heroEyebrow} stacked />
+        <h1>{homeContent.heroTitle.zh.replace(/\n/g, "")}</h1>
+        <p className={styles.heroEnglish} lang="en">
+          {heroEnglish}
+        </p>
+        <div className={styles.heroActions}>
           <HomeAction
             href="/collection"
             text={{
@@ -191,62 +137,116 @@ export default async function HomePage() {
               en: "Explore the collection",
             }}
           />
+          <HomeAction
+            href={exhibitionHref}
+            text={homeContent.heroSecondaryAction}
+            subtle
+            arrow={false}
+            className={styles.heroSecondary}
+          />
+        </div>
+      </HomeHero>
+
+      <section id="about" className={`${styles.wrap} ${styles.statement}`}>
+        <div className={styles.statementGrid}>
+          <HomeLabel
+            text={{ zh: "竹瑾居", en: "Zhu Jin Ju, Chengdu" }}
+            stacked
+            muted
+          />
+          <div className={styles.statementCopy}>
+            <p className={styles.statementZh}>{siteConfig.homeIntro.zh}</p>
+            <p className={styles.statementEn} lang="en">
+              {siteConfig.homeIntro.en}
+            </p>
+            <HomeAction href="/about" text={siteConfig.about.title} subtle />
+          </div>
         </div>
       </section>
 
       {exhibition ? (
-        <section
-          className={`${styles.wrap} ${styles.exhibition}`}
-          id="exhibition"
-        >
-          <SectionHeading
-            title={{ zh: "近期展览", en: "Recent Exhibition" }}
-            href="/exhibitions"
-            action={{ zh: "往期展览", en: "Exhibition archive" }}
-          />
-          <div className={styles.exhibitionGrid}>
-            <Link
-              href={`/exhibitions/${exhibition.slug}`}
-              className={styles.coverLink}
-            >
-              <ProtectedImage
-                src={exhibition.coverAsset?.card ?? exhibition.cover}
-                alt={`${exhibition.title.zh} ${exhibition.title.en}`}
-                width={1600}
-                height={1000}
-                quality={86}
-                sizes="(min-width: 1366px) 648px, (min-width: 768px) 55vw, 100vw"
-                className={styles.cover}
-              />
+        <section id="exhibition" className={styles.exhibition}>
+          <div className={`${styles.wrap} ${styles.exhibitionTop}`}>
+            <HomeLabel text={{ zh: "近期展览", en: "Recent Exhibition" }} />
+            <Link href="/exhibitions" className={styles.archiveLink}>
+              <HomeLabel text={{ zh: "往期展览", en: "Exhibition archive" }} />
+              <HomeArrow />
             </Link>
-            <div className={styles.exhibitionCopy}>
-              <h3>
-                {exhibitionTitle?.replace(/\s*\d{4}$/, "")}{" "}
-                <span>{exhibitionTitle?.match(/\d{4}$/)?.[0]}</span>
-              </h3>
-              <p className={styles.exhibitionEnglish} lang="en">
-                {exhibitionEnglish}
-              </p>
-              <div className={styles.exhibitionFacts}>
-                <p>
-                  {exhibition.period.zh}
-                  <span lang="en">{exhibition.period.en}</span>
-                </p>
-                <p>
-                  {exhibition.venue.zh}
-                  <span lang="en">{exhibition.venue.en}</span>
-                </p>
+          </div>
+          <div className={`${styles.wrap} ${styles.exhibitionGrid}`}>
+            <div className={styles.exhibitionGraphic}>
+              <div className={styles.wordmark} aria-label="Himalayan Art">
+                <div>Hima</div>
+                <div>layan</div>
+                <div>Art</div>
               </div>
+              <div className={styles.wordmarkCaption}>{exhibitionTitle}</div>
+            </div>
+            <ProtectedImage
+              src={COVER_VAJRA_IMAGE}
+              alt="五股金刚杵，展览图录封面作品"
+              width={900}
+              height={1198}
+              sizes="600px"
+              quality={86}
+              wrapperClassName={styles.vajraFrame}
+              className={styles.vajra}
+              style={{ clipPath: COVER_VAJRA_CLIP }}
+            />
+            <div className={styles.exhibitionCopy}>
+              <div className={styles.exhibitionHeading}>
+                <HomeLabel
+                  text={{ zh: "专题展览", en: "Special Exhibition" }}
+                />
+                <h2>{exhibitionTitle}</h2>
+                <p lang="en">{exhibition.title.en}</p>
+              </div>
+              <dl className={styles.exhibitionFacts}>
+                <div>
+                  <dt>
+                    <HomeLabel text={{ zh: "展期", en: "Dates" }} stacked />
+                  </dt>
+                  <dd>
+                    {exhibition.period.zh}
+                    <span className={styles.desktopFact} lang="en">
+                      {exhibition.period.en}
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    <HomeLabel text={{ zh: "地点", en: "Venue" }} stacked />
+                  </dt>
+                  <dd>
+                    {exhibition.venue.zh}
+                    <span className={styles.venueEnglish} lang="en">
+                      {exhibition.venue.en}
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    <HomeLabel text={{ zh: "图录", en: "Catalogue" }} stacked />
+                  </dt>
+                  <dd>
+                    {workCount} 件作品 · {pageCount} 页图录
+                    <span className={styles.desktopFact} lang="en">
+                      {workCount} works · {pageCount} catalogue pages
+                    </span>
+                  </dd>
+                </div>
+              </dl>
               <div className={styles.exhibitionActions}>
                 <HomeAction
-                  href={`/exhibitions/${exhibition.slug}`}
+                  href={exhibitionHref}
                   text={{ zh: "查看展览", en: "View exhibition" }}
                 />
-                {exhibition.cataloguePages > 0 ? (
+                {pageCount > 0 ? (
                   <HomeAction
-                    href={`/exhibitions/${exhibition.slug}#catalogue`}
+                    href={`${exhibitionHref}#catalogue`}
                     text={{ zh: "阅读电子图录", en: "Read the catalogue" }}
-                    catalogue
+                    subtle
+                    arrow={false}
                   />
                 ) : null}
               </div>
@@ -257,70 +257,235 @@ export default async function HomePage() {
 
       {artworks.length ? (
         <section
-          className={`${styles.wrap} ${styles.highlights}`}
           id="highlights"
+          className={`${styles.wrap} ${styles.highlights}`}
         >
           <SectionHeading
             title={{ zh: "部分藏品赏析", en: "Selected Highlights" }}
             href="/collection"
-            action={{ zh: "全部藏品", en: "View collection" }}
+            action={{
+              zh: "全部藏品",
+              en: `View collection · ${publicArtworks.length}`,
+            }}
+            mobileAction={`全部 ${publicArtworks.length}`}
           />
-          <HomeHighlights count={artworks.length}>
-            {artworks.map((artwork) => (
-              <HomeArtwork key={artwork.slug} artwork={artwork} />
-            ))}
-          </HomeHighlights>
+          <HomeArtworkGrid artworks={artworks} />
         </section>
       ) : null}
 
       {feature ? (
-        <section className={`${styles.wrap} ${styles.journal}`} id="reading">
-          <SectionHeading
-            title={{ zh: "文章与动态", en: "Journal" }}
-            href="/journal"
-            action={{ zh: "更多阅读", en: "Read more" }}
-          />
-          <div className={styles.journalGrid}>
-            <article className={styles.readingFeature}>
-              <Link href={`/journal/${feature.slug}`}>
-                {cover ? (
-                  <div className={styles.readingImage} data-editorial={feature.editorial ? "exhibition" : undefined}>
-                    <ProtectedImage
-                      src={cover}
-                      alt={feature.title.zh}
-                      width={900}
-                      height={580}
-                      sizes="(min-width: 1366px) 540px, (min-width: 768px) 45vw, 100vw"
-                      quality={84}
-                    />
-                  </div>
-                ) : null}
-                <div>
-                  <h3>{feature.title.zh}</h3>
-                  <p className={styles.readingEnglish} lang="en">
-                    {feature.title.en}
-                  </p>
-                  <p className={styles.readingExcerpt}>
-                    {getArticleDisplayExcerpt(feature).zh}
-                  </p>
-                  <ReadingMeta article={feature} />
-                </div>
+        <section id="journal" className={styles.journal}>
+          <div className={`${styles.wrap} ${styles.journalInner}`}>
+            <SectionHeading
+              title={{ zh: "文章与动态", en: "Journal" }}
+              href="/journal"
+              action={{ zh: "更多阅读", en: "Read more" }}
+              mobileAction="更多"
+            />
+            <div className={styles.journalGrid}>
+              <Link
+                href={`/journal/${feature.slug}`}
+                className={styles.featureImage}
+              >
+                <ProtectedImage
+                  src={withImageVersion(resolveArticleCover(feature))}
+                  alt={feature.title.zh}
+                  width={feature.coverAsset?.width ?? 1600}
+                  height={feature.coverAsset?.height ?? 1792}
+                  sizes="(max-width: 860px) 100vw, 42vw"
+                  quality={84}
+                  wrapperClassName={styles.featureImageFrame}
+                  className={styles.featureCover}
+                />
               </Link>
-            </article>
-
+              <Link
+                href={`/journal/${feature.slug}`}
+                className={styles.featureCopy}
+              >
+                <div className={styles.featureMeta}>
+                  <span className={styles.labelZh}>
+                    {feature.category.zh} ·{" "}
+                    <time dateTime={feature.date}>
+                      {feature.date.replaceAll("-", ".")}
+                    </time>
+                  </span>
+                  <span
+                    className={`${styles.labelEn} ${styles.muted}`}
+                    lang="en"
+                  >
+                    {feature.category.en}
+                  </span>
+                </div>
+                <h3>
+                  {featureTitleParts ? (
+                    <>
+                      {featureTitleParts[1]}
+                      <br className={styles.desktopOnly} />
+                      <span className={styles.mobileTitleSpace}> </span>
+                      {featureTitleParts[2]}
+                    </>
+                  ) : (
+                    feature.title.zh
+                  )}
+                </h3>
+                <p className={styles.featureEnglish} lang="en">
+                  {feature.title.en}
+                </p>
+                <p className={styles.featureExcerpt}>{excerpt?.zh}</p>
+                <p className={styles.featureExcerptEn} lang="en">
+                  {excerpt?.en}
+                </p>
+                <span className={styles.textLink}>
+                  <span>
+                    阅读全文<small lang="en">Read</small>
+                  </span>
+                  <HomeArrow />
+                </span>
+              </Link>
+              <div className={styles.articleList}>
+                {otherArticles.map((article) => (
+                  <Link
+                    href={`/journal/${article.slug}`}
+                    className={styles.articleItem}
+                    key={article.slug}
+                  >
+                    <ProtectedImage
+                      src={withImageVersion(resolveArticleCover(article))}
+                      alt={article.title.zh}
+                      width={500}
+                      height={400}
+                      quality={84}
+                      sizes="(max-width: 860px) 112px, 200px"
+                      wrapperClassName={styles.articleImage}
+                      className={styles.articleThumbnail}
+                      style={{
+                        objectPosition:
+                          article.slug ===
+                          "christies-lecture-sonam-gyaltsen-2026"
+                            ? "78% 50%"
+                            : article.slug === "article-1773838559083"
+                              ? "62% 50%"
+                              : "50% 50%",
+                      }}
+                    />
+                    <span className={styles.articleCopy}>
+                      <span className={styles.articleMeta}>
+                        {article.category.zh} ·{" "}
+                        <time dateTime={article.date}>
+                          {article.date.replaceAll("-", ".")}
+                        </time>
+                      </span>
+                      <span className={styles.articleTitle}>
+                        {article.title.zh}
+                      </span>
+                      <span className={styles.articleEnglish} lang="en">
+                        {article.title.en}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       ) : null}
 
-      <section className={`${styles.wrap} ${styles.contact}`}>
-        <div>
-          <h2>与竹瑾居联系</h2>
-          <p lang="en">Contact Zhu Jin Ju</p>
+      <section id="contact" className={`${styles.wrap} ${styles.contact}`}>
+        <div className={styles.contactGrid}>
+          <div className={styles.contactCopy}>
+            <div className={styles.headingCopy}>
+              <h2>与竹瑾居联系</h2>
+              <p lang="en">Contact Zhu Jin Ju</p>
+            </div>
+            <div className={styles.contactIntro}>
+              <p>{siteConfig.contactPage.description.zh}</p>
+              <p lang="en">{siteConfig.contactPage.description.en}</p>
+            </div>
+            <dl className={styles.contactFacts}>
+              <div>
+                <dt>
+                  <HomeLabel
+                    text={siteConfig.contactPage.infoLabels.email}
+                    muted
+                  />
+                </dt>
+                <dd>
+                  <a href={`mailto:${siteConfig.contact.email}`}>
+                    {siteConfig.contact.email}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <HomeLabel
+                    text={siteConfig.contactPage.infoLabels.wechat}
+                    muted
+                  />
+                </dt>
+                <dd>{siteConfig.contact.wechat}</dd>
+              </div>
+              <div>
+                <dt>
+                  <HomeLabel
+                    text={siteConfig.contactPage.infoLabels.phoneWhatsapp}
+                    muted
+                  />
+                </dt>
+                <dd>
+                  <a href={phoneHref ?? undefined}>
+                    {siteConfig.contact.phone}
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <HomeLabel text={{ zh: "地址", en: "Address" }} muted />
+                </dt>
+                <dd>
+                  {siteConfig.contact.replyWindow.zh.replace(
+                    /^地址[：:]\s*/,
+                    "",
+                  )}
+                  <span lang="en">
+                    {siteConfig.contact.replyWindow.en.replace(
+                      /^Address:\s*/,
+                      "",
+                    )}
+                  </span>
+                </dd>
+              </div>
+            </dl>
+            <div className={styles.contactActions}>
+              <HomeAction
+                href="/contact"
+                text={{ zh: "作品洽询与联系", en: "Inquiries & contact" }}
+              />
+              <span>
+                {siteConfig.contact.appointmentNote.zh}
+                {siteConfig.contact.appointmentNote.en}
+              </span>
+            </div>
+          </div>
+          <figure className={styles.spacePhoto}>
+            <ProtectedImage
+              src="/uploads/branding/about-space-himalayan-art-20260930.png"
+              alt="竹瑾居艺术空间外景：红墙与旋转楼梯"
+              width={724}
+              height={1086}
+              sizes="(max-width: 860px) 100vw, 33vw"
+              quality={86}
+              wrapperClassName={styles.spacePhotoFrame}
+              className={styles.spaceImage}
+            />
+            <figcaption>
+              <span>竹瑾居艺术空间 · 成都</span>
+              <span lang="en">
+                Zhu Jin Ju Art Space
+                <span className={styles.desktopOnly}>, Chengdu</span>
+              </span>
+            </figcaption>
+          </figure>
         </div>
-        <HomeAction
-          href="/contact"
-          text={{ zh: "作品洽询与联系", en: "Inquiries & contact" }}
-        />
       </section>
     </div>
   );

@@ -1,6 +1,6 @@
 export const COVER_VAJRA_SLUG = "artwork-1790510831618";
 export const COVER_VAJRA_IMAGE = "/uploads/artworks/five-pronged-vajra-cover-cutout-2026.png";
-export const COVER_VAJRA_BACKDROP = "#9d4433";
+export const COVER_VAJRA_BACKDROP = "#9d4432";
 
 // The embedded cover image includes an unrelated mark beside the very bottom of the object.
 // Clip only that empty lower corner; all of the vajra remains visible.

@@ -1,4 +1,95 @@
 .siteTheme {
+  --font-serif:
+    "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  --font-editorial:
+    "Instrument Serif", "Source Serif 4", "Zhujinju Song", Georgia, serif;
+  --font-song:
+    "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  --font-sans:
+    "Instrument Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", sans-serif;
+  --font-display: "Anton", "Arial Narrow", sans-serif;
+  --type-page: 30px;
+  --type-section: 26px;
+  --type-artwork: 22px;
+  --bg: #f3f1ec;
+  --surface: #f3f1ec;
+  --surface-2: #f3f1ec;
+  --surface-strong: #e9e6df;
+  --ink: #141311;
+  --muted: #5c5852;
+  --accent: #8f3b2b;
+  --accent-text: #8f3b2b;
+  --error: #87372f;
+  --success: #356247;
+  --warning: #71521b;
+  --line: rgba(20, 19, 17, 0.2);
+  --line-strong: #141311;
+  --content-width: 1480px;
+  --page-inline: 24px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-section: 64px;
+  --motion-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --paper: #f3f1ec;
+  --panel: #e9e6df;
+  --rust-ink: #f4ede4;
+  --rust-muted: #ead9cf;
+  --rust-line: rgba(244, 237, 228, 0.42);
+  --display-ink: #e6e1da;
+  --dark-ink: #efeae2;
+  --dark-muted: #a9a39a;
+  --dark-line: rgba(239, 234, 226, 0.2);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+@media (min-width: 768px) {
+  .siteTheme {
+    --font-serif:
+      "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC",
+      serif;
+    --font-editorial:
+      "Instrument Serif", "Source Serif 4", "Zhujinju Song", Georgia, serif;
+    --type-page: 30px;
+    --type-section: 26px;
+    --type-artwork: 22px;
+    --page-inline: 40px;
+    --type-page: 36px;
+    --type-section: 30px;
+    --type-artwork: 25px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .siteTheme {
+    --type-page: 40px;
+    --type-section: 32px;
+    --type-artwork: 26px;
+  }
+}
+.siteTheme :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.siteTheme input,
+.siteTheme textarea {
+  caret-color: var(--ink);
+}
+
+/* Keep the approved editorial body isolated from the new global palette/type. */
+.legacyEditorial {
   --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
   --font-editorial: "Source Serif 4", Georgia, serif;
   --type-page: 30px;
@@ -26,37 +117,29 @@
   --space-xl: 40px;
   --space-section: 64px;
   --motion-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 100dvh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: auto;
+  --font-sans:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Source Han Sans SC", sans-serif;
   background: var(--bg);
   color: var(--ink);
 }
 
 @media (min-width: 768px) {
-  .siteTheme {
-    --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
-    --font-editorial: "Source Serif 4", Georgia, serif;
-    --type-page: 30px;
-    --type-section: 26px;
-    --type-artwork: 22px;
+  .legacyEditorial {
     --page-inline: 40px;
     --type-page: 36px;
     --type-section: 30px;
     --type-artwork: 25px;
   }
 }
-
 @media (min-width: 1100px) {
-  .siteTheme {
+  .legacyEditorial {
     --type-page: 40px;
     --type-section: 32px;
     --type-artwork: 26px;
   }
-}
-.siteTheme :is(a, button, input, select, textarea):focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 4px;
-}
-.siteTheme input,
-.siteTheme textarea {
-  caret-color: var(--ink);
 }
