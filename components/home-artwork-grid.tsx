@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
+import { HomeHighlights } from "@/components/home-highlights";
 import { ProtectedImage } from "@/components/protected-image";
 import {
   COVER_VAJRA_CLIP,
@@ -28,7 +30,11 @@ function Card({ artwork }: { artwork: Artwork }) {
     .filter(Boolean)
     .join("，");
   return (
-    <Link href={`/collection/${artwork.slug}`} className={styles.artworkCard}>
+    <Link
+      href={`/collection/${artwork.slug}`}
+      className={styles.artworkCard}
+      style={{ "--artwork-ratio": width / height } as CSSProperties}
+    >
       <ProtectedImage
         src={withImageVersion(
           vajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(artwork),
@@ -36,7 +42,7 @@ function Card({ artwork }: { artwork: Artwork }) {
         alt={`${artwork.title.zh} ${artwork.title.en}`}
         width={width}
         height={height}
-        sizes="(max-width: 860px) 50vw, (max-width: 1279px) 33vw, 400px"
+        sizes={`(max-width: 860px) ${Math.ceil((260 * width) / height)}px, (max-width: 1279px) 25vw, 400px`}
         quality={84}
         wrapperClassName={`${styles.cardImageFrame} ${vajra ? styles.vajraCard : ""}`}
         className={styles.cardImage}
@@ -84,31 +90,33 @@ function Card({ artwork }: { artwork: Artwork }) {
 export function HomeArtworkGrid({ artworks }: { artworks: Artwork[] }) {
   return (
     <>
-      {(["desktop", "mobile"] as const).map((mode) => (
-        <div
-          key={mode}
-          className={`${styles.artworkRows} ${styles[`${mode}Rows`]}`}
-        >
-          {packArtworkRows(artworks.map(ratio), mode).map((row, index) => (
-            <div
-              key={index}
-              className={styles.artworkRow}
-              style={{
-                gridTemplateColumns: [
-                  ...row.ratios,
-                  ...(row.spacer ? [row.spacer] : []),
-                ]
-                  .map((value) => `minmax(0, ${value * 1000}fr)`)
-                  .join(" "),
-              }}
-            >
-              {row.indexes.map((i) => (
-                <Card key={artworks[i].slug} artwork={artworks[i]} />
-              ))}
-            </div>
+      <div className={`${styles.artworkRows} ${styles.desktopRows}`}>
+        {packArtworkRows(artworks.map(ratio), "desktop").map((row, index) => (
+          <div
+            key={index}
+            className={styles.artworkRow}
+            style={{
+              gridTemplateColumns: [
+                ...row.ratios,
+                ...(row.spacer ? [row.spacer] : []),
+              ]
+                .map((value) => `minmax(0, ${value * 1000}fr)`)
+                .join(" "),
+            }}
+          >
+            {row.indexes.map((i) => (
+              <Card key={artworks[i].slug} artwork={artworks[i]} />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className={`${styles.artworkRows} ${styles.mobileRows}`}>
+        <HomeHighlights count={artworks.length} className={styles.mobileRail}>
+          {artworks.map((artwork) => (
+            <Card key={artwork.slug} artwork={artwork} />
           ))}
-        </div>
-      ))}
+        </HomeHighlights>
+      </div>
     </>
   );
 }

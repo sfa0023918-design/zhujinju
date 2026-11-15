@@ -1055,9 +1055,19 @@
     display: none;
   }
   .mobileRows {
-    display: flex;
-    gap: 36px;
+    --home-secondary: var(--muted);
+    display: block;
     padding-top: 32px;
+  }
+  .mobileRows .mobileRail {
+    width: calc(100% + 20px);
+    gap: 12px;
+    padding-right: 20px;
+  }
+  .mobileRail > .artworkCard {
+    flex: 0 0 calc(260px * var(--artwork-ratio));
+    grid-template-rows: auto;
+    grid-row: auto;
   }
   .artworkCard {
     grid-row: span 5;
