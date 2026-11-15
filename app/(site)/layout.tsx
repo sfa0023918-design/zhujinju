@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { Suspense, type CSSProperties } from "react";
 import { COVER_VAJRA_BACKDROP } from "@/lib/artwork-presentation";
 import { SiteContentFrame } from "@/components/site-content-frame";
 import { Analytics } from "@vercel/analytics/next";
@@ -21,11 +21,14 @@ export default function SiteLayout({
       className={styles.siteTheme}
       style={{ "--season-color": COVER_VAJRA_BACKDROP } as CSSProperties}
     >
-      <SiteFontPreloads />
-      <SiteHeader />
-      <SiteContentFrame>{children}</SiteContentFrame>
-      <SiteFooter />
-      <Analytics />
+      {/* Resolve streamed children inside a boundary, not the theme host node. */}
+      <Suspense fallback={null}>
+        <SiteFontPreloads />
+        <SiteHeader />
+        <SiteContentFrame>{children}</SiteContentFrame>
+        <SiteFooter />
+        <Analytics />
+      </Suspense>
     </div>
   );
 }
