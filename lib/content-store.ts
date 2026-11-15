@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 
 import { getArticleBodyParagraphs, normalizeArticleContentBlocks } from "./article-content";
 import { bt } from "./bilingual";
@@ -153,13 +154,15 @@ const loadCachedSiteContent = unstable_cache(
   { tags: [getSiteContentTag()] },
 );
 
-export async function loadSiteContent(): Promise<SiteContent> {
+// Metadata, header, footer and page share one read within the same server render.
+// React owns the request scope; the tagged deployment cache still controls freshness.
+export const loadSiteContent = cache(async (): Promise<SiteContent> => {
   if (process.env.NODE_ENV === "production") {
     return await loadCachedSiteContent();
   }
 
   return await readSiteContentFresh();
-}
+});
 
 export async function readSiteContentFresh() {
   return normalizeSiteContent(
