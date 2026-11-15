@@ -138,35 +138,7 @@
 
 .philosophyBody {
   grid-column: 6 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-  gap: 48px;
-  align-items: start;
-}
-
-.philosophyLanguageColumn {
-  color: var(--muted);
-}
-
-.philosophyLanguageColumn p + p {
-  margin-top: 24px;
-}
-
-.philosophyLanguageColumn.zh {
-  font-size: 16px;
-  line-height: 2;
-}
-
-.philosophyLanguageColumn.en {
-  font-size: 14px;
-  line-height: 1.75;
-}
-
-.philosophyLanguageColumn.zh p[data-emphasis="lead"] {
-  color: var(--ink);
-  font-family: var(--font-serif);
-  font-size: 20px;
-  line-height: 1.8;
+  min-width: 0;
 }
 
 .factsSection {
@@ -435,7 +407,7 @@
   padding: 10px 12px;
   color: var(--ink);
   font: inherit;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
@@ -693,3 +665,6 @@
     transition: none;
   }
 }
+
+a.contactValue,
+a.contactSecondaryValue { display: flex; align-items: center; min-height: 44px; }

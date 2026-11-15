@@ -92,3 +92,14 @@ test("all collection pages fill every row at every layout breakpoint", () => {
   const reference = pack([0.849, 1.72, 0.435, 0.847, 0.778, 0.837, 0.587, 3.488, 0.936, 0.824, 0.849, 0.67, 1.695, 0.82, 0.849], "desktop", { fillRows: true });
   assert.deepEqual(reference.map((row) => row.indexes.length), [3, 4, 1, 4, 3]);
 });
+
+test("recommendations preserve order and fill rows around wide works on every screen", () => {
+  for (const ratios of [[0.8, 0.6], [0.8, 3.5, 0.6, 0.8], [3.5, 0.6], [1.7, 0.6, 3.5, 0.8]]) {
+    for (const mode of ["desktop", "tablet", "mobile"]) {
+      const rows = pack(ratios, mode, { fillRows: true, groupWideWorks: true });
+      assert.deepEqual(rows.flatMap(row => row.indexes), ratios.map((_, index) => index));
+      assert.ok(rows.every(row => row.spacer === 0));
+      if (mode !== "mobile") assert.ok(rows.every(row => row.indexes.length > 1));
+    }
+  }
+});

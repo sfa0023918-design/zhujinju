@@ -144,3 +144,8 @@
 .paperBlend {
   mix-blend-mode: multiply;
 }
+
+@media (min-width: 600px) and (max-width: 860px) {
+  .related .mobile { display: none; }
+  .related .tablet { display: flex; }
+}

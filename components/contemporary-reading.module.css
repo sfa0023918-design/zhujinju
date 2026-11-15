@@ -21,12 +21,9 @@
 .tabs {
   display: none;
 }
-.column {
+.body {
   min-width: 0;
-}
-.column[data-locale="en"] {
-  border-left: 1px solid var(--line);
-  padding-left: 24px;
+  grid-column: 2 / -1;
 }
 .reading .paragraph {
   max-width: none;
@@ -38,7 +35,7 @@
 .reading .paragraph + .paragraph {
   margin-top: var(--reading-paragraph-gap);
 }
-.column[data-locale="en"] .paragraph {
+.reading .paragraph[lang="en"] {
   font: 400 var(--reading-size)/1.8 var(--font-sans);
   color: var(--ink);
   text-align: left;
@@ -49,6 +46,7 @@
 .reading button {
   border-radius: 0;
   min-height: 44px;
+  min-width: 44px;
   color: var(--ink);
   font-size: 14px;
 }
@@ -84,12 +82,5 @@
   .tabs button[aria-pressed="true"] {
     color: var(--ink);
     border-bottom: 1px solid var(--ink);
-  }
-  .column[data-active="false"] {
-    display: none;
-  }
-  .column[data-locale="en"] {
-    border: 0;
-    padding: 0;
   }
 }

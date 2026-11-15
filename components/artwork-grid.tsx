@@ -16,10 +16,12 @@ export function ArtworkGrid({
   artworks,
   priority = false,
   fillRows = false,
+  groupWideWorks = false,
 }: {
   artworks: CollectionArtworkSummary[];
   priority?: boolean;
   fillRows?: boolean;
+  groupWideWorks?: boolean;
 }) {
   const ratios = artworks.map((a) =>
     a.slug === COVER_VAJRA_SLUG
@@ -27,10 +29,10 @@ export function ArtworkGrid({
       : (a.imageAsset?.width ?? 800) / (a.imageAsset?.height ?? 1000),
   );
   return (
-    <div className={styles.grid}>
+    <div className={`${styles.grid} ${groupWideWorks ? styles.related : ""}`}>
       {(["desktop", "tablet", "mobile"] as const).map((mode) => (
         <div key={mode} className={`${styles.rows} ${styles[mode]}`}>
-          {packArtworkRows(ratios, mode, { fillRows }).map((row, index) => (
+          {packArtworkRows(ratios, mode, { fillRows, groupWideWorks }).map((row, index) => (
             <div
               key={index}
               className={styles.row}

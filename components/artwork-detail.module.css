@@ -325,6 +325,7 @@
   border-block: 1px solid var(--line);
 }
 .sectionNav button {
+  min-width: 44px;
   display: inline-flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -493,6 +494,8 @@
   color: var(--muted);
 }
 .relatedHeading a {
+  flex-shrink: 0;
+  min-width: 44px;
   font-size: 13px;
   min-height: 44px;
   display: inline-flex;
@@ -616,6 +619,7 @@
     width: 100%;
   }
   .galleryNavigation {
+    flex-wrap: wrap;
     min-height: 48px;
     border-bottom: 1px solid var(--line);
     gap: 8px;
@@ -627,12 +631,15 @@
     display: none;
   }
   .imageNavigation {
+    max-width: 100%;
+    flex-wrap: wrap;
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 11px;
   }
   .imageDots {
+    flex-wrap: wrap;
     display: flex;
   }
   .imageDots button {
@@ -640,7 +647,7 @@
     justify-content: center;
     align-items: center;
     min-height: 44px;
-    width: 20px;
+    width: 44px;
     cursor: pointer;
   }
   .imageDots span {

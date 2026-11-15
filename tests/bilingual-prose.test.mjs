@@ -17,7 +17,18 @@ const compiled = ts.transpileModule(source, {
   fileName: filename,
 }).outputText;
 vm.runInNewContext(`(function(exports, require, module) {${compiled}\n})`, { console })
-  (loaded.exports, (id) => id === "./bilingual-text" ? {} : require(id), loaded);
+  (loaded.exports, (id) => {
+    if (id === "./bilingual-text") return {};
+    if (id === "@/lib/reading-preview") {
+      const module = { exports: {} };
+      const code = ts.transpileModule(fs.readFileSync(path.join(root, "lib/reading-preview.ts"), "utf8"), {
+        compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+      }).outputText;
+      vm.runInNewContext(`(function(exports,module){${code}\n})`)(module.exports, module);
+      return module.exports;
+    }
+    return require(id);
+  }, loaded);
 
 const { getParagraphsByLocale } = loaded.exports;
 const options = { manualParagraphMode: "split-long", manualSplitThresholdZh: 260, manualSplitThresholdEn: 420 };
@@ -106,16 +117,19 @@ test("prose repair preserves headings, lists, quotations and English names", () 
   ]);
 });
 
-test("collapsed reading exposes whole paragraphs instead of cutting off a sentence", () => {
+test("short paragraphs stay visible and long single paragraphs fold at a complete sentence", () => {
   const { createElement } = require("react");
   const { renderToStaticMarkup } = require("react-dom/server");
-  const paragraphs = ["First complete paragraph.", "Second complete paragraph.", "Third complete paragraph.", "Fourth complete paragraph."];
-  const markup = renderToStaticMarkup(createElement(loaded.exports.BilingualReadingPanel, {
-    sections: [{ key: "note", content: paragraphs.map((en) => ({ zh: "", en })), expandable: true }],
-    locale: "en", showToggle: false,
-  }));
-  for (const paragraph of paragraphs.slice(0, 3)) assert.ok(markup.includes(paragraph));
-  assert.ok(!markup.includes(paragraphs[3]));
+  const short = ["First complete paragraph.", "Second complete paragraph.", "Third complete paragraph.", "Fourth complete paragraph."];
+  const render = paragraphs => renderToStaticMarkup(createElement(loaded.exports.ExpandableReadingText, { paragraphs, locale: "en" }));
+  const shortMarkup = render(short);
+  for (const paragraph of short) assert.ok(shortMarkup.includes(paragraph));
+  assert.ok(!shortMarkup.includes('aria-expanded="false"'));
+  const long = Array.from({ length: 50 }, (_, i) => `Sentence ${i} describes the sculpture and its material.`).join(" ");
+  const markup = render([long]);
+  assert.ok(markup.includes("Sentence 0 describes the sculpture and its material."));
+  assert.ok(!markup.includes("Sentence 49"));
   assert.ok(markup.includes('aria-expanded="false"'));
-  assert.ok(markup.includes("View more"));
+  assert.ok(markup.includes("Read more"));
+  assert.match(markup, /material\.<\/p>/);
 });

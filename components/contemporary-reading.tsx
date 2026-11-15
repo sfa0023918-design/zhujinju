@@ -3,7 +3,8 @@
 import { useState } from "react";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 import {
-  BilingualReadingPanel,
+  ExpandableReadingText,
+  getParagraphsByLocale,
   type BilingualProseContent,
   type ReadingLocale,
 } from "./bilingual-prose";
@@ -21,9 +22,10 @@ export function ContemporaryReading({
   expandable?: boolean;
 }) {
   const [locale, setLocale] = useState<ReadingLocale>("zh");
-  const sections = [
-    { key: id ?? "reading", content, variant: "body" as const, expandable },
-  ];
+  const paragraphs = {
+    zh: getParagraphsByLocale(content, "zh", "paragraph", { autoSplitLongSingleParagraph: false, repairWrappedLines: true }),
+    en: getParagraphsByLocale(content, "en", "paragraph", { autoSplitLongSingleParagraph: false, repairWrappedLines: true }),
+  };
   return (
     <section id={id} className={styles.reading}>
       <div className={styles.heading}>
@@ -44,25 +46,9 @@ export function ContemporaryReading({
           ))}
         </div>
       </div>
-      {(["zh", "en"] as const).map((value) => (
-        <div
-          key={value}
-          data-locale={value}
-          data-active={locale === value}
-          className={styles.column}
-        >
-          <BilingualReadingPanel
-            sections={sections}
-            locale={value}
-            showToggle={false}
-            singleLineBreakMode="paragraph"
-            manualParagraphMode="preserve"
-            autoSplitLongSingleParagraph={false}
-            repairWrappedLines
-            paragraphClassName={styles.paragraph}
-          />
-        </div>
-      ))}
+      <div className={styles.body}>
+        <ExpandableReadingText translations={paragraphs} locale={locale} showBoth expandable={expandable} paragraphClassName={styles.paragraph} />
+      </div>
     </section>
   );
 }

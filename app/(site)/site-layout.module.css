@@ -159,3 +159,29 @@
     --type-artwork: 26px;
   }
 }
+
+/* Shared reading rhythm and one bilingual disclosure control. */
+.siteTheme :global(.reading-excerpt) { min-width: 0; scroll-margin-top: 24px; }
+.siteTheme :global(.reading-excerpt-columns) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.siteTheme :global(.reading-excerpt-columns) > div { min-width: 0; }
+.siteTheme :global(.reading-excerpt-columns) > [data-reading-locale="en"] { border-left: 1px solid var(--line); padding-left: 24px; }
+.siteTheme :global(.reading-excerpt) :global(.prose-block) { max-width: none; font: 400 var(--reading-size)/1.9 var(--font-song); color: var(--ink); text-align: justify; overflow-wrap: break-word; }
+.siteTheme :global(.reading-excerpt) :global(.prose-block--en) { font-family: var(--font-sans); text-align: left; line-height: 1.8; }
+.siteTheme :global(.reading-excerpt) p + p { margin-top: var(--reading-paragraph-gap); }
+.siteTheme :global(.reading-excerpt-toggle) { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; margin-top: 24px; padding: 0; border: 0; border-bottom: 1px solid currentColor; border-radius: 0; background: transparent; color: var(--accent-text); font: 400 14px/1.5 var(--font-sans); cursor: pointer; }
+.siteTheme :global(.reading-excerpt-toggle):hover { color: var(--ink); }
+.siteTheme :global(.reading-excerpt-toggle) [lang="en"] { font-size: 13px; }
+.siteTheme :global(.reading-excerpt-tabs) { display: none; }
+@media (max-width: 860px) {
+  .siteTheme :global(.reading-excerpt-columns) { grid-template-columns: minmax(0, 1fr); }
+  .siteTheme :global(.reading-excerpt-columns) > div { grid-area: 1 / 1; }
+  .siteTheme :global(.reading-excerpt-columns) > [data-active="false"] { visibility: hidden; pointer-events: none; }
+  .siteTheme :global(.reading-excerpt-columns) > [data-reading-locale="en"] { border: 0; padding: 0; }
+  .siteTheme :global(.reading-excerpt-tabs) { display: flex; gap: 12px; margin-bottom: 20px; }
+  .siteTheme :global(.reading-excerpt-tabs) button { min-width: 44px; min-height: 44px; color: var(--muted); cursor: pointer; }
+  .siteTheme :global(.reading-excerpt-tabs) [aria-pressed="true"] { color: var(--ink); border-bottom: 1px solid currentColor; }
+}
+
+@media (max-width: 860px) {
+  .siteTheme :global(.reading-excerpt)[data-expanded="true"] :global(.reading-excerpt-columns) > [data-active="false"] { display: none; }
+}

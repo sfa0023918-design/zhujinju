@@ -1,8 +1,10 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
+
+import { getReadingPreview, type ReadingParagraphs } from "@/lib/reading-preview";
 
 import { BilingualText } from "./bilingual-text";
 
@@ -269,61 +271,104 @@ function proseClasses(variant: ProseVariant, locale: ReadingLocale) {
     : `prose-block prose-block--en max-w-[42rem] text-[0.9rem] leading-[1.84] text-[var(--muted)]/90 ${alignmentClasses}`;
 }
 
-function ExpandableReadingText({
+export function ExpandableReadingText({
   paragraphs,
-  locale,
-  variant,
+  translations,
+  locale: controlledLocale,
+  showBoth = false,
+  expandable = true,
+  variant = "body",
   paragraphClassName,
 }: {
-  paragraphs: string[];
-  locale: ReadingLocale;
-  variant: ProseVariant;
+  paragraphs?: string[];
+  translations?: ReadingParagraphs;
+  locale?: ReadingLocale;
+  showBoth?: boolean;
+  expandable?: boolean;
+  variant?: ProseVariant;
   paragraphClassName?: string;
 }) {
-  const [expandedByLocale, setExpandedByLocale] = useState<Record<ReadingLocale, boolean>>({
-    zh: false,
-    en: false,
-  });
+  const [selectedLocale, setSelectedLocale] = useState<ReadingLocale>("zh");
+  const locale = controlledLocale ?? selectedLocale;
+  const [expanded, setExpanded] = useState(false);
+  const [columns, setColumns] = useState({ zh: 24, en: 56 });
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const contentId = useId();
-  const expanded = expandedByLocale[locale];
-  const canExpand = paragraphs.length > 3;
-  const visibleParagraphs = expanded ? paragraphs : paragraphs.slice(0, 3);
+  const original = useMemo(() => translations ?? {
+    zh: locale === "zh" ? paragraphs ?? [] : [],
+    en: locale === "en" ? paragraphs ?? [] : [],
+  }, [translations, paragraphs, locale]);
+  const excerpt = useMemo(() => getReadingPreview(original, columns), [original, columns]);
+  const canExpand = expandable && (["zh", "en"] as const).some(value =>
+    excerpt[value].join("") !== original[value].join(""));
+  const visible = expanded || !canExpand ? original : excerpt;
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    let active = true;
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const measure = () => {
+      if (!active || !context || !wrapper.clientWidth) return;
+      const width = showBoth && window.innerWidth > 860
+        ? (wrapper.clientWidth - 24) / 2 : wrapper.clientWidth;
+      const next = { zh: 24, en: 56 };
+      for (const value of ["zh", "en"] as const) {
+        const paragraph = wrapper.querySelector<HTMLParagraphElement>(`[data-reading-locale="${value}"] p`)
+          ?? wrapper.querySelector<HTMLParagraphElement>("p");
+        if (!paragraph) continue;
+        const style = getComputedStyle(paragraph);
+        context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        const sample = value === "zh" ? "观看作品的形态与艺术细节" : "The sculpture reveals its form and material through light. ";
+        const average = context.measureText(sample).width / sample.length;
+        const contentWidth = width - (showBoth && window.innerWidth > 860 && value === "en" ? 24 : 0);
+        next[value] = Math.max(8, Math.floor(contentWidth / average));
+      }
+      setColumns(current => current.zh === next.zh && current.en === next.en ? current : next);
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(wrapper);
+    window.addEventListener("resize", measure);
+    void document.fonts.ready.then(measure);
+    measure();
+    return () => { active = false; observer.disconnect(); window.removeEventListener("resize", measure); };
+  }, [showBoth, locale]);
 
   function toggleExpanded() {
-    setExpandedByLocale((current) => ({ ...current, [locale]: !expanded }));
+    setExpanded(!expanded);
     if (expanded) {
       requestAnimationFrame(() => {
-        wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        wrapperRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
       });
     }
   }
 
   return (
-    <div ref={wrapperRef} className="space-y-3">
-      <div id={contentId} data-expanded={expanded ? "true" : "false"}>
-        <div className="space-y-3 md:space-y-4">
-          {visibleParagraphs.map((paragraph, index) => (
-            <p
-              key={`${locale}-${index}`}
-              lang={locale === "en" ? "en" : "zh-CN"}
-              className={`${proseClasses(variant, locale)} ${paragraphClassName ?? ""}`.trim()}
-            >
-              {paragraph}
-            </p>
-          ))}
-        </div>
+    <div ref={wrapperRef} className="reading-excerpt" data-expanded={expanded ? "true" : "false"}>
+      {showBoth && !controlledLocale ? <div className="reading-excerpt-tabs" aria-label="阅读语言">
+        {(["zh", "en"] as const).map(value => <button key={value} type="button" aria-pressed={locale === value} onClick={() => setSelectedLocale(value)}>{value === "zh" ? "中文" : "English"}</button>)}
+      </div> : null}
+      <div id={contentId} className={showBoth ? "reading-excerpt-columns" : undefined}>
+        {(showBoth ? ["zh", "en"] as const : [locale]).map(value => (
+          <div key={value} data-reading-locale={value} data-active={locale === value}>
+            {visible[value].map((paragraph, index) => (
+              <p key={index} lang={value === "en" ? "en" : "zh-CN"}
+                className={`${proseClasses(variant, value)} ${paragraphClassName ?? ""}`.trim()}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        ))}
       </div>
       {canExpand ? (
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={contentId}
-          onClick={toggleExpanded}
-          className="inline-flex min-h-11 cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)]"
-        >
-          {locale === "zh" ? (expanded ? "收起" : "查看更多") : expanded ? "Show less" : "View more"}
-          {expanded ? <span aria-hidden="true">∧</span> : null}
+        <button type="button" aria-expanded={expanded} aria-controls={contentId}
+          onClick={toggleExpanded} className="reading-excerpt-toggle">
+          {translations ? <><span>{expanded ? "收起" : "阅读全文"}</span><span lang="en">{expanded ? "Show less" : "Read more"}</span></>
+            : locale === "zh" ? (expanded ? "收起" : "阅读全文") : expanded ? "Show less" : "Read more"}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={expanded ? { transform: "rotate(180deg)" } : undefined}>
+            <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
         </button>
       ) : null}
     </div>
@@ -476,7 +521,10 @@ export function BilingualReadingPanel({
               ) : null}
               {section.expandable ? (
                 <ExpandableReadingText
-                  paragraphs={paragraphs}
+                  translations={{
+                    zh: getParagraphsByLocale(section.content, "zh", singleLineBreakMode, { manualParagraphMode, manualSplitThresholdZh, manualSplitThresholdEn, autoSplitLongSingleParagraph, repairWrappedLines }),
+                    en: getParagraphsByLocale(section.content, "en", singleLineBreakMode, { manualParagraphMode, manualSplitThresholdZh, manualSplitThresholdEn, autoSplitLongSingleParagraph, repairWrappedLines }),
+                  }}
                   locale={locale}
                   variant={section.variant ?? "body"}
                   paragraphClassName={mergedParagraphClassName}

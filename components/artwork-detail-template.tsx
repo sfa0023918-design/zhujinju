@@ -249,7 +249,6 @@ export function ArtworkDetailTemplate({
           id={hasText(viewingNote) ? "artwork-comparison" : "artwork-viewing"}
           title={detailCopy.comparisonNote}
           content={artwork.comparisonNote}
-          expandable={false}
         />
       ) : null}
       {artwork.provenance.length ||
@@ -387,7 +386,7 @@ export function ArtworkDetailTemplate({
               <span lang="en">{detailCopy.breadcrumb.en}</span> →
             </Link>
           </div>
-          <ArtworkGrid artworks={relatedWorks.slice(0, 4)} />
+          <ArtworkGrid artworks={relatedWorks.slice(0, 4)} fillRows groupWideWorks />
         </section>
       ) : null}
     </article>

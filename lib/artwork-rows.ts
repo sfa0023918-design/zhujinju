@@ -8,12 +8,12 @@ export type ArtworkRow = {
 export function packArtworkRows(
   ratios: number[],
   mode: "desktop" | "tablet" | "mobile" | "details",
-  options: { fillRows?: boolean } = {},
+  options: { fillRows?: boolean; groupWideWorks?: boolean } = {},
 ): ArtworkRow[] {
   const target = mode === "desktop" ? 2.75 : mode === "details" ? 2.3 : 2;
-  const limit =
+  const limit = options.groupWideWorks && mode === "tablet" ? 2 :
     mode === "desktop" || mode === "details" ? 5 : mode === "tablet" ? 4 : 2;
-  const solo =
+  const solo = options.groupWideWorks && mode !== "mobile" ? Infinity :
     mode === "desktop"
       ? 2.6
       : mode === "tablet"
