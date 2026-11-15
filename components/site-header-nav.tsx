@@ -37,7 +37,7 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
       return;
     }
 
-    const desktop = window.matchMedia("(min-width: 861px)");
+    const desktop = window.matchMedia("(min-width: 1181px) and (pointer: fine)");
     const closeOnDesktop = () => { if (desktop.matches) setOpenPath(null); };
     closeOnDesktop();
     desktop.addEventListener("change", closeOnDesktop);
@@ -48,14 +48,16 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
     <>
       <button
         type="button"
-        aria-label={open ? "关闭菜单" : "打开菜单"}
+        aria-label={open ? "关闭菜单 Close menu" : "打开菜单 Open menu"}
         aria-expanded={open}
         aria-controls="site-mobile-nav"
         onClick={() => setOpenPath(open ? null : pathname)}
         className={styles.menuButton}
       >
-        <span aria-hidden="true" />
-        <span aria-hidden="true" />
+        <span className={styles.menuLabel}>
+          <span>菜单</span>
+          <span lang="en" className={styles.menuEnglish}>Menu</span>
+        </span>
       </button>
 
       <nav aria-label="主导航" className={styles.desktopNav}>
@@ -85,7 +87,7 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
       {open ? (
         <ModalDialog id="site-mobile-nav" label="主导航 Main navigation"
           className={styles.mobileBackdrop} onDismiss={() => setOpenPath(null)}>
-          <button type="button" className={styles.menuClose} aria-label="关闭菜单"
+          <button type="button" className={styles.menuClose} aria-label="关闭菜单 Close menu"
             onClick={() => setOpenPath(null)}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="m5 5 14 14M19 5 5 19" stroke="currentColor" strokeWidth="1.5" />

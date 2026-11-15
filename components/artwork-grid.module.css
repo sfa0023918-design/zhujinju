@@ -41,7 +41,7 @@
 }
 .english {
   margin-top: 2px;
-  font: italic 18px/1.25 var(--font-editorial);
+  font: var(--type-card-en)/1.5 var(--font-editorial);
   color: var(--muted);
   overflow-wrap: anywhere;
 }

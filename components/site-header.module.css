@@ -15,10 +15,21 @@
   gap: 32px;
 }
 .brand {
+  position: relative;
   flex: none;
   display: flex;
   align-items: center;
   min-height: 44px;
+}
+/* Re-ink the existing tagline without changing the logo artwork or its spacing. */
+.brand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  mask: url("/zhujinju-header-v20260317d.png") center / contain no-repeat;
+  clip-path: inset(78% 0 0 37%);
+  pointer-events: none;
 }
 .logo {
   height: 52px;

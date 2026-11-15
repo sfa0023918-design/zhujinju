@@ -214,7 +214,7 @@
 }
 .heroCopy .heroEnglish {
   margin-top: 6px;
-  font: italic 400 var(--type-hero-en)/1.3 var(--font-editorial);
+  font: 400 var(--type-hero-en)/1.3 var(--font-editorial);
   line-height: 1.3;
 }
 .heroActions {
@@ -265,7 +265,7 @@
   letter-spacing: 0.06em;
 }
 .captionTitle > span:last-child {
-  font: italic 400 21px/1.3 var(--font-editorial);
+  font: 400 var(--type-feature-en)/1.4 var(--font-editorial);
 }
 .captionFacts {
   min-width: 0;
@@ -480,7 +480,7 @@
   font-weight: 400;
 }
 .exhibitionHeading > p {
-  font: italic 400 var(--type-page-en)/1.3 var(--font-editorial);
+  font: 400 var(--type-page-en)/1.3 var(--font-editorial);
 }
 .exhibitionFacts {
   border-top: 1px solid var(--rust-line);
@@ -545,7 +545,7 @@
   font-weight: 400;
 }
 .headingCopy > p {
-  font: italic 400 var(--type-section-en)/1.3 var(--font-editorial);
+  font: 400 var(--type-section-en)/1.3 var(--font-editorial);
   color: var(--muted);
 }
 .mobileHeadingAction,
@@ -598,7 +598,7 @@
   letter-spacing: 0;
 }
 .cardEnglish {
-  font: italic 400 16px/1.3 var(--font-editorial);
+  font: 400 14px/1.5 var(--font-editorial);
   color: var(--muted);
   margin-top: 3px;
 }
@@ -674,7 +674,7 @@
   font-weight: 400;
 }
 .featureEnglish {
-  font: italic 400 var(--type-feature-en)/1.35 var(--font-editorial);
+  font: 400 var(--type-feature-en)/1.35 var(--font-editorial);
 }
 .featureCopy .featureExcerpt {
   margin-top: 8px;
@@ -734,7 +734,7 @@
   font: 400 18px/1.55 var(--font-song);
 }
 .articleEnglish {
-  font: italic 400 16px/1.3 var(--font-editorial);
+  font: 400 14px/1.5 var(--font-editorial);
   color: var(--muted);
 }
 @media (min-width: 861px) and (max-width: 1279px) {

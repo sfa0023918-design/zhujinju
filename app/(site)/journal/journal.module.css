@@ -53,7 +53,7 @@
   font-size: var(--type-page-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
-  font-style: italic;
+  font-style: normal;
 }
 
 .heroDescription {
@@ -157,7 +157,7 @@
   font-size: var(--type-card-en);
   line-height: 1.5;
   letter-spacing: 0;
-  font-style: italic;
+  font-style: normal;
   font-weight: 400;
 }
 
@@ -289,7 +289,7 @@
   }
   .pageTitle .en {
     font-size: var(--type-page-en);
-    font-style: italic;
+    font-style: normal;
   }
   .heroDescription {
     margin-top: 18px;
@@ -443,7 +443,7 @@
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
-  font-style: italic;
+  font-style: normal;
 }
 
 .keywords {
@@ -621,7 +621,7 @@
 
   .detailTitle .en {
     font-size: var(--type-page-en);
-    font-style: italic;
+    font-style: normal;
   }
 
   .detailCover {

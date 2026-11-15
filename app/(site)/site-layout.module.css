@@ -1,8 +1,7 @@
 .siteTheme {
   --font-serif:
     "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
-  --font-editorial:
-    "Instrument Serif", "Source Serif 4", "Zhujinju Song", Georgia, serif;
+  --font-editorial: var(--font-sans);
   --font-song:
     "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
   --font-sans:
@@ -10,17 +9,17 @@
     "Noto Sans SC", sans-serif;
   --font-display: "Anton", "Arial Narrow", sans-serif;
   --type-hero: 30px;
-  --type-hero-en: 22px;
+  --type-hero-en: 20px;
   --type-page: 26px;
-  --type-page-en: 18px;
+  --type-page-en: 17px;
   --type-section: 22px;
-  --type-section-en: 18px;
+  --type-section-en: 16px;
   --type-feature: 20px;
-  --type-feature-en: 18px;
+  --type-feature-en: 16px;
   --type-reading-title: 20px;
-  --type-reading-title-en: 18px;
+  --type-reading-title-en: 16px;
   --type-card: 16px;
-  --type-card-en: 16px;
+  --type-card-en: 14px;
   --type-artwork: 20px;
   --bg: #f3f1ec;
   --surface: #f3f1ec;
@@ -78,15 +77,15 @@
   .siteTheme {
     --page-inline: 40px;
     --type-hero: 32px;
-    --type-hero-en: 24px;
+    --type-hero-en: 22px;
     --type-page: 30px;
-    --type-page-en: 20px;
+    --type-page-en: 18px;
     --type-section: 24px;
-    --type-section-en: 19px;
+    --type-section-en: 17px;
     --type-feature: 22px;
-    --type-feature-en: 19px;
+    --type-feature-en: 17px;
     --type-card: 18px;
-    --type-card-en: 17px;
+    --type-card-en: 15px;
     --type-artwork: 22px;
   }
 }
@@ -94,16 +93,16 @@
 @media (min-width: 1100px) {
   .siteTheme {
     --type-hero: 36px;
-    --type-hero-en: 26px;
+    --type-hero-en: 24px;
     --type-page: 32px;
-    --type-page-en: 22px;
+    --type-page-en: 20px;
     --type-section: 26px;
-    --type-section-en: 20px;
+    --type-section-en: 18px;
     --type-feature: 24px;
-    --type-feature-en: 20px;
+    --type-feature-en: 18px;
     --type-reading-title: 22px;
     --type-card: 19px;
-    --type-card-en: 18px;
+    --type-card-en: 16px;
     --type-artwork: 24px;
   }
 }
@@ -128,10 +127,10 @@
   }
 }
 
-/* Keep the approved journal palette and faces; inherit the shared type scale. */
+/* Keep the journal palette and Chinese face with the shared English family. */
 .legacyEditorial {
   --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
-  --font-editorial: "Source Serif 4", Georgia, serif;
+  --font-editorial: var(--font-sans);
   --bg: #eeeae2;
   --surface: #f4f0e8;
   --surface-2: #f4f0e8;
@@ -159,7 +158,7 @@
   line-height: 1.5;
   -webkit-font-smoothing: auto;
   --font-sans:
-    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Instrument Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
     "Source Han Sans SC", sans-serif;
   background: var(--bg);
   color: var(--ink);

@@ -27,7 +27,7 @@
 }
 .heroTitleGroup p {
   margin: 0;
-  font: italic var(--type-page-en)/1.3 var(--font-editorial);
+  font: var(--type-page-en)/1.3 var(--font-editorial);
   color: var(--muted);
 }
 .totalCount {
@@ -257,7 +257,7 @@
     letter-spacing: 0.03em;
   }
   .heroTitleGroup p {
-    font: italic var(--type-page-en)/1.3 var(--font-editorial);
+    font: var(--type-page-en)/1.3 var(--font-editorial);
   }
   .totalCount {
     flex-direction: row;

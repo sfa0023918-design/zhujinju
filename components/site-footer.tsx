@@ -77,6 +77,8 @@ export async function SiteFooter() {
       alt={`${siteConfig.siteName.zh} ${siteConfig.siteName.en}`}
       width={908}
       height={322}
+      loading="lazy"
+      decoding="async"
       className={styles.logo}
       draggable="false"
       data-protect="true"

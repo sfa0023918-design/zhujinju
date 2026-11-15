@@ -107,6 +107,14 @@ export function HomeHero({
         {carousel.indexes.map((index, position) => {
           const slide = slides[index];
           const clone = native && slides.length > 1 && (position === 0 || position === slides.length + 1);
+          const ratio = slide.height / slide.width;
+          const desktopScale = parseFloat(slide.imageHeight) / 100 / ratio;
+          const mobileScale = parseFloat(slide.mobileHeight) / 100;
+          // The photograph follows the hero height, not the full screen width.
+          // In particular, portrait tablets still use the 460px mobile field.
+          const imageSizes = slide.framed
+            ? `(max-width: 860px) ${Math.ceil(414 / ratio)}px, (max-width: 895px) ${Math.ceil(520 * desktopScale)}px, (max-width: 1440px) ${(58.06 * desktopScale).toFixed(2)}vw, ${Math.ceil(836 * desktopScale)}px`
+            : `(max-width: ${Math.floor(460 / ratio)}px) ${(mobileScale * 100).toFixed(2)}vw, (max-width: 860px) ${Math.ceil(460 * mobileScale / ratio)}px, (max-width: 895px) ${Math.ceil(520 * desktopScale)}px, (max-width: 1440px) ${(58.06 * desktopScale).toFixed(2)}vw, ${Math.ceil(836 * desktopScale)}px`;
           return (
             <div
               key={`${slide.slug}-${position}`}
@@ -139,7 +147,7 @@ export function HomeHero({
                 onLoad={index === 0 ? () => setFirstImageReady(true) : undefined}
                 onError={index === 0 ? () => setFirstImageReady(true) : undefined}
                 quality={85}
-                sizes="(max-width: 860px) 100vw, 1024px"
+                sizes={imageSizes}
                 wrapperClassName={`${styles.heroImageFrame} ${slide.topFade ? styles.topFade : ""} ${slide.bottomFade ? styles.bottomFade : ""} ${slide.framed ? styles.framedArtwork : ""}`}
                 className={styles.heroImage}
               /> : null}
@@ -153,6 +161,7 @@ export function HomeHero({
             <Link
               key={slide.slug}
               href={`/collection/${slide.slug}`}
+              prefetch={index === active ? undefined : false}
               className={styles.caption}
               tabIndex={index === active ? 0 : -1}
               aria-hidden={index !== active}

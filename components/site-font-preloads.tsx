@@ -8,7 +8,6 @@ import readingFonts from "@/lib/data/reading-fonts.json";
 export function SiteFontPreloads() {
   for (const font of [
     readingFonts.core["400"],
-    "InstrumentSerif-Italic.woff2",
     "InstrumentSans.woff2",
   ]) {
     preload(`/fonts/${font}`, {

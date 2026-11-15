@@ -33,6 +33,8 @@ export async function SiteHeader() {
           width={908}
           height={322}
           draggable="false"
+          loading="lazy"
+          decoding="async"
           data-protect="true"
           className={`${styles.logo} ${styles.standardLogo}`}
         />
@@ -43,6 +45,8 @@ export async function SiteHeader() {
           width={908}
           height={322}
           draggable="false"
+          loading="lazy"
+          decoding="async"
           data-protect="true"
           className={`${styles.logo} ${styles.homeLogo}`}
         />
@@ -53,6 +57,8 @@ export async function SiteHeader() {
           width={908}
           height={322}
           draggable="false"
+          loading="lazy"
+          decoding="async"
           data-protect="true"
           className={`${styles.logo} ${styles.seasonLogo}`}
         />

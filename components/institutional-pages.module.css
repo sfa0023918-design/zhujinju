@@ -43,7 +43,7 @@
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
-  font-style: italic;
+  font-style: normal;
 }
 
 .aboutHero {
@@ -135,7 +135,7 @@
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
-  font-style: italic;
+  font-style: normal;
 }
 
 .philosophyBody {
