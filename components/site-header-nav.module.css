@@ -111,7 +111,7 @@
     justify-content: center;
     align-items: center;
     gap: 7px;
-    color: var(--ink);
+    color: var(--header-ink, var(--ink));
   }
   .menuButton span {
     display: block;
@@ -134,5 +134,23 @@
 @media (min-width: 861px) {
   .mobileBackdrop {
     display: none;
+  }
+}
+
+.mobileBackdrop {
+  color: var(--ink);
+}
+.menuButton[aria-expanded="true"] {
+  color: var(--ink);
+}
+@media (min-width: 861px) and (max-width: 1100px) {
+  .desktopNav {
+    gap: 16px;
+  }
+  .navLabel {
+    gap: 5px;
+  }
+  .navEn {
+    font-size: 12px;
   }
 }

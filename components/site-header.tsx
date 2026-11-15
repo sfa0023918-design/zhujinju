@@ -8,6 +8,7 @@ import { SiteHeaderFrame } from "./site-header-frame";
 import styles from "./site-header.module.css";
 
 const navigation = [
+  { href: "/", label: bt("首页", "Home") },
   { href: "/collection", label: bt("藏品", "Collection") },
   { href: "/exhibitions", label: bt("展览", "Exhibitions") },
   { href: "/journal", label: bt("文章", "Journal") },
@@ -44,6 +45,16 @@ export async function SiteHeader() {
           draggable="false"
           data-protect="true"
           className={`${styles.logo} ${styles.homeLogo}`}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/zhujinju-header-cream.png"
+          alt=""
+          width={908}
+          height={322}
+          draggable="false"
+          data-protect="true"
+          className={`${styles.logo} ${styles.seasonLogo}`}
         />
       </Link>
       <SiteHeaderNav items={navigation} />

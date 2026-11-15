@@ -52,3 +52,24 @@
     height: 40px;
   }
 }
+
+.seasonLogo {
+  display: none;
+}
+.seasonHeader {
+  background: var(--season-color);
+  color: var(--rust-ink);
+  --nav-english-opacity: 0.78;
+  --header-ink: var(--rust-ink);
+}
+.seasonHeader .standardLogo {
+  display: none;
+}
+.seasonHeader .seasonLogo {
+  display: block;
+}
+@media (min-width: 861px) and (max-width: 1100px) {
+  .inner {
+    gap: 20px;
+  }
+}

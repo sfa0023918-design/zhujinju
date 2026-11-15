@@ -3,9 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
-import { catalogueImageVariant, cataloguePageGeometry } from "@/lib/catalogue-media";
+import {
+  catalogueImageVariant,
+  cataloguePageGeometry,
+} from "@/lib/catalogue-media";
 
-import { BilingualText } from "./bilingual-text";
+import styles from "./exhibition-catalogue-viewer.module.css";
 import { ProtectedImage } from "./protected-image";
 import { MobileCatalogueReader } from "./mobile-catalogue-reader";
 
@@ -57,9 +60,21 @@ export function ExhibitionCatalogueViewer({
   viewMode = "single-pages",
 }: ExhibitionCatalogueViewerProps) {
   const cataloguePages = useMemo(() => pages.filter(Boolean), [pages]);
-  const readerPages = useMemo(() => cataloguePages.map((page) => catalogueImageVariant(page, "reader")), [cataloguePages]);
-  const thumbPages = useMemo(() => cataloguePages.map((page) => catalogueImageVariant(page, "thumb")), [cataloguePages]);
-  const geometries = useMemo(() => cataloguePages.map((page) => cataloguePageGeometry(page, viewMode === "spread-images")), [cataloguePages, viewMode]);
+  const readerPages = useMemo(
+    () => cataloguePages.map((page) => catalogueImageVariant(page, "reader")),
+    [cataloguePages],
+  );
+  const thumbPages = useMemo(
+    () => cataloguePages.map((page) => catalogueImageVariant(page, "thumb")),
+    [cataloguePages],
+  );
+  const geometries = useMemo(
+    () =>
+      cataloguePages.map((page) =>
+        cataloguePageGeometry(page, viewMode === "spread-images"),
+      ),
+    [cataloguePages, viewMode],
+  );
   const [isDesktop, setIsDesktop] = useState(false);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -67,7 +82,9 @@ export function ExhibitionCatalogueViewer({
   const [isDesktopReaderOpen, setIsDesktopReaderOpen] = useState(false);
   const hasNavigatedRef = useRef(false);
   const desktopFullscreenButtonRef = useRef<HTMLButtonElement | null>(null);
-  const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<Set<number>>(() => new Set([0]));
+  const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<
+    Set<number>
+  >(() => new Set([0]));
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
   const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
@@ -75,7 +92,8 @@ export function ExhibitionCatalogueViewer({
   const totalPages = cataloguePages.length;
   const showsSpreadImage = viewMode === "spread-images";
   const usesMobileReader = isLayoutReady && (!isDesktop || isFullscreenReading);
-  const usesDesktopPairing = isDesktop && !showsSpreadImage && !usesMobileReader;
+  const usesDesktopPairing =
+    isDesktop && !showsSpreadImage && !usesMobileReader;
   const usesPairedPages = !showsSpreadImage;
   const preloadsPairedPages = usesPairedPages;
 
@@ -98,7 +116,9 @@ export function ExhibitionCatalogueViewer({
         return 0;
       }
 
-      return usesPairedPages ? getDesktopStartIndex(previous, totalPages) : clamp(previous, 0, totalPages - 1);
+      return usesPairedPages
+        ? getDesktopStartIndex(previous, totalPages)
+        : clamp(previous, 0, totalPages - 1);
     });
   }, [usesPairedPages, totalPages]);
 
@@ -110,7 +130,11 @@ export function ExhibitionCatalogueViewer({
     }
 
     const requestedIndex = clamp(Number(match[1]) - 1, 0, totalPages - 1);
-    setCurrentIndex(usesPairedPages ? getDesktopStartIndex(requestedIndex, totalPages) : requestedIndex);
+    setCurrentIndex(
+      usesPairedPages
+        ? getDesktopStartIndex(requestedIndex, totalPages)
+        : requestedIndex,
+    );
     document.getElementById("catalogue")?.scrollIntoView();
   }, [totalPages, usesPairedPages]);
 
@@ -120,24 +144,30 @@ export function ExhibitionCatalogueViewer({
     }
   }, [currentIndex]);
 
-  const handleMobileFullscreenChange = useCallback((open: boolean) => {
-    setIsFullscreenReading(open);
-    if (!open && hasNavigatedRef.current) {
-      writePageHash(currentIndex);
-    }
-  }, [currentIndex]);
+  const handleMobileFullscreenChange = useCallback(
+    (open: boolean) => {
+      setIsFullscreenReading(open);
+      if (!open && hasNavigatedRef.current) {
+        writePageHash(currentIndex);
+      }
+    },
+    [currentIndex],
+  );
 
-  const handleDesktopFullscreenChange = useCallback((open: boolean) => {
-    if (open) {
-      return;
-    }
+  const handleDesktopFullscreenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        return;
+      }
 
-    setIsDesktopReaderOpen(false);
-    desktopFullscreenButtonRef.current?.focus({ preventScroll: true });
-    if (hasNavigatedRef.current) {
-      writePageHash(currentIndex);
-    }
-  }, [currentIndex]);
+      setIsDesktopReaderOpen(false);
+      desktopFullscreenButtonRef.current?.focus({ preventScroll: true });
+      if (hasNavigatedRef.current) {
+        writePageHash(currentIndex);
+      }
+    },
+    [currentIndex],
+  );
 
   useEffect(() => {
     if (!readerPages.length || !isLayoutReady) {
@@ -153,14 +183,16 @@ export function ExhibitionCatalogueViewer({
       }
     }
 
-    const connection = (navigator as Navigator & {
-      connection?: { saveData?: boolean; effectiveType?: string };
-    }).connection;
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
 
     if (
-      connection?.saveData
-      || connection?.effectiveType === "2g"
-      || connection?.effectiveType === "slow-2g"
+      connection?.saveData ||
+      connection?.effectiveType === "2g" ||
+      connection?.effectiveType === "slow-2g"
     ) {
       return;
     }
@@ -200,7 +232,8 @@ export function ExhibitionCatalogueViewer({
       return;
     }
 
-    const targetLeft = selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
+    const targetLeft =
+      selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
     strip.scrollTo({ left: Math.max(0, targetLeft), behavior: "auto" });
   }, [currentIndex, usesDesktopPairing]);
 
@@ -219,44 +252,53 @@ export function ExhibitionCatalogueViewer({
 
   useEffect(() => {
     const strip = thumbnailStripRef.current;
-    const connection = (navigator as Navigator & {
-      connection?: { saveData?: boolean; effectiveType?: string };
-    }).connection;
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
 
     if (
-      !strip
-      || typeof IntersectionObserver === "undefined"
-      || connection?.saveData
-      || connection?.effectiveType === "2g"
-      || connection?.effectiveType === "slow-2g"
+      !strip ||
+      typeof IntersectionObserver === "undefined" ||
+      connection?.saveData ||
+      connection?.effectiveType === "2g" ||
+      connection?.effectiveType === "slow-2g"
     ) {
       return;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      const visibleIndexes = entries
-        .filter((entry) => entry.isIntersecting)
-        .map((entry) => Number((entry.target as HTMLElement).dataset.thumbnailIndex))
-        .filter(Number.isInteger);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleIndexes = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) =>
+            Number((entry.target as HTMLElement).dataset.thumbnailIndex),
+          )
+          .filter(Number.isInteger);
 
-      if (!visibleIndexes.length) {
-        return;
-      }
+        if (!visibleIndexes.length) {
+          return;
+        }
 
-      setThumbnailImageIndexes((previous) => {
-        const next = new Set(previous);
-        visibleIndexes.forEach((index) => next.add(index));
-        return next.size === previous.size ? previous : next;
+        setThumbnailImageIndexes((previous) => {
+          const next = new Set(previous);
+          visibleIndexes.forEach((index) => next.add(index));
+          return next.size === previous.size ? previous : next;
+        });
+      },
+      {
+        root: strip,
+        rootMargin: "0px 160px",
+        threshold: 0.01,
+      },
+    );
+
+    strip
+      .querySelectorAll<HTMLElement>("[data-thumbnail-index]")
+      .forEach((thumbnail) => {
+        observer.observe(thumbnail);
       });
-    }, {
-      root: strip,
-      rootMargin: "0px 160px",
-      threshold: 0.01,
-    });
-
-    strip.querySelectorAll<HTMLElement>("[data-thumbnail-index]").forEach((thumbnail) => {
-      observer.observe(thumbnail);
-    });
 
     return () => observer.disconnect();
   }, [cataloguePages.length]);
@@ -269,17 +311,19 @@ export function ExhibitionCatalogueViewer({
     ? [readerPages[currentIndex] ?? null, readerPages[currentIndex + 1] ?? null]
     : [readerPages[currentIndex] ?? null];
   const canGoPrevious = currentIndex > 0;
-  const canGoNext = usesDesktopPairing ? currentIndex + 2 < totalPages : currentIndex + 1 < totalPages;
+  const canGoNext = usesDesktopPairing
+    ? currentIndex + 2 < totalPages
+    : currentIndex + 1 < totalPages;
   const currentLabel = usesDesktopPairing
     ? `${currentIndex + 1}${cataloguePages[currentIndex + 1] ? ` - ${currentIndex + 2}` : ""}`
     : `${currentIndex + 1}`;
-  const readingModeLabel = "双页浏览 / Facing Pages";
   const visiblePageNumbers = visiblePages
     .map((page, index) => (page ? currentIndex + index + 1 : null))
     .filter((pageNumber): pageNumber is number => pageNumber !== null);
-  const stageSummary = visiblePageNumbers.length > 1
-    ? `${visiblePageNumbers[0]} - ${visiblePageNumbers[visiblePageNumbers.length - 1]}`
-    : `${visiblePageNumbers[0] ?? 1}`;
+  const stageSummary =
+    visiblePageNumbers.length > 1
+      ? `${visiblePageNumbers[0]} - ${visiblePageNumbers[visiblePageNumbers.length - 1]}`
+      : `${visiblePageNumbers[0] ?? 1}`;
   function jumpTo(index: number) {
     if (!totalPages) {
       return;
@@ -287,7 +331,9 @@ export function ExhibitionCatalogueViewer({
 
     hasNavigatedRef.current = true;
     setCurrentIndex(
-      usesPairedPages ? getDesktopStartIndex(index, totalPages) : clamp(index, 0, totalPages - 1),
+      usesPairedPages
+        ? getDesktopStartIndex(index, totalPages)
+        : clamp(index, 0, totalPages - 1),
     );
   }
 
@@ -297,7 +343,11 @@ export function ExhibitionCatalogueViewer({
     }
 
     hasNavigatedRef.current = true;
-    setCurrentIndex((previous) => (usesDesktopPairing ? Math.max(0, previous - 2) : Math.max(0, previous - 1)));
+    setCurrentIndex((previous) =>
+      usesDesktopPairing
+        ? Math.max(0, previous - 2)
+        : Math.max(0, previous - 1),
+    );
   }
 
   function goNext() {
@@ -308,7 +358,10 @@ export function ExhibitionCatalogueViewer({
     hasNavigatedRef.current = true;
     setCurrentIndex((previous) => {
       if (usesDesktopPairing) {
-        return getDesktopStartIndex(Math.min(totalPages - 1, previous + 2), totalPages);
+        return getDesktopStartIndex(
+          Math.min(totalPages - 1, previous + 2),
+          totalPages,
+        );
       }
 
       return Math.min(totalPages - 1, previous + 1);
@@ -316,82 +369,53 @@ export function ExhibitionCatalogueViewer({
   }
 
   return (
-    <div className="space-y-7">
-      <div className="grid gap-6 border-b border-[var(--line)]/68 pb-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)] lg:items-end">
-        <div className="space-y-5">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">
-            <span>电子图录 / DIGITAL CATALOGUE</span>
-            <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
-            <span>{`${usesMobileReader ? "Plate Count" : "Page Count"} / ${totalPages}`}</span>
-            <span className="h-px w-8 bg-[var(--line-strong)]/28" aria-hidden="true" />
-            <span>{readingModeLabel}</span>
-          </div>
-          <BilingualText
-            as="h2"
-            text={title}
-            className="font-serif text-[var(--ink)]"
-            zhClassName="block max-w-[20em] text-[length:var(--type-section)] leading-[1.4] tracking-normal"
-            enClassName="mt-3 block font-[family-name:var(--font-editorial)] text-base tracking-normal leading-[1.5] text-[var(--accent-text)]"
-          />
-          <div className="flex items-center gap-3 text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">
-            <span className="h-px w-12 bg-[var(--line-strong)]/34" aria-hidden="true" />
-            <span>刊首阅读页 / Editorial Opening</span>
-          </div>
-        </div>
-
-        <div className="rounded-[4px] border border-[var(--line)] bg-[var(--surface)] p-5">
-          <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-3">
-            <p className="text-[0.75rem] uppercase tracking-[0.08em] text-[var(--accent-text)]">Reading Note</p>
-            <p className="text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
-              {usesMobileReader ? `Current Plate · ${stageSummary}` : visiblePageNumbers.length > 1 ? `Current Pages · ${stageSummary}` : `Current Page · ${stageSummary}`}
-            </p>
-          </div>
-          <BilingualText
-            as="p"
-            text={note}
-            className="mt-4 text-[0.9375rem] leading-7 text-[var(--muted)]"
-            zhClassName="block"
-            enClassName="mt-2 block text-[0.8125rem] tracking-[0.04em] leading-[1.65] text-[var(--accent-text)]"
-          />
-        </div>
-      </div>
-
-      {usesMobileReader ? (
-        <MobileCatalogueReader title={title} pages={cataloguePages} readerPages={readerPages} thumbPages={thumbPages} geometries={geometries} pairSingleImages={!showsSpreadImage} currentIndex={currentIndex} onIndexChange={jumpTo} onFullscreenChange={handleMobileFullscreenChange} />
-      ) : <div id="catalogue-reader" className="scroll-mt-24 rounded-[4px] border border-[var(--line-strong)] bg-[var(--surface)] p-4 md:p-5 lg:p-7">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-[var(--line)] pb-4 text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span>
-              {`第 ${currentLabel} 页 / 共 ${totalPages} 页`}
-            </span>
-            <span className="h-px w-6 bg-[var(--line-strong)]/26" aria-hidden="true" />
-            <span>当前展开 / {stageSummary}</span>
-          </div>
+    <div className={styles.viewer}>
+      <div className={styles.heading}>
+        <h2>
+          电子图录 <span lang="en">Catalogue</span>
+        </h2>
+        {!usesMobileReader ? (
           <button
             ref={desktopFullscreenButtonRef}
             type="button"
             onClick={() => setIsDesktopReaderOpen(true)}
-            className="inline-flex min-h-9 items-center rounded-[2px] border border-[var(--line)] px-3 text-[var(--accent-text)] transition-colors duration-150 hover:border-[var(--line-strong)] hover:bg-[var(--surface-strong)]"
+            className={styles.fullscreenButton}
           >
-            全屏阅读 / Full Screen
+            全屏阅读 <span lang="en">Full screen</span> ↗
           </button>
-        </div>
-
-        <div className="grid gap-3 lg:grid-cols-[48px_minmax(0,1fr)_48px] lg:items-center">
-          <NavigationButton
-            direction="previous"
-            disabled={!canGoPrevious}
-            onClick={goPrevious}
-          />
-
+        ) : null}
+      </div>
+      <div className={styles.catalogueInfo}>
+        <p>
+          {title.zh} <span lang="en">{title.en}</span>
+        </p>
+        <p>
+          {note.zh}
+          <span lang="en">{note.en}</span>
+        </p>
+      </div>
+      {usesMobileReader ? (
+        <MobileCatalogueReader
+          title={title}
+          pages={cataloguePages}
+          readerPages={readerPages}
+          thumbPages={thumbPages}
+          geometries={geometries}
+          pairSingleImages={!showsSpreadImage}
+          currentIndex={currentIndex}
+          onIndexChange={jumpTo}
+          onFullscreenChange={handleMobileFullscreenChange}
+        />
+      ) : (
+        <div id="catalogue-reader" className={styles.desktopReader}>
           <div
             tabIndex={0}
+            aria-label="图录翻页区域"
             onKeyDown={(event) => {
               if (event.key === "ArrowLeft") {
                 event.preventDefault();
                 goPrevious();
               }
-
               if (event.key === "ArrowRight") {
                 event.preventDefault();
                 goNext();
@@ -401,72 +425,77 @@ export function ExhibitionCatalogueViewer({
               touchStartX.current = event.touches[0]?.clientX ?? null;
             }}
             onTouchEnd={(event) => {
-              if (touchStartX.current === null) {
-                return;
-              }
-
-              const endX = event.changedTouches[0]?.clientX ?? touchStartX.current;
+              if (touchStartX.current === null) return;
+              const endX =
+                event.changedTouches[0]?.clientX ?? touchStartX.current;
               const delta = endX - touchStartX.current;
               touchStartX.current = null;
-
-              if (Math.abs(delta) < 28) {
-                return;
-              }
-
-              if (delta > 0) {
-                goPrevious();
-              } else {
-                goNext();
-              }
+              if (Math.abs(delta) < 28) return;
+              if (delta > 0) goPrevious();
+              else goNext();
             }}
-            className="touch-pan-y select-none outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]"
+            className={styles.stage}
+            style={{
+              gridTemplateColumns: usesDesktopPairing
+                ? "repeat(2,minmax(0,1fr))"
+                : "minmax(0,1fr)",
+            }}
           >
-            <div
-              className={`relative grid gap-2 overflow-hidden rounded-[4px] border border-[var(--line)] bg-[var(--surface-strong)] p-2 md:p-3 ${
-                usesDesktopPairing ? "lg:grid-cols-2" : "grid-cols-1"
-              }`}
-            >
-              {usesDesktopPairing ? (
-                <div className="pointer-events-none absolute inset-y-8 left-1/2 hidden w-px -translate-x-1/2 bg-[var(--line-strong)]/48 lg:block" />
-              ) : null}
-              {visiblePages.map((page, index) => (
-                <CataloguePage
+            {visiblePages.map((page, index) =>
+              page ? (
+                <ProtectedImage
                   key={`slot-${index}-${page}`}
-                  page={page}
-                  pageNumber={currentIndex + index + 1}
-                  title={title}
-                  side={usesDesktopPairing ? (index === 0 ? "left" : "right") : "single"}
-                  displayMode={showsSpreadImage ? "spread" : "page"}
+                  src={page}
+                  alt={`${title.zh || title.en} page ${currentIndex + index + 1}`}
+                  width={geometries[currentIndex + index]?.width ?? 4000}
+                  height={geometries[currentIndex + index]?.height ?? 2358}
+                  unoptimized
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes={usesDesktopPairing ? "50vw" : "100vw"}
+                  wrapperClassName={styles.pageFrame}
+                  className={styles.page}
                 />
-              ))}
-            </div>
+              ) : (
+                <div key={index} />
+              ),
+            )}
           </div>
-
-          <NavigationButton
-            direction="next"
-            disabled={!canGoNext}
-            onClick={goNext}
-          />
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-[4px] border border-[var(--line)] bg-[var(--surface)] p-3 md:p-4">
-          <div className="mb-3 flex flex-col gap-2 border-b border-[var(--line)]/52 pb-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-[0.75rem] tracking-[0.08em] text-[var(--accent-text)]">图版索引 / PLATE INDEX</p>
+          <div className={styles.controls}>
+            <span aria-live="polite">
+              第 {currentLabel} 页 · {stageSummary} / {totalPages}
+            </span>
+            <div className={styles.progress} aria-hidden="true">
+              <span
+                style={{ width: `${((currentIndex + 1) / totalPages) * 100}%` }}
+              />
             </div>
-            <p className="text-[0.75rem] tracking-[0.06em] text-[var(--accent-text)]">
-              当前浏览 / Page {stageSummary}
+            <button
+              type="button"
+              aria-label="上一页 Prev"
+              disabled={!canGoPrevious}
+              onClick={goPrevious}
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              aria-label="下一页 Next"
+              disabled={!canGoNext}
+              onClick={goNext}
+            >
+              →
+            </button>
+          </div>
+          <div className={styles.index}>
+            <p>
+              缩略索引 <span lang="en">Index</span>
             </p>
-          </div>
-
-          <div>
-            <div ref={thumbnailStripRef} className="flex gap-2 overflow-x-auto pb-1">
+            <div ref={thumbnailStripRef} className={styles.thumbnails}>
               {cataloguePages.map((page, index) => {
                 const selected = usesDesktopPairing
                   ? currentIndex === getDesktopStartIndex(index, totalPages)
                   : currentIndex === index;
-                const showThumbnail = thumbnailImageIndexes.has(index);
-
                 return (
                   <button
                     key={`${page}-${index}`}
@@ -476,141 +505,42 @@ export function ExhibitionCatalogueViewer({
                     aria-label={`${title.zh || title.en} page ${index + 1}`}
                     aria-current={selected ? "page" : undefined}
                     data-thumbnail-index={index}
-                    className="group relative shrink-0 rounded-[2px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                    className={styles.thumbnail}
                   >
-                    <div className={`overflow-hidden rounded-[2px] border p-1.5 transition-colors duration-150 ${
-                      selected
-                        ? "border-[var(--line-strong)] bg-[var(--surface-strong)]"
-                        : "border-[var(--line)] bg-transparent hover:border-[var(--line-strong)]"
-                    }`}>
-                      <div className={`relative overflow-hidden rounded-[1px] bg-[var(--surface-strong)] ${
-                        showsSpreadImage ? "h-20 w-32 md:h-24 md:w-40" : "h-24 w-16 md:h-28 md:w-20"
-                      }`}>
-                        {showThumbnail ? (
-                          <ProtectedImage
-                            src={catalogueImageVariant(page, "thumb")}
-                            alt={`${title.zh || title.en} page ${index + 1}`}
-                            fill
-                            sizes={showsSpreadImage ? "160px" : "80px"}
-                            unoptimized={catalogueImageVariant(page, "thumb") !== page}
-                            wrapperClassName="h-full w-full"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="flex h-full w-full items-center justify-center font-serif text-[1.1rem] text-[var(--accent-text)]">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2 flex items-center justify-between px-0.5 text-[0.75rem] tracking-[0.04em] text-[var(--accent-text)]">
-                        <span>{String(index + 1).padStart(2, "0")}</span>
-                        <span>{selected ? "Current" : showsSpreadImage ? "Spread" : "Plate"}</span>
-                      </div>
-                    </div>
+                    <span className={styles.thumbnailImage}>
+                      {thumbnailImageIndexes.has(index) ? (
+                        <ProtectedImage
+                          src={thumbPages[index]}
+                          alt=""
+                          fill
+                          unoptimized
+                          sizes="180px"
+                          className={styles.thumbImage}
+                        />
+                      ) : null}
+                    </span>
+                    <span>{String(index + 1).padStart(3, "0")}</span>
                   </button>
                 );
               })}
             </div>
           </div>
+          {isDesktopReaderOpen ? (
+            <MobileCatalogueReader
+              presentation="dialog"
+              title={title}
+              pages={cataloguePages}
+              readerPages={readerPages}
+              thumbPages={thumbPages}
+              geometries={geometries}
+              pairSingleImages={!showsSpreadImage}
+              currentIndex={currentIndex}
+              onIndexChange={jumpTo}
+              onFullscreenChange={handleDesktopFullscreenChange}
+            />
+          ) : null}
         </div>
-        {isDesktopReaderOpen ? (
-          <MobileCatalogueReader
-            presentation="dialog"
-            title={title}
-            pages={cataloguePages}
-            readerPages={readerPages}
-            thumbPages={thumbPages}
-            geometries={geometries}
-            pairSingleImages={!showsSpreadImage}
-            currentIndex={currentIndex}
-            onIndexChange={jumpTo}
-            onFullscreenChange={handleDesktopFullscreenChange}
-          />
-        ) : null}
-      </div>}
+      )}
     </div>
-  );
-}
-
-function CataloguePage({
-  page,
-  pageNumber,
-  title,
-  side,
-  displayMode,
-}: {
-  page: string | null;
-  pageNumber: number;
-  title: BilingualValue;
-  side: "left" | "right" | "single";
-  displayMode: "page" | "spread";
-}) {
-  const minHeightClass = "min-h-[420px]";
-
-  if (!page) {
-    return (
-      <div className={`relative hidden ${minHeightClass} rounded-[2px] border border-[var(--line)] bg-[var(--surface)] lg:block`}>
-        <div className={`absolute inset-y-10 ${side === "right" ? "left-0" : "right-0"} w-px bg-[var(--line)]/26`} />
-      </div>
-    );
-  }
-
-  return (
-    <div className={`group relative ${minHeightClass} rounded-[2px] border border-[var(--line)] bg-[var(--surface)] p-2 md:p-3`}>
-      <div className={`absolute inset-y-8 hidden w-px bg-[var(--line)]/24 lg:block ${side === "right" ? "left-0" : side === "left" ? "right-0" : "left-0"}`} />
-      <div className="relative overflow-hidden rounded-[1px] border border-[var(--line)] bg-[var(--surface)]">
-        <div
-          className={`relative bg-[var(--surface)] ${displayMode === "spread" ? "aspect-[1.7/1]" : "aspect-[0.72/1]"} ${
-            side === "left" ? "ml-auto" : side === "right" ? "mr-auto" : "mx-auto"
-          }`}
-          // Keep the whole page or spread within a laptop screen's height.
-          style={{ maxWidth: `calc((100svh - 220px) * ${displayMode === "spread" ? 1.7 : 0.72})` }}
-        >
-          <ProtectedImage
-            src={page}
-            alt={`${title.zh || title.en} page ${pageNumber}`}
-            unoptimized
-            fill
-            sizes={displayMode === "spread" ? "(min-width: 1024px) 84vw, 92vw" : "(min-width: 1024px) 42vw, 88vw"}
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            wrapperClassName="h-full w-full"
-            className="object-contain"
-          />
-        </div>
-      </div>
-      <div className="mt-3 flex items-center justify-between text-[0.75rem] uppercase tracking-[0.06em] text-[var(--accent-text)]">
-        <span>{pageNumber.toString().padStart(2, "0")}</span>
-        <span>{displayMode === "spread" ? "Spread" : side === "single" ? "Reader" : "Catalogue"}</span>
-      </div>
-    </div>
-  );
-}
-
-function NavigationButton({
-  direction,
-  disabled,
-  onClick,
-}: {
-  direction: "previous" | "next";
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  const label = direction === "previous" ? "上一页 Prev" : "下一页 Next";
-  const symbol = direction === "previous" ? "←" : "→";
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="inline-flex min-h-11 items-center justify-center rounded-[2px] border border-[var(--line)] bg-transparent px-4 text-[var(--ink)] transition-colors duration-150 hover:border-[var(--line-strong)] hover:bg-[var(--surface-strong)] disabled:cursor-not-allowed disabled:opacity-30 lg:min-h-[144px] lg:w-[48px] lg:px-0"
-      aria-label={label}
-    >
-      <span className="text-[1.1rem]" aria-hidden="true">
-        {symbol}
-      </span>
-    </button>
   );
 }

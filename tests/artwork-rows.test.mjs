@@ -53,3 +53,17 @@ test("short desktop tail uses preceding row ratio without inflating images", () 
   assert.equal(rows[1].spacer, 2.2);
   assert.deepEqual(pack([], "desktop"), []);
 });
+
+test("detail rows retain sequence, cap five images, and avoid enlarged tails", () => {
+  const rows = pack([0.4, 0.4, 0.4, 0.4, 0.4, 0.8, 0.8, 0.8, 0.7], "details");
+  assert.deepEqual(
+    rows.map((row) => row.indexes),
+    [[0, 1, 2, 3, 4], [5, 6, 7], [8]],
+  );
+  assert.ok(Math.abs(rows[0].spacer - 0.3) < 1e-10);
+  assert.ok(Math.abs(rows[2].spacer - 1.7) < 1e-10);
+  assert.deepEqual(
+    pack([0.8, 3.5], "details").map((row) => row.indexes),
+    [[0, 1]],
+  );
+});

@@ -9,10 +9,8 @@ import type {
 } from "@/lib/site-data";
 import { withImageVersion } from "@/lib/image-url";
 
-import { ArtworkCard } from "./artwork-card";
+import { ContemporaryExhibition } from "./contemporary-exhibition";
 import { BilingualText } from "./bilingual-text";
-import { ExhibitionCatalogueViewer } from "./exhibition-catalogue-viewer";
-import { ExhibitionDetailReading } from "./exhibition-detail-reading";
 import { HistoryBackLink } from "./history-back-link";
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
@@ -28,12 +26,16 @@ type ExhibitionDetailPageContentProps = {
   detailCopy: PageCopyContent["exhibitionDetail"];
   highlightedArtworks: Artwork[];
   relatedArticles: Article[];
+  pastExhibitions: Exhibition[];
 };
 
 // Some exhibitions store only a heading such as "序 / Preface" in the intro field.
 // That heading belongs with the preface text, so lists and the masthead skip it.
 function hasIntroSummary(exhibition: Exhibition) {
-  return exhibition.intro.zh.trim().length > 4 || exhibition.intro.en.trim().split(/\s+/).length > 3;
+  return (
+    exhibition.intro.zh.trim().length > 4 ||
+    exhibition.intro.en.trim().split(/\s+/).length > 3
+  );
 }
 
 // Keep "竹瑾居｜" and the rest of a title together on their own lines, so a title
@@ -64,13 +66,20 @@ function ExhibitionTitle({
 }
 
 function getYear(exhibition: Exhibition) {
-  return exhibition.period.zh.match(/\d{4}/)?.[0]
-    ?? exhibition.period.en.match(/\d{4}/)?.[0]
-    ?? "";
+  return (
+    exhibition.period.zh.match(/\d{4}/)?.[0] ??
+    exhibition.period.en.match(/\d{4}/)?.[0] ??
+    ""
+  );
 }
 
 function getCataloguePageCount(exhibition: Exhibition) {
-  return exhibition.cataloguePageCount ?? exhibition.cataloguePages ?? exhibition.cataloguePageImages?.length ?? 0;
+  return (
+    exhibition.cataloguePageCount ??
+    exhibition.cataloguePages ??
+    exhibition.cataloguePageImages?.length ??
+    0
+  );
 }
 
 function getCatalogueMode(exhibition: Exhibition) {
@@ -88,15 +97,19 @@ function ExhibitionImage({
   priority?: boolean;
   className?: string;
 }) {
-  const image = exhibition.coverAsset?.detail
-    ?? exhibition.coverAsset?.hero
-    ?? exhibition.coverAsset?.card
-    ?? exhibition.cover;
+  const image =
+    exhibition.coverAsset?.detail ??
+    exhibition.coverAsset?.hero ??
+    exhibition.coverAsset?.card ??
+    exhibition.cover;
 
   if (image.startsWith("/api/placeholder/")) {
     return (
       <div className={`${styles.coverPlaceholder} ${className ?? ""}`}>
-        <MediaPlaceholder eyebrow="Exhibition Image" title={exhibition.title.zh} />
+        <MediaPlaceholder
+          eyebrow="Exhibition Image"
+          title={exhibition.title.zh}
+        />
       </div>
     );
   }
@@ -168,10 +181,14 @@ export function ExhibitionsPageContent({
   exhibitions,
   pageCopy,
 }: ExhibitionsPageContentProps) {
-  const currentExhibition = exhibitions.find((exhibition) => exhibition.current === true);
+  const currentExhibition = exhibitions.find(
+    (exhibition) => exhibition.current === true,
+  );
   const recentExhibition = currentExhibition ?? exhibitions[0];
   const pastExhibitions = recentExhibition
-    ? exhibitions.filter((exhibition) => exhibition.slug !== recentExhibition.slug)
+    ? exhibitions.filter(
+        (exhibition) => exhibition.slug !== recentExhibition.slug,
+      )
     : [];
   const recentSectionLabel = currentExhibition
     ? { zh: "当前展览", en: "Current Exhibition" }
@@ -330,129 +347,87 @@ export function ExhibitionDetailPageContent({
   detailCopy,
   highlightedArtworks,
   relatedArticles,
+  pastExhibitions,
 }: ExhibitionDetailPageContentProps) {
   const cataloguePages = exhibition.cataloguePageImages?.filter(Boolean) ?? [];
   const pageCount = getCataloguePageCount(exhibition);
   const catalogueUnit = getCatalogueMode(exhibition);
-  const catalogueNote = exhibition.catalogueNote ?? exhibition.catalogueIntro;
-  const curatorialNote = exhibition.curatorialNote ?? exhibition.curatorialLead;
-
   return (
-    <div className={styles.exhibitionDetail}>
-      <section className={styles.detailHero}>
-        <div className={styles.detailCover}>
-          <ExhibitionImage exhibition={exhibition} priority />
-        </div>
-        <div className={styles.detailRecord}>
-          <HistoryBackLink fallbackHref="/exhibitions" className={styles.backLink}>
-            <BilingualText
-              as="span"
-              text={detailCopy.backAction}
-              className={styles.bilingualPair}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-          </HistoryBackLink>
-          <p className={styles.year}>{getYear(exhibition)}</p>
-          <BilingualText
-            as="p"
-            text={exhibition.subtitle}
-            className={`${styles.bilingualPair} ${styles.subtitle}`}
-            zhClassName={styles.zh}
-            enClassName={styles.en}
-          />
-          <ExhibitionTitle
-            as="h1"
-            text={exhibition.title}
-            className={`${styles.bilingualPair} ${styles.detailTitle}`}
-          />
-          <ExhibitionRecord exhibition={exhibition} />
-          <dl className={styles.summaryFacts}>
-            <div>
-              <dt>{detailCopy.summaryLine.highlightUnit.zh}</dt>
-              <dd>{exhibition.featuredWorksCount ?? exhibition.highlightCount ?? highlightedArtworks.length}</dd>
-            </div>
-            <div>
-              <dt>{catalogueUnit.zh}</dt>
-              <dd>{pageCount}</dd>
-            </div>
-          </dl>
-          {hasIntroSummary(exhibition) ? (
-            <BilingualText
-              as="div"
-              text={exhibition.intro}
-              className={`${styles.bilingualPair} ${styles.detailIntro}`}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-          ) : null}
-          {cataloguePages.length ? (
-            <Link href="#catalogue" className={styles.catalogueLink}>
+    <ContemporaryExhibition
+      exhibition={exhibition}
+      detailCopy={detailCopy}
+      relatedArticles={relatedArticles}
+      pastExhibitions={pastExhibitions}
+      fallbackWorkCount={highlightedArtworks.length}
+      legacyHero={
+        <section className={styles.detailHero}>
+          <div className={styles.detailCover}>
+            <ExhibitionImage exhibition={exhibition} priority />
+          </div>
+          <div className={styles.detailRecord}>
+            <HistoryBackLink
+              fallbackHref="/exhibitions"
+              className={styles.backLink}
+            >
               <BilingualText
                 as="span"
-                text={{ zh: "查看电子图录", en: "View Catalogue" }}
+                text={detailCopy.backAction}
                 className={styles.bilingualPair}
                 zhClassName={styles.zh}
                 enClassName={styles.en}
               />
-            </Link>
-          ) : null}
-        </div>
-      </section>
-
-      {cataloguePages.length ? (
-        <section id="catalogue" className={styles.catalogueSection}>
-          <div className={styles.catalogueFrame}>
-            <ExhibitionCatalogueViewer
-              title={exhibition.catalogueTitle}
-              note={catalogueNote}
-              pages={cataloguePages}
-              viewMode={exhibition.catalogueViewMode}
+            </HistoryBackLink>
+            <p className={styles.year}>{getYear(exhibition)}</p>
+            <BilingualText
+              as="p"
+              text={exhibition.subtitle}
+              className={`${styles.bilingualPair} ${styles.subtitle}`}
+              zhClassName={styles.zh}
+              enClassName={styles.en}
             />
+            <ExhibitionTitle
+              as="h1"
+              text={exhibition.title}
+              className={`${styles.bilingualPair} ${styles.detailTitle}`}
+            />
+            <ExhibitionRecord exhibition={exhibition} />
+            <dl className={styles.summaryFacts}>
+              <div>
+                <dt>{detailCopy.summaryLine.highlightUnit.zh}</dt>
+                <dd>
+                  {exhibition.featuredWorksCount ??
+                    exhibition.highlightCount ??
+                    highlightedArtworks.length}
+                </dd>
+              </div>
+              <div>
+                <dt>{catalogueUnit.zh}</dt>
+                <dd>{pageCount}</dd>
+              </div>
+            </dl>
+            {hasIntroSummary(exhibition) ? (
+              <BilingualText
+                as="div"
+                text={exhibition.intro}
+                className={`${styles.bilingualPair} ${styles.detailIntro}`}
+                zhClassName={styles.zh}
+                enClassName={styles.en}
+              />
+            ) : null}
+            {cataloguePages.length ? (
+              <Link href="#catalogue" className={styles.catalogueLink}>
+                <BilingualText
+                  as="span"
+                  text={{ zh: "查看电子图录", en: "View Catalogue" }}
+                  className={styles.bilingualPair}
+                  zhClassName={styles.zh}
+                  enClassName={styles.en}
+                />
+              </Link>
+            ) : null}
           </div>
         </section>
-      ) : null}
-
-      <div className={styles.readingFrame}>
-        <ExhibitionDetailReading
-          introLabel={{ zh: "展览介绍", en: "Exhibition Text" }}
-          intro={exhibition.intro}
-          description={exhibition.description}
-          catalogueNoteLabel={detailCopy.catalogueNote}
-          catalogueNote={catalogueNote}
-          curatorialLeadLabel={{ zh: "策展说明", en: "Curatorial Note" }}
-          curatorialLead={curatorialNote}
-          relatedWritingLabel={detailCopy.relatedWriting}
-          relatedArticles={relatedArticles.map((article) => ({
-            slug: article.slug,
-            title: article.title,
-          }))}
-        />
-      </div>
-
-      {highlightedArtworks.length ? (
-        <section className={styles.highlightedWorks}>
-          <BilingualText
-            as="p"
-            text={detailCopy.highlightedWorks}
-            className={`${styles.bilingualPair} ${styles.sectionLabel}`}
-            zhClassName={styles.zh}
-            enClassName={styles.en}
-          />
-          <BilingualText
-            as="h2"
-            text={detailCopy.highlightedWorksTitle}
-            className={`${styles.bilingualPair} ${styles.highlightTitle}`}
-            zhClassName={styles.zh}
-            enClassName={styles.en}
-          />
-          <div className={styles.highlightGrid}>
-            {highlightedArtworks.map((artwork) => (
-              <ArtworkCard key={artwork.slug} artwork={artwork} variant="catalogue" />
-            ))}
-          </div>
-        </section>
-      ) : null}
-    </div>
+      }
+    />
   );
 }

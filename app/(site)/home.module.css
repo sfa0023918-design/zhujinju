@@ -1256,3 +1256,73 @@
     transition: none !important;
   }
 }
+
+/* 2026-11-15: owner requested a quieter scale based on the existing live site. */
+.heroCopy h1 {
+  font-size: clamp(40px, 3.889vw, 56px);
+}
+.heroCopy .heroEnglish {
+  font-size: clamp(25px, 2.223vw, 32px);
+}
+.statementZh {
+  font-size: 26px;
+}
+.statementEn {
+  font-size: 22px;
+}
+.wordmark {
+  font-size: clamp(88px, 8.889vw, 128px);
+}
+.exhibitionHeading h2 {
+  font-size: clamp(30px, 2.5vw, 36px);
+}
+.exhibitionHeading p {
+  font-size: 26px;
+}
+.headingCopy h2 {
+  font-size: 32px;
+}
+.headingCopy p {
+  font-size: 24px;
+}
+.featureCopy h3 {
+  font-size: 28px;
+}
+.featureEnglish {
+  font-size: 22px;
+}
+@media (max-width: 860px) {
+  .heroCopy h1 {
+    font-size: 36px;
+  }
+  .heroCopy .heroEnglish {
+    font-size: 24px;
+  }
+  .statementZh {
+    font-size: 20px;
+  }
+  .statementEn {
+    font-size: 18px;
+  }
+  .wordmark {
+    font-size: 72px;
+  }
+  .exhibitionHeading h2 {
+    font-size: 30px;
+  }
+  .exhibitionHeading p {
+    font-size: 22px;
+  }
+  .headingCopy h2 {
+    font-size: 26px;
+  }
+  .headingCopy p {
+    font-size: 21px;
+  }
+  .featureCopy h3 {
+    font-size: 24px;
+  }
+  .featureEnglish {
+    font-size: 20px;
+  }
+}

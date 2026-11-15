@@ -1,0 +1,112 @@
+.reading {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 104px 40px 112px;
+  display: grid;
+  grid-template-columns: 2fr 5fr 5fr;
+  gap: 24px;
+  scroll-margin-top: 24px;
+}
+.heading h2 {
+  font: 500 24px/1.4 var(--font-song);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.heading h2 span {
+  display: block;
+  margin-top: 6px;
+  font: italic 22px/1.2 var(--font-editorial);
+  color: var(--muted);
+}
+.tabs {
+  display: none;
+}
+.column {
+  min-width: 0;
+}
+.column[data-locale="en"] {
+  border-left: 1px solid var(--line);
+  padding-left: 24px;
+}
+.reading .paragraph {
+  max-width: none;
+  font: 400 18px/2.05 var(--font-song);
+  color: var(--ink);
+  text-align: justify;
+  text-indent: 0;
+}
+.reading .paragraph:first-child {
+  font-size: 24px;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+}
+.column[data-locale="en"] .paragraph {
+  font: 400 15.5px/1.78 var(--font-sans);
+  color: #2b2925;
+  text-align: left;
+}
+.column[data-locale="en"] .paragraph:first-child {
+  font: italic 25px/1.24 var(--font-editorial);
+  color: var(--ink);
+}
+.reading :global(.pointer-events-none) {
+  display: none;
+}
+.reading button {
+  border-radius: 0;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: 14px;
+}
+@media (max-width: 860px) {
+  .reading {
+    padding: 64px 20px 72px;
+    display: block;
+  }
+  .heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .heading h2 {
+    font-size: 21px;
+  }
+  .heading h2 span {
+    font-size: 20px;
+  }
+  .tabs {
+    display: flex;
+    gap: 12px;
+  }
+  .tabs button {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .tabs button[aria-pressed="true"] {
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .column[data-active="false"] {
+    display: none;
+  }
+  .column[data-locale="en"] {
+    border: 0;
+    padding: 0;
+  }
+  .reading .paragraph {
+    font-size: 16.5px;
+    line-height: 2.02;
+  }
+  .reading .paragraph:first-child {
+    font-size: 20px;
+    line-height: 1.62;
+  }
+  .column[data-locale="en"] .paragraph:first-child {
+    font-size: 22px;
+  }
+}

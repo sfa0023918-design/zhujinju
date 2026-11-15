@@ -7,11 +7,19 @@ export type ArtworkRow = {
 /** Approved equal-height packing: preserve order, close on threshold/count. */
 export function packArtworkRows(
   ratios: number[],
-  mode: "desktop" | "tablet" | "mobile",
+  mode: "desktop" | "tablet" | "mobile" | "details",
 ): ArtworkRow[] {
-  const target = mode === "desktop" ? 2.75 : 2;
-  const limit = mode === "desktop" ? 5 : mode === "tablet" ? 4 : 2;
-  const solo = mode === "desktop" ? 2.6 : mode === "tablet" ? 1.9 : 1.5;
+  const target = mode === "desktop" ? 2.75 : mode === "details" ? 2.3 : 2;
+  const limit =
+    mode === "desktop" || mode === "details" ? 5 : mode === "tablet" ? 4 : 2;
+  const solo =
+    mode === "desktop"
+      ? 2.6
+      : mode === "tablet"
+        ? 1.9
+        : mode === "details"
+          ? Infinity
+          : 1.5;
   const rows: ArtworkRow[] = [];
   let indexes: number[] = [];
   let current: number[] = [];

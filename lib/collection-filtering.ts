@@ -4,17 +4,34 @@ import type { Artwork } from "./data/types";
 // Shared by the collection page on the server and in the browser, so filtering and
 // pagination can update instantly without asking the server to re-render the page.
 
-export const COLLECTION_FILTER_KEYS = ["category", "region", "period", "material", "status"] as const;
+export const COLLECTION_FILTER_KEYS = [
+  "category",
+  "region",
+  "period",
+  "material",
+  "status",
+] as const;
 
 export type CollectionFilterKey = (typeof COLLECTION_FILTER_KEYS)[number];
 
-export type CollectionFilterState = Partial<Record<CollectionFilterKey, string>>;
+export type CollectionFilterState = Partial<
+  Record<CollectionFilterKey, string>
+>;
 
 // Only the fields the collection grid and its filters need. Long texts such as
 // viewing notes, provenance and publications stay on the artwork detail page.
 export type CollectionArtworkSummary = Pick<
   Artwork,
-  "slug" | "title" | "period" | "region" | "material" | "category" | "status" | "image" | "imageAsset"
+  | "slug"
+  | "title"
+  | "period"
+  | "region"
+  | "material"
+  | "dimensions"
+  | "category"
+  | "status"
+  | "image"
+  | "imageAsset"
 >;
 
 const ALL_VALUE = "全部";
@@ -23,13 +40,16 @@ type SearchParamsReader = {
   get(name: string): string | null;
 };
 
-export function toCollectionArtworkSummary(artwork: Artwork): CollectionArtworkSummary {
+export function toCollectionArtworkSummary(
+  artwork: Artwork,
+): CollectionArtworkSummary {
   return {
     slug: artwork.slug,
     title: artwork.title,
     period: artwork.period,
     region: artwork.region,
     material: artwork.material,
+    dimensions: artwork.dimensions,
     category: artwork.category,
     status: artwork.status,
     image: artwork.image,
@@ -41,7 +61,9 @@ function isActiveValue(value: string | null | undefined): value is string {
   return Boolean(value) && value !== ALL_VALUE;
 }
 
-export function readCollectionFilters(searchParams: SearchParamsReader): CollectionFilterState {
+export function readCollectionFilters(
+  searchParams: SearchParamsReader,
+): CollectionFilterState {
   const filters: CollectionFilterState = {};
 
   COLLECTION_FILTER_KEYS.forEach((key) => {

@@ -1,0 +1,446 @@
+.exhibition {
+  color: var(--ink);
+}
+.hero {
+  background: var(--season-color);
+  color: var(--rust-ink);
+  overflow: hidden;
+}
+.heroGrid {
+  max-width: 1600px;
+  margin: auto;
+  padding: 24px 40px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 4.6fr) minmax(0, 2.4fr) minmax(0, 5fr);
+  column-gap: 24px;
+  align-items: center;
+}
+.wordmarkBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.wordmark {
+  font: 400 clamp(96px, 10vw, 144px) / 0.98 var(--font-display);
+  color: var(--display-ink);
+  letter-spacing: 0.01em;
+}
+.wordmarkBlock > p {
+  font-size: 17px;
+  letter-spacing: 0.62em;
+}
+.vajra {
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.vajraImage {
+  height: clamp(480px, 55.56vw, 800px);
+  width: auto;
+  max-width: none;
+  margin: -40px max(-180px, -12.5vw) -56px;
+}
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 500px;
+  justify-self: end;
+  width: 100%;
+  padding-block: 32px;
+}
+.backLink {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 12px;
+}
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.14em;
+  margin: 0;
+}
+.label span {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-left: 10px;
+}
+.hero h1 {
+  margin: 0;
+  font: 500 clamp(32px, 2.778vw, 40px) / 1.25 var(--font-song);
+  letter-spacing: 0.03em;
+}
+.hero h1 span {
+  display: block;
+}
+.heroEnglish {
+  font: italic clamp(24px, 1.945vw, 28px) / 1.2 var(--font-editorial);
+  margin: 10px 0 0;
+}
+.heroIntro p {
+  font-size: 16px;
+  line-height: 1.9;
+  margin: 0;
+}
+.heroIntro p[lang="en"] {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--rust-muted);
+  margin-top: 6px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 32px;
+}
+.button,
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+.button {
+  background: var(--rust-ink);
+  color: var(--ink);
+  padding: 12px 24px;
+}
+.button span,
+.textLink span {
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.78;
+  letter-spacing: 0.01em;
+}
+.textLink {
+  min-height: 44px;
+  border-bottom: 1px solid currentColor;
+}
+.hero a:hover {
+  color: white;
+}
+.hero .button:hover {
+  color: var(--ink);
+  background: white;
+}
+.facts {
+  max-width: 1520px;
+  margin: 8px auto 0;
+  padding-bottom: 36px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.facts > div {
+  border-top: 1px solid var(--rust-line);
+  padding: 24px 28px 0;
+  border-left: 1px solid var(--rust-line);
+}
+.facts > div:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+.facts > div > p:nth-child(2) {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 14px 0 4px;
+}
+.facts > div > p[lang="en"] {
+  color: var(--rust-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+.catalogue {
+  background: #121110;
+  color: var(--dark-ink);
+}
+.catalogueFrame {
+  max-width: 1600px;
+  margin: auto;
+  padding: 88px 40px 96px;
+}
+.journal {
+  max-width: 1600px;
+  margin: auto;
+  padding: 128px 40px 136px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: center;
+}
+.journalCover {
+  grid-column: span 5;
+}
+.journalImageFrame,
+.journalImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.journalCopy {
+  grid-column: 7 / span 6;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.journalCopy .label span {
+  display: block;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+.journalCopy h2 {
+  font: 500 36px/1.25 var(--font-song);
+  letter-spacing: 0.05em;
+  margin: 10px 0 0;
+  white-space: pre-line;
+}
+.journalEnglish {
+  font: italic 26px/1.18 var(--font-editorial);
+  margin: 0;
+}
+.journalExcerpt {
+  font-size: 17px;
+  line-height: 1.95;
+  margin: 12px 0 0;
+}
+.journalExcerptEnglish {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 0;
+}
+.collectionLink {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.collectionLink span {
+  font-size: 12px;
+}
+.otherArticles {
+  max-width: 1600px;
+  margin: auto;
+  padding: 0 40px 40px;
+}
+.otherArticles a {
+  display: block;
+  padding-block: 12px;
+  font-size: 14px;
+}
+.otherArticles span {
+  margin-left: 10px;
+  color: var(--muted);
+}
+.archive {
+  background: var(--panel);
+}
+.archiveInner {
+  max-width: 1600px;
+  margin: auto;
+  padding: 104px 40px 120px;
+}
+.archiveInner h2 {
+  font: 500 32px/1.25 var(--font-song);
+  letter-spacing: 0.04em;
+  margin: 0 0 48px;
+}
+.archiveInner h2 span {
+  display: inline-block;
+  margin-left: 18px;
+  font: italic 24px/1.2 var(--font-editorial);
+  color: var(--muted);
+}
+.archiveGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.archiveCard h3 {
+  font: 400 22px/1.45 var(--font-song);
+  letter-spacing: 0.04em;
+  margin: 18px 0 3px;
+}
+.archiveImageFrame {
+  display: block;
+  height: auto;
+}
+.archiveImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.archiveEnglish {
+  font: italic 20px/1.25 var(--font-editorial);
+  color: var(--muted);
+  margin: 0;
+}
+.archiveFacts {
+  margin-top: 13px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+@media (max-width: 1600px) {
+  .facts {
+    margin-inline: 40px;
+  }
+}
+@media (max-width: 860px) {
+  .heroGrid {
+    position: relative;
+    display: block;
+    padding: 0 20px;
+  }
+  .wordmarkBlock {
+    height: 430px;
+    padding-top: 52px;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .wordmark {
+    font-size: 72px;
+  }
+  .wordmarkBlock > p {
+    font-size: 13px;
+    letter-spacing: 0.5em;
+  }
+  .vajra {
+    position: absolute;
+    right: -100px;
+    top: 0;
+  }
+  .vajraImage {
+    height: 470px;
+    margin: 0;
+  }
+  .heroCopy {
+    max-width: none;
+    padding: 24px 0 36px;
+    gap: 24px;
+    position: relative;
+  }
+  .hero h1 {
+    font-size: 30px;
+  }
+  .heroEnglish {
+    font-size: 22px;
+  }
+  .heroIntro p {
+    font-size: 15px;
+  }
+  .heroIntro p[lang="en"] {
+    font-size: 13.5px;
+  }
+  .actions {
+    gap: 16px;
+  }
+  .hero .button {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .label {
+    font-size: 12.5px;
+  }
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0 20px;
+    padding-bottom: 32px;
+  }
+  .facts > div {
+    padding: 18px 16px 20px;
+  }
+  .facts > div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .facts > div > p:nth-child(2) {
+    font-size: 15px;
+    margin-top: 12px;
+  }
+  .facts > div > p[lang="en"] {
+    font-size: 13px;
+  }
+  .facts .label span {
+    display: block;
+    margin: 4px 0 0;
+  }
+  .catalogueFrame {
+    padding: 56px 20px 64px;
+  }
+  .journal {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 64px 20px 72px;
+  }
+  .journalCover {
+    width: 100%;
+  }
+  .journalImage {
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+  .journalCopy {
+    max-width: none;
+    gap: 16px;
+  }
+  .journalCopy h2 {
+    font-size: 26px;
+    margin-top: 0;
+  }
+  .journalEnglish {
+    font-size: 21px;
+  }
+  .journalExcerpt {
+    font-size: 15px;
+    line-height: 1.9;
+  }
+  .journalExcerptEnglish {
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .archiveInner {
+    padding: 64px 20px 80px;
+  }
+  .archiveInner h2 {
+    font-size: 26px;
+    margin-bottom: 32px;
+  }
+  .archiveInner h2 span {
+    display: block;
+    margin: 6px 0 0;
+    font-size: 21px;
+  }
+  .archiveGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .archiveCard h3 {
+    font-size: 20px;
+  }
+  .archiveEnglish {
+    font-size: 18px;
+  }
+  .archiveFacts {
+    font-size: 12.5px;
+  }
+}

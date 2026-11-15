@@ -7,6 +7,7 @@ import { buildMetadata } from "@/lib/metadata";
 import type { BilingualText, Exhibition } from "@/lib/site-data";
 import {
   getArticlesBySlugs,
+  getPublicArticles,
   getExhibitionBySlug,
   getHighlightedArtworks,
   getPublicExhibitions,
@@ -15,7 +16,9 @@ import {
 
 function summarize(text: string, maxLength: number, joinWith: string) {
   const flat = text.split(/\s+/).filter(Boolean).join(joinWith).trim();
-  return flat.length > maxLength ? `${flat.slice(0, maxLength).trimEnd()}…` : flat;
+  return flat.length > maxLength
+    ? `${flat.slice(0, maxLength).trimEnd()}…`
+    : flat;
 }
 
 // The intro field of some exhibitions holds only the heading "序 / Preface", which
@@ -27,7 +30,10 @@ function getExhibitionShareDescription(exhibition: Exhibition): BilingualText {
     return exhibition.intro;
   }
 
-  return { zh: summarize(opening.zh, 90, ""), en: summarize(opening.en, 180, " ") };
+  return {
+    zh: summarize(opening.zh, 90, ""),
+    en: summarize(opening.en, 180, " "),
+  };
 }
 
 type ExhibitionDetailPageProps = {
@@ -54,7 +60,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const includeDrafts =
+    query.preview === "1" ? Boolean(await getAdminSession()) : false;
   const exhibition = getExhibitionBySlug(content, slug, { includeDrafts });
 
   if (!exhibition) {
@@ -71,7 +78,10 @@ export async function generateMetadata({
     description: getExhibitionShareDescription(exhibition),
     path: `/exhibitions/${exhibition.slug}`,
     site: content.siteConfig,
-    image: { path: exhibition.cover || exhibition.coverAsset?.original, alt: exhibition.title },
+    image: {
+      path: exhibition.cover || exhibition.coverAsset?.original,
+      alt: exhibition.title,
+    },
   });
 }
 
@@ -82,7 +92,8 @@ export default async function ExhibitionDetailPage({
   const { slug } = await params;
   const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const includeDrafts =
+    query.preview === "1" ? Boolean(await getAdminSession()) : false;
   const exhibition = getExhibitionBySlug(content, slug, { includeDrafts });
 
   if (!exhibition) {
@@ -93,8 +104,23 @@ export default async function ExhibitionDetailPage({
     <ExhibitionDetailPageContent
       exhibition={exhibition}
       detailCopy={content.pageCopy.exhibitionDetail}
-      highlightedArtworks={getHighlightedArtworks(content, exhibition.highlightArtworkSlugs)}
-      relatedArticles={getArticlesBySlugs(content, exhibition.relatedArticleSlugs)}
+      highlightedArtworks={getHighlightedArtworks(
+        content,
+        exhibition.highlightArtworkSlugs,
+      )}
+      relatedArticles={Array.from(
+        new Map(
+          [
+            ...getArticlesBySlugs(content, exhibition.relatedArticleSlugs),
+            ...getPublicArticles(content).filter((article) =>
+              article.relatedExhibitionSlugs.includes(exhibition.slug),
+            ),
+          ].map((article) => [article.slug, article]),
+        ).values(),
+      )}
+      pastExhibitions={getPublicExhibitions(content)
+        .filter((item) => item.slug !== exhibition.slug)
+        .sort((a, b) => b.period.zh.localeCompare(a.period.zh))}
     />
   );
 }

@@ -396,7 +396,9 @@
       "gallery": [],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773726406689-3353ee86a913f9dcc512f01832f3fea2.jpg"
+        "original": "/uploads/artworks/1773726406689-3353ee86a913f9dcc512f01832f3fea2.jpg",
+        "width": 1200,
+        "height": 1500
       },
       "galleryAssets": []
     },
@@ -799,7 +801,9 @@
       ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773730424320-l1001089.jpg"
+        "original": "/uploads/artworks/1773730424320-l1001089.jpg",
+        "width": 1200,
+        "height": 1500
       },
       "galleryAssets": [
         {
@@ -1047,7 +1051,9 @@
       ],
       "featured": false,
       "imageAsset": {
-        "original": "/uploads/artworks/1773730176014-l1000792.jpg"
+        "original": "/uploads/artworks/1773730176014-l1000792.jpg",
+        "width": 1200,
+        "height": 1500
       },
       "galleryAssets": [
         {
@@ -1277,7 +1283,9 @@
       "gallery": [],
       "featured": true,
       "imageAsset": {
-        "original": "/uploads/artworks/1773728118037-l1002732.jpg"
+        "original": "/uploads/artworks/1773728118037-l1002732.jpg",
+        "width": 1200,
+        "height": 1500
       },
       "galleryAssets": []
     },
@@ -6236,7 +6244,9 @@
         }
       ],
       "imageAsset": {
-        "original": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg"
+        "original": "/uploads/artworks/1790508277380-sakya-pandit-kunga-gyaltsen-main.jpg",
+        "width": 2400,
+        "height": 2928
       }
     },
     {
