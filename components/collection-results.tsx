@@ -184,7 +184,7 @@ export function CollectionResults({
         </span>
       </div>
       <div className={styles.artworksGrid}>
-        <ArtworkGrid artworks={currentItems} priority={currentPage === 1} />
+        <ArtworkGrid artworks={currentItems} priority={currentPage === 1} fillRows />
       </div>
 
       {artworks.length > pageSize ? (
