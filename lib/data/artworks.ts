@@ -5,17 +5,17 @@ export const artworks: Artwork[] = [
   {
     slug: "ekadasamukha-avalokiteshvara",
     title: bt("十一面观音坐像", "Seated Ekadasamukha Avalokiteshvara"),
-    subtitle: bt("西藏中部鎏金铜造像", "Gilt Bronze Sculpture, Central Xizang"),
+    subtitle: bt("西藏中部鎏金铜造像", "Gilt Bronze Sculpture, Central Tibet"),
     period: bt("十六世纪", "16th century"),
-    region: bt("西藏中部", "Central Xizang"),
-    origin: bt("西藏", "Xizang"),
+    region: bt("西藏中部", "Central Tibet"),
+    origin: bt("西藏", "Tibet"),
     material: bt("鎏金铜", "Gilt copper alloy"),
     category: bt("铜造像", "Bronze Sculpture"),
     dimensions: bt("高 42 cm", "Height 42 cm"),
     status: "inquiry",
     excerpt: bt(
       "造像比例修长，主面相与莲座处理收敛而稳定，呈现西藏中后期金铜造像成熟的静观气质。",
-      "Elegant in proportion and restrained in facial treatment and lotus base, the sculpture reflects the poised maturity of later Central Xizang gilt bronze production."
+      "Elegant in proportion and restrained in facial treatment and lotus base, the sculpture reflects the poised maturity of later Central Tibet gilt bronze production."
     ),
     viewingNote: bt(
       "本件十一面观音坐像整体铸造精整，主面相宽额细目，鼻梁挺直，胸前饰链、帔帛翻折与覆莲瓣起伏之间维持着稳定而克制的装饰节奏。其观看重点不在繁缛细节，而在比例、光泽与图像秩序如何共同建立一件造像的静定感。",
@@ -23,7 +23,7 @@ export const artworks: Artwork[] = [
     ),
     comparisonNote: bt(
       "与依赖夸张姿态取胜的同类题材相比，此件更接近十六世纪西藏中部造像偏向内敛的面容处理与结构控制，对理解晚期西藏金铜造像如何在庄严与装饰之间取得平衡具有参考意义。",
-      "Compared with related examples that rely on emphatic gesture, this work aligns more closely with the inward facial handling and structural control found in 16th-century Central Xizang bronzes, making it a useful point of reference for how later Xizang sculpture balanced solemnity and ornament."
+      "Compared with related examples that rely on emphatic gesture, this work aligns more closely with the inward facial handling and structural control found in 16th-century Central Tibet bronzes, making it a useful point of reference for how later Tibet sculpture balanced solemnity and ornament."
     ),
     provenance: [
       {
@@ -81,7 +81,7 @@ export const artworks: Artwork[] = [
     ),
     comparisonNote: bt(
       "与更强调表面繁饰的马拉时期造像相比，此件在精密与庄重之间保持了更好的平衡，尤其适合作为尼瓦尔工艺系统进入西藏语境前后的比较参照。",
-      "Compared with Malla-period bronzes that lean more heavily on surface ornament, this work sustains a stronger balance between precision and gravity, making it an effective comparative example for the Newar idiom before and after its movement into Xizang."
+      "Compared with Malla-period bronzes that lean more heavily on surface ornament, this work sustains a stronger balance between precision and gravity, making it an effective comparative example for the Newar idiom before and after its movement into Tibet."
     ),
     provenance: [
       {
@@ -94,7 +94,7 @@ export const artworks: Artwork[] = [
     ],
     exhibitions: [
       {
-        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Xizang Buddhist Art, 13th-18th Century"),
+        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
         venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
@@ -123,14 +123,14 @@ export const artworks: Artwork[] = [
     subtitle: bt("后藏合金铜造像", "Copper Alloy Sculpture, Tsang"),
     period: bt("十四世纪", "14th century"),
     region: bt("后藏", "Tsang"),
-    origin: bt("西藏", "Xizang"),
+    origin: bt("西藏", "Tibet"),
     material: bt("合金铜", "Copper alloy"),
     category: bt("铜造像", "Bronze Sculpture"),
     dimensions: bt("高 28 cm", "Height 28 cm"),
     status: "reserved",
     excerpt: bt(
       "地触印清晰，衣纹处理简约，呈现早期西藏造像由尼泊尔语汇向本地风格转化的线索。",
-      "The earth-touching gesture and restrained drapery offer a clear view of how Nepalese vocabulary was transformed within early Xizang style."
+      "The earth-touching gesture and restrained drapery offer a clear view of how Nepalese vocabulary was transformed within early Tibet style."
     ),
     viewingNote: bt(
       "造像面容沉静，肩部宽展，坐姿稳固，衣缘线条收束有度，未作过多细碎装饰，使观看重心集中于胸腹与双手印相之间。整体结构感明确，是一件更适合近距离观察而非远观炫示的作品。",
@@ -201,7 +201,7 @@ export const artworks: Artwork[] = [
     ],
     exhibitions: [
       {
-        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Xizang Buddhist Art, 13th-18th Century"),
+        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
         venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
@@ -227,10 +227,10 @@ export const artworks: Artwork[] = [
   {
     slug: "vajrapani-thangka",
     title: bt("金刚手菩萨唐卡", "Thangka of Vajrapani"),
-    subtitle: bt("西藏中部设色唐卡", "Painted Thangka, Central Xizang"),
+    subtitle: bt("西藏中部设色唐卡", "Painted Thangka, Central Tibet"),
     period: bt("十七世纪", "17th century"),
-    region: bt("西藏中部", "Central Xizang"),
-    origin: bt("西藏", "Xizang"),
+    region: bt("西藏中部", "Central Tibet"),
+    origin: bt("西藏", "Tibet"),
     material: bt("矿物彩、金粉、棉布", "Mineral pigment, gold, and cotton"),
     category: bt("唐卡", "Thangka"),
     dimensions: bt("画心 82 × 58 cm", "Painting 82 × 58 cm"),
@@ -279,7 +279,7 @@ export const artworks: Artwork[] = [
   {
     slug: "ritual-conch-set",
     title: bt("法螺与供养器组合", "Ritual Conch and Offering Set"),
-    subtitle: bt("藏传佛教工艺器物", "Xizang Buddhist Ritual Object Group"),
+    subtitle: bt("藏传佛教工艺器物", "Tibetan Buddhist Ritual Object Group"),
     period: bt("十八至十九世纪", "18th-19th century"),
     region: bt("拉达克", "Ladakh"),
     origin: bt("喜马拉雅地区", "Himalayan region"),
@@ -307,7 +307,7 @@ export const artworks: Artwork[] = [
     ],
     exhibitions: [
       {
-        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Xizang Buddhist Art, 13th-18th Century"),
+        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
         venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },
@@ -331,10 +331,10 @@ export const artworks: Artwork[] = [
   {
     slug: "amitayus-western-xizang",
     title: bt("无量寿佛坐像", "Seated Amitayus"),
-    subtitle: bt("西藏西部鎏金铜造像", "Gilt Bronze Sculpture, Western Xizang"),
+    subtitle: bt("西藏西部鎏金铜造像", "Gilt Bronze Sculpture, Western Tibet"),
     period: bt("十六世纪", "16th century"),
-    region: bt("西藏西部", "Western Xizang"),
-    origin: bt("西藏", "Xizang"),
+    region: bt("西藏西部", "Western Tibet"),
+    origin: bt("西藏", "Tibet"),
     material: bt("鎏金铜", "Gilt copper alloy"),
     category: bt("铜造像", "Bronze Sculpture"),
     dimensions: bt("高 24 cm", "Height 24 cm"),
@@ -349,7 +349,7 @@ export const artworks: Artwork[] = [
     ),
     comparisonNote: bt(
       "相较同时期体量更大的西藏西部造像，此件的分量来自比例与完成度，而非尺寸本身。对私人收藏和预约制陈列环境而言，它具有更友好的观看尺度。",
-      "Compared with larger western Xizang bronzes of the same period, its presence derives from proportion and finish rather than scale itself. It is particularly well suited to private collections and appointment-based display settings."
+      "Compared with larger western Tibet bronzes of the same period, its presence derives from proportion and finish rather than scale itself. It is particularly well suited to private collections and appointment-based display settings."
     ),
     provenance: [
       {
@@ -411,7 +411,7 @@ export const artworks: Artwork[] = [
     ],
     exhibitions: [
       {
-        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Xizang Buddhist Art, 13th-18th Century"),
+        title: bt("金铜之间：十三至十八世纪藏传佛教艺术", "Between Gilding and Pigment: Tibetan Buddhist Art, 13th-18th Century"),
         venue: bt("竹瑾居 · 成都预约制空间", "Zhu Jin Ju, Appointment Space, Chengdu"),
         year: "2024",
       },

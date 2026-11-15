@@ -17,7 +17,18 @@ const compiled = ts.transpileModule(source, {
   fileName: filename,
 }).outputText;
 vm.runInNewContext(`(function(exports, require, module) {${compiled}\n})`, { console })
-  (loaded.exports, (id) => id === "./bilingual-text" ? {} : require(id), loaded);
+  (loaded.exports, (id) => {
+    if (id === "./bilingual-text") return {};
+    if (id === "@/lib/reading-preview") {
+      const readingModule = { exports: {} };
+      const code = ts.transpileModule(fs.readFileSync(path.join(root, "lib/reading-preview.ts"), "utf8"), {
+        compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+      }).outputText;
+      vm.runInNewContext(`(function(exports,module){${code}\n})`)(readingModule.exports, readingModule);
+      return readingModule.exports;
+    }
+    return require(id);
+  }, loaded);
 
 const { getParagraphsByLocale } = loaded.exports;
 const options = { manualParagraphMode: "split-long", manualSplitThresholdZh: 260, manualSplitThresholdEn: 420 };
@@ -44,4 +55,81 @@ test("all existing artwork scholarly texts survive paragraph splitting", () => {
     }
   }
   assert.deepEqual(losses, []);
+});
+
+const readingOptions = {
+  manualParagraphMode: "preserve",
+  autoSplitLongSingleParagraph: false,
+  repairWrappedLines: true,
+};
+
+test("printed Chinese prefaces reflow into complete paragraphs", () => {
+  const content = JSON.parse(fs.readFileSync(path.join(root, "content/site-content.json"), "utf8"));
+  const preface = content.exhibitions.find((item) => item.slug === "exhibition-1773394358822").description;
+  const paragraphs = getParagraphsByLocale(preface, "zh", "paragraph", readingOptions);
+  assert.equal(paragraphs[0], "2024 年 8 月 15 日，又一个星期四，成都又一个雨天，又一次在雨声中找到了灵感，又一次为展览图录撰写序言。");
+  assert.ok(paragraphs[1].includes("图录也是第三本了"));
+  assert.ok(paragraphs[1].endsWith("我们却依旧乐此不疲。"));
+  assert.ok(paragraphs.length < preface[0].zh.split(/\n+/).length);
+});
+
+test("authored English paragraphs are not split into a decorative first sentence", () => {
+  const content = JSON.parse(fs.readFileSync(path.join(root, "content/site-content.json"), "utf8"));
+  const preface = content.exhibitions.find((item) => item.slug === "silent-radiance").description;
+  const paragraphs = getParagraphsByLocale(preface, "en", "paragraph", readingOptions);
+  assert.equal(paragraphs[0], preface[0].en.split(/\n\s*\n/)[0]);
+  assert.ok(paragraphs[0].includes("These lines—whether fluid or rugged—"));
+});
+
+test("site reading normalization preserves every word and intentional 2026 paragraph", () => {
+  const content = JSON.parse(fs.readFileSync(path.join(root, "content/site-content.json"), "utf8"));
+  const passages = [
+    ...content.exhibitions.map((e) => e.description),
+    ...content.artworks.flatMap((a) => [a.viewingNote, a.comparisonNote]).filter(Boolean),
+    ...content.articles.flatMap((a) => a.contentBlocks.filter((b) => b.type === "paragraph").map((b) => b.content)),
+  ];
+  for (const passage of passages) {
+    for (const locale of ["zh", "en"]) {
+      const original = getParagraphsByLocale(passage, locale, "paragraph", { autoSplitLongSingleParagraph: false });
+      const formatted = getParagraphsByLocale(passage, locale, "paragraph", readingOptions);
+      assert.equal(compact(formatted.join("")), compact(original.join("")));
+    }
+  }
+  const contemporary = content.exhibitions.find((e) => e.slug === "himalayan-art-2026").description;
+  for (const locale of ["zh", "en"]) {
+    assert.deepEqual(
+      getParagraphsByLocale(contemporary, locale, "paragraph", readingOptions),
+      getParagraphsByLocale(contemporary, locale, "paragraph", { autoSplitLongSingleParagraph: false }),
+    );
+  }
+});
+
+test("prose repair preserves headings, lists, quotations and English names", () => {
+  const content = {
+    zh: "观看与记忆\n\n这段文字讲的是雕塑的面容与身体，\n\n以及观看时的感受。\n\n一、材质\n\n二、工艺",
+    en: "A viewing note\n\nDr. A. Smith described the sculpture as\n\n“quiet and composed.”\n\n1. Material\n\n2. Technique",
+  };
+  assert.deepEqual(Array.from(getParagraphsByLocale(content, "zh", "paragraph", readingOptions)), [
+    "观看与记忆", "这段文字讲的是雕塑的面容与身体，以及观看时的感受。", "一、材质", "二、工艺",
+  ]);
+  assert.deepEqual(Array.from(getParagraphsByLocale(content, "en", "paragraph", readingOptions)), [
+    "A viewing note", "Dr. A. Smith described the sculpture as “quiet and composed.”", "1. Material", "2. Technique",
+  ]);
+});
+
+test("short paragraphs stay visible and long single paragraphs fold at a complete sentence", () => {
+  const { createElement } = require("react");
+  const { renderToStaticMarkup } = require("react-dom/server");
+  const short = ["First complete paragraph.", "Second complete paragraph.", "Third complete paragraph.", "Fourth complete paragraph."];
+  const render = paragraphs => renderToStaticMarkup(createElement(loaded.exports.ExpandableReadingText, { paragraphs, locale: "en" }));
+  const shortMarkup = render(short);
+  for (const paragraph of short) assert.ok(shortMarkup.includes(paragraph));
+  assert.ok(!shortMarkup.includes('aria-expanded="false"'));
+  const long = Array.from({ length: 50 }, (_, i) => `Sentence ${i} describes the sculpture and its material.`).join(" ");
+  const markup = render([long]);
+  assert.ok(markup.includes("Sentence 0 describes the sculpture and its material."));
+  assert.ok(!markup.includes("Sentence 49"));
+  assert.ok(markup.includes('aria-expanded="false"'));
+  assert.ok(markup.includes("Read more"));
+  assert.match(markup, /material\.<\/p>/);
 });

@@ -1,3 +1,4 @@
+import { ExpandableReadingText } from "@/components/bilingual-prose";
 import Link from "next/link";
 import type { Article } from "@/lib/data/types";
 import type { EditorialImage, ExhibitionEditorial } from "@/lib/data/exhibition-editorial";
@@ -44,13 +45,12 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
         <div className={styles.prefaceOpening}>
           <figure><Plate image={e.prefacePortrait} sizes="(min-width: 1050px) 220px, 200px" /></figure>
           <div className={styles.prose}>
-            <p className={styles.lead}>{e.prefaceLead}</p>
-            {e.prefaceFirst.map(p => <p key={p}>{p}</p>)}
+            <ExpandableReadingText paragraphs={[e.prefaceLead, ...e.prefaceFirst]} />
           </div>
         </div>
         <figure className={styles.prefaceWalk}><Plate image={e.prefaceLandscape} sizes="(min-width: 768px) 600px, 95vw" /></figure>
         <div className={`${styles.prose} ${styles.prefaceClosing}`}>
-          {e.prefaceSecond.map(p => <p key={p}>{p}</p>)}
+          <ExpandableReadingText paragraphs={e.prefaceSecond} />
           <p className={styles.introduction}>{e.introduction}</p>
         </div>
       </section>
@@ -79,7 +79,7 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
               <figure className={styles.workPlate}><Plate image={work.image} /></figure>
               <div className={`${styles.prose} ${styles.essay}`}>
                 <h4>{work.heading}</h4>
-                {work.paragraphs.map(p => <p key={p}>{p}</p>)}
+                <ExpandableReadingText paragraphs={work.paragraphs} />
                 {work.collectionSlug && <Link className={styles.textLink} href={`/collection/${work.collectionSlug}`}>作品详情 <span lang="en">View artwork</span><span aria-hidden="true"> ↗</span></Link>}
               </div>
               {work.detail && <figure className={styles.detailPlate}><Plate image={work.detail} sizes="(min-width: 768px) 600px, 95vw" /><figcaption>{work.detail.alt}</figcaption></figure>}
@@ -88,7 +88,7 @@ export function ExhibitionJournal({ article, editorial: e }: { article: Article;
         </section>
       ))}
       <section className={styles.closing} aria-labelledby="closing-title">
-        <div className={styles.prose}><h2 id="closing-title">{e.closingTitle}</h2>{e.closing.map(p => <p key={p}>{p}</p>)}</div>
+        <div className={styles.prose}><h2 id="closing-title">{e.closingTitle}</h2><ExpandableReadingText paragraphs={e.closing} /></div>
         <div className={styles.event}><h3>{e.subtitle.zh}</h3>{e.event.map(p => <p key={p}>{p}</p>)}
           <Link className={styles.eventLink} href={`/exhibitions/${e.exhibitionSlug}#catalogue`}>展览与电子图录<span lang="en">Exhibition & Catalogue ↗</span></Link>
           {e.pdf && <a className={styles.textLink} href={e.pdf} download>下载本文 PDF <span lang="en">Download article</span></a>}

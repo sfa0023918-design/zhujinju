@@ -1,0 +1,207 @@
+.grid {
+  min-width: 0;
+}
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+}
+.row {
+  display: grid;
+  column-gap: 8px;
+}
+.card {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 5;
+  min-width: 0;
+  align-content: start;
+}
+.card > span:not(.imageFrame) {
+  padding-right: 14px;
+}
+.imageFrame {
+  display: block;
+  margin-bottom: 16px;
+}
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.vajra {
+  background: var(--season-color);
+}
+.title {
+  font-family: var(--font-song);
+  font-size: 19px;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+}
+.english {
+  margin-top: 2px;
+  font: italic 18px/1.25 var(--font-editorial);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.facts {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+}
+.status span {
+  text-transform: uppercase;
+}
+.status i {
+  flex: none;
+  position: relative;
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+.status i[data-status="sold"],
+.status i[data-status="reserved"] {
+  background: transparent;
+}
+.status i[data-status="reserved"]::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.card:hover .title,
+.card:hover .english {
+  color: var(--accent-text);
+}
+.tablet,
+.mobile {
+  display: none;
+}
+@media (min-width: 861px) and (max-width: 1279px) {
+  .desktop {
+    display: none;
+  }
+  .tablet {
+    display: flex;
+  }
+}
+@media (max-width: 860px) {
+  .desktop {
+    display: none;
+  }
+  .mobile {
+    display: flex;
+    gap: 36px;
+  }
+  .row {
+    column-gap: 6px;
+  }
+  .card > span:not(.imageFrame) {
+    padding-right: 6px;
+  }
+  .imageFrame {
+    margin-bottom: 12px;
+  }
+  .title {
+    font-size: 16px;
+    letter-spacing: 0.03em;
+  }
+  .english {
+    font-size: 16px;
+    line-height: 1.22;
+  }
+  .facts {
+    font-size: 12.5px;
+    line-height: 1.55;
+    margin-top: 8px;
+  }
+  .extra,
+  .status span {
+    display: none;
+  }
+  .status {
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+  }
+}
+
+.paperBlend {
+  mix-blend-mode: multiply;
+}
+
+@media (min-width: 600px) and (max-width: 860px) {
+  .related .mobile { display: none; }
+  .related .tablet { display: flex; }
+}
+
+/* Only detail recommendations become a strip; collection rows keep their packing. */
+@media (max-width: 1279px), (pointer: coarse) and (max-width: 1366px) {
+  .swipe .desktop,
+  .swipe .tablet {
+    display: none;
+  }
+  .swipe .mobile {
+    --strip-image-height: clamp(240px, 34vw, 320px);
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 2px;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) var(--panel);
+  }
+  .swipe .mobile:focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 3px;
+  }
+  .swipe .row {
+    display: contents;
+  }
+  .swipe .card {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 min(calc(var(--strip-image-height) * var(--artwork-ratio)), calc(100% - 32px));
+    min-width: min(160px, calc(100% - 32px));
+    scroll-snap-align: start;
+  }
+  .swipe .imageFrame {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .swipe .image {
+    max-height: var(--strip-image-height);
+  }
+  .swipe .title {
+    font-size: 16px;
+  }
+  .swipe .english {
+    font-size: 16px;
+  }
+  .swipe .extra,
+  .swipe .status span {
+    display: none;
+  }
+  .swipe :global(.protected-media__shield) {
+    touch-action: pan-x pan-y;
+  }
+}

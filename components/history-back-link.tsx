@@ -45,7 +45,9 @@ export function HistoryBackLink({
         const previousInternalRoute = historyEntry?.previousInternalRoute ?? null;
 
         if (!previousInternalRoute) {
-          router.push(fallbackHref);
+          // A direct entry has no list state to restore. A document navigation
+          // also avoids a cancelled first client transition in mobile WebKit.
+          window.location.assign(fallbackHref);
           return;
         }
 

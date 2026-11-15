@@ -1,24 +1,49 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 
+import measuredSizes from "@/lib/data/artwork-image-sizes.json";
+import { packArtworkRows } from "@/lib/artwork-rows";
 import { withImageVersion } from "@/lib/image-url";
-import { COVER_VAJRA_BACKDROP, COVER_VAJRA_CLIP, COVER_VAJRA_DETAIL_MASKS, COVER_VAJRA_IMAGE } from "@/lib/artwork-presentation";
+import {
+  COVER_VAJRA_BACKDROP,
+  COVER_VAJRA_CLIP,
+  COVER_VAJRA_DETAIL_MASKS,
+  COVER_VAJRA_IMAGE,
+} from "@/lib/artwork-presentation";
 
+import type { ImageAsset } from "@/lib/data/types";
+import { HistoryBackLink } from "./history-back-link";
+import styles from "./artwork-detail.module.css";
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
+import { ModalDialog } from "./modal-dialog";
+import { useNativeCarousel } from "./use-native-carousel";
+import { DirectionalArrow } from "./directional-arrow";
 
 type ArtworkGalleryProps = {
   title: string;
   primaryImage: string;
   primaryImageCandidates?: string[];
-  category?: string;
+  width: number;
+  height: number;
+  galleryAssets?: Array<ImageAsset | null>;
+  children: ReactNode;
+  backLabel: { zh: string; en: string };
   gallery?: string[];
 };
 
 function isVajraImage(image: string) {
-  return image === COVER_VAJRA_IMAGE || Boolean(COVER_VAJRA_DETAIL_MASKS[image]);
+  return (
+    image === COVER_VAJRA_IMAGE || Boolean(COVER_VAJRA_DETAIL_MASKS[image])
+  );
 }
 
 function vajraImageStyle(image: string): CSSProperties | undefined {
@@ -46,12 +71,17 @@ export function ArtworkGallery({
   title,
   primaryImage,
   primaryImageCandidates = [],
-  category = "",
+  width,
+  height,
+  galleryAssets = [],
+  children,
+  backLabel,
   gallery = [],
 }: ArtworkGalleryProps) {
   const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [native, setNative] = useState(false);
   const normalizedPrimaryCandidates = useMemo(() => {
     const seen = new Set<string>();
     const candidates = [primaryImage, ...primaryImageCandidates]
@@ -68,14 +98,20 @@ export function ArtworkGallery({
     return candidates;
   }, [primaryImage, primaryImageCandidates]);
   const [primaryCandidateIndex, setPrimaryCandidateIndex] = useState(0);
-  const resolvedPrimaryImage = normalizedPrimaryCandidates[primaryCandidateIndex] ?? "";
+  const resolvedPrimaryImage =
+    normalizedPrimaryCandidates[primaryCandidateIndex] ?? "";
   const detailImages = useMemo(() => {
     const seen = new Set<string>();
 
     return gallery.filter((image) => {
       const normalized = image.trim();
 
-      if (!normalized || normalized === resolvedPrimaryImage || normalized.startsWith("/api/placeholder/") || seen.has(normalized)) {
+      if (
+        !normalized ||
+        normalized === resolvedPrimaryImage ||
+        normalized.startsWith("/api/placeholder/") ||
+        seen.has(normalized)
+      ) {
         return false;
       }
 
@@ -84,13 +120,21 @@ export function ArtworkGallery({
     });
   }, [gallery, resolvedPrimaryImage]);
   const thumbnailImages = useMemo(
-    () => [resolvedPrimaryImage, ...detailImages].filter((image) => Boolean(image.trim())),
+    () =>
+      [resolvedPrimaryImage, ...detailImages].filter((image) =>
+        Boolean(image.trim()),
+      ),
     [detailImages, resolvedPrimaryImage],
   );
   const [activeImage, setActiveImage] = useState(resolvedPrimaryImage);
 
   useEffect(() => {
     setIsMounted(true);
+    const media = window.matchMedia("(any-pointer: coarse), (max-width: 1180px)");
+    const update = () => setNative(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -102,7 +146,10 @@ export function ArtworkGallery({
   }, [resolvedPrimaryImage]);
 
   useEffect(() => {
-    if (activeImage === resolvedPrimaryImage || detailImages.includes(activeImage)) {
+    if (
+      activeImage === resolvedPrimaryImage ||
+      detailImages.includes(activeImage)
+    ) {
       return;
     }
 
@@ -115,11 +162,6 @@ export function ArtworkGallery({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsLightboxOpen(false);
-        return;
-      }
-
       if (thumbnailImages.length < 2) {
         return;
       }
@@ -130,48 +172,58 @@ export function ArtworkGallery({
       }
 
       if (event.key === "ArrowRight") {
-        setActiveImage(thumbnailImages[(currentIndex + 1) % thumbnailImages.length]);
+        setActiveImage(
+          thumbnailImages[(currentIndex + 1) % thumbnailImages.length],
+        );
       }
 
       if (event.key === "ArrowLeft") {
         setActiveImage(
-          thumbnailImages[(currentIndex - 1 + thumbnailImages.length) % thumbnailImages.length],
+          thumbnailImages[
+            (currentIndex - 1 + thumbnailImages.length) % thumbnailImages.length
+          ],
         );
       }
     };
 
-    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [activeImage, isLightboxOpen, thumbnailImages]);
 
   const hasMultipleImages = thumbnailImages.length > 1;
   const activeImageIndex = Math.max(thumbnailImages.indexOf(activeImage), 0);
-  const activeImageSrc = withImageVersion(activeImage);
   const isVajraActive = isVajraImage(activeImage);
-  const isActivePlaceholder = !activeImage || activeImage.startsWith("/api/placeholder/");
-  const categoryHint = category.toLowerCase();
-  const isPaintingLike =
-    categoryHint.includes("唐卡") ||
-    categoryHint.includes("绘画") ||
-    categoryHint.includes("thangka") ||
-    categoryHint.includes("painting");
-  const isVeryTall = naturalRatio !== null && naturalRatio < 0.78;
-  const desktopContainerClass = isPaintingLike || isVeryTall
-    ? "lg:min-h-[47rem] lg:items-start lg:justify-center"
-    : "lg:min-h-[40rem] lg:items-start lg:justify-center";
-  const desktopFrameClass = isPaintingLike || isVeryTall
-    ? "lg:inline-flex lg:w-auto lg:max-w-full lg:justify-center"
-    : "lg:inline-flex lg:w-auto lg:max-w-full lg:justify-center";
-  const desktopImageClass = isPaintingLike || isVeryTall
-    ? "lg:w-auto lg:max-h-[84vh] lg:max-w-full lg:object-top"
-    : "lg:w-auto lg:max-h-[78vh] lg:max-w-full lg:object-top";
+  const isActivePlaceholder =
+    !activeImage || activeImage.startsWith("/api/placeholder/");
 
   const canOpenLightbox = !isActivePlaceholder;
+  const primaryCarousel = useNativeCarousel({
+    count: thumbnailImages.length, active: activeImageIndex,
+    onChange: (index) => setActiveImage(thumbnailImages[index]),
+    enabled: native, loop: native,
+  });
+  const lightboxCarousel = useNativeCarousel({
+    count: thumbnailImages.length, active: activeImageIndex,
+    onChange: (index) => setActiveImage(thumbnailImages[index]),
+    enabled: isLightboxOpen, loop: true,
+  });
+
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    // Cache only the adjacent views so a gesture does not wait for a new photo.
+    for (const offset of [-1, 1]) {
+      const image = new window.Image();
+      image.decoding = "async";
+      image.fetchPriority = "low";
+      image.src = withImageVersion(thumbnailImages[(activeImageIndex + offset + thumbnailImages.length) % thumbnailImages.length]);
+      void image.decode?.().catch(() => {});
+    }
+  }, [activeImageIndex, hasMultipleImages, thumbnailImages]);
 
   const stepLightboxImage = (direction: "prev" | "next") => {
     if (thumbnailImages.length < 2) {
@@ -181,7 +233,8 @@ export function ArtworkGallery({
     const nextIndex =
       direction === "next"
         ? (activeImageIndex + 1) % thumbnailImages.length
-        : (activeImageIndex - 1 + thumbnailImages.length) % thumbnailImages.length;
+        : (activeImageIndex - 1 + thumbnailImages.length) %
+          thumbnailImages.length;
     setActiveImage(thumbnailImages[nextIndex]);
   };
 
@@ -196,196 +249,289 @@ export function ArtworkGallery({
     });
   };
 
-  return (
-    <>
-      <div
-        className={`grid gap-5 lg:items-start lg:gap-4 xl:gap-5 ${
-          hasMultipleImages ? "lg:grid-cols-[72px_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1fr)]"
-        }`}
-      >
-        {hasMultipleImages ? (
-          <div className="order-2 flex gap-2.5 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible">
-          {thumbnailImages.map((image, index) => {
-            const active = image === activeImage;
-
-            return (
+  const ratio = width / height;
+  const fraction =
+    ratio <= 0.85 ? 0.5 : Math.min(0.6, 0.5 + (ratio - 0.85) * 0.6);
+  const imageSize = (src: string) => {
+    const asset = galleryAssets.find(
+      (a) => a && [a.original, a.detail, a.hero, a.card].includes(src),
+    );
+    const measured = (measuredSizes as Record<string, number[]>)[src];
+    return {
+      width: asset?.width ?? measured?.[0] ?? width,
+      height: asset?.height ?? measured?.[1] ?? height,
+    };
+  };
+  const navigation = (
+    <div className={styles.galleryNavigation}>
+      <HistoryBackLink fallbackHref="/collection" className={styles.backAction}>
+        ← {backLabel.zh} <span lang="en">{backLabel.en}</span>
+      </HistoryBackLink>
+      {hasMultipleImages ? (
+        <div className={styles.imageNavigation}>
+          <span>
+            图 {activeImageIndex + 1} / {thumbnailImages.length}
+          </span>
+          <div className={styles.imageDots}>
+            {thumbnailImages.map((src, index) => (
               <button
-                key={`${image}-${index}`}
+                key={src}
                 type="button"
                 aria-label={`${title} image ${index + 1}`}
-                onClick={() => setActiveImage(image)}
-                className="group shrink-0 cursor-pointer select-none"
+                aria-pressed={activeImage === src}
+                onClick={() => setActiveImage(src)}
               >
-                <div
-                  className={`relative overflow-hidden border bg-[var(--surface-strong)] transition-colors ${
-                    active
-                      ? "border-[var(--line-strong)]/72 ring-1 ring-[var(--line-strong)]/12"
-                      : "border-[var(--line)]/42 group-hover:border-[var(--line-strong)]/42"
-                  }`}
-                  style={isVajraImage(image) ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
-                >
-                  {image.startsWith("/api/placeholder/") ? (
-                    <div className="flex aspect-[4/5] h-[90px] w-[68px] items-end bg-[linear-gradient(180deg,rgba(239,235,229,0.8)_0%,rgba(233,228,221,0.97)_100%)] p-2.5 lg:h-[98px] lg:w-[72px]">
-                      <div className="w-full border-t border-[var(--line)]/44 pt-1.5 text-left">
-                        <span className="block text-[0.34rem] uppercase tracking-[0.16em] text-[var(--accent)]/34">
-                          {index + 1}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
+                <span />
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+  return (
+    <>
+      <section
+        id="artwork-info"
+        className={styles.hero}
+        data-layout={ratio > 1.5 ? "panorama" : "split"}
+        style={
+          {
+            "--image-fraction": fraction,
+            "--image-ratio": naturalRatio ?? ratio,
+            "--gallery-frame-ratio": ratio,
+          } as CSSProperties
+        }
+      >
+        <div className={styles.panoramaNavigation}>{navigation}</div>
+        <div
+          className={styles.galleryColumn}
+          data-native-carousel={native}
+          style={
+            isVajraActive ? { background: COVER_VAJRA_BACKDROP } : undefined
+          }
+        >
+          {isActivePlaceholder ? (
+            <MediaPlaceholder eyebrow="Artwork Image" title={title} />
+          ) : (
+            <div className={styles.galleryViewport} ref={primaryCarousel.ref}>
+              {(native ? primaryCarousel.indexes : [activeImageIndex]).map((index, position) => {
+                const src = thumbnailImages[index];
+                const clone = native && hasMultipleImages && (position === 0 || position === thumbnailImages.length + 1);
+                return (
+                  <button
+                    key={`${src}-${position}`}
+                    type="button"
+                    aria-label={`放大 ${title}${index ? ` · 局部 ${index}` : ""}`}
+                    aria-hidden={clone || index !== activeImageIndex}
+                    tabIndex={clone || index !== activeImageIndex ? -1 : 0}
+                    className={styles.primaryImageButton}
+                    onClick={() => { if (primaryCarousel.canClick()) setIsLightboxOpen(true); }}
+                  >
                     <ProtectedImage
-                      src={withImageVersion(COVER_VAJRA_DETAIL_MASKS[image] ?? image)}
-                      alt={title}
-                      width={220}
-                      height={275}
+                      src={withImageVersion(src)}
+                      alt={index ? `${title} · 局部 ${index}` : title}
+                      width={imageSize(src).width}
+                      height={imageSize(src).height}
+                      priority={index === 0 && !clone}
+                      loading={index === 0 && !clone ? undefined : "eager"}
                       unoptimized
-                      wrapperClassName="block"
-                      className="aspect-[4/5] h-[90px] w-[68px] object-contain lg:h-[98px] lg:w-[72px]"
-                      style={image === COVER_VAJRA_IMAGE ? vajraImageStyle(image) : undefined}
+                      wrapperClassName={styles.primaryImageFrame}
+                      className={styles.primaryImage}
+                      style={vajraImageStyle(src)}
+                      onError={src === resolvedPrimaryImage ? tryFallbackPrimaryImage : undefined}
+                      onLoad={(event) => {
+                        const img = event.currentTarget;
+                        if (src === resolvedPrimaryImage && img.naturalWidth && img.naturalHeight)
+                          setNaturalRatio(img.naturalWidth / img.naturalHeight);
+                      }}
                     />
-                  )}
-                </div>
-              </button>
-            );
-          })}
-          </div>
-        ) : null}
-        <div className={`order-1 min-w-0 grid gap-3.5 ${hasMultipleImages ? "" : "lg:justify-items-center"}`}>
-          <div
-            className={`relative overflow-hidden lg:flex ${isVajraActive ? "lg:overflow-hidden" : "bg-transparent lg:overflow-visible"} ${desktopContainerClass}`}
-            style={isVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
-          >
-            {isActivePlaceholder ? (
-              <div className="aspect-[4/5] lg:flex lg:min-h-full lg:w-full lg:items-start lg:justify-center">
-                <MediaPlaceholder eyebrow="Artwork Image" title={title} />
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsLightboxOpen(true)}
-                className={`block w-full cursor-zoom-in lg:w-auto lg:max-w-full ${desktopFrameClass}`}
-                data-protect-wrap="true"
-              >
-                <ProtectedImage
-                  src={activeImageSrc}
-                  alt={title}
-                  width={1200}
-                  height={1500}
-                  priority
-                  unoptimized
-                  wrapperClassName="block lg:w-auto"
-                  onError={tryFallbackPrimaryImage}
-                  onLoad={(event) => {
-                    const target = event.currentTarget;
-                    if (target.naturalWidth > 0 && target.naturalHeight > 0) {
-                      setNaturalRatio(target.naturalWidth / target.naturalHeight);
-                    }
-                  }}
-                  className={`h-auto w-full object-contain ${desktopImageClass}`}
-                  style={vajraImageStyle(activeImage)}
-                />
-              </button>
-            )}
-          </div>
-          {thumbnailImages.length > 1 && activeImage !== resolvedPrimaryImage && !resolvedPrimaryImage.startsWith("/api/placeholder/") ? (
-            <div className="flex justify-end border-t border-[var(--line)]/34 pt-3 text-[var(--muted)]">
-              <button
-                type="button"
-                onClick={() => setActiveImage(resolvedPrimaryImage)}
-                className="cursor-pointer select-none text-[0.74rem] tracking-[0.06em] transition-colors hover:text-[var(--ink)]"
-              >
-                返回主图
-              </button>
+                  </button>
+                );
+              })}
             </div>
+          )}
+          {hasMultipleImages ? <p className={styles.gallerySwipeHint}>左右滑动查看 · 点按放大 <span lang="en">Swipe · Tap to enlarge</span></p> : null}
+          {activeImage !== resolvedPrimaryImage ? (
+            <button
+              type="button"
+              className={styles.returnPrimary}
+              data-no-swipe
+              onClick={() => setActiveImage(resolvedPrimaryImage)}
+            >
+              返回主图
+            </button>
           ) : null}
         </div>
-      </div>
-
-      {isMounted && isLightboxOpen && canOpenLightbox
-        ? createPortal(
-        <div
-          className="fixed inset-0 z-[120] isolate px-4 py-4 md:px-8 md:py-6"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setIsLightboxOpen(false)}
-        >
-          <div className="absolute inset-0 z-0 bg-[rgba(12,10,8,0.9)] backdrop-blur-[1px]" />
-          <div
-            className="relative z-10 mx-auto flex h-full w-full max-w-[1380px] flex-col"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="sticky top-0 z-20 mb-3 flex items-center justify-between border-b border-[rgba(244,239,232,0.12)] bg-[rgba(12,10,8,0.72)] py-2 text-[var(--surface)]/88 backdrop-blur-[6px]">
-              <div className="min-h-6 text-[0.8rem] tracking-[0.08em]">
-                {thumbnailImages.length > 1 ? `${activeImageIndex + 1} / ${thumbnailImages.length}` : null}
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsLightboxOpen(false)}
-                className="cursor-pointer select-none text-[0.8rem] tracking-[0.08em] transition-colors hover:text-[var(--surface)]"
+        <aside className={styles.recordColumn}>
+          <div className={styles.recordNavigation}>{navigation}</div>
+          {children}
+        </aside>
+      </section>
+      {detailImages.length ? (
+        <section className={styles.detailsSection}>
+          <div className={styles.detailsImages}>
+            {packArtworkRows(
+              detailImages.map(
+                (src) => imageSize(src).width / imageSize(src).height,
+              ),
+              "details",
+            ).map((row, rowIndex) => (
+              <div
+                key={rowIndex}
+                className={styles.detailsRow}
+                style={{
+                  gridTemplateColumns: [
+                    ...row.ratios,
+                    ...(row.spacer ? [row.spacer] : []),
+                  ]
+                    .map((r) => `minmax(0, ${r * 1000}fr)`)
+                    .join(" "),
+                }}
               >
-                关闭
-              </button>
-            </div>
-            <div
-              className="relative z-20 min-h-[calc(100vh-7.5rem)] flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] md:min-h-[calc(100vh-9rem)]"
-              style={isVajraActive ? { backgroundColor: COVER_VAJRA_BACKDROP } : undefined}
-            >
-              {thumbnailImages.length > 1 ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => stepLightboxImage("prev")}
-                    className="absolute left-3 top-1/2 z-30 -translate-y-1/2 cursor-pointer select-none border border-[rgba(244,239,232,0.18)] bg-[rgba(12,10,8,0.38)] px-3 py-2 text-[0.72rem] text-[var(--surface)]/82 transition-colors hover:text-[var(--surface)]"
-                  >
-                    上一张
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => stepLightboxImage("next")}
-                    className="absolute right-3 top-1/2 z-30 -translate-y-1/2 cursor-pointer select-none border border-[rgba(244,239,232,0.18)] bg-[rgba(12,10,8,0.38)] px-3 py-2 text-[0.72rem] text-[var(--surface)]/82 transition-colors hover:text-[var(--surface)]"
-                  >
-                    下一张
-                  </button>
-                </>
-              ) : null}
-              <div className="relative z-20 flex h-full min-h-full overflow-auto px-3 py-3 md:px-6 md:py-6">
-                <div className="flex min-h-[calc(100vh-9rem)] w-full items-center justify-center md:min-h-[calc(100vh-11rem)]">
-                  <ProtectedImage
-                    src={activeImageSrc}
-                    alt={title}
-                    width={1600}
-                    height={2000}
-                    unoptimized
-                    wrapperClassName="inline-block !h-auto !w-auto"
-                    className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
-                    style={vajraImageStyle(activeImage)}
-                  />
-                </div>
-              </div>
-            </div>
-            {thumbnailImages.length > 1 ? (
-              <div className="relative z-20 mt-3 flex justify-center gap-2 overflow-x-auto pb-1">
-                {thumbnailImages.map((image, index) => {
-                  const active = image === activeImage;
+                {row.indexes.map((index) => {
+                  const src = detailImages[index];
                   return (
                     <button
-                      key={`lightbox-${image}-${index}`}
+                      key={src}
                       type="button"
-                      onClick={() => setActiveImage(image)}
-                      className={`h-1.5 w-8 shrink-0 cursor-pointer rounded-full transition-colors ${
-                        active ? "bg-[var(--surface)]/82" : "bg-[var(--surface)]/24"
-                      }`}
-                      aria-label={`切换到第 ${index + 1} 张图片`}
-                    />
+                      aria-label={`放大局部图 ${index + 2}`}
+                      onClick={() => {
+                        setActiveImage(src);
+                        setIsLightboxOpen(true);
+                      }}
+                      style={{
+                        background: isVajraImage(src)
+                          ? COVER_VAJRA_BACKDROP
+                          : undefined,
+                      }}
+                    >
+                      <ProtectedImage
+                        src={withImageVersion(src)}
+                        alt={`${title} · 局部 ${index + 1}`}
+                        width={imageSize(src).width}
+                        height={imageSize(src).height}
+                        unoptimized
+                        wrapperClassName={styles.detailImageFrame}
+                        className={styles.detailImage}
+                        style={vajraImageStyle(src)}
+                      />
+                    </button>
                   );
                 })}
               </div>
-            ) : null}
+            ))}
           </div>
-        </div>
-          ,
-          document.body,
-        )
+          <p className={styles.detailsCaption}>
+            <span>图 2 – {thumbnailImages.length} · 局部 · Details</span>
+            <span>点击图片放大 · Click to enlarge</span>
+          </p>
+        </section>
+      ) : null}
+
+      {isMounted && isLightboxOpen && canOpenLightbox
+        ? createPortal(
+            <ModalDialog
+              className={styles.lightbox}
+              label={`${title} · 图片放大 Image viewer`}
+              onDismiss={() => setIsLightboxOpen(false)}
+            >
+              <div
+                className={styles.lightboxBackdrop}
+                onClick={() => setIsLightboxOpen(false)}
+              />
+              <div
+                className="relative z-10 mx-auto flex h-full w-full max-w-[1380px] flex-col"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className={styles.lightboxToolbar}>
+                  <div className={styles.lightboxPagination}>
+                    {hasMultipleImages ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => stepLightboxImage("prev")}
+                          className={styles.lightboxStep}
+                          aria-label="上一张 / Previous image"
+                        >
+                          <DirectionalArrow backwards />
+                        </button>
+                        <span className={styles.lightboxCount}>
+                          {activeImageIndex + 1} / {thumbnailImages.length}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => stepLightboxImage("next")}
+                          className={styles.lightboxStep}
+                          aria-label="下一张 / Next image"
+                        >
+                          <DirectionalArrow />
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsLightboxOpen(false)}
+                    className={styles.lightboxClose}
+                  >
+                    关闭
+                  </button>
+                </div>
+                <div
+                  className="relative z-20 min-h-0 flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)]"
+                  style={
+                    isVajraActive
+                      ? { backgroundColor: COVER_VAJRA_BACKDROP }
+                      : undefined
+                  }
+                >
+                  <div className={styles.lightboxViewport} ref={lightboxCarousel.ref}
+                    role="region" aria-label="作品图片 Artwork images" tabIndex={0}>
+                    {lightboxCarousel.indexes.map((index, position) => {
+                      const src = thumbnailImages[index];
+                      const clone = hasMultipleImages && (position === 0 || position === thumbnailImages.length + 1);
+                      return (
+                        <div className={styles.lightboxPanel} key={`${src}-${position}`} aria-hidden={clone || index !== activeImageIndex}>
+                          <ProtectedImage
+                            src={withImageVersion(src)}
+                            alt={index ? `${title} · 局部 ${index}` : title}
+                            width={imageSize(src).width}
+                            height={imageSize(src).height}
+                            unoptimized
+                            loading="eager"
+                            wrapperClassName={styles.lightboxMedia}
+                            className="relative z-30 h-auto w-auto max-h-full max-w-full object-contain object-center"
+                            style={vajraImageStyle(src)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                {thumbnailImages.length > 1 ? (
+                  <div className="relative z-20 mt-3 flex justify-center gap-2 overflow-x-auto pb-1">
+                    {thumbnailImages.map((image, index) => {
+                      const active = image === activeImage;
+                      return (
+                        <button
+                          key={`lightbox-${image}-${index}`}
+                          type="button"
+                          onClick={() => setActiveImage(image)}
+                          className={styles.lightboxDot}
+                          aria-pressed={active}
+                          aria-label={`切换到第 ${index + 1} 张图片`}
+                        >
+                          <span />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            </ModalDialog>,
+            document.body,
+          )
         : null}
     </>
   );

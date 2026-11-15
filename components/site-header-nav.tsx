@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 import { BilingualText } from "./bilingual-text";
+import { ModalDialog } from "./modal-dialog";
 import styles from "./site-header-nav.module.css";
 
 type NavItem = {
@@ -18,61 +19,55 @@ type SiteHeaderNavProps = {
 };
 
 export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
-  const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const open = openPath === pathname;
+
+  useEffect(() => {
+    if (openPath !== null && openPath !== pathname) setOpenPath(null);
+  }, [openPath, pathname]);
 
   const isActive = (href: string) =>
-    href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+    href === "/"
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    // Keep the page behind the open menu from scrolling.
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleEscape);
-    };
+    const desktop = window.matchMedia("(min-width: 861px)");
+    const closeOnDesktop = () => { if (desktop.matches) setOpenPath(null); };
+    closeOnDesktop();
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
   }, [open]);
 
   return (
     <>
       <button
         type="button"
+        aria-label={open ? "关闭菜单" : "打开菜单"}
         aria-expanded={open}
         aria-controls="site-mobile-nav"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => setOpenPath(open ? null : pathname)}
         className={styles.menuButton}
       >
-        <span>{open ? "关闭" : "导航"}</span>
+        <span aria-hidden="true" />
+        <span aria-hidden="true" />
       </button>
 
-      <nav
-        aria-label="主导航"
-        className={styles.desktopNav}
-      >
+      <nav aria-label="主导航" className={styles.desktopNav}>
         {items.map((item) => {
           const active = isActive(item.href);
-          const sectionStart = item.href === "/about";
 
           return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`${styles.navLink} ${active ? styles.navLinkActive : ""} ${
-                sectionStart ? styles.navLinkSectionStart : ""
-              }`}
+              className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
             >
               <BilingualText
                 as="span"
@@ -88,11 +83,16 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
       </nav>
 
       {open ? (
-        <div className={styles.mobileBackdrop} onClick={() => setOpen(false)}>
+        <ModalDialog id="site-mobile-nav" label="主导航 Main navigation"
+          className={styles.mobileBackdrop} onDismiss={() => setOpenPath(null)}>
+          <button type="button" className={styles.menuClose} aria-label="关闭菜单"
+            onClick={() => setOpenPath(null)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m5 5 14 14M19 5 5 19" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </button>
           <div
-            id="site-mobile-nav"
             className={styles.mobilePanel}
-            onClick={(event) => event.stopPropagation()}
           >
             <div className={styles.mobileLinks}>
               {items.map((item) => {
@@ -103,7 +103,11 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
                     key={item.href}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      // Other destinations close when pathname changes; keep
+                      // their Link mounted until the navigation commits.
+                      if (item.href === pathname) setOpenPath(null);
+                    }}
                     className={`${styles.mobileLink} ${active ? styles.mobileLinkActive : ""}`}
                   >
                     <BilingualText
@@ -119,7 +123,7 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
               })}
             </div>
           </div>
-        </div>
+        </ModalDialog>
       ) : null}
     </>
   );

@@ -10,7 +10,7 @@ import type {
 } from "@/lib/site-data";
 import { withImageVersion } from "@/lib/image-url";
 
-import { getLocalizedText, getParagraphsByLocale, type ReadingLocale } from "./bilingual-prose";
+import { ExpandableReadingText, getLocalizedText, getParagraphsByLocale, type ReadingLocale } from "./bilingual-prose";
 import { ProtectedImage } from "./protected-image";
 
 const ARTICLE_TEXT_MAX_WIDTH_CLASS = "max-w-[40rem]";
@@ -132,18 +132,6 @@ function ArticleImagePairFigure({
       ) : null}
     </figure>
   );
-}
-
-function proseClasses(variant: "lead" | "body", locale: ReadingLocale) {
-  if (variant === "lead") {
-    return locale === "zh"
-      ? `prose-block prose-block--zh mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS} text-[1.02rem] leading-[1.98] tracking-[0.01em] text-[var(--ink)] md:text-[1.16rem] md:leading-[2.02]`
-      : "prose-block prose-block--en mx-auto max-w-[40rem] text-[0.92rem] leading-[1.82] text-[var(--muted)]/92 md:text-[1rem] md:leading-[1.88]";
-  }
-
-  return locale === "zh"
-    ? `prose-block prose-block--zh mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS} text-[1rem] leading-[2] tracking-[0.01em] text-[var(--ink)] md:text-[1.12rem] md:leading-[2.04]`
-    : "prose-block prose-block--en mx-auto max-w-[38rem] text-[0.9rem] leading-[1.8] text-[var(--muted)]/90 md:text-[0.94rem] md:leading-[1.86]";
 }
 
 function hasLocalizedContent(content: BilingualValue | undefined, locale: ReadingLocale) {
@@ -270,12 +258,37 @@ export function ArticleReadingContent({
 }) {
   const [locale, setLocale] = useState<ReadingLocale>("zh");
   const hasEnglish = useMemo(() => articleHasCompleteEnglish(excerpt, blocks), [blocks, excerpt]);
-  const excerptParagraphs = useMemo(
-    () => getParagraphsByLocale(excerpt, locale, "soft", { autoSplitLongSingleParagraph: false }),
-    [excerpt, locale],
-  );
-  const excerptLead = excerptParagraphs[0]?.trim() ?? "";
-  let checkedFirstBodyParagraph = false;
+  const readingBlocks = useMemo(() => {
+    type ProseRun = { type: "reading"; paragraphs: { zh: string[]; en: string[] } };
+    const result: (ProseRun | Exclude<ArticleContentBlock, { type: "paragraph" }>)[] = [];
+    const first = { zh: "", en: "" };
+    const excerptText = { zh: [] as string[], en: [] as string[] };
+    for (const value of ["zh", "en"] as const) {
+      excerptText[value] = getParagraphsByLocale(excerpt, value, "soft", { autoSplitLongSingleParagraph: false, repairWrappedLines: true });
+      first[value] = excerptText[value][0]?.trim() ?? "";
+    }
+    result.push({ type: "reading", paragraphs: excerptText });
+    let checkedFirst = false;
+    for (const block of blocks) {
+      if (block.type !== "paragraph") { result.push(block); continue; }
+      const paragraphs = { zh: [] as string[], en: [] as string[] };
+      for (const value of ["zh", "en"] as const) {
+        paragraphs[value] = getParagraphsByLocale(block.content, value, "paragraph", { autoSplitLongSingleParagraph: false, repairWrappedLines: true });
+        if (!checkedFirst && paragraphs[value].length) {
+          const [lead, ...rest] = paragraphs[value];
+          const trimmed = trimDuplicatedLead(first[value], lead);
+          paragraphs[value] = trimmed ? [trimmed, ...rest] : rest;
+        }
+      }
+      checkedFirst = true;
+      const previous = result.at(-1);
+      if (previous?.type === "reading") {
+        previous.paragraphs.zh.push(...paragraphs.zh);
+        previous.paragraphs.en.push(...paragraphs.en);
+      } else result.push({ type: "reading", paragraphs });
+    }
+    return result;
+  }, [blocks, excerpt]);
 
   return (
     <div className={className}>
@@ -304,55 +317,12 @@ export function ArticleReadingContent({
       ) : null}
 
       <div className="article-reading-flow">
-        {excerptParagraphs.length ? (
-          <div className="article-reading-lead space-y-5 md:space-y-6">
-            {excerptParagraphs.map((paragraph, index) => (
-              <p
-                key={`excerpt-${locale}-${index}`}
-                lang={locale === "en" ? "en" : "zh-CN"}
-                className={proseClasses("lead", locale)}
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        ) : null}
-
-        {blocks.map((block, index) => {
-          if (block.type === "paragraph") {
-            const paragraphs = getParagraphsByLocale(block.content, locale, "paragraph", {
-              autoSplitLongSingleParagraph: false,
-            });
-
-            if (!paragraphs.length) {
-              return null;
-            }
-
-            let paragraphsForRender = paragraphs;
-            if (!checkedFirstBodyParagraph) {
-              checkedFirstBodyParagraph = true;
-              const [firstParagraph, ...rest] = paragraphs;
-              const trimmedFirstParagraph = trimDuplicatedLead(excerptLead, firstParagraph);
-              paragraphsForRender = trimmedFirstParagraph ? [trimmedFirstParagraph, ...rest] : rest;
-            }
-
-            if (!paragraphsForRender.length) {
-              return null;
-            }
-
-            return (
-              <div key={`paragraph-${index}`} className="article-reading-copy space-y-5 md:space-y-6">
-                {paragraphsForRender.map((paragraph, paragraphIndex) => (
-                  <p
-                    key={`paragraph-${index}-${locale}-${paragraphIndex}`}
-                    lang={locale === "en" ? "en" : "zh-CN"}
-                    className={proseClasses("body", locale)}
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            );
+        {readingBlocks.map((block, index) => {
+          if (block.type === "reading") {
+            return <div key={`reading-${index}`} className={`article-reading-copy mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS}`}>
+              <ExpandableReadingText translations={hasEnglish ? block.paragraphs : undefined}
+                paragraphs={block.paragraphs.zh} locale={locale} />
+            </div>;
           }
 
           if (block.type === "image") {

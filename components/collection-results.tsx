@@ -2,19 +2,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import { getCollectionFilterSignature, readCollectionFilters } from "@/lib/collection-filtering";
+import {
+  getCollectionFilterSignature,
+  readCollectionFilters,
+} from "@/lib/collection-filtering";
 import type { CollectionArtworkSummary } from "@/lib/collection-filtering";
 
-import { ArtworkCard } from "./artwork-card";
+import { ArtworkGrid } from "./artwork-grid";
 import styles from "./collection-page.module.css";
 
-const DESKTOP_PAGE_SIZE = 9;
+const DESKTOP_PAGE_SIZE = 15;
 const TABLET_PAGE_SIZE = 6;
 const MOBILE_PAGE_SIZE = 6;
 type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
 
-function getPageSize(width: number) {
-  if (width >= 1280) {
+function getPageSize(width: number, touchDevice: boolean) {
+  if (width >= 1280 && !touchDevice) {
     return DESKTOP_PAGE_SIZE;
   }
 
@@ -25,7 +28,10 @@ function getPageSize(width: number) {
   return MOBILE_PAGE_SIZE;
 }
 
-function getPaginationItems(currentPage: number, totalPages: number): PaginationItem[] {
+function getPaginationItems(
+  currentPage: number,
+  totalPages: number,
+): PaginationItem[] {
   if (totalPages <= 9) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }
@@ -53,7 +59,10 @@ type CollectionResultsProps = {
   filterSignature: string;
 };
 
-export function CollectionResults({ artworks, filterSignature }: CollectionResultsProps) {
+export function CollectionResults({
+  artworks,
+  filterSignature,
+}: CollectionResultsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -72,16 +81,19 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
   );
 
   useEffect(() => {
+    const touch = window.matchMedia("(any-pointer: coarse)");
     const updatePageSize = () => {
-      setPageSize(getPageSize(window.innerWidth));
+      setPageSize(getPageSize(window.innerWidth, touch.matches));
       setPageSizeReady(true);
     };
 
     updatePageSize();
     window.addEventListener("resize", updatePageSize);
+    touch.addEventListener("change", updatePageSize);
 
     return () => {
       window.removeEventListener("resize", updatePageSize);
+      touch.removeEventListener("change", updatePageSize);
     };
   }, []);
 
@@ -107,7 +119,11 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
     const query = params.toString();
     // Page numbers only change what the browser shows, so update the address in place
     // rather than asking the server to render the page again.
-    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
+    window.history.replaceState(
+      null,
+      "",
+      query ? `${pathname}?${query}` : pathname,
+    );
   }, [
     activeFilterSignature,
     currentPage,
@@ -143,25 +159,46 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
     }
 
     const query = params.toString();
-    window.history.pushState(null, "", query ? `${pathname}?${query}` : pathname);
+    window.history.pushState(
+      null,
+      "",
+      query ? `${pathname}?${query}` : pathname,
+    );
   }
 
   return (
     <div ref={rootRef} className={styles.results}>
+      <div className={styles.resultSummary}>
+        <span className={styles.mobileRange}>
+          第 {(currentPage - 1) * pageSize + 1} –{" "}
+          {Math.min(currentPage * pageSize, artworks.length)} 件 ·{" "}
+          {(currentPage - 1) * pageSize + 1} –{" "}
+          {Math.min(currentPage * pageSize, artworks.length)} of{" "}
+          {artworks.length}
+        </span>
+        <span>
+          <span className={styles.desktopOnly}>
+            第 {currentPage} / {totalPages} 页 · Page{" "}
+          </span>
+          {currentPage}
+          <span className={styles.desktopOnly}> of </span>
+          <span className={styles.mobileOnly}> / </span>
+          {totalPages}
+        </span>
+      </div>
       <div className={styles.artworksGrid}>
-        {currentItems.map((artwork, index) => (
-          <ArtworkCard
-            key={artwork.slug}
-            artwork={artwork}
-            priority={currentPage === 1 && index < 3}
-            variant="catalogue"
-          />
-        ))}
+        <ArtworkGrid artworks={currentItems} priority={currentPage === 1} fillRows />
       </div>
 
       {artworks.length > pageSize ? (
         <nav className={styles.pagination} aria-label="Collection pages">
-          <p>第 {currentPage} 页，共 {totalPages} 页</p>
+          <p>
+            第 {(currentPage - 1) * pageSize + 1} –{" "}
+            {Math.min(currentPage * pageSize, artworks.length)} 件 ·{" "}
+            {(currentPage - 1) * pageSize + 1} –{" "}
+            {Math.min(currentPage * pageSize, artworks.length)} of{" "}
+            {artworks.length}
+          </p>
           <div className={styles.pageLinks}>
             <button
               type="button"
@@ -183,7 +220,11 @@ export function CollectionResults({ artworks, filterSignature }: CollectionResul
                   {item}
                 </button>
               ) : (
-                <span key={item} className={styles.paginationEllipsis} aria-hidden="true">
+                <span
+                  key={item}
+                  className={styles.paginationEllipsis}
+                  aria-hidden="true"
+                >
                   …
                 </span>
               ),

@@ -9,10 +9,10 @@ export function SiteHeaderFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <header className={styles.header}>
-      <div className={`${styles.inner} ${pathname === "/" ? styles.homeInner : ""}`}>
-        {children}
-      </div>
+    <header
+      className={`${styles.header} ${pathname === "/" ? styles.homeHeader : ""} ${pathname === "/exhibitions" || pathname === "/exhibitions/himalayan-art-2026" ? styles.seasonHeader : ""}`}
+    >
+      <div className={styles.inner}>{children}</div>
     </header>
   );
 }

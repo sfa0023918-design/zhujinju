@@ -1,5 +1,6 @@
 .pageShell {
-  width: min(100%, var(--content-width));
+  --page-inline: 40px;
+  width: min(100%, 1600px);
   margin-inline: auto;
   padding-inline: var(--page-inline);
 }
@@ -38,10 +39,11 @@
   margin-top: 12px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 16px;
+  font-size: var(--type-page-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
+  font-style: italic;
 }
 
 .aboutHero {
@@ -129,43 +131,16 @@
   margin-top: 14px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 16px;
+  font-size: var(--type-section-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
+  font-style: italic;
 }
 
 .philosophyBody {
   grid-column: 6 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-  gap: 48px;
-  align-items: start;
-}
-
-.philosophyLanguageColumn {
-  color: var(--muted);
-}
-
-.philosophyLanguageColumn p + p {
-  margin-top: 24px;
-}
-
-.philosophyLanguageColumn.zh {
-  font-size: 16px;
-  line-height: 2;
-}
-
-.philosophyLanguageColumn.en {
-  font-size: 14px;
-  line-height: 1.75;
-}
-
-.philosophyLanguageColumn.zh p[data-emphasis="lead"] {
-  color: var(--ink);
-  font-family: var(--font-serif);
-  font-size: 20px;
-  line-height: 1.8;
+  min-width: 0;
 }
 
 .factsSection {
@@ -208,7 +183,7 @@
 
 .factValue .zh {
   display: block;
-  font-size: 24px;
+  font-size: var(--type-feature);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -372,7 +347,7 @@
   display: block;
   color: var(--ink);
   font-family: var(--font-serif);
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1.45;
 }
 
@@ -434,7 +409,7 @@
   padding: 10px 12px;
   color: var(--ink);
   font: inherit;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
@@ -535,6 +510,12 @@
 
   .contactBody {
     gap: 48px;
+  }
+}
+
+@media (max-width: 860px) {
+  .pageShell {
+    --page-inline: 20px;
   }
 }
 
@@ -686,3 +667,6 @@
     transition: none;
   }
 }
+
+a.contactValue,
+a.contactSecondaryValue { display: flex; align-items: center; min-height: 44px; }

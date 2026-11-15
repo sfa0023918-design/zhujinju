@@ -1,3 +1,4 @@
+import { ExpandableReadingText } from "@/components/bilingual-prose";
 import { BilingualText } from "@/components/bilingual-text";
 import { ContactForm } from "@/components/contact-form";
 import { ProtectedImage } from "@/components/protected-image";
@@ -94,20 +95,10 @@ export function AboutPageContent({
         </div>
 
         <div className={styles.philosophyBody}>
-          <div className={`${styles.philosophyLanguageColumn} ${styles.zh}`} lang="zh-CN">
-            {siteConfig.about.body.map((paragraph, index) =>
-              paragraph.zh.trim() ? (
-                <p key={`${paragraph.zh}-${index}`} data-emphasis={index === 0 ? "lead" : "body"}>
-                  {paragraph.zh}
-                </p>
-              ) : null,
-            )}
-          </div>
-          <div className={`${styles.philosophyLanguageColumn} ${styles.en}`} lang="en">
-            {siteConfig.about.body.map((paragraph, index) =>
-              paragraph.en.trim() ? <p key={`${paragraph.en}-${index}`}>{paragraph.en}</p> : null,
-            )}
-          </div>
+          <ExpandableReadingText showBoth translations={{
+            zh: siteConfig.about.body.map(paragraph => paragraph.zh).filter(text => text.trim()),
+            en: siteConfig.about.body.map(paragraph => paragraph.en).filter(text => text.trim()),
+          }} />
         </div>
       </section>
 

@@ -8,9 +8,11 @@ import styles from "./home-highlights.module.css";
 export function HomeHighlights({
   children,
   count,
+  className,
 }: {
   children: ReactNode;
   count: number;
+  className?: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({
@@ -72,11 +74,18 @@ export function HomeHighlights({
   const move = (direction: number) => {
     const track = trackRef.current;
     if (!track || track.children.length < 2) return;
-    const step =
-      track.children[1].getBoundingClientRect().left -
-      track.children[0].getBoundingClientRect().left;
-    track.scrollBy({
-      left: direction * step,
+    const left = track.getBoundingClientRect().left;
+    const positions = Array.from(track.children, (item) =>
+      Math.max(0, item.getBoundingClientRect().left - left + track.scrollLeft),
+    );
+    const target =
+      direction > 0
+        ? positions.find((position) => position > track.scrollLeft + 2)
+        : positions
+            .reverse()
+            .find((position) => position < track.scrollLeft - 2);
+    track.scrollTo({
+      left: target ?? (direction > 0 ? track.scrollWidth : 0),
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "instant"
         : "smooth",
@@ -88,7 +97,7 @@ export function HomeHighlights({
       <div
         ref={trackRef}
         id="selected-highlights"
-        className={styles.track}
+        className={`${styles.track} ${className ?? ""}`}
         role="region"
         aria-label="精选藏品 / Selected highlights"
         tabIndex={position.scrollable ? 0 : undefined}

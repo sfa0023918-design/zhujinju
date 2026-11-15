@@ -1,0 +1,72 @@
+.browser {
+  min-width: 0;
+  margin-top: 20px;
+  color: var(--catalogue-ink);
+}
+.browser p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0 0 10px;
+  color: var(--catalogue-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.track {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scroll-padding: 2px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--catalogue-line-strong) var(--catalogue-surface);
+}
+.track button {
+  flex: 0 0 136px;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--catalogue-muted);
+  scroll-snap-align: start;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+.track button[aria-current] {
+  border-color: var(--catalogue-line-strong);
+  color: var(--catalogue-ink);
+}
+.imageFrame {
+  position: relative;
+  display: block;
+  aspect-ratio: 1.7;
+  margin-bottom: 5px;
+  background: rgb(240 237 228 / 10%);
+}
+.image { object-fit: contain; }
+.track :global(.protected-media__shield) { touch-action: pan-x pan-y; }
+.track:focus-visible,
+.track button:focus-visible {
+  outline: 2px solid var(--catalogue-ink);
+  outline-offset: -2px;
+}
+.browser[data-compact="true"] {
+  flex: none;
+  margin-top: 0;
+}
+.browser[data-compact="true"] .track { padding-block: 3px 5px; }
+.browser[data-compact="true"] button { flex-basis: 76px; padding: 2px; }
+.browser[data-compact="true"] .imageFrame { margin-bottom: 2px; }
+@media (max-width: 860px) {
+  .track button { flex-basis: 112px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .browser[data-compact="true"] button { flex-basis: 60px; }
+  .browser[data-compact="true"] .track { padding-block: 1px; }
+}

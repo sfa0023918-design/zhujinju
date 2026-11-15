@@ -1,7 +1,13 @@
 .journalShell {
-  width: min(100%, var(--content-width));
+  width: min(100%, 1600px);
   margin: 0 auto;
-  padding-inline: var(--page-inline);
+  padding-inline: 40px;
+}
+
+@media (max-width: 860px) {
+  .journalShell {
+    padding-inline: 20px;
+  }
 }
 
 .indexHero {
@@ -34,7 +40,7 @@
 
 .pageTitle .zh {
   display: block;
-  font-size: 34px;
+  font-size: var(--type-page);
   line-height: 1.35;
   font-weight: 400;
 }
@@ -44,9 +50,10 @@
   margin-top: 6px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 16px;
+  font-size: var(--type-page-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
+  font-style: italic;
 }
 
 .heroDescription {
@@ -136,9 +143,10 @@
 
 .cardTitle .zh {
   display: block;
-  font-size: 23px;
+  font-size: var(--type-card);
   line-height: 1.45;
   letter-spacing: 0;
+  font-weight: 400;
 }
 
 .cardTitle .en {
@@ -146,18 +154,20 @@
   margin-top: 6px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 14px;
+  font-size: var(--type-card-en);
   line-height: 1.5;
   letter-spacing: 0;
+  font-style: italic;
+  font-weight: 400;
 }
 
 .card[data-layout="lead"] .cardTitle .zh {
-  font-size: 28px;
+  font-size: var(--type-feature);
   line-height: 1.4;
 }
 
 .card[data-layout="lead"] .cardTitle .en {
-  font-size: 16px;
+  font-size: var(--type-feature-en);
 }
 
 .cardInfo {
@@ -216,7 +226,7 @@
   align-items: center;
   gap: 16px;
   color: var(--accent-text);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .readLink > span {
@@ -227,8 +237,8 @@
 }
 
 .readLink small {
-  font-size: 12px;
-  font-family: var(--font-editorial);
+  font-size: 13px;
+  font-family: var(--font-sans);
 }
 
 .readLink:hover {
@@ -254,17 +264,18 @@
     align-items: start;
   }
   .card[data-layout="lead"] .cardTitle .zh {
-    font-size: 25px;
+    font-size: var(--type-feature);
   }
   .cardTitle .zh {
-    font-size: 22px;
+    font-size: var(--type-card);
+    font-weight: 400;
   }
   .indexHero {
     grid-template-columns: minmax(0, 1fr) minmax(250px, 0.9fr);
     gap: 28px;
   }
   .pageTitle .zh {
-    font-size: 30px;
+    font-size: var(--type-page);
   }
 }
 
@@ -274,10 +285,11 @@
     padding-block: 28px 24px;
   }
   .pageTitle .zh {
-    font-size: 28px;
+    font-size: var(--type-page);
   }
   .pageTitle .en {
-    font-size: 15px;
+    font-size: var(--type-page-en);
+    font-style: italic;
   }
   .heroDescription {
     margin-top: 18px;
@@ -310,15 +322,16 @@
     padding-top: 16px;
   }
   .cardTitle .zh {
-    font-size: 22px;
+    font-size: var(--type-card);
     line-height: 1.5;
+    font-weight: 400;
   }
   .card[data-layout="lead"] .cardTitle .zh {
-    font-size: 24px;
+    font-size: var(--type-feature);
   }
   .cardTitle .en,
   .card[data-layout="lead"] .cardTitle .en {
-    font-size: 14px;
+    font-size: var(--type-card-en);
     line-height: 1.55;
   }
   .cardInfo {
@@ -426,10 +439,11 @@
   margin-top: 12px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 16px;
+  font-size: var(--type-page-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
+  font-style: italic;
 }
 
 .keywords {
@@ -472,7 +486,7 @@
 
 .readingFrame :global(.article-reading-lead) {
   width: 100%;
-  margin-bottom: 28px;
+  margin-bottom: var(--reading-paragraph-gap);
 }
 
 .readingFrame :global(.article-reading-copy) {
@@ -480,7 +494,7 @@
 }
 
 .readingFrame :global(.article-reading-copy) + :global(.article-reading-copy) {
-  margin-top: 20px;
+  margin-top: var(--reading-paragraph-gap);
 }
 
 .readingFrame :global(.article-reading-lead) + :global(.article-reading-media),
@@ -497,19 +511,19 @@
 
 .readingFrame :global(.article-reading-lead p + p),
 .readingFrame :global(.article-reading-copy p + p) {
-  margin-top: 20px;
+  margin-top: var(--reading-paragraph-gap);
 }
 
 .readingFrame :global(.prose-block--zh) {
   max-width: 40rem;
-  font-size: 17px;
-  line-height: 1.95;
+  font: 400 var(--reading-size)/1.9 var(--font-song);
+  color: var(--ink);
 }
 
 .readingFrame :global(.prose-block--en) {
   max-width: 42rem;
-  font-size: 15px;
-  line-height: 1.82;
+  font: 400 var(--reading-size)/1.8 var(--font-sans);
+  color: var(--ink);
 }
 
 .readingFrame :global(.article-reading-media--group) {
@@ -606,7 +620,8 @@
   }
 
   .detailTitle .en {
-    font-size: 13px;
+    font-size: var(--type-page-en);
+    font-style: italic;
   }
 
   .detailCover {
@@ -622,12 +637,12 @@
   }
 
   .readingFrame :global(.article-reading-lead) {
-    margin-bottom: 24px;
+    margin-bottom: var(--reading-paragraph-gap);
   }
 
   .readingFrame :global(.article-reading-lead p + p),
   .readingFrame :global(.article-reading-copy p + p) {
-    margin-top: 18px;
+    margin-top: var(--reading-paragraph-gap);
   }
 
   .readingFrame :global(.article-reading-lead) + :global(.article-reading-media),
@@ -639,14 +654,10 @@
 
   .readingFrame :global(.prose-block--zh) {
     max-width: 40rem;
-    font-size: 16px;
-    line-height: 1.92;
   }
 
   .readingFrame :global(.prose-block--en) {
     max-width: 42rem;
-    font-size: 15px;
-    line-height: 1.78;
   }
 
   .readingFrame figure {

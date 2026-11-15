@@ -23,9 +23,9 @@ const EXACT_GLOSSARY = new Map<string, string>([
   ["绘画", "Painting"],
   ["专题展览", "Exhibition"],
   ["图录", "Catalogue"],
-  ["西藏", "Xizang"],
-  ["西藏中部", "Central Xizang"],
-  ["西藏西部", "Western Xizang"],
+  ["西藏", "Tibet"],
+  ["西藏中部", "Central Tibet"],
+  ["西藏西部", "Western Tibet"],
   ["后藏", "Tsang"],
   ["尼泊尔", "Nepal"],
   ["斯瓦特", "Swat"],
@@ -44,8 +44,8 @@ const EXACT_GLOSSARY = new Map<string, string>([
 ]);
 
 const PHRASE_GLOSSARY = [
-  ["西藏中部", "Central Xizang"],
-  ["西藏西部", "Western Xizang"],
+  ["西藏中部", "Central Tibet"],
+  ["西藏西部", "Western Tibet"],
   ["后藏", "Tsang"],
   ["尼泊尔", "Nepal"],
   ["斯瓦特", "Swat"],

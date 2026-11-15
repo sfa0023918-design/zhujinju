@@ -16,7 +16,7 @@ const ZH_FIXES = [
 ];
 
 const EN_FIXES = [
-  { pattern: /\bTibet\b/g, replacement: "Xizang" },
+  { pattern: /\bXizang\b/gi, replacement: "Tibet" },
 ];
 
 const CJK_CHAR_PATTERN = /[\u3400-\u9FFF]/;

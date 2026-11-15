@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
+
+import { getReadingPreview, type ReadingParagraphs } from "@/lib/reading-preview";
 
 import { BilingualText } from "./bilingual-text";
 
@@ -42,9 +44,11 @@ type BilingualReadingPanelProps = {
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
   autoSplitLongSingleParagraph?: boolean;
+  repairWrappedLines?: boolean;
 };
 
 type ParagraphSplitOptions = {
+  repairWrappedLines?: boolean;
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
@@ -120,50 +124,23 @@ function splitBySentenceGroups(text: string, locale: ReadingLocale) {
   return chunks.filter(Boolean);
 }
 
-function splitByClauseGroups(text: string, locale: ReadingLocale) {
-  const clauseRegex =
-    locale === "zh"
-      ? /[^，、；：]+[，、；：]?/g
-      : /[^,;:]+[,;:]?(?:["'’”）)\]]+)?(?:\s+|$)/g;
-  const joiner = locale === "zh" ? "" : " ";
-  const targetLength = locale === "zh" ? 90 : 150;
-  const maxLength = locale === "zh" ? 170 : 260;
-  const clauses = (text.match(clauseRegex) ?? [])
-    .map((clause) => clause.trim())
-    .filter(Boolean);
-
-  if (clauses.join("").replace(/\s/g, "") !== text.replace(/\s/g, "")) {
-    return [text];
-  }
-
-  if (clauses.length <= 1) {
-    return [text];
-  }
-
-  const chunks: string[] = [];
-  let current = "";
-
-  clauses.forEach((clause) => {
-    if (!current) {
-      current = clause;
-      return;
+// Printed/PDF text often stores each typeset line as a paragraph. Join only
+// unfinished prose; retain sentence endings, list items and short headings.
+function repairWrappedParagraphs(paragraphs: string[], locale: ReadingLocale) {
+  const result: string[] = [];
+  const endsParagraph = /[。！？.!?…；;：:~～][”’"'）)\]]*$/;
+  const startsListItem = /^(?:[•●▪-]\s|\d+[.、)]\s*|[一二三四五六七八九十]+[、．])/;
+  for (const paragraph of paragraphs) {
+    const previous = result.at(-1);
+    const isHeading = previous && previous.length <= (locale === "zh" ? 18 : 40)
+      && !/[，,、。.!?！？；;：:]/.test(previous);
+    if (previous && !endsParagraph.test(previous) && !isHeading && !startsListItem.test(paragraph)) {
+      result[result.length - 1] = normalizeParagraphText(`${previous} ${paragraph}`, locale);
+    } else {
+      result.push(paragraph);
     }
-
-    const next = `${current}${joiner}${clause}`;
-    if (current.length >= targetLength || next.length > maxLength) {
-      chunks.push(current);
-      current = clause;
-      return;
-    }
-
-    current = next;
-  });
-
-  if (current) {
-    chunks.push(current);
   }
-
-  return chunks.filter(Boolean);
+  return result;
 }
 
 function splitLongManualParagraphs(
@@ -178,7 +155,6 @@ function splitLongManualParagraphs(
   const threshold = locale === "zh"
     ? options.manualSplitThresholdZh ?? 260
     : options.manualSplitThresholdEn ?? 420;
-  const hardCap = locale === "zh" ? 320 : 520;
 
   return paragraphs.flatMap((paragraph) => {
     if (paragraph.length < threshold) {
@@ -188,14 +164,7 @@ function splitLongManualParagraphs(
     const chunks = splitBySentenceGroups(paragraph, locale);
     const normalizedChunks = chunks.length > 1 ? chunks : [paragraph];
 
-    return normalizedChunks.flatMap((chunk) => {
-      if (chunk.length <= hardCap) {
-        return [chunk];
-      }
-
-      const clauseChunks = splitByClauseGroups(chunk, locale);
-      return clauseChunks.length > 1 ? clauseChunks : [chunk];
-    });
+    return normalizedChunks;
   });
 }
 
@@ -217,15 +186,19 @@ function splitParagraphs(
       ? normalized.split(/\n+/)
       : [normalized];
 
-  const manualParagraphs = rawParagraphs
+  const normalizedParagraphs = rawParagraphs
     .map((paragraph) => normalizeParagraphText(paragraph, locale))
     .filter(Boolean);
+
+  const manualParagraphs = options?.repairWrappedLines
+    ? repairWrappedParagraphs(normalizedParagraphs, locale)
+    : normalizedParagraphs;
 
   if (manualParagraphs.length > 1) {
     return splitLongManualParagraphs(manualParagraphs, locale, options);
   }
 
-  const singleParagraph = normalizeParagraphText(normalized, locale);
+  const singleParagraph = manualParagraphs[0] ?? "";
   if (!singleParagraph) {
     return [];
   }
@@ -260,9 +233,11 @@ export function getParagraphsByLocale(
 ) {
   const items = Array.isArray(content) ? content : [content];
 
-  return items.flatMap((item) => {
+  const paragraphs = items.flatMap((item) => {
     return splitParagraphs(getLocalizedText(item, locale), locale, singleLineBreakMode, options);
   });
+
+  return paragraphs;
 }
 
 function hasLocaleContent(content: BilingualProseContent, locale: ReadingLocale) {
@@ -296,110 +271,104 @@ function proseClasses(variant: ProseVariant, locale: ReadingLocale) {
     : `prose-block prose-block--en max-w-[42rem] text-[0.9rem] leading-[1.84] text-[var(--muted)]/90 ${alignmentClasses}`;
 }
 
-function ExpandableReadingText({
+export function ExpandableReadingText({
   paragraphs,
-  locale,
-  variant,
+  translations,
+  locale: controlledLocale,
+  showBoth = false,
+  expandable = true,
+  variant = "body",
   paragraphClassName,
 }: {
-  paragraphs: string[];
-  locale: ReadingLocale;
-  variant: ProseVariant;
+  paragraphs?: string[];
+  translations?: ReadingParagraphs;
+  locale?: ReadingLocale;
+  showBoth?: boolean;
+  expandable?: boolean;
+  variant?: ProseVariant;
   paragraphClassName?: string;
 }) {
-  const [expandedByLocale, setExpandedByLocale] = useState<Record<ReadingLocale, boolean>>({
-    zh: false,
-    en: false,
-  });
-  const [canExpand, setCanExpand] = useState(false);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const innerRef = useRef<HTMLDivElement | null>(null);
+  const [selectedLocale, setSelectedLocale] = useState<ReadingLocale>("zh");
+  const locale = controlledLocale ?? selectedLocale;
+  const [expanded, setExpanded] = useState(false);
+  const [columns, setColumns] = useState({ zh: 24, en: 56 });
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const expanded = expandedByLocale[locale];
+  const contentId = useId();
+  const original = useMemo(() => translations ?? {
+    zh: locale === "zh" ? paragraphs ?? [] : [],
+    en: locale === "en" ? paragraphs ?? [] : [],
+  }, [translations, paragraphs, locale]);
+  const excerpt = useMemo(() => getReadingPreview(original, columns), [original, columns]);
+  const canExpand = expandable && (["zh", "en"] as const).some(value =>
+    excerpt[value].join("") !== original[value].join(""));
+  const visible = expanded || !canExpand ? original : excerpt;
 
   useEffect(() => {
-    const element = contentRef.current;
-    const inner = innerRef.current;
-
-    if (!element || !inner) {
-      return;
-    }
-
-    const getCollapsedHeight = () => {
-      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-      return isDesktop ? 304 : 208;
-    };
-
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    let active = true;
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
     const measure = () => {
-      if (!inner) {
-        return;
+      if (!active || !context || !wrapper.clientWidth) return;
+      const width = showBoth && window.innerWidth > 860
+        ? (wrapper.clientWidth - 24) / 2 : wrapper.clientWidth;
+      const next = { zh: 24, en: 56 };
+      for (const value of ["zh", "en"] as const) {
+        const paragraph = wrapper.querySelector<HTMLParagraphElement>(`[data-reading-locale="${value}"] p`)
+          ?? wrapper.querySelector<HTMLParagraphElement>("p");
+        if (!paragraph) continue;
+        const style = getComputedStyle(paragraph);
+        context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        const sample = value === "zh" ? "观看作品的形态与艺术细节" : "The sculpture reveals its form and material through light. ";
+        const average = context.measureText(sample).width / sample.length;
+        const contentWidth = width - (showBoth && window.innerWidth > 860 && value === "en" ? 24 : 0);
+        next[value] = Math.max(8, Math.floor(contentWidth / average));
       }
-      const nextCanExpand = inner.scrollHeight - getCollapsedHeight() > 8;
-      setCanExpand(nextCanExpand);
+      setColumns(current => current.zh === next.zh && current.en === next.en ? current : next);
     };
-
-    measure();
-
     const observer = new ResizeObserver(measure);
-    observer.observe(inner);
+    observer.observe(wrapper);
     window.addEventListener("resize", measure);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [locale, paragraphs]);
+    void document.fonts.ready.then(measure);
+    measure();
+    return () => { active = false; observer.disconnect(); window.removeEventListener("resize", measure); };
+  }, [showBoth, locale]);
 
   function toggleExpanded() {
-    const wrapperTop = wrapperRef.current?.getBoundingClientRect().top ?? null;
-    const nextExpanded = !expanded;
-
-    setExpandedByLocale((current) => ({
-      ...current,
-      [locale]: nextExpanded,
-    }));
-
-    if (!nextExpanded && wrapperTop !== null) {
+    setExpanded(!expanded);
+    if (expanded) {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+        wrapperRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
       });
     }
   }
 
   return (
-    <div ref={wrapperRef} className="space-y-3">
-      <div
-        ref={contentRef}
-        data-expanded={expanded ? "true" : "false"}
-        className={`relative overflow-hidden transition-[max-height] duration-300 ease-out ${
-          !expanded ? "max-h-[13rem] md:max-h-[19rem]" : "max-h-[999rem]"
-        }`}
-      >
-        <div ref={innerRef} className="space-y-3 md:space-y-4">
-          {paragraphs.map((paragraph, index) => (
-            <p
-              key={`${locale}-${index}`}
-              lang={locale === "en" ? "en" : "zh-CN"}
-              className={`${proseClasses(variant, locale)} ${paragraphClassName ?? ""}`.trim()}
-            >
-              {paragraph}
-            </p>
-          ))}
-        </div>
-        {canExpand && !expanded ? (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--bg)] via-[rgba(244,240,232,0.9)] to-transparent" />
-        ) : null}
+    <div ref={wrapperRef} className="reading-excerpt" data-expanded={expanded ? "true" : "false"}>
+      {showBoth && !controlledLocale ? <div className="reading-excerpt-tabs" aria-label="阅读语言">
+        {(["zh", "en"] as const).map(value => <button key={value} type="button" aria-pressed={locale === value} onClick={() => setSelectedLocale(value)}>{value === "zh" ? "中文" : "English"}</button>)}
+      </div> : null}
+      <div id={contentId} className={showBoth ? "reading-excerpt-columns" : undefined}>
+        {(showBoth ? ["zh", "en"] as const : [locale]).map(value => (
+          <div key={value} data-reading-locale={value} data-active={locale === value}>
+            {visible[value].map((paragraph, index) => (
+              <p key={index} lang={value === "en" ? "en" : "zh-CN"}
+                className={`${proseClasses(variant, value)} ${paragraphClassName ?? ""}`.trim()}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        ))}
       </div>
       {canExpand ? (
-        <button
-          type="button"
-          onClick={toggleExpanded}
-          className="inline-flex min-h-11 cursor-pointer select-none items-center gap-1.5 text-[0.82rem] leading-6 tracking-[0.02em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)]"
-        >
-          {locale === "zh" ? (expanded ? "收起" : "查看更多") : expanded ? "Show less" : "View more"}
-          {expanded ? <span aria-hidden="true">∧</span> : null}
+        <button type="button" aria-expanded={expanded} aria-controls={contentId}
+          onClick={toggleExpanded} className="reading-excerpt-toggle">
+          {translations ? <><span>{expanded ? "收起" : "阅读全文"}</span><span lang="en">{expanded ? "Show less" : "Read more"}</span></>
+            : locale === "zh" ? (expanded ? "收起" : "阅读全文") : expanded ? "Show less" : "Read more"}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={expanded ? { transform: "rotate(180deg)" } : undefined}>
+            <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
         </button>
       ) : null}
     </div>
@@ -485,6 +454,7 @@ export function BilingualReadingPanel({
   manualSplitThresholdZh,
   manualSplitThresholdEn,
   autoSplitLongSingleParagraph = true,
+  repairWrappedLines = false,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -524,6 +494,7 @@ export function BilingualReadingPanel({
             manualSplitThresholdZh,
             manualSplitThresholdEn,
             autoSplitLongSingleParagraph,
+            repairWrappedLines,
           });
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",
@@ -550,7 +521,10 @@ export function BilingualReadingPanel({
               ) : null}
               {section.expandable ? (
                 <ExpandableReadingText
-                  paragraphs={paragraphs}
+                  translations={{
+                    zh: getParagraphsByLocale(section.content, "zh", singleLineBreakMode, { manualParagraphMode, manualSplitThresholdZh, manualSplitThresholdEn, autoSplitLongSingleParagraph, repairWrappedLines }),
+                    en: getParagraphsByLocale(section.content, "en", singleLineBreakMode, { manualParagraphMode, manualSplitThresholdZh, manualSplitThresholdEn, autoSplitLongSingleParagraph, repairWrappedLines }),
+                  }}
                   locale={locale}
                   variant={section.variant ?? "body"}
                   paragraphClassName={mergedParagraphClassName}

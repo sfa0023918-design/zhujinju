@@ -1,9 +1,137 @@
 .siteTheme {
+  --font-serif:
+    "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  --font-editorial:
+    "Instrument Serif", "Source Serif 4", "Zhujinju Song", Georgia, serif;
+  --font-song:
+    "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  --font-sans:
+    "Instrument Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", sans-serif;
+  --font-display: "Anton", "Arial Narrow", sans-serif;
+  --type-hero: 30px;
+  --type-hero-en: 22px;
+  --type-page: 26px;
+  --type-page-en: 18px;
+  --type-section: 22px;
+  --type-section-en: 18px;
+  --type-feature: 20px;
+  --type-feature-en: 18px;
+  --type-reading-title: 20px;
+  --type-reading-title-en: 18px;
+  --type-card: 16px;
+  --type-card-en: 16px;
+  --type-artwork: 20px;
+  --bg: #f3f1ec;
+  --surface: #f3f1ec;
+  --surface-2: #f3f1ec;
+  --surface-strong: #e9e6df;
+  --ink: #141311;
+  --muted: #5c5852;
+  --accent: #8f3b2b;
+  --accent-text: #8f3b2b;
+  --error: #87372f;
+  --success: #356247;
+  --status-available: #356247;
+  --status-acquired: #984438;
+  --reading-size: 17px;
+  --reading-paragraph-gap: 20px;
+  --warning: #71521b;
+  --line: rgba(20, 19, 17, 0.2);
+  --line-strong: #141311;
+  --content-width: 1480px;
+  --page-inline: 24px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-section: 64px;
+  --motion-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --paper: #f3f1ec;
+  --panel: #e9e6df;
+  --rust-ink: #f4ede4;
+  --rust-muted: #ead9cf;
+  --rust-line: rgba(244, 237, 228, 0.42);
+  --display-ink: #e6e1da;
+  --dark-ink: #efeae2;
+  --dark-muted: #a9a39a;
+  --dark-line: rgba(239, 234, 226, 0.2);
+  --catalogue-surface: #504d45;
+  --catalogue-ink: #f0ede4;
+  --catalogue-muted: #d1cbbf;
+  --catalogue-line: rgb(240 237 228 / 26%);
+  --catalogue-line-strong: #b2ac9f;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+@media (min-width: 768px) {
+  .siteTheme {
+    --page-inline: 40px;
+    --type-hero: 32px;
+    --type-hero-en: 24px;
+    --type-page: 30px;
+    --type-page-en: 20px;
+    --type-section: 24px;
+    --type-section-en: 19px;
+    --type-feature: 22px;
+    --type-feature-en: 19px;
+    --type-card: 18px;
+    --type-card-en: 17px;
+    --type-artwork: 22px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .siteTheme {
+    --type-hero: 36px;
+    --type-hero-en: 26px;
+    --type-page: 32px;
+    --type-page-en: 22px;
+    --type-section: 26px;
+    --type-section-en: 20px;
+    --type-feature: 24px;
+    --type-feature-en: 20px;
+    --type-reading-title: 22px;
+    --type-card: 19px;
+    --type-card-en: 18px;
+    --type-artwork: 24px;
+  }
+}
+.siteTheme :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.siteTheme input,
+.siteTheme textarea {
+  caret-color: var(--ink);
+}
+.siteTheme [data-artwork-status="inquiry"] {
+  color: var(--status-available);
+}
+.siteTheme [data-artwork-status="sold"] {
+  color: var(--status-acquired);
+}
+@media (max-width: 860px) {
+  .siteTheme {
+    --reading-size: 16px;
+    --reading-paragraph-gap: 18px;
+  }
+}
+
+/* Keep the approved journal palette and faces; inherit the shared type scale. */
+.legacyEditorial {
   --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
   --font-editorial: "Source Serif 4", Georgia, serif;
-  --type-page: 30px;
-  --type-section: 26px;
-  --type-artwork: 22px;
   --bg: #eeeae2;
   --surface: #f4f0e8;
   --surface-2: #f4f0e8;
@@ -26,37 +154,45 @@
   --space-xl: 40px;
   --space-section: 64px;
   --motion-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 100dvh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: auto;
+  --font-sans:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Source Han Sans SC", sans-serif;
   background: var(--bg);
   color: var(--ink);
 }
 
 @media (min-width: 768px) {
-  .siteTheme {
-    --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
-    --font-editorial: "Source Serif 4", Georgia, serif;
-    --type-page: 30px;
-    --type-section: 26px;
-    --type-artwork: 22px;
+  .legacyEditorial {
     --page-inline: 40px;
-    --type-page: 36px;
-    --type-section: 30px;
-    --type-artwork: 25px;
   }
 }
 
-@media (min-width: 1100px) {
-  .siteTheme {
-    --type-page: 40px;
-    --type-section: 32px;
-    --type-artwork: 26px;
-  }
+/* Shared reading rhythm and one bilingual disclosure control. */
+.siteTheme :global(.reading-excerpt) { min-width: 0; scroll-margin-top: 24px; }
+.siteTheme :global(.reading-excerpt-columns) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.siteTheme :global(.reading-excerpt-columns) > div { min-width: 0; }
+.siteTheme :global(.reading-excerpt-columns) > [data-reading-locale="en"] { border-left: 1px solid var(--line); padding-left: 24px; }
+.siteTheme :global(.reading-excerpt) :global(.prose-block) { max-width: none; font: 400 var(--reading-size)/1.9 var(--font-song); color: var(--ink); text-align: justify; overflow-wrap: break-word; }
+.siteTheme :global(.reading-excerpt) :global(.prose-block--en) { font-family: var(--font-sans); text-align: left; line-height: 1.8; }
+.siteTheme :global(.reading-excerpt) p + p { margin-top: var(--reading-paragraph-gap); }
+.siteTheme :global(.reading-excerpt-toggle) { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; margin-top: 24px; padding: 0; border: 0; border-bottom: 1px solid currentColor; border-radius: 0; background: transparent; color: var(--accent-text); font: 400 14px/1.5 var(--font-sans); cursor: pointer; }
+.siteTheme :global(.reading-excerpt-toggle):hover { color: var(--ink); }
+.siteTheme :global(.reading-excerpt-toggle) [lang="en"] { font-size: 13px; }
+.siteTheme :global(.reading-excerpt-tabs) { display: none; }
+@media (max-width: 860px) {
+  .siteTheme :global(.reading-excerpt-columns) { grid-template-columns: minmax(0, 1fr); }
+  .siteTheme :global(.reading-excerpt-columns) > div { grid-area: 1 / 1; }
+  .siteTheme :global(.reading-excerpt-columns) > [data-active="false"] { visibility: hidden; pointer-events: none; }
+  .siteTheme :global(.reading-excerpt-columns) > [data-reading-locale="en"] { border: 0; padding: 0; }
+  .siteTheme :global(.reading-excerpt-tabs) { display: flex; gap: 12px; margin-bottom: 20px; }
+  .siteTheme :global(.reading-excerpt-tabs) button { min-width: 44px; min-height: 44px; color: var(--muted); cursor: pointer; }
+  .siteTheme :global(.reading-excerpt-tabs) [aria-pressed="true"] { color: var(--ink); border-bottom: 1px solid currentColor; }
 }
-.siteTheme :is(a, button, input, select, textarea):focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 4px;
-}
-.siteTheme input,
-.siteTheme textarea {
-  caret-color: var(--ink);
+
+@media (max-width: 860px) {
+  .siteTheme :global(.reading-excerpt)[data-expanded="true"] :global(.reading-excerpt-columns) > [data-active="false"] { display: none; }
 }

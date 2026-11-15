@@ -1,0 +1,138 @@
+.viewer {
+  --ink: var(--catalogue-ink);
+  --muted: var(--catalogue-muted);
+  --accent-text: var(--catalogue-ink);
+  --line: var(--catalogue-line);
+  --line-strong: var(--catalogue-line-strong);
+  --surface: var(--catalogue-surface);
+  --surface-strong: var(--catalogue-surface);
+  color: var(--catalogue-ink);
+}
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.heading h2 {
+  font: 400 var(--type-section)/1.35 var(--font-song);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.heading h2 span {
+  margin-left: 18px;
+  font: italic var(--type-section-en)/1.3 var(--font-editorial);
+  color: var(--catalogue-muted);
+}
+.fullscreenButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 14px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  cursor: pointer;
+}
+.fullscreenButton span {
+  font-size: 13px;
+}
+.catalogueInfo {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  font-size: 13px;
+  color: var(--catalogue-muted);
+  margin: 20px 0 36px;
+}
+.catalogueInfo p {
+  margin: 0;
+  max-width: 48%;
+}
+.catalogueInfo span {
+  display: block;
+  margin-top: 4px;
+}
+.stage {
+  display: grid;
+  gap: 0;
+  touch-action: pan-y;
+}
+.stage:focus-visible,
+.viewer button:focus-visible {
+  outline: 2px solid var(--catalogue-ink);
+  outline-offset: 3px;
+}
+.pageFrame,
+.page {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.page {
+  object-fit: contain;
+  clip-path: inset(0 0 0.5% 0);
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 36px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+.controls > span {
+  margin-right: 20px;
+}
+.controls button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--catalogue-line-strong);
+  background: none;
+  cursor: pointer;
+}
+.controls button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.controls button:hover:not(:disabled) {
+  border-color: var(--catalogue-ink);
+}
+.progress {
+  flex: 1;
+  height: 1px;
+  background: var(--catalogue-line);
+  position: relative;
+  margin-right: 20px;
+}
+.progress span {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  height: 3px;
+  background: var(--catalogue-ink);
+}
+@media (max-width: 860px) {
+  .heading h2 {
+    font: 400 var(--type-section)/1.35 var(--font-song);
+  }
+  .heading h2 span {
+    margin-left: 12px;
+    font: italic var(--type-section-en)/1.3 var(--font-editorial);
+  }
+  .catalogueInfo {
+    display: block;
+    margin: 20px 0 28px;
+  }
+  .catalogueInfo p {
+    max-width: none;
+    font-size: 12px;
+  }
+  .catalogueInfo p + p {
+    margin-top: 12px;
+  }
+}

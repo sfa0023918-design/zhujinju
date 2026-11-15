@@ -16,7 +16,7 @@ export const KNOWN_ZH_COPY_TYPO_FIXES: CopyFixRule[] = [
 ];
 
 const KNOWN_ENGLISH_TERM_FIXES: Array<{ pattern: RegExp; replacement: string }> = [
-  { pattern: /\bTibet\b/g, replacement: "Xizang" },
+  { pattern: /\bXizang\b/gi, replacement: "Tibet" },
 ];
 
 const CJK_CHAR_PATTERN = /[\u3400-\u9FFF]/;

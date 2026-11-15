@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { getArtworkCatalogueReference } from "@/lib/data/catalogue-pages";
 import { ArtworkDetailTemplate } from "@/components/artwork-detail-template";
 import { getAdminSession } from "@/lib/admin-auth";
 import { resolveArtworkPrimaryImage } from "@/lib/image-url";
@@ -38,7 +39,8 @@ export async function generateMetadata({
   const { slug } = await params;
   const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const includeDrafts =
+    query.preview === "1" ? Boolean(await getAdminSession()) : false;
   const artwork = getArtworkBySlug(content, slug, { includeDrafts });
 
   if (!artwork) {
@@ -59,23 +61,40 @@ export async function generateMetadata({
   });
 }
 
-export default async function ArtworkDetailPage({ params, searchParams }: ArtworkDetailPageProps) {
+export default async function ArtworkDetailPage({
+  params,
+  searchParams,
+}: ArtworkDetailPageProps) {
   const { slug } = await params;
   const query = (await searchParams) ?? {};
   const content = await loadSiteContent();
-  const includeDrafts = query.preview === "1" ? Boolean(await getAdminSession()) : false;
+  const includeDrafts =
+    query.preview === "1" ? Boolean(await getAdminSession()) : false;
   const artwork = getArtworkBySlug(content, slug, { includeDrafts });
 
   if (!artwork) {
     notFound();
   }
 
-  const relatedWorks = getRelatedArtworks(content, artwork.slug, artwork.category.zh);
-  const relatedArticles = getArticlesBySlugs(content, artwork.relatedArticleSlugs);
-  const relatedExhibitions = getExhibitionsBySlugs(content, artwork.relatedExhibitionSlugs);
+  const relatedWorks = getRelatedArtworks(
+    content,
+    artwork.slug,
+    artwork.category.zh,
+  );
+  const relatedArticles = getArticlesBySlugs(
+    content,
+    artwork.relatedArticleSlugs,
+  );
+  const relatedExhibitions = getExhibitionsBySlugs(
+    content,
+    artwork.relatedExhibitionSlugs,
+  );
+
+  const catalogue = getArtworkCatalogueReference(artwork, content.exhibitions);
 
   return (
     <ArtworkDetailTemplate
+      catalogue={catalogue}
       artwork={artwork}
       detailCopy={content.pageCopy.artworkDetail}
       siteConfig={content.siteConfig}

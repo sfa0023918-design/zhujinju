@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 
-import { bt } from "@/lib/bilingual";
 import type { CollectionFacets } from "@/lib/collection-facets";
-import { buildCollectionHref, COLLECTION_FILTER_KEYS } from "@/lib/collection-filtering";
+import { buildCollectionHref } from "@/lib/collection-filtering";
 import type { CollectionFilterKey } from "@/lib/collection-filtering";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -84,13 +83,11 @@ export function CollectionFilters({
   current,
   options,
   labels,
-  resultCount,
   onNavigate,
 }: CollectionFiltersProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<number | null>(null);
   const [openKey, setOpenKey] = useState<FilterKey | null>(null);
-  const resultCountLabel = bt(`${resultCount} 件作品`, `${resultCount} works`);
 
   const cancelClose = () => {
     if (closeTimerRef.current !== null) {
@@ -99,7 +96,10 @@ export function CollectionFilters({
     }
   };
 
-  const handleFilterLinkClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleFilterLinkClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
     cancelClose();
     setOpenKey(null);
 
@@ -119,18 +119,26 @@ export function CollectionFilters({
 
   const filterFields = useMemo(
     () =>
-      COLLECTION_FILTER_KEYS.map((name) => ({
-        name,
-        label: labels[name],
-        total: options.facets[name].total,
-        options: options.facets[name].options,
-      })),
+      (["category", "period", "region", "material", "status"] as const).map(
+        (name) => ({
+          name,
+          label: labels[name],
+          total: options.facets[name].total,
+          options: options.facets[name].options,
+        }),
+      ),
     [labels, options],
   );
 
   useEffect(() => {
     setOpenKey(null);
-  }, [current.category, current.region, current.period, current.material, current.status]);
+  }, [
+    current.category,
+    current.region,
+    current.period,
+    current.material,
+    current.status,
+  ]);
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -162,7 +170,8 @@ export function CollectionFilters({
       <div className={styles.filters}>
         {filterFields.map((field) => {
           const currentLabel =
-            field.options.find((option) => option.value === current[field.name])?.label ?? options.all;
+            field.options.find((option) => option.value === current[field.name])
+              ?.label ?? options.all;
           const isOpen = openKey === field.name;
 
           return (
@@ -179,14 +188,25 @@ export function CollectionFilters({
               <button
                 type="button"
                 className={styles.filterTrigger}
+                data-selected={Boolean(current[field.name])}
                 aria-expanded={isOpen}
                 onClick={() => {
                   cancelClose();
-                  setOpenKey((previous) => (previous === field.name ? null : field.name));
+                  setOpenKey((previous) =>
+                    previous === field.name ? null : field.name,
+                  );
                 }}
               >
-                <FilterBilingualPair text={field.label} className={styles.filterLabel} />
-                <FilterBilingualPair text={currentLabel} className={styles.filterValue} />
+                <FilterBilingualPair
+                  text={field.label}
+                  className={styles.filterLabel}
+                />
+                <span className={styles.filterValue}>
+                  {currentLabel.zh} {currentLabel.en}
+                </span>
+                <svg viewBox="0 0 12 12" aria-hidden="true">
+                  <path d="m2 4 4 4 4-4" />
+                </svg>
               </button>
 
               {isOpen ? (
@@ -194,7 +214,12 @@ export function CollectionFilters({
                   <Link
                     href={buildFilterHref(current, field.name)}
                     aria-current={!current[field.name] ? "true" : undefined}
-                    onClick={(event) => handleFilterLinkClick(event, buildFilterHref(current, field.name))}
+                    onClick={(event) =>
+                      handleFilterLinkClick(
+                        event,
+                        buildFilterHref(current, field.name),
+                      )
+                    }
                   >
                     <FilterBilingualPair text={options.all} />
                     <span className={styles.filterCount}>{field.total}</span>
@@ -203,9 +228,16 @@ export function CollectionFilters({
                     <Link
                       key={`${field.name}-${option.value}`}
                       href={buildFilterHref(current, field.name, option.value)}
-                      aria-current={current[field.name] === option.value ? "true" : undefined}
+                      aria-current={
+                        current[field.name] === option.value
+                          ? "true"
+                          : undefined
+                      }
                       onClick={(event) =>
-                        handleFilterLinkClick(event, buildFilterHref(current, field.name, option.value))
+                        handleFilterLinkClick(
+                          event,
+                          buildFilterHref(current, field.name, option.value),
+                        )
                       }
                     >
                       <FilterBilingualPair text={option.label} />
@@ -219,12 +251,18 @@ export function CollectionFilters({
         })}
       </div>
 
-      <div className={styles.filterSummary}>
-        <FilterBilingualPair text={resultCountLabel} />
-        <Link href="/collection" onClick={(event) => handleFilterLinkClick(event, "/collection")}>
-          <FilterBilingualPair text={labels.reset} />
-        </Link>
-      </div>
+      {Object.values(current).some(Boolean) ? (
+        <div className={styles.filterSummary}>
+          <Link
+            href="/collection"
+            onClick={(event) => handleFilterLinkClick(event, "/collection")}
+          >
+            <span>
+              重置 <span lang="en">Reset</span>
+            </span>
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

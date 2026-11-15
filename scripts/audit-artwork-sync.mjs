@@ -3,7 +3,13 @@ import { execSync } from "node:child_process";
 const siteBaseUrl = process.env.SITE_BASE_URL ?? "https://www.zhujinju.com";
 
 function readRemoteContent() {
-  return JSON.parse(execSync("git show origin/main:content/site-content.json", { encoding: "utf8" }));
+  return JSON.parse(
+    execSync("git show origin/main:content/site-content.json", {
+      encoding: "utf8",
+      // The live content file now exceeds execSync's default 1 MiB output buffer.
+      maxBuffer: 16 * 1024 * 1024,
+    }),
+  );
 }
 
 function readRemoteFile(repoPath) {
@@ -30,7 +36,9 @@ async function main() {
   const issues = [];
 
   for (const artwork of content.artworks) {
-    const expectedMedia = [artwork.image, ...(artwork.gallery ?? [])].filter(Boolean);
+    const expectedMedia = [artwork.image, ...(artwork.gallery ?? [])].filter(
+      Boolean,
+    );
     const pageUrl = `${siteBaseUrl}/collection/${artwork.slug}`;
     const html = await fetchHtml(pageUrl);
 
@@ -58,7 +66,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`Artwork media audit passed for ${content.artworks.length} artworks.`);
+  console.log(
+    `Artwork media audit passed for ${content.artworks.length} artworks.`,
+  );
 }
 
 main().catch((error) => {
