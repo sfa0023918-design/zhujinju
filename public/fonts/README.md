@@ -36,3 +36,17 @@ The source directory contains `SourceHanSerifSC-Medium.otf`,
 `InstrumentSerif-Regular.ttf`, `InstrumentSerif-Italic.ttf`, `InstrumentSans.ttf`
 (the upstream `InstrumentSans[wdth,wght].ttf`), `Anton-Regular.ttf`, and the three
 Latin license files named above. Generated rules: `app/(site)/contemporary-fonts.css`.
+
+## Reading subsets (2026-11-15)
+
+The public layout now imports `reading-fonts.css`. Chinese Regular and Medium
+retain the exact Source Han Serif SC 2.003 glyphs, metrics, weights and licenses.
+Common titles form a small core; remaining current-site text is grouped by use.
+The old disjoint Unicode blocks remain available for characters introduced later
+through the CMS. Their advertised ranges exclude the new groups, so coverage
+is complete without duplicate downloads. Latin faces are unchanged.
+
+Rebuild with `python scripts/build-reading-fonts.py /path/to/source-fonts`, using
+the original Regular and Medium OTFs. Content hashes in new asset filenames
+prevent cache conflicts. `lib/data/reading-fonts.json` records glyph counts,
+sizes and the preload filenames. Existing font assets are retained.

@@ -5,7 +5,7 @@ export const pageCopy = {
     footer: {
       intro: bt(
         "关注喜马拉雅艺术、藏传佛教艺术及相关亚洲古代艺术，以作品、展览、图录与研究建立长期判断。",
-        "Focused on Himalayan art, Xizang Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research.",
+        "Focused on Himalayan art, Tibetan Buddhist art, and related Asian antiquities, with long-term judgement built through objects, exhibitions, catalogues, and research.",
       ),
       appointment: bt("By Appointment in Chengdu", "By Appointment in Chengdu"),
       copyrightLabel: bt("版权所有", "Copyright"),

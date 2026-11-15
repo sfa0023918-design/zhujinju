@@ -53,13 +53,13 @@
   display: inline-flex;
   align-items: center;
   gap: 14px;
-  height: 52px;
+  height: 48px;
   padding: 0 24px;
   background: var(--ink);
   color: var(--paper);
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
 }
 .button > span {
   display: inline-flex;
@@ -84,9 +84,9 @@
   min-height: 44px;
   padding: 8px 0 7px;
   border-bottom: 1px solid currentColor;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
 }
 .textLink > span {
   display: inline-flex;
@@ -96,6 +96,33 @@
 .hero {
   position: relative;
 }
+.hero[data-native-carousel="true"] .heroField {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: none;
+  scrollbar-width: none;
+}
+.heroField::-webkit-scrollbar { display: none; }
+.hero[data-native-carousel="true"] .slide {
+  position: relative;
+  inset: auto;
+  flex: 0 0 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  transition: none;
+}
+.hero[data-native-carousel="true"] .heroCopy {
+  pointer-events: none;
+}
+.hero[data-native-carousel="true"] .heroCopy a {
+  pointer-events: auto;
+}
+.hero[data-native-carousel="true"] .caption { transition-duration: 180ms; }
 .heroField {
   position: relative;
   height: clamp(520px, 58.06vw, 836px);
@@ -111,31 +138,63 @@
   transition: opacity 1.4s ease;
 }
 .heroImageFrame {
+  --photo-mask: linear-gradient(to right, transparent, #000 var(--fade));
+  --photo-top-mask: linear-gradient(#000, #000);
   height: var(--image-height);
   width: auto;
   flex: none;
   align-self: flex-end;
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 var(--fade)
-  );
-  mask-image: linear-gradient(to right, transparent 0, #000 var(--fade));
+  transform: translateY(var(--image-shift));
+  -webkit-mask-image: var(--photo-mask), var(--photo-top-mask);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--photo-mask), var(--photo-top-mask);
+  mask-composite: intersect;
 }
 .topFade {
-  -webkit-mask-image:
-    linear-gradient(to right, transparent 0, #000 var(--fade)),
-    linear-gradient(to bottom, transparent 0, #000 5%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(to right, transparent 0, #000 var(--fade)),
-    linear-gradient(to bottom, transparent 0, #000 5%);
-  mask-composite: intersect;
+  --photo-top-mask: linear-gradient(to bottom, transparent, #000 5%);
+}
+.bottomFade {
+  /* Only the photographic surface below the complete base is blended away. */
+  -webkit-mask-image: var(--photo-mask), var(--photo-top-mask), linear-gradient(to bottom, #000 94%, transparent 97%);
+  mask-image: var(--photo-mask), var(--photo-top-mask), linear-gradient(to bottom, #000 94%, transparent 97%);
 }
 .heroImage {
   height: 100%;
   width: auto;
   max-width: none;
+}
+.framedArtwork {
+  margin: 0 40px 0 0;
+  transform: translateY(-5%);
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+@media (min-width: 861px) {
+  .slide[data-shaded="true"] {
+    background-image: linear-gradient(to right, rgb(40 28 16 / 48%), rgb(40 28 16 / 38%) 46%, transparent 78%), var(--slide-background);
+  }
+  .slide[data-shaded="true"]::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 88px;
+    background: linear-gradient(to bottom, rgb(40 28 16 / 18%), transparent);
+    pointer-events: none;
+  }
+  .hero[data-hero-tone="light"] .heroCopy {
+    color: #f4efe7;
+    --accent-text: #f4efe7;
+  }
+  .hero[data-hero-tone="light"] .heroSecondary {
+    color: #f4efe7;
+  }
+  .hero[data-hero-tone="light"] .button:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .hero[data-hero-tone="light"] .heroCopy a:focus-visible {
+    outline-color: #f4efe7;
+  }
 }
 .heroCopy {
   position: absolute;
@@ -148,12 +207,15 @@
 }
 .heroCopy h1 {
   margin-top: 22px;
-  font: 500 clamp(52px, 5.556vw, 80px) / 1.1 var(--font-song);
+  font: 400 var(--type-hero)/1.3 var(--font-song);
   letter-spacing: 0.04em;
+  font-weight: 400;
+  line-height: 1.3;
 }
 .heroCopy .heroEnglish {
   margin-top: 6px;
-  font: italic 400 clamp(29px, 3.195vw, 46px) / 1.12 var(--font-editorial);
+  font: italic 400 var(--type-hero-en)/1.3 var(--font-editorial);
+  line-height: 1.3;
 }
 .heroActions {
   display: flex;
@@ -173,7 +235,7 @@
   height: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 220px 0 40px;
+  padding: 0 280px 0 40px;
   display: flex;
   align-items: center;
   gap: 32px;
@@ -191,7 +253,11 @@
 .captionTitle {
   display: inline-flex;
   align-items: baseline;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.3;
 }
 .captionTitle > span:first-child {
   font-family: var(--font-song);
@@ -199,9 +265,12 @@
   letter-spacing: 0.06em;
 }
 .captionTitle > span:last-child {
-  font: italic 400 21px/1.7 var(--font-editorial);
+  font: italic 400 21px/1.3 var(--font-editorial);
 }
 .captionFacts {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 14px;
   color: var(--muted);
 }
@@ -212,6 +281,7 @@
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.12em;
+  flex-shrink: 0;
 }
 .statusDot {
   display: inline-block;
@@ -243,6 +313,7 @@
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.06em;
+  flex-shrink: 0;
 }
 .captionGo small {
   font-size: 13px;
@@ -271,6 +342,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.playback {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.exhibitionActions .textLink small {
+  opacity: 1;
 }
 .tick span {
   display: block;
@@ -303,12 +388,13 @@
   max-width: 900px;
 }
 .statementZh {
-  font: 400 34px/1.62 var(--font-song);
+  font: 400 var(--type-feature)/1.62 var(--font-song);
   letter-spacing: 0.02em;
   text-wrap: pretty;
+  font-weight: 400;
 }
 .statementEn {
-  font: 400 25px/1.36 var(--font-editorial);
+  font: 400 var(--type-feature-en)/1.36 var(--font-editorial);
   color: var(--muted);
   max-width: 30em;
   text-wrap: pretty;
@@ -353,7 +439,7 @@
   gap: 26px;
 }
 .wordmark {
-  font: 400 clamp(106px, 12.223vw, 176px) / 0.98 var(--font-display);
+  font: 400 clamp(88px, 8.889vw, 128px) / 0.98 var(--font-display);
   letter-spacing: 0.01em;
   color: var(--display-ink);
   text-transform: uppercase;
@@ -389,11 +475,12 @@
 }
 .exhibitionHeading h2 {
   margin-top: 6px;
-  font: 500 clamp(34px, 3.195vw, 46px) / 1.2 var(--font-song);
+  font: 400 var(--type-page)/1.3 var(--font-song);
   letter-spacing: 0.03em;
+  font-weight: 400;
 }
 .exhibitionHeading > p {
-  font: italic 400 clamp(23px, 2.084vw, 30px) / 1.2 var(--font-editorial);
+  font: italic 400 var(--type-page-en)/1.3 var(--font-editorial);
 }
 .exhibitionFacts {
   border-top: 1px solid var(--rust-line);
@@ -453,11 +540,12 @@
   gap: 4px;
 }
 .headingCopy h2 {
-  font: 500 44px/1.25 var(--font-song);
+  font: 400 var(--type-section)/1.35 var(--font-song);
   letter-spacing: 0.04em;
+  font-weight: 400;
 }
 .headingCopy > p {
-  font: italic 400 28px/1.2 var(--font-editorial);
+  font: italic 400 var(--type-section-en)/1.3 var(--font-editorial);
   color: var(--muted);
 }
 .mobileHeadingAction,
@@ -580,11 +668,12 @@
 }
 .featureCopy h3 {
   margin-top: 8px;
-  font: 500 34px/1.32 var(--font-song);
+  font: 400 var(--type-feature)/1.4 var(--font-song);
   letter-spacing: 0.04em;
+  font-weight: 400;
 }
 .featureEnglish {
-  font: italic 400 24px/1.22 var(--font-editorial);
+  font: italic 400 var(--type-feature-en)/1.35 var(--font-editorial);
 }
 .featureCopy .featureExcerpt {
   margin-top: 8px;
@@ -671,9 +760,12 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    height: 54px;
+    height: 48px;
     padding: 0 20px;
     gap: 12px;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
   }
   .button > span {
     display: block;
@@ -686,39 +778,32 @@
   }
   .slide {
     align-items: center;
-    background: var(--slide-mobile);
+    justify-content: center;
+    background: var(--slide-background);
   }
   .heroImageFrame {
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: min(var(--mobile-height), calc(100vw * var(--image-ratio) * var(--mobile-scale)));
     align-self: auto;
-    -webkit-mask-image: none;
-    mask-image: none;
+    transform: translateY(var(--mobile-shift));
+    --photo-mask: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    --photo-top-mask: linear-gradient(to bottom, transparent, #000 6%, #000 95%, transparent);
   }
   .heroImage {
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+  }
+  .framedArtwork {
+    width: calc(100% - 40px);
+    height: 90%;
+    margin: 0;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .framedArtwork .heroImage {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-  }
-  .mobileContain {
-    height: auto;
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      #000 16%,
-      #000 88%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      #000 16%,
-      #000 88%,
-      transparent 100%
-    );
-  }
-  .mobileContain .heroImage {
-    height: auto;
   }
   .captionBar {
     height: 76px;
@@ -739,7 +824,8 @@
     display: none;
   }
   .captionTitle {
-    gap: 9px;
+    max-width: 100%;
+    gap: 0 9px;
   }
   .captionTitle > span:first-child {
     font-size: 17px;
@@ -776,13 +862,14 @@
   }
   .heroCopy h1 {
     margin-top: 20px;
-    font-size: 52px;
-    line-height: 1.12;
+    font-size: var(--type-hero);
+    line-height: 1.3;
+    font-weight: 400;
   }
   .heroCopy .heroEnglish {
     margin-top: 10px;
-    font-size: 29px;
-    line-height: 1.15;
+    font-size: var(--type-hero-en);
+    line-height: 1.3;
   }
   .heroActions {
     flex-direction: column;
@@ -811,11 +898,12 @@
     gap: 22px;
   }
   .statementZh {
-    font-size: 22px;
+    font-size: var(--type-feature);
     line-height: 1.72;
+    font-weight: 400;
   }
   .statementEn {
-    font-size: 19px;
+    font-size: var(--type-feature-en);
     line-height: 1.38;
     max-width: none;
   }
@@ -878,8 +966,9 @@
     gap: 6px;
   }
   .exhibitionHeading h2 {
-    font-size: 32px;
+    font-size: var(--type-page);
     line-height: 1.25;
+    font-weight: 400;
   }
   .exhibitionHeading > p {
     font-size: 23px;
@@ -922,8 +1011,9 @@
     gap: 2px;
   }
   .headingCopy h2 {
-    font-size: 30px;
+    font-size: var(--type-section);
     line-height: 1.3;
+    font-weight: 400;
   }
   .headingCopy > p {
     font-size: 22px;
@@ -1022,11 +1112,12 @@
   }
   .featureCopy h3 {
     margin-top: 0;
-    font-size: 28px;
+    font-size: var(--type-feature);
     line-height: 1.35;
+    font-weight: 400;
   }
   .featureEnglish {
-    font-size: 21px;
+    font-size: var(--type-feature-en);
   }
   .featureCopy .featureExcerpt {
     margin-top: 4px;
@@ -1073,79 +1164,10 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .slide,
+  .heroImageFrame,
   .caption,
   .tick span {
     transition: none !important;
-  }
-}
-
-/* 2026-11-15: owner requested a quieter scale based on the existing live site. */
-.heroCopy h1 {
-  font-size: clamp(40px, 3.889vw, 56px);
-}
-.heroCopy .heroEnglish {
-  font-size: clamp(25px, 2.223vw, 32px);
-}
-.statementZh {
-  font-size: 26px;
-}
-.statementEn {
-  font-size: 22px;
-}
-.wordmark {
-  font-size: clamp(88px, 8.889vw, 128px);
-}
-.exhibitionHeading h2 {
-  font-size: clamp(30px, 2.5vw, 36px);
-}
-.exhibitionHeading p {
-  font-size: 26px;
-}
-.headingCopy h2 {
-  font-size: 32px;
-}
-.headingCopy p {
-  font-size: 24px;
-}
-.featureCopy h3 {
-  font-size: 28px;
-}
-.featureEnglish {
-  font-size: 22px;
-}
-@media (max-width: 860px) {
-  .heroCopy h1 {
-    font-size: 36px;
-  }
-  .heroCopy .heroEnglish {
-    font-size: 24px;
-  }
-  .statementZh {
-    font-size: 20px;
-  }
-  .statementEn {
-    font-size: 18px;
-  }
-  .wordmark {
-    font-size: 72px;
-  }
-  .exhibitionHeading h2 {
-    font-size: 30px;
-  }
-  .exhibitionHeading p {
-    font-size: 22px;
-  }
-  .headingCopy h2 {
-    font-size: 26px;
-  }
-  .headingCopy p {
-    font-size: 21px;
-  }
-  .featureCopy h3 {
-    font-size: 24px;
-  }
-  .featureEnglish {
-    font-size: 20px;
   }
 }
 
@@ -1153,18 +1175,17 @@
 @media (min-width: 561px) and (max-width: 860px) {
   .heroField { height: 540px; }
   .slide { justify-content: center; }
-  .heroImageFrame { width: auto; max-width: 100%; height: 100%; }
-  .heroImage { width: auto; max-width: 100%; height: 100%; object-fit: contain; }
-  .mobileContain { width: 100%; height: 100%; }
-  .mobileContain .heroImage { width: 100%; height: 100%; object-fit: contain; }
+  .heroImageFrame:not(.framedArtwork) {
+    --photo-mask: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  }
 }
 
 @media (pointer: coarse) {
   .tick { width: 44px; }
-  .caption { padding-right: 280px; }
+  .caption { padding-right: 326px; }
 }
-@media (pointer: coarse) and (max-width: 860px) {
-  .captionBar { height: 108px; }
-  .caption { top: 0; bottom: auto; right: 20px; height: 64px; padding: 0; }
+@media (max-width: 860px) {
+  .captionBar { height: 120px; }
+  .caption { top: 0; bottom: auto; right: 20px; height: 76px; padding: 0; }
   .ticks { top: auto; bottom: 0; right: 20px; height: 44px; }
 }

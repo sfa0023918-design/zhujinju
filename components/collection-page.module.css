@@ -22,12 +22,12 @@
 }
 .heroTitleGroup h1 {
   margin: 0;
-  font: 500 44px/1.15 var(--font-song);
-  letter-spacing: 0.06em;
+  font: 400 var(--type-page)/1.3 var(--font-song);
+  letter-spacing: 0.03em;
 }
 .heroTitleGroup p {
   margin: 0;
-  font: italic 32px/1.1 var(--font-editorial);
+  font: italic var(--type-page-en)/1.3 var(--font-editorial);
   color: var(--muted);
 }
 .totalCount {
@@ -80,7 +80,7 @@
   align-items: baseline;
 }
 .filterLabel .zh {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.06em;
 }
@@ -253,10 +253,11 @@
     gap: 14px;
   }
   .heroTitleGroup h1 {
-    font-size: 34px;
+    font: 400 var(--type-page)/1.3 var(--font-song);
+    letter-spacing: 0.03em;
   }
   .heroTitleGroup p {
-    font-size: 25px;
+    font: italic var(--type-page-en)/1.3 var(--font-editorial);
   }
   .totalCount {
     flex-direction: row;

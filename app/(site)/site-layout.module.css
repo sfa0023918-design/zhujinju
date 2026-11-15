@@ -9,9 +9,19 @@
     "Instrument Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
     "Noto Sans SC", sans-serif;
   --font-display: "Anton", "Arial Narrow", sans-serif;
-  --type-page: 30px;
-  --type-section: 26px;
-  --type-artwork: 22px;
+  --type-hero: 30px;
+  --type-hero-en: 22px;
+  --type-page: 26px;
+  --type-page-en: 18px;
+  --type-section: 22px;
+  --type-section-en: 18px;
+  --type-feature: 20px;
+  --type-feature-en: 18px;
+  --type-reading-title: 20px;
+  --type-reading-title-en: 18px;
+  --type-card: 16px;
+  --type-card-en: 16px;
+  --type-artwork: 20px;
   --bg: #f3f1ec;
   --surface: #f3f1ec;
   --surface-2: #f3f1ec;
@@ -24,7 +34,7 @@
   --success: #356247;
   --status-available: #356247;
   --status-acquired: #984438;
-  --reading-size: 18px;
+  --reading-size: 17px;
   --reading-paragraph-gap: 20px;
   --warning: #71521b;
   --line: rgba(20, 19, 17, 0.2);
@@ -47,6 +57,11 @@
   --dark-ink: #efeae2;
   --dark-muted: #a9a39a;
   --dark-line: rgba(239, 234, 226, 0.2);
+  --catalogue-surface: #504d45;
+  --catalogue-ink: #f0ede4;
+  --catalogue-muted: #d1cbbf;
+  --catalogue-line: rgb(240 237 228 / 26%);
+  --catalogue-line-strong: #b2ac9f;
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.7;
@@ -61,26 +76,35 @@
 
 @media (min-width: 768px) {
   .siteTheme {
-    --font-serif:
-      "Zhujinju Song", "Source Han Serif SC", "Noto Serif SC", "Songti SC",
-      serif;
-    --font-editorial:
-      "Instrument Serif", "Source Serif 4", "Zhujinju Song", Georgia, serif;
-    --type-page: 30px;
-    --type-section: 26px;
-    --type-artwork: 22px;
     --page-inline: 40px;
-    --type-page: 36px;
-    --type-section: 30px;
-    --type-artwork: 25px;
+    --type-hero: 32px;
+    --type-hero-en: 24px;
+    --type-page: 30px;
+    --type-page-en: 20px;
+    --type-section: 24px;
+    --type-section-en: 19px;
+    --type-feature: 22px;
+    --type-feature-en: 19px;
+    --type-card: 18px;
+    --type-card-en: 17px;
+    --type-artwork: 22px;
   }
 }
 
 @media (min-width: 1100px) {
   .siteTheme {
-    --type-page: 40px;
-    --type-section: 32px;
-    --type-artwork: 26px;
+    --type-hero: 36px;
+    --type-hero-en: 26px;
+    --type-page: 32px;
+    --type-page-en: 22px;
+    --type-section: 26px;
+    --type-section-en: 20px;
+    --type-feature: 24px;
+    --type-feature-en: 20px;
+    --type-reading-title: 22px;
+    --type-card: 19px;
+    --type-card-en: 18px;
+    --type-artwork: 24px;
   }
 }
 .siteTheme :is(a, button, input, select, textarea):focus-visible {
@@ -104,13 +128,10 @@
   }
 }
 
-/* Keep the approved editorial body isolated from the new global palette/type. */
+/* Keep the approved journal palette and faces; inherit the shared type scale. */
 .legacyEditorial {
   --font-serif: "Zhujinju Song", "Songti SC", "STSong", serif;
   --font-editorial: "Source Serif 4", Georgia, serif;
-  --type-page: 30px;
-  --type-section: 26px;
-  --type-artwork: 22px;
   --bg: #eeeae2;
   --surface: #f4f0e8;
   --surface-2: #f4f0e8;
@@ -147,16 +168,6 @@
 @media (min-width: 768px) {
   .legacyEditorial {
     --page-inline: 40px;
-    --type-page: 36px;
-    --type-section: 30px;
-    --type-artwork: 25px;
-  }
-}
-@media (min-width: 1100px) {
-  .legacyEditorial {
-    --type-page: 40px;
-    --type-section: 32px;
-    --type-artwork: 26px;
   }
 }
 

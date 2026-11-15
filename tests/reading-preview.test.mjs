@@ -4,12 +4,12 @@ import vm from "node:vm";
 import test from "node:test";
 import ts from "typescript";
 
-const module = { exports: {} };
+const readingModule = { exports: {} };
 const code = ts.transpileModule(fs.readFileSync(new URL("../lib/reading-preview.ts", import.meta.url), "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
-vm.runInNewContext(`(function(exports,module){${code}\n})`)(module.exports, module);
-const { getReadingPreview } = module.exports;
+vm.runInNewContext(`(function(exports,module){${code}\n})`)(readingModule.exports, readingModule);
+const { getReadingPreview } = readingModule.exports;
 const content = JSON.parse(fs.readFileSync(new URL("../content/site-content.json", import.meta.url), "utf8"));
 
 test("the long Hevajra passage folds without losing source or cutting a sentence", () => {

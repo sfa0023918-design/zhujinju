@@ -15,8 +15,18 @@ const stopMessage = /已停止保存以避免覆盖现有数据/;
 
 // Load the real TypeScript modules with only Next's cache, filesystem I/O and
 // fetch isolated. Tests cannot contact GitHub or write any content/media files.
-function harness({ failure, env = {} } = {}) {
-  const state = { body: fixture, puts: 0, reads: 0, localReads: 0, localWrites: 0 };
+function harness({ failure, env = {}, withDraft = false } = {}) {
+  const testContent = JSON.parse(fixture);
+  if (withDraft) {
+    testContent.artworks.unshift({
+      ...structuredClone(testContent.artworks[0]),
+      id: "isolated-test-draft",
+      slug: "isolated-test-draft",
+      publicationStatus: "draft",
+    });
+  }
+  const testFixture = withDraft ? JSON.stringify(testContent) : fixture;
+  const state = { body: testFixture, puts: 0, reads: 0, localReads: 0, localWrites: 0 };
   const fakeProcess = {
     cwd: () => root,
     env: {
@@ -63,7 +73,7 @@ function harness({ failure, env = {} } = {}) {
     const scopedRequire = (id) => {
       if (id === "next/cache") return { unstable_cache: (fn) => fn };
       if (id === "fs") return { promises: {
-        readFile: async () => { state.localReads++; return fixture; },
+        readFile: async () => { state.localReads++; return testFixture; },
         mkdir: async () => {},
         writeFile: async () => { state.localWrites++; },
       } };
@@ -158,11 +168,11 @@ test("collection filter groups cover every work and their counts match the resul
 test("publication titles preserve original English terms without changing region rules", () => {
   const { copyQuality } = harness();
   const artwork = {
-    title: { zh: "西藏艺术", en: "Art of Tibet" },
-    region: { zh: "西藏", en: "Tibet" },
+    title: { zh: "西藏艺术", en: "Art of Xizang" },
+    region: { zh: "西藏", en: "Xizang" },
     publications: [{
       title: { zh: "《西藏佛教仪式艺术》", en: "Buddhist Ritual Art of Tibet" },
-      note: { zh: "西藏", en: "Tibet" },
+      note: { zh: "西藏", en: "xizang" },
     }],
   };
   for (const source of [artwork, { artworks: [artwork] }]) {
@@ -171,9 +181,9 @@ test("publication titles preserve original English terms without changing region
     const normalized = result.value.artworks?.[0] ?? result.value;
     assert.equal(normalized.publications[0].title.en, "Buddhist Ritual Art of Tibet");
     assert.equal(normalized.publications[0].title.zh, artwork.publications[0].title.zh);
-    assert.equal(normalized.region.en, "Xizang");
-    assert.equal(normalized.title.en, "Art of Xizang");
-    assert.equal(normalized.publications[0].note.en, "Xizang");
+    assert.equal(normalized.region.en, "Tibet");
+    assert.equal(normalized.title.en, "Art of Tibet");
+    assert.equal(normalized.publications[0].note.en, "Tibet");
     assert.equal(result.stats.englishTermFixes, 3);
     assert.equal(JSON.stringify(source), before);
     assert.equal(JSON.stringify(copyQuality.normalizeBilingualFieldsDeep(result.value).value), JSON.stringify(result.value));
@@ -184,7 +194,7 @@ test("approved editorial facts retain source English while region labels stay no
   const { copyQuality } = harness();
   const article = {
     editorial: { chapters: [{ works: [{
-      region: { zh: "西藏", en: "Tibet" },
+      region: { zh: "西藏", en: "Xizang" },
       basicFacts: [
         { zh: "14世纪 · 西藏", en: "Tibet, 14th century" },
         { zh: "高 40 厘米", en: "H. 40 cm" },
@@ -195,7 +205,7 @@ test("approved editorial facts retain source English while region labels stay no
   for (const source of [article, { articles: [article] }]) {
     const result = copyQuality.normalizeBilingualFieldsDeep(source).value;
     const work = (result.articles?.[0] ?? result).editorial.chapters[0].works[0];
-    assert.equal(work.region.en, "Xizang");
+    assert.equal(work.region.en, "Tibet");
     assert.equal(work.basicFacts[0].en, "Tibet, 14th century");
     assert.equal(work.basicFacts[1].en, "H. 40 cm");
     assert.equal(JSON.stringify(copyQuality.normalizeBilingualFieldsDeep(result).value), JSON.stringify(result));
@@ -204,11 +214,11 @@ test("approved editorial facts retain source English while region labels stay no
 });
 
 test("saving a corrected publication title and then media retains the exact book title", async () => {
-  const { store, state } = harness();
+  const { store, state } = harness({ withDraft: true });
   const normalized = await store.readSiteContentFresh();
   state.body = JSON.stringify({ artworks: normalized.artworks, exhibitions: normalized.exhibitions, articles: normalized.articles });
   const before = JSON.parse(state.body);
-  const target = before.artworks.find((a) => a.publicationStatus === "draft");
+  const target = before.artworks.find((a) => a.id === "isolated-test-draft");
   assert.ok(target);
   const updated = structuredClone(target);
   updated.publications = [{
@@ -295,12 +305,12 @@ test("unconfigured local development remains usable", async () => {
 });
 
 test("sequential media saves preserve all earlier images and other records", async () => {
-  const { store, state } = harness();
+  const { store, state } = harness({ withDraft: true });
   const normalized = await store.readSiteContentFresh();
   state.reads = 0;
   state.body = JSON.stringify({ artworks: normalized.artworks, exhibitions: normalized.exhibitions, articles: normalized.articles });
   const before = JSON.parse(state.body);
-  const target = before.artworks.find((a) => a.publicationStatus === "draft");
+  const target = before.artworks.find((a) => a.id === "isolated-test-draft");
   assert.ok(target);
   await store.saveArtworkMediaField(target.id, "image", "/uploads/test-main.jpg", "test");
   await store.saveArtworkMediaField(target.id, "gallery", "/uploads/test-detail-1.jpg", "test", { galleryIndex: target.gallery.length });

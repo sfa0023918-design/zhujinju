@@ -5,6 +5,8 @@ import type { BilingualText } from "@/lib/site-data";
 import type { CataloguePageGeometry } from "@/lib/catalogue-media";
 import { clampCataloguePan, moveCataloguePosition } from "@/lib/catalogue-reading";
 import { ProtectedImage } from "./protected-image";
+import { CatalogueThumbnails } from "./catalogue-thumbnails";
+import { useSwipeNavigation } from "./use-swipe-navigation";
 import styles from "./mobile-catalogue-reader.module.css";
 
 type Props = {
@@ -19,6 +21,7 @@ type Props = {
   onFullscreenChange: (open: boolean) => void;
   // "dialog" renders only the full-screen reader, already open (used on desktop).
   presentation?: "inline" | "dialog";
+  loadPreview?: boolean;
 };
 type Point = { x: number; y: number };
 type Transform = Point & { scale: number };
@@ -35,7 +38,7 @@ function Chevron({ next = false }: { next?: boolean }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={next ? "m9 5 7 7-7 7" : "m15 5-7 7 7 7"} stroke="currentColor" strokeWidth="1.4" /></svg>;
 }
 
-export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, geometries, pairSingleImages, currentIndex, onIndexChange, onFullscreenChange, presentation = "inline" }: Props) {
+export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, geometries, pairSingleImages, currentIndex, onIndexChange, onFullscreenChange, presentation = "inline", loadPreview = true }: Props) {
   const dialogOnly = presentation === "dialog";
   const hasRightCover = geometries[0]?.openingSide === "right";
   const [half, setHalf] = useState<0 | 1>(hasRightCover ? 1 : 0);
@@ -49,7 +52,6 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   const points = useRef(new Map<number, Point>());
   const gesture = useRef<{ start: Transform; origin: Point; distance: number; dragged: boolean; multi: boolean } | null>(null);
   const tap = useRef(0);
-  const inlineTouch = useRef<Point | null>(null);
 
   useEffect(() => {
     const media = window.matchMedia("(orientation: portrait)");
@@ -103,7 +105,12 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   const displayRatio = pairedPages ? sourceRatio + secondRatio : splitPage ? sourceRatio / 2 : sourceRatio;
   const pageLabel = currentIndex === 0 && hasRightCover ? "封面" : splitPage ? half === 0 ? "左页" : "右页" : geometry.spread ? "完整跨页" : pairedPages ? "双页" : "单页";
   const progress = `图版 ${currentIndex + 1}${pairedPages ? `–${currentIndex + 2}` : ""} / ${pages.length} · ${pageLabel}`;
-  const nearbyIndexes = Array.from({ length: Math.min(5, pages.length) }, (_, slot) => Math.max(0, Math.min(currentIndex - 2, pages.length - 5)) + slot);
+  const inlineSwipe = useSwipeNavigation<HTMLButtonElement>({
+    enabled: pages.length > 1,
+    ignoreControls: false,
+    onPrevious: () => move(-1),
+    onNext: () => move(1),
+  });
 
   function move(direction: -1 | 1) {
     const target = direction === 1 ? next : previous;
@@ -179,7 +186,9 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
     const anchorY = initial.origin.y - rect.top - rect.height / 2;
     const x = initial.start.x * ratio + anchorX * (1 - ratio) + dx;
     const y = initial.start.y * ratio + anchorY * (1 - ratio) + dy;
-    setTransform({ scale, ...clampCataloguePan(x, y, scale, page.clientWidth, page.clientHeight) });
+    setTransform(scale === 1 && !initial.multi
+      ? { scale, x: Math.abs(dx) > Math.abs(dy) * 1.35 ? Math.max(-80, Math.min(80, dx * 0.3)) : 0, y: 0 }
+      : { scale, ...clampCataloguePan(x, y, scale, page.clientWidth, page.clientHeight) });
   }
 
   function pointerUp(event: PointerEvent<HTMLDivElement>, cancelled = false) {
@@ -191,7 +200,11 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
       return;
     }
     gesture.current = null;
-    if (!initial || cancelled) return;
+    if (!initial || cancelled) {
+      if (transform.scale === 1) setTransform(fitted);
+      return;
+    }
+    if (transform.scale === 1) setTransform(fitted);
     if (initial.multi) { tap.current = 0; return; }
     const dx = event.clientX - initial.origin.x;
     const dy = event.clientY - initial.origin.y;
@@ -207,10 +220,10 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   function sheet(source: string, full = false) {
     return <div className={styles.sheet} style={full ? { transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` } : undefined}>
       <div className={`${styles.imageWindow} ${splitPage ? styles.doubleWidth : ""}`} style={splitPage ? { left: half === 1 ? "-100%" : "0" } : pairedPages ? { width: `${sourceRatio / displayRatio * 100}%`, right: "auto" } : undefined}>
-        <ProtectedImage src={source} alt={`${title.zh || title.en}，${progress}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />
+        <ProtectedImage src={full || loadPreview ? source : thumbPages[currentIndex]} alt={`${title.zh || title.en}，${progress}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />
       </div>
       {pairedPages && <div className={styles.imageWindow} style={{ left: `${sourceRatio / displayRatio * 100}%` }}>
-        <ProtectedImage src={full ? pages[currentIndex + 1] : readerPages[currentIndex + 1]} alt={`${title.zh || title.en}，图版 ${currentIndex + 2}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />
+        <ProtectedImage src={full ? pages[currentIndex + 1] : loadPreview ? readerPages[currentIndex + 1] : thumbPages[currentIndex + 1]} alt={`${title.zh || title.en}，图版 ${currentIndex + 2}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />
       </div>}
     </div>;
   }
@@ -218,24 +231,20 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   function controls(full = false) {
     return <div className={styles.controls}>
       <button type="button" aria-label="上一页" disabled={!canPrevious} onClick={() => move(-1)}><Chevron /></button>
-      <span aria-live="polite" className={full ? styles.fullProgress : undefined}>{progress}
-        {full && <select aria-label="全屏跳至图版" value={currentIndex} onChange={(event) => jump(Number(event.target.value))}>
-          {pages.map((source, index) => <option key={source} value={index}>{`图版 ${index + 1} / ${pages.length}`}</option>)}
-        </select>}
-      </span>
+      <span aria-live="polite" className={full ? styles.fullProgress : undefined}>{progress}</span>
       <button type="button" aria-label="下一页" disabled={!canNext} onClick={() => move(1)}><Chevron next /></button>
       {!full && <button type="button" className={styles.open} onClick={openReader}>全屏</button>}
     </div>;
   }
 
   const dialog = isOpen && <dialog ref={dialogRef} className={styles.dialog} aria-label="全屏图录阅读" onCancel={closeReader} onKeyDown={(event) => {
-      if (["INPUT", "SELECT"].includes((event.target as HTMLElement).tagName)) return;
+      if ((event.target as HTMLElement).closest("[data-catalogue-thumbnails]")) return;
       if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); }
     }}>
       <div className={styles.fullReader}>
         <header className={styles.toolbar}><span>图录阅读 / Catalogue</span><button type="button" onClick={closeReader}>关闭 Close</button></header>
         <p className={styles.orientationHint}>横屏浏览双页更方便 <span lang="en">Rotate for facing pages</span></p>
-        <div className={styles.canvas} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={(event) => pointerUp(event)} onPointerCancel={(event) => pointerUp(event, true)}>
+        <div className={styles.canvas} data-dragging={points.current.size > 0} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={(event) => pointerUp(event)} onPointerCancel={(event) => pointerUp(event, true)}>
           <div ref={pageRef} className={styles.fit}>{sheet(pages[currentIndex], true)}</div>
         </div>
         <div className={styles.zoomControls}>
@@ -245,6 +254,7 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
           <span>双指缩放 · 双击放大 · 拖动查看</span>
         </div>
         {controls(true)}
+        <CatalogueThumbnails pages={thumbPages} currentIndex={currentIndex} paired={pairedPages} compact onSelect={jump} />
       </div>
     </dialog>;
 
@@ -253,34 +263,14 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   }
 
   return <div id="catalogue-reader" className={styles.reader} data-mobile-catalogue="true" style={{ "--catalogue-ratio": displayRatio } as CSSProperties}>
-    <button type="button" ref={openButtonRef} className={styles.preview} aria-label="打开全屏图录阅读" onClick={openReader}
-      onTouchStart={(event) => { inlineTouch.current = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null; }}
-      onTouchEnd={(event) => {
-        const start = inlineTouch.current;
-        inlineTouch.current = null;
-        if (!start) return;
-        const end = event.changedTouches[0];
-        const dx = end.clientX - start.x;
-        if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(end.clientY - start.y) * 1.5) { event.preventDefault(); move(dx < 0 ? 1 : -1); }
-      }}>
-      {sheet(readerPages[currentIndex])}
+    <button type="button" {...inlineSwipe.bindings}
+      ref={(node) => { openButtonRef.current = node; inlineSwipe.bindings.ref.current = node; }}
+      className={styles.preview} aria-label="打开全屏图录阅读" onClick={openReader}>
+      <div key={currentIndex} className={styles.inlineMotion}>{sheet(readerPages[currentIndex])}</div>
     </button>
     {controls()}
     <p className={styles.hint}>横屏浏览双页更方便；点开全屏，双指放大阅读<span lang="en">Rotate for facing pages. Open full screen to pinch and zoom.</span></p>
-    <details className={styles.index}>
-      <summary>图版索引 <span>Plate index</span></summary>
-      <label className={styles.jump}>跳至图版
-        <select aria-label="跳至图版" value={currentIndex} onChange={(event) => jump(Number(event.target.value))}>
-          {pages.map((source, index) => <option key={source} value={index}>{index + 1}{index === 0 && hasRightCover ? " · 封面" : ""}</option>)}
-        </select>
-      </label>
-      <div className={styles.thumbnails}>
-        {nearbyIndexes.map((index) => <button type="button" key={index} aria-label={`打开图版 ${index + 1}`} aria-current={index === currentIndex ? "page" : undefined} onClick={() => jump(index)}>
-          <span className={styles.thumbnail}><ProtectedImage src={thumbPages[index]} alt="" fill unoptimized sizes="120px" loading="lazy" className={styles.image} /></span>
-          <span>{String(index + 1).padStart(2, "0")}</span>
-        </button>)}
-      </div>
-    </details>
+    <CatalogueThumbnails pages={thumbPages} currentIndex={currentIndex} paired={pairedPages} enabled={loadPreview} onSelect={jump} />
     {dialog}
   </div>;
 }

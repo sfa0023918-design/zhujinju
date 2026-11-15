@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import type {
   Article,
   Artwork,
@@ -21,6 +20,7 @@ import {
 } from "@/lib/image-url";
 import { ArtworkGrid } from "./artwork-grid";
 import { ArtworkGallery } from "./artwork-gallery";
+import { ArtworkSectionNav } from "./artwork-section-nav";
 import { ContemporaryReading } from "./contemporary-reading";
 import { ProtectedImage } from "./protected-image";
 import styles from "./artwork-detail.module.css";
@@ -86,14 +86,6 @@ export function ArtworkDetailTemplate({
   catalogue,
 }: Props) {
   const isVajra = artwork.slug === COVER_VAJRA_SLUG;
-  const titleLength = [...artwork.title.zh].length;
-  const englishLength = artwork.title.en.length;
-  const titleStyle = {
-    "--title-size": `${titleLength <= 8 ? 44 : titleLength <= 14 ? 36 : 30}px`,
-    "--title-mobile": `${titleLength <= 6 ? 34 : titleLength <= 12 ? 28 : 26}px`,
-    "--english-size": `${englishLength <= 40 ? 28 : englishLength <= 80 ? 24 : 21}px`,
-    "--english-mobile": `${englishLength <= 28 ? 24 : englishLength <= 60 ? 21 : 18}px`,
-  } as CSSProperties;
   const status = getArtworkStatusText(artwork.status);
   // Some records use the title as a placeholder summary. Keep unique copy,
   // but do not repeat the heading as a second paragraph in either language.
@@ -164,7 +156,7 @@ export function ArtworkDetailTemplate({
             {artwork.category.zh}
             <span lang="en">{artwork.category.en}</span>
           </p>
-          <div className={styles.titleGroup} style={titleStyle}>
+          <div className={styles.titleGroup}>
             <h1>{artwork.title.zh}</h1>
             <p lang="en">{artwork.title.en}</p>
           </div>
@@ -221,22 +213,7 @@ export function ArtworkDetailTemplate({
           </div>
         </div>
       </ArtworkGallery>
-      <nav className={styles.sectionNav} aria-label="Artwork sections">
-        {sections.map((section) => (
-          <button
-            key={section.id}
-            type="button"
-            onClick={() =>
-              document
-                .getElementById(section.id)
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-          >
-            {section.label.zh}
-            <span lang="en">{section.label.en}</span>
-          </button>
-        ))}
-      </nav>
+      <ArtworkSectionNav sections={sections} />
       {hasText(viewingNote) ? (
         <ContemporaryReading
           id="artwork-viewing"
@@ -386,7 +363,7 @@ export function ArtworkDetailTemplate({
               <span lang="en">{detailCopy.breadcrumb.en}</span> →
             </Link>
           </div>
-          <ArtworkGrid artworks={relatedWorks.slice(0, 4)} fillRows groupWideWorks />
+          <ArtworkGrid artworks={relatedWorks.slice(0, 4)} fillRows groupWideWorks swipeOnTablet />
         </section>
       ) : null}
     </article>

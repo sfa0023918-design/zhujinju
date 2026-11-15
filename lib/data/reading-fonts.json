@@ -1,0 +1,64 @@
+{
+  "core": {
+    "400": "reading-song-400-core-3eeb56b34209.woff2",
+    "500": "reading-song-500-core-06d4e415058d.woff2"
+  },
+  "groups": [
+    {
+      "weight": 400,
+      "name": "core",
+      "file": "reading-song-400-core-3eeb56b34209.woff2",
+      "glyphs": 621,
+      "bytes": 185908
+    },
+    {
+      "weight": 400,
+      "name": "text-00",
+      "file": "reading-song-400-text-00-ff4c0dfa7537.woff2",
+      "glyphs": 800,
+      "bytes": 376756
+    },
+    {
+      "weight": 400,
+      "name": "text-01",
+      "file": "reading-song-400-text-01-945d1b1b0213.woff2",
+      "glyphs": 800,
+      "bytes": 428508
+    },
+    {
+      "weight": 400,
+      "name": "text-02",
+      "file": "reading-song-400-text-02-4d97f4b45972.woff2",
+      "glyphs": 669,
+      "bytes": 398236
+    },
+    {
+      "weight": 500,
+      "name": "core",
+      "file": "reading-song-500-core-06d4e415058d.woff2",
+      "glyphs": 621,
+      "bytes": 188468
+    },
+    {
+      "weight": 500,
+      "name": "text-00",
+      "file": "reading-song-500-text-00-770450a258b2.woff2",
+      "glyphs": 800,
+      "bytes": 380532
+    },
+    {
+      "weight": 500,
+      "name": "text-01",
+      "file": "reading-song-500-text-01-70ae34cbf50e.woff2",
+      "glyphs": 800,
+      "bytes": 434580
+    },
+    {
+      "weight": 500,
+      "name": "text-02",
+      "file": "reading-song-500-text-02-68b7bd9ed341.woff2",
+      "glyphs": 669,
+      "bytes": 403148
+    }
+  ]
+}

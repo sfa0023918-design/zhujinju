@@ -16,8 +16,8 @@ const TABLET_PAGE_SIZE = 6;
 const MOBILE_PAGE_SIZE = 6;
 type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
 
-function getPageSize(width: number) {
-  if (width >= 1280) {
+function getPageSize(width: number, touchDevice: boolean) {
+  if (width >= 1280 && !touchDevice) {
     return DESKTOP_PAGE_SIZE;
   }
 
@@ -81,16 +81,19 @@ export function CollectionResults({
   );
 
   useEffect(() => {
+    const touch = window.matchMedia("(any-pointer: coarse)");
     const updatePageSize = () => {
-      setPageSize(getPageSize(window.innerWidth));
+      setPageSize(getPageSize(window.innerWidth, touch.matches));
       setPageSizeReady(true);
     };
 
     updatePageSize();
     window.addEventListener("resize", updatePageSize);
+    touch.addEventListener("change", updatePageSize);
 
     return () => {
       window.removeEventListener("resize", updatePageSize);
+      touch.removeEventListener("change", updatePageSize);
     };
   }, []);
 

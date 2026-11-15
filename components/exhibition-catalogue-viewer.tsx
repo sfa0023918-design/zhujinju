@@ -11,6 +11,7 @@ import {
 import styles from "./exhibition-catalogue-viewer.module.css";
 import { ProtectedImage } from "./protected-image";
 import { MobileCatalogueReader } from "./mobile-catalogue-reader";
+import { CatalogueThumbnails } from "./catalogue-thumbnails";
 
 const DESKTOP_BREAKPOINT = "(min-width: 1181px) and (pointer: fine)";
 const PRELOAD_GROUP_OFFSETS = [-1, 1] as const;
@@ -80,15 +81,32 @@ export function ExhibitionCatalogueViewer({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreenReading, setIsFullscreenReading] = useState(false);
   const [isDesktopReaderOpen, setIsDesktopReaderOpen] = useState(false);
+  const [nearViewport, setNearViewport] = useState(false);
+  const viewerRef = useRef<HTMLDivElement>(null);
   const hasNavigatedRef = useRef(false);
   const desktopFullscreenButtonRef = useRef<HTMLButtonElement | null>(null);
-  const [thumbnailImageIndexes, setThumbnailImageIndexes] = useState<
-    Set<number>
-  >(() => new Set([0]));
   const touchStartX = useRef<number | null>(null);
   const preloadedPagesRef = useRef<Set<string>>(new Set());
-  const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
-  const selectedThumbnailRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNearViewport(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setNearViewport(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "400px" },
+    );
+    observer.observe(viewer);
+    return () => observer.disconnect();
+  }, []);
   const totalPages = cataloguePages.length;
   const showsSpreadImage = viewMode === "spread-images";
   const usesMobileReader = isLayoutReady && (!isDesktop || isFullscreenReading);
@@ -170,7 +188,7 @@ export function ExhibitionCatalogueViewer({
   );
 
   useEffect(() => {
-    if (!readerPages.length || !isLayoutReady) {
+    if (!readerPages.length || !isLayoutReady || !nearViewport) {
       return;
     }
 
@@ -222,86 +240,7 @@ export function ExhibitionCatalogueViewer({
       preloadedPagesRef.current.add(src);
       void image.decode?.().catch(() => {});
     });
-  }, [readerPages, currentIndex, isLayoutReady, preloadsPairedPages]);
-
-  useEffect(() => {
-    const strip = thumbnailStripRef.current;
-    const selected = selectedThumbnailRef.current;
-
-    if (!strip || !selected) {
-      return;
-    }
-
-    const targetLeft =
-      selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2;
-    strip.scrollTo({ left: Math.max(0, targetLeft), behavior: "auto" });
-  }, [currentIndex, usesDesktopPairing]);
-
-  useEffect(() => {
-    setThumbnailImageIndexes((previous) => {
-      const next = new Set(previous);
-      next.add(currentIndex);
-
-      if (usesDesktopPairing && currentIndex + 1 < totalPages) {
-        next.add(currentIndex + 1);
-      }
-
-      return next.size === previous.size ? previous : next;
-    });
-  }, [currentIndex, totalPages, usesDesktopPairing]);
-
-  useEffect(() => {
-    const strip = thumbnailStripRef.current;
-    const connection = (
-      navigator as Navigator & {
-        connection?: { saveData?: boolean; effectiveType?: string };
-      }
-    ).connection;
-
-    if (
-      !strip ||
-      typeof IntersectionObserver === "undefined" ||
-      connection?.saveData ||
-      connection?.effectiveType === "2g" ||
-      connection?.effectiveType === "slow-2g"
-    ) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleIndexes = entries
-          .filter((entry) => entry.isIntersecting)
-          .map((entry) =>
-            Number((entry.target as HTMLElement).dataset.thumbnailIndex),
-          )
-          .filter(Number.isInteger);
-
-        if (!visibleIndexes.length) {
-          return;
-        }
-
-        setThumbnailImageIndexes((previous) => {
-          const next = new Set(previous);
-          visibleIndexes.forEach((index) => next.add(index));
-          return next.size === previous.size ? previous : next;
-        });
-      },
-      {
-        root: strip,
-        rootMargin: "0px 160px",
-        threshold: 0.01,
-      },
-    );
-
-    strip
-      .querySelectorAll<HTMLElement>("[data-thumbnail-index]")
-      .forEach((thumbnail) => {
-        observer.observe(thumbnail);
-      });
-
-    return () => observer.disconnect();
-  }, [cataloguePages.length]);
+  }, [readerPages, currentIndex, isLayoutReady, preloadsPairedPages, nearViewport]);
 
   if (!totalPages) {
     return null;
@@ -369,7 +308,7 @@ export function ExhibitionCatalogueViewer({
   }
 
   return (
-    <div className={styles.viewer}>
+    <div ref={viewerRef} className={styles.viewer}>
       <div className={styles.heading}>
         <h2>
           电子图录 <span lang="en">Catalogue</span>
@@ -405,6 +344,7 @@ export function ExhibitionCatalogueViewer({
           currentIndex={currentIndex}
           onIndexChange={jumpTo}
           onFullscreenChange={handleMobileFullscreenChange}
+          loadPreview={nearViewport}
         />
       ) : (
         <div id="catalogue-reader" className={styles.desktopReader}>
@@ -445,7 +385,7 @@ export function ExhibitionCatalogueViewer({
               page ? (
                 <ProtectedImage
                   key={`slot-${index}-${page}`}
-                  src={page}
+                  src={nearViewport ? page : thumbPages[currentIndex + index]}
                   alt={`${title.zh || title.en} page ${currentIndex + index + 1}`}
                   width={geometries[currentIndex + index]?.width ?? 4000}
                   height={geometries[currentIndex + index]?.height ?? 2358}
@@ -487,44 +427,7 @@ export function ExhibitionCatalogueViewer({
               →
             </button>
           </div>
-          <div className={styles.index}>
-            <p>
-              缩略索引 <span lang="en">Index</span>
-            </p>
-            <div ref={thumbnailStripRef} className={styles.thumbnails}>
-              {cataloguePages.map((page, index) => {
-                const selected = usesDesktopPairing
-                  ? currentIndex === getDesktopStartIndex(index, totalPages)
-                  : currentIndex === index;
-                return (
-                  <button
-                    key={`${page}-${index}`}
-                    ref={selected ? selectedThumbnailRef : null}
-                    type="button"
-                    onClick={() => jumpTo(index)}
-                    aria-label={`${title.zh || title.en} page ${index + 1}`}
-                    aria-current={selected ? "page" : undefined}
-                    data-thumbnail-index={index}
-                    className={styles.thumbnail}
-                  >
-                    <span className={styles.thumbnailImage}>
-                      {thumbnailImageIndexes.has(index) ? (
-                        <ProtectedImage
-                          src={thumbPages[index]}
-                          alt=""
-                          fill
-                          unoptimized
-                          sizes="180px"
-                          className={styles.thumbImage}
-                        />
-                      ) : null}
-                    </span>
-                    <span>{String(index + 1).padStart(3, "0")}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <CatalogueThumbnails pages={thumbPages} currentIndex={currentIndex} paired={usesDesktopPairing} enabled={nearViewport} onSelect={jumpTo} />
           {isDesktopReaderOpen ? (
             <MobileCatalogueReader
               presentation="dialog"

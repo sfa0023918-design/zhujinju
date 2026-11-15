@@ -42,6 +42,19 @@
   .homeHeader .homeLogo {
     display: block;
   }
+  :global(body:has([data-hero-tone="light"])) .homeHeader {
+    color: #f4efe7;
+    --accent-text: #f4efe7;
+  }
+  :global(body:has([data-hero-tone="light"])) .homeHeader .homeLogo {
+    display: none;
+  }
+  :global(body:has([data-hero-tone="light"])) .homeHeader .seasonLogo {
+    display: block;
+  }
+  :global(body:has([data-hero-tone="light"])) .homeHeader a:focus-visible {
+    outline-color: #f4efe7;
+  }
 }
 @media (max-width: 860px) {
   .inner {
@@ -59,7 +72,7 @@
 .seasonHeader {
   background: var(--season-color);
   color: var(--rust-ink);
-  --nav-english-opacity: 0.78;
+  --nav-english-opacity: 1;
   --header-ink: var(--rust-ink);
 }
 .seasonHeader .standardLogo {

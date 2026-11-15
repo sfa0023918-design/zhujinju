@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { packArtworkRows } from "@/lib/artwork-rows";
 import {
   COVER_VAJRA_CLIP,
@@ -10,6 +11,7 @@ import type { CollectionArtworkSummary } from "@/lib/collection-filtering";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
 import { getArtworkStatusText } from "@/lib/bilingual";
 import { ProtectedImage } from "./protected-image";
+import { ArtworkStrip } from "./artwork-strip";
 import styles from "./artwork-grid.module.css";
 
 export function ArtworkGrid({
@@ -17,21 +19,33 @@ export function ArtworkGrid({
   priority = false,
   fillRows = false,
   groupWideWorks = false,
+  swipeOnTablet = false,
 }: {
   artworks: CollectionArtworkSummary[];
   priority?: boolean;
   fillRows?: boolean;
   groupWideWorks?: boolean;
+  swipeOnTablet?: boolean;
 }) {
   const ratios = artworks.map((a) =>
     a.slug === COVER_VAJRA_SLUG
       ? 900 / 1198
       : (a.imageAsset?.width ?? 800) / (a.imageAsset?.height ?? 1000),
   );
-  return (
-    <div className={`${styles.grid} ${groupWideWorks ? styles.related : ""}`}>
+  const grid = (
+    <div className={`${styles.grid} ${groupWideWorks ? styles.related : ""} ${swipeOnTablet ? styles.swipe : ""}`}>
       {(["desktop", "tablet", "mobile"] as const).map((mode) => (
-        <div key={mode} className={`${styles.rows} ${styles[mode]}`}>
+        <div
+          key={mode}
+          className={`${styles.rows} ${styles[mode]}`}
+          {...(swipeOnTablet && mode === "mobile" ? {
+            id: "related-artworks-track",
+            "data-artwork-track": "swipe",
+            role: "region",
+            "aria-label": "同类方向中的其他作品 / Other works in the same direction",
+            tabIndex: 0,
+          } : {})}
+        >
           {packArtworkRows(ratios, mode, { fillRows, groupWideWorks }).map((row, index) => (
             <div
               key={index}
@@ -54,6 +68,7 @@ export function ArtworkGrid({
                     key={a.slug}
                     href={`/collection/${a.slug}`}
                     className={styles.card}
+                    style={swipeOnTablet ? { "--artwork-ratio": ratios[i] } as CSSProperties : undefined}
                   >
                     <ProtectedImage
                       src={withImageVersion(
@@ -103,4 +118,5 @@ export function ArtworkGrid({
       ))}
     </div>
   );
+  return swipeOnTablet ? <ArtworkStrip>{grid}</ArtworkStrip> : grid;
 }

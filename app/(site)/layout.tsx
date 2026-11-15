@@ -7,8 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFontPreloads } from "@/components/site-font-preloads";
 
-import "./editorial-fonts.css";
-import "./contemporary-fonts.css";
+import "./reading-fonts.css";
 import styles from "./site-layout.module.css";
 
 export default function SiteLayout({

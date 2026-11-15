@@ -39,10 +39,11 @@
   margin-top: 12px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 16px;
+  font-size: var(--type-page-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
+  font-style: italic;
 }
 
 .aboutHero {
@@ -130,10 +131,11 @@
   margin-top: 14px;
   color: var(--accent-text);
   font-family: var(--font-editorial);
-  font-size: 16px;
+  font-size: var(--type-section-en);
   line-height: 1.5;
   letter-spacing: 0.01em;
   text-transform: none;
+  font-style: italic;
 }
 
 .philosophyBody {
@@ -181,7 +183,7 @@
 
 .factValue .zh {
   display: block;
-  font-size: 24px;
+  font-size: var(--type-feature);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -345,7 +347,7 @@
   display: block;
   color: var(--ink);
   font-family: var(--font-serif);
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1.45;
 }
 

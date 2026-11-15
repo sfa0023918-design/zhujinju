@@ -1,0 +1,48 @@
+.controls {
+  display: none;
+}
+@media (max-width: 1279px), (pointer: coarse) and (max-width: 1366px) {
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .controls p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .controls p span {
+    display: block;
+  }
+  .controls > div {
+    display: flex;
+    gap: 8px;
+  }
+  .controls button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .controls button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .controls button:focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 3px;
+  }
+  .controls button:hover:not(:disabled) {
+    color: var(--accent-text);
+    border-color: currentColor;
+  }
+}

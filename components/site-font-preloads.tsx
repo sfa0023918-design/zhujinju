@@ -1,12 +1,13 @@
 "use client";
 
 import { preload } from "react-dom";
+import readingFonts from "@/lib/data/reading-fonts.json";
 
 // Keep resource hints in the document head, outside the streamed site layout.
 // This component also renders on the server, so the hints still arrive early.
 export function SiteFontPreloads() {
   for (const font of [
-    "zhujinju-song-medium-core.woff2",
+    readingFonts.core["500"],
     "InstrumentSerif-Italic.woff2",
     "InstrumentSans.woff2",
   ]) {

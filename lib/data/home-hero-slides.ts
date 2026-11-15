@@ -1,91 +1,73 @@
-// Visual-only configuration from the approved contemporary reference.
-// All artwork content and publication/sales states are resolved from site data.
-export const homeHeroSlides = [
+// Presentation only: original images, titles and sales states come from site data.
+// Background samples follow each photograph's left edge at its displayed scale.
+type HomeHeroConfig = {
+  slug: string;
+  fade: string;
+  height: string;
+  colors: readonly string[];
+  topFade?: boolean;
+  bottomFade?: boolean;
+  lightInk?: boolean;
+  shaded?: boolean;
+  framed?: boolean;
+  imageShift?: string;
+  mobileHeight?: string;
+  mobileShift?: string;
+};
+
+export const homeHeroSlides: readonly HomeHeroConfig[] = [
   {
-    slug: "artwork-1790512216778",
+    slug: "artwork-1773412663200", // 世尊观音
+    fade: "12%",
+    height: "96%",
+    topFade: true,
+    bottomFade: true,
+    lightInk: true,
+    shaded: true,
+    colors: [
+      "#886545", "#8b6848", "#8e6a48", "#906c4a", "#906c4a",
+      "#906c4a", "#8e6a4a", "#896646", "#ad927f",
+    ],
+  },
+  {
+    slug: "artwork-1790512216778", // 释迦牟尼
     fade: "10%",
     height: "96%",
     topFade: true,
-    mobileColor: "#e3bd78",
     colors: [
-      "#e2bc78",
-      "#e3be7d",
-      "#e3be7c",
-      "#e4bd78",
-      "#e4bd77",
-      "#e3bd77",
-      "#dfb565",
-      "#e2b662",
-      "#f1cd8c",
+      "#e2bc78", "#e3be7d", "#e3be7c", "#e4bd78", "#e4bd77",
+      "#e3bd77", "#dfb565", "#e2b662", "#f1cd8c",
     ],
   },
   {
-    slug: "artwork-1790491844513",
-    fade: "10%",
-    height: "100%",
-    mobileColor: "#8c92b7",
+    slug: "artwork-1790500845359", // 说法文殊
+    fade: "12%",
+    height: "132%",
+    imageShift: "10%",
+    mobileHeight: "132%",
+    mobileShift: "-2%",
     colors: [
-      "#9195be",
-      "#8f93ba",
-      "#8e93b9",
-      "#8c92b7",
-      "#888bb2",
-      "#878ab2",
-      "#8b8eb5",
-      "#9c9fbf",
-      "#757a9a",
+      "#e4c6a2", "#e5c8a8", "#e6c8a6", "#e4c6a2", "#e2c4a0",
+      "#ddbd97", "#d4b48e", "#e0c5a7", "#dec3a6",
     ],
   },
   {
-    slug: "artwork-1790513079613",
+    slug: "artwork-1790513079613", // 扎巴坚赞
     fade: "8%",
     height: "100%",
-    mobileColor: "#b892b5",
     colors: [
-      "#b78fab",
-      "#b891ae",
-      "#b591ae",
-      "#b690b2",
-      "#b892b5",
-      "#bd99ba",
-      "#c7a5c0",
-      "#cbacc6",
-      "#c7adc7",
+      "#b78fab", "#b891ae", "#b591ae", "#b690b2", "#b892b5",
+      "#bd99ba", "#c7a5c0", "#cbacc6", "#c7adc7",
     ],
   },
   {
-    slug: "artwork-1790501768521",
-    fade: "8%",
-    height: "100%",
-    mobileColor: "#e2cfac",
-    colors: [
-      "#b59364",
-      "#b9986a",
-      "#bf9e71",
-      "#cab186",
-      "#e2cfac",
-      "#f2e3c4",
-      "#f3e6cb",
-      "#f3e4c7",
-      "#f2e4c9",
-    ],
+    slug: "artwork-1790510327321", // 大轮金刚手曼荼罗唐卡
+    fade: "0%",
+    height: "80%",
+    framed: true,
+    lightInk: true,
+    // A quiet blue-grey drawn from the painting; preserve every painted edge.
+    colors: ["#303d44", "#303d44", "#303d44", "#303d44", "#303d44",
+      "#303d44", "#303d44", "#303d44", "#303d44"],
   },
-  {
-    slug: "artwork-1790520125834",
-    fade: "1.6%",
-    height: "100%",
-    mobileColor: "#bbb3cb",
-    mobileContain: true,
-    colors: [
-      "#b3abc3",
-      "#b9b3ca",
-      "#bdb9d0",
-      "#bfbbd2",
-      "#bebad1",
-      "#b3adc4",
-      "#b1acc3",
-      "#b0abc3",
-      "#ada7bf",
-    ],
-  },
-] as const;
+];

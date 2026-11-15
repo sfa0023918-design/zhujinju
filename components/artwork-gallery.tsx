@@ -24,6 +24,8 @@ import { HistoryBackLink } from "./history-back-link";
 import styles from "./artwork-detail.module.css";
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
+import { ModalDialog } from "./modal-dialog";
+import { useNativeCarousel } from "./use-native-carousel";
 
 type ArtworkGalleryProps = {
   title: string;
@@ -78,6 +80,7 @@ export function ArtworkGallery({
   const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [native, setNative] = useState(false);
   const normalizedPrimaryCandidates = useMemo(() => {
     const seen = new Set<string>();
     const candidates = [primaryImage, ...primaryImageCandidates]
@@ -126,6 +129,11 @@ export function ArtworkGallery({
 
   useEffect(() => {
     setIsMounted(true);
+    const media = window.matchMedia("(any-pointer: coarse), (max-width: 1180px)");
+    const update = () => setNative(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -153,11 +161,6 @@ export function ArtworkGallery({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsLightboxOpen(false);
-        return;
-      }
-
       if (thumbnailImages.length < 2) {
         return;
       }
@@ -182,23 +185,44 @@ export function ArtworkGallery({
       }
     };
 
-    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [activeImage, isLightboxOpen, thumbnailImages]);
 
   const hasMultipleImages = thumbnailImages.length > 1;
   const activeImageIndex = Math.max(thumbnailImages.indexOf(activeImage), 0);
-  const activeImageSrc = withImageVersion(activeImage);
   const isVajraActive = isVajraImage(activeImage);
   const isActivePlaceholder =
     !activeImage || activeImage.startsWith("/api/placeholder/");
 
   const canOpenLightbox = !isActivePlaceholder;
+  const primaryCarousel = useNativeCarousel({
+    count: thumbnailImages.length, active: activeImageIndex,
+    onChange: (index) => setActiveImage(thumbnailImages[index]),
+    enabled: native, loop: native,
+  });
+  const lightboxCarousel = useNativeCarousel({
+    count: thumbnailImages.length, active: activeImageIndex,
+    onChange: (index) => setActiveImage(thumbnailImages[index]),
+    enabled: isLightboxOpen, loop: true,
+  });
+
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    // Cache only the adjacent views so a gesture does not wait for a new photo.
+    for (const offset of [-1, 1]) {
+      const image = new window.Image();
+      image.decoding = "async";
+      image.fetchPriority = "low";
+      image.src = withImageVersion(thumbnailImages[(activeImageIndex + offset + thumbnailImages.length) % thumbnailImages.length]);
+      void image.decode?.().catch(() => {});
+    }
+  }, [activeImageIndex, hasMultipleImages, thumbnailImages]);
 
   const stepLightboxImage = (direction: "prev" | "next") => {
     if (thumbnailImages.length < 2) {
@@ -274,12 +298,14 @@ export function ArtworkGallery({
           {
             "--image-fraction": fraction,
             "--image-ratio": naturalRatio ?? ratio,
+            "--gallery-frame-ratio": ratio,
           } as CSSProperties
         }
       >
         <div className={styles.panoramaNavigation}>{navigation}</div>
         <div
           className={styles.galleryColumn}
+          data-native-carousel={native}
           style={
             isVajraActive ? { background: COVER_VAJRA_BACKDROP } : undefined
           }
@@ -287,35 +313,49 @@ export function ArtworkGallery({
           {isActivePlaceholder ? (
             <MediaPlaceholder eyebrow="Artwork Image" title={title} />
           ) : (
-            <button
-              type="button"
-              aria-label={`放大 ${title}`}
-              className={styles.primaryImageButton}
-              onClick={() => setIsLightboxOpen(true)}
-            >
-              <ProtectedImage
-                src={activeImageSrc}
-                alt={title}
-                width={imageSize(activeImage).width}
-                height={imageSize(activeImage).height}
-                priority
-                unoptimized
-                wrapperClassName={styles.primaryImageFrame}
-                className={styles.primaryImage}
-                style={vajraImageStyle(activeImage)}
-                onError={tryFallbackPrimaryImage}
-                onLoad={(event) => {
-                  const img = event.currentTarget;
-                  if (img.naturalWidth && img.naturalHeight)
-                    setNaturalRatio(img.naturalWidth / img.naturalHeight);
-                }}
-              />
-            </button>
+            <div className={styles.galleryViewport} ref={primaryCarousel.ref}>
+              {(native ? primaryCarousel.indexes : [activeImageIndex]).map((index, position) => {
+                const src = thumbnailImages[index];
+                const clone = native && hasMultipleImages && (position === 0 || position === thumbnailImages.length + 1);
+                return (
+                  <button
+                    key={`${src}-${position}`}
+                    type="button"
+                    aria-label={`放大 ${title}${index ? ` · 局部 ${index}` : ""}`}
+                    aria-hidden={clone || index !== activeImageIndex}
+                    tabIndex={clone || index !== activeImageIndex ? -1 : 0}
+                    className={styles.primaryImageButton}
+                    onClick={() => { if (primaryCarousel.canClick()) setIsLightboxOpen(true); }}
+                  >
+                    <ProtectedImage
+                      src={withImageVersion(src)}
+                      alt={index ? `${title} · 局部 ${index}` : title}
+                      width={imageSize(src).width}
+                      height={imageSize(src).height}
+                      priority={index === 0 && !clone}
+                      loading={index === 0 && !clone ? undefined : "eager"}
+                      unoptimized
+                      wrapperClassName={styles.primaryImageFrame}
+                      className={styles.primaryImage}
+                      style={vajraImageStyle(src)}
+                      onError={src === resolvedPrimaryImage ? tryFallbackPrimaryImage : undefined}
+                      onLoad={(event) => {
+                        const img = event.currentTarget;
+                        if (src === resolvedPrimaryImage && img.naturalWidth && img.naturalHeight)
+                          setNaturalRatio(img.naturalWidth / img.naturalHeight);
+                      }}
+                    />
+                  </button>
+                );
+              })}
+            </div>
           )}
+          {hasMultipleImages ? <p className={styles.gallerySwipeHint}>左右滑动查看 · 点按放大 <span lang="en">Swipe · Tap to enlarge</span></p> : null}
           {activeImage !== resolvedPrimaryImage ? (
             <button
               type="button"
               className={styles.returnPrimary}
+              data-no-swipe
               onClick={() => setActiveImage(resolvedPrimaryImage)}
             >
               返回主图
@@ -390,13 +430,15 @@ export function ArtworkGallery({
 
       {isMounted && isLightboxOpen && canOpenLightbox
         ? createPortal(
-            <div
+            <ModalDialog
               className={styles.lightbox}
-              role="dialog"
-              aria-modal="true"
-              onClick={() => setIsLightboxOpen(false)}
+              label={`${title} · 图片放大 Image viewer`}
+              onDismiss={() => setIsLightboxOpen(false)}
             >
-              <div className={styles.lightboxBackdrop} />
+              <div
+                className={styles.lightboxBackdrop}
+                onClick={() => setIsLightboxOpen(false)}
+              />
               <div
                 className="relative z-10 mx-auto flex h-full w-full max-w-[1380px] flex-col"
                 onClick={(event) => event.stopPropagation()}
@@ -416,7 +458,7 @@ export function ArtworkGallery({
                   </button>
                 </div>
                 <div
-                  className="relative z-20 min-h-[calc(100vh-7.5rem)] flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)] md:min-h-[calc(100vh-9rem)]"
+                  className="relative z-20 min-h-0 flex-1 overflow-hidden border border-[rgba(244,239,232,0.12)] bg-[rgba(247,243,237,0.03)]"
                   style={
                     isVajraActive
                       ? { backgroundColor: COVER_VAJRA_BACKDROP }
@@ -441,19 +483,27 @@ export function ArtworkGallery({
                       </button>
                     </>
                   ) : null}
-                  <div className="relative z-20 flex h-full min-h-full overflow-auto px-3 py-3 md:px-6 md:py-6">
-                    <div className="flex min-h-[calc(100vh-9rem)] w-full items-center justify-center md:min-h-[calc(100vh-11rem)]">
-                      <ProtectedImage
-                        src={activeImageSrc}
-                        alt={title}
-                        width={1600}
-                        height={2000}
-                        unoptimized
-                        wrapperClassName="inline-block !h-auto !w-auto"
-                        className="relative z-30 h-auto w-auto max-h-[calc(100vh-9rem)] max-w-[min(100%,72rem)] object-contain object-center md:max-h-[calc(100vh-11rem)]"
-                        style={vajraImageStyle(activeImage)}
-                      />
-                    </div>
+                  <div className={styles.lightboxViewport} ref={lightboxCarousel.ref}
+                    role="region" aria-label="作品图片 Artwork images" tabIndex={0}>
+                    {lightboxCarousel.indexes.map((index, position) => {
+                      const src = thumbnailImages[index];
+                      const clone = hasMultipleImages && (position === 0 || position === thumbnailImages.length + 1);
+                      return (
+                        <div className={styles.lightboxPanel} key={`${src}-${position}`} aria-hidden={clone || index !== activeImageIndex}>
+                          <ProtectedImage
+                            src={withImageVersion(src)}
+                            alt={index ? `${title} · 局部 ${index}` : title}
+                            width={imageSize(src).width}
+                            height={imageSize(src).height}
+                            unoptimized
+                            loading="eager"
+                            wrapperClassName={styles.lightboxMedia}
+                            className="relative z-30 h-auto w-auto max-h-full max-w-full object-contain object-center"
+                            style={vajraImageStyle(src)}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 {thumbnailImages.length > 1 ? (
@@ -465,19 +515,18 @@ export function ArtworkGallery({
                           key={`lightbox-${image}-${index}`}
                           type="button"
                           onClick={() => setActiveImage(image)}
-                          className={`h-1.5 w-8 shrink-0 cursor-pointer rounded-full transition-colors ${
-                            active
-                              ? "bg-[var(--surface)]/82"
-                              : "bg-[var(--surface)]/24"
-                          }`}
+                          className={styles.lightboxDot}
+                          aria-pressed={active}
                           aria-label={`切换到第 ${index + 1} 张图片`}
-                        />
+                        >
+                          <span />
+                        </button>
                       );
                     })}
                   </div>
                 ) : null}
               </div>
-            </div>,
+            </ModalDialog>,
             document.body,
           )
         : null}

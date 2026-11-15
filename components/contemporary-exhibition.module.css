@@ -95,14 +95,14 @@
 }
 .hero h1 {
   margin: 0;
-  font: 500 clamp(32px, 2.778vw, 40px) / 1.25 var(--font-song);
+  font: 400 var(--type-page)/1.3 var(--font-song);
   letter-spacing: 0.03em;
 }
 .hero h1 span {
   display: block;
 }
 .heroEnglish {
-  font: italic clamp(24px, 1.945vw, 28px) / 1.2 var(--font-editorial);
+  font: italic var(--type-page-en)/1.35 var(--font-editorial);
   margin: 10px 0 0;
 }
 .heroIntro p {
@@ -127,15 +127,15 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  min-height: 54px;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
 }
 .button {
   background: var(--rust-ink);
   color: var(--ink);
-  padding: 12px 24px;
+  padding: 10px 20px;
 }
 .button span,
 .textLink span {
@@ -147,6 +147,9 @@
 .textLink {
   min-height: 44px;
   border-bottom: 1px solid currentColor;
+}
+.hero .textLink span {
+  opacity: 1;
 }
 .hero a:hover {
   color: white;
@@ -194,8 +197,8 @@
   margin: 0;
 }
 .catalogue {
-  background: #121110;
-  color: var(--dark-ink);
+  background: var(--catalogue-surface);
+  color: var(--catalogue-ink);
 }
 .catalogueFrame {
   max-width: 1600px;
@@ -233,13 +236,13 @@
   margin: 4px 0 0;
 }
 .journalCopy h2 {
-  font: 500 28px/1.3 var(--font-song);
+  font: 400 var(--type-feature)/1.4 var(--font-song);
   letter-spacing: 0.05em;
   margin: 10px 0 0;
   white-space: pre-line;
 }
 .journalEnglish {
-  font: italic 22px/1.25 var(--font-editorial);
+  font: italic var(--type-feature-en)/1.35 var(--font-editorial);
   margin: 0;
 }
 .journalExcerpt {
@@ -288,14 +291,14 @@
   padding: 80px 40px 88px;
 }
 .archiveInner h2 {
-  font: 500 32px/1.25 var(--font-song);
+  font: 400 var(--type-section)/1.35 var(--font-song);
   letter-spacing: 0.04em;
   margin: 0 0 36px;
 }
 .archiveInner h2 span {
   display: inline-block;
   margin-left: 18px;
-  font: italic 24px/1.2 var(--font-editorial);
+  font: italic var(--type-section-en)/1.3 var(--font-editorial);
   color: var(--muted);
 }
 .archiveGrid {
@@ -304,7 +307,7 @@
   gap: 24px;
 }
 .archiveCard h3 {
-  font: 400 20px/1.45 var(--font-song);
+  font: 400 var(--type-card)/1.5 var(--font-song);
   letter-spacing: 0.04em;
   margin: 18px 0 3px;
 }
@@ -319,7 +322,7 @@
   object-fit: contain;
 }
 .archiveEnglish {
-  font: italic 18px/1.3 var(--font-editorial);
+  font: italic var(--type-card-en)/1.4 var(--font-editorial);
   color: var(--muted);
   margin: 0;
 }
@@ -377,10 +380,10 @@
     position: relative;
   }
   .hero h1 {
-    font-size: 30px;
+    font: 400 var(--type-page)/1.3 var(--font-song);
   }
   .heroEnglish {
-    font-size: 22px;
+    font: italic var(--type-page-en)/1.35 var(--font-editorial);
   }
   .heroIntro p {
     font-size: 15px;
@@ -443,11 +446,11 @@
     gap: 16px;
   }
   .journalCopy h2 {
-    font-size: 24px;
     margin-top: 0;
+    font: 400 var(--type-feature)/1.4 var(--font-song);
   }
   .journalEnglish {
-    font-size: 21px;
+    font: italic var(--type-feature-en)/1.35 var(--font-editorial);
   }
   .journalExcerpt {
     font-size: 15px;
@@ -461,13 +464,13 @@
     padding: 56px 20px 64px;
   }
   .archiveInner h2 {
-    font-size: 26px;
     margin-bottom: 32px;
+    font: 400 var(--type-section)/1.35 var(--font-song);
   }
   .archiveInner h2 span {
     display: block;
     margin: 6px 0 0;
-    font-size: 21px;
+    font: italic var(--type-section-en)/1.3 var(--font-editorial);
   }
   .archiveGrid {
     display: flex;
@@ -476,9 +479,11 @@
   }
   .archiveCard h3 {
     font-size: 20px;
+    font: 400 var(--type-card)/1.5 var(--font-song);
   }
   .archiveEnglish {
     font-size: 18px;
+    font: italic var(--type-card-en)/1.4 var(--font-editorial);
   }
   .archiveFacts {
     font-size: 12.5px;

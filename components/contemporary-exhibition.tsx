@@ -37,6 +37,10 @@ export function ContemporaryExhibition({
   const article = relatedArticles
     .filter((a) => a.relatedExhibitionSlugs.includes(e.slug))
     .sort((a, b) => b.date.localeCompare(a.date))[0];
+  const additionalArticles = relatedArticles.filter(
+    (item) => item.slug !== article?.slug &&
+      !(seasonal && item.slug === "christies-lecture-sonam-gyaltsen-2026"),
+  );
   const curatorial = e.curatorialNote ?? e.curatorialLead;
   const facts = [
     { zh: "展期", en: "Dates", value: e.period },
@@ -73,7 +77,7 @@ export function ContemporaryExhibition({
                   width={900}
                   height={1198}
                   priority
-                  unoptimized
+                  quality={86}
                   sizes="(max-width: 860px) 380px, 650px"
                   className={styles.vajraImage}
                   style={{ clipPath: COVER_VAJRA_CLIP }}
@@ -171,7 +175,7 @@ export function ContemporaryExhibition({
           </div>
         </section>
       ) : null}
-      {article ? (
+      {article && !seasonal ? (
         <section className={styles.journal}>
           <Link
             href={`/journal/${article.slug}`}
@@ -219,14 +223,12 @@ export function ContemporaryExhibition({
           </div>
         </section>
       ) : null}
-      {relatedArticles.some((item) => item.slug !== article?.slug) ? (
+      {additionalArticles.length ? (
         <nav
           className={styles.otherArticles}
           aria-label={detailCopy.relatedWriting.zh}
         >
-          {relatedArticles
-            .filter((item) => item.slug !== article?.slug)
-            .map((item) => (
+          {additionalArticles.map((item) => (
               <Link key={item.slug} href={`/journal/${item.slug}`}>
                 {item.title.zh}
                 <span lang="en">{item.title.en}</span>

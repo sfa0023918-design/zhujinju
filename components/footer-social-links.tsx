@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 
 import type { FooterPlatform } from "./footer-social-icon";
 import { FooterSocialIcon } from "./footer-social-icon";
+import { ModalDialog } from "./modal-dialog";
 import styles from "./footer-social-links.module.css";
 
 type FooterSocialLinksProps = {
@@ -20,27 +21,6 @@ export function FooterSocialLinks({
 }: FooterSocialLinksProps) {
   const [isWechatOpen, setIsWechatOpen] = useState(false);
   const dialogId = useId();
-
-  useEffect(() => {
-    if (!isWechatOpen) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsWechatOpen(false);
-      }
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isWechatOpen]);
 
   return (
     <>
@@ -93,13 +73,9 @@ export function FooterSocialLinks({
       </div>
 
       {isWechatOpen ? (
-        <div className={styles.backdrop} onClick={() => setIsWechatOpen(false)}>
+        <ModalDialog id={dialogId} label="微信二维码 WeChat QR"
+          className={styles.backdrop} onDismiss={() => setIsWechatOpen(false)}>
           <div
-            id={dialogId}
-            role="dialog"
-            aria-modal="true"
-            aria-label="微信二维码"
-            onClick={(event) => event.stopPropagation()}
             className={styles.panel}
           >
             <div className={styles.panelHeader}>
@@ -130,7 +106,7 @@ export function FooterSocialLinks({
               to add Zhu Jin Ju on WeChat.
             </p>
           </div>
-        </div>
+        </ModalDialog>
       ) : null}
     </>
   );

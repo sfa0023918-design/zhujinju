@@ -54,39 +54,67 @@
   inset: 0;
   z-index: 50;
   background: var(--paper);
+  color: var(--ink);
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.menuClose {
+  position: absolute;
+  z-index: 1;
+  right: 10px;
+  top: 10px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.mobileBackdrop .menuClose:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: -6px;
 }
 .mobilePanel {
   position: absolute;
   inset: 0;
-  padding: 84px 20px 24px;
+  padding: 72px 24px 24px;
   overflow-y: auto;
 }
 .mobileLinks {
   display: grid;
 }
 .mobileLink {
-  min-height: 76px;
+  min-height: 52px;
   border-bottom: 1px solid var(--line);
 }
 .mobileLabel {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  padding-block: 14px;
+  gap: 14px;
+  padding-block: 12px;
 }
 .mobileZh {
   font-family: var(--font-song);
-  font-size: 28px;
-  font-weight: 500;
-  line-height: 1.7;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
   letter-spacing: 0.06em;
 }
 .mobileEn {
-  font-family: var(--font-editorial);
-  font-size: 20px;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 14px;
   font-weight: 400;
-  font-style: italic;
-  line-height: 1.7;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
   color: var(--muted);
 }
 .mobileLinkActive {
@@ -115,7 +143,7 @@
   }
   .menuButton span {
     display: block;
-    width: 24px;
+    width: 20px;
     height: 1.5px;
     background: currentColor;
   }

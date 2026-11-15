@@ -20,12 +20,12 @@ vm.runInNewContext(`(function(exports, require, module) {${compiled}\n})`, { con
   (loaded.exports, (id) => {
     if (id === "./bilingual-text") return {};
     if (id === "@/lib/reading-preview") {
-      const module = { exports: {} };
+      const readingModule = { exports: {} };
       const code = ts.transpileModule(fs.readFileSync(path.join(root, "lib/reading-preview.ts"), "utf8"), {
         compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
       }).outputText;
-      vm.runInNewContext(`(function(exports,module){${code}\n})`)(module.exports, module);
-      return module.exports;
+      vm.runInNewContext(`(function(exports,module){${code}\n})`)(readingModule.exports, readingModule);
+      return readingModule.exports;
     }
     return require(id);
   }, loaded);

@@ -35,7 +35,7 @@ export const PERIOD_GROUPS: PeriodGroup[] = [
 ];
 
 export const REGION_GROUPS: Array<FacetGroup & { pattern: RegExp }> = [
-  { value: "西藏", label: { zh: "西藏", en: "Xizang" }, pattern: /西藏/ },
+  { value: "西藏", label: { zh: "西藏", en: "Tibet" }, pattern: /西藏/ },
   { value: "尼泊尔", label: { zh: "尼泊尔", en: "Nepal" }, pattern: /尼泊尔/ },
   { value: "印度", label: { zh: "印度", en: "India" }, pattern: /印度|比哈尔/ },
   {

@@ -108,15 +108,11 @@ function normalizeTranslation(raw: string) {
     .filter(Boolean);
 
   const joined = paragraphs.join("\n\n").trim();
-  return normalizeXizangTerminology(joined.replace(/^["“”']|["“”']$/g, "").trim());
+  return normalizeTibetTerminology(joined.replace(/^["“”']|["“”']$/g, "").trim());
 }
 
-function normalizeXizangTerminology(value: string) {
-  return value
-    .replace(/\bTibetan\b/g, "Xizang")
-    .replace(/\btibetan\b/g, "xizang")
-    .replace(/\bTibet\b/g, "Xizang")
-    .replace(/\btibet\b/g, "xizang");
+function normalizeTibetTerminology(value: string) {
+  return value.replace(/\bXizang\b/gi, "Tibet");
 }
 
 async function requestTranslation(endpoint: string, body: unknown) {
@@ -222,7 +218,7 @@ export async function POST(request: Request) {
       const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
 
       if (fallback) {
-        return NextResponse.json({ translation: normalizeXizangTerminology(fallback), fallback: true });
+        return NextResponse.json({ translation: normalizeTibetTerminology(fallback), fallback: true });
       }
 
       return NextResponse.json(
@@ -237,7 +233,7 @@ export async function POST(request: Request) {
       "要求：",
       "1. 只输出英文翻译本身，不要解释。",
       "2. 保持简洁，不要营销化。",
-      "3. 保留专有名词、年代、地名、材料名的专业表达。",
+      "3. 保留专有名词、年代、地名、材料名的专业表达。西藏使用 Tibet，藏传佛教等形容词用法使用 Tibetan。",
       "4. 如果字段是标题，就翻成适合网页标题的简洁英文。",
       "5. 不要复述字段名称，不要输出“英文翻译：”“字段名称：”之类前缀。",
     ].join("\n");
@@ -271,7 +267,7 @@ export async function POST(request: Request) {
       const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
 
       if (fallback) {
-        return NextResponse.json({ translation: normalizeXizangTerminology(fallback), fallback: true });
+        return NextResponse.json({ translation: normalizeTibetTerminology(fallback), fallback: true });
       }
 
       const status = result.status ?? 502;
@@ -293,13 +289,13 @@ export async function POST(request: Request) {
       const fallback = await fallbackTranslateChineseToEnglish(sourceText, label);
 
       if (fallback) {
-        return NextResponse.json({ translation: normalizeXizangTerminology(fallback), fallback: true });
+        return NextResponse.json({ translation: normalizeTibetTerminology(fallback), fallback: true });
       }
 
       return NextResponse.json({ error: "未生成可用英文内容，请重试一次。" }, { status: 502 });
     }
 
-    return NextResponse.json({ translation: normalizeXizangTerminology(normalizedTranslation) });
+    return NextResponse.json({ translation: normalizeTibetTerminology(normalizedTranslation) });
   } catch (error) {
     return NextResponse.json(
       {
