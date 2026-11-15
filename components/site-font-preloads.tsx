@@ -7,7 +7,7 @@ import readingFonts from "@/lib/data/reading-fonts.json";
 // This component also renders on the server, so the hints still arrive early.
 export function SiteFontPreloads() {
   for (const font of [
-    readingFonts.core["500"],
+    readingFonts.core["400"],
     "InstrumentSerif-Italic.woff2",
     "InstrumentSans.woff2",
   ]) {

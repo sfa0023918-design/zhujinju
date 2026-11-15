@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { loadSiteContent } from "@/lib/site-data";
-import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
+import { getWhatsAppHref } from "@/lib/contact-links";
 
 import { BilingualText } from "./bilingual-text";
 import { FooterSocialLinks } from "./footer-social-links";
@@ -25,7 +25,6 @@ export async function SiteFooter() {
   const year = new Date().getFullYear();
   const normalizedPhone = siteConfig.contact.phone.trim();
   const normalizedWhatsapp = siteConfig.contact.whatsapp.trim();
-  const phoneHref = getTelHref(normalizedPhone);
   const whatsappValue = normalizedWhatsapp || normalizedPhone;
   const whatsappHref = getWhatsAppHref(whatsappValue);
   const instagramHref = siteConfig.contact.instagram.startsWith("http")
@@ -124,9 +123,6 @@ export async function SiteFooter() {
             >
               {siteConfig.contact.email}
             </a>
-            <a className={styles.contactLine} href={phoneHref ?? undefined}>
-              {siteConfig.contact.phone}
-            </a>
             {showWhatsApp ? (
               <a
                 className={styles.contactLine}
@@ -165,15 +161,6 @@ export async function SiteFooter() {
           >
             {siteConfig.contact.email}
           </a>
-          {phoneHref ? (
-            <a href={phoneHref} className={styles.primaryLink}>
-              {siteConfig.contact.phone}
-            </a>
-          ) : (
-            <span className={styles.primaryLink}>
-              {siteConfig.contact.phone}
-            </span>
-          )}
         </div>
         <div className={styles.disclosures}>
           <details>

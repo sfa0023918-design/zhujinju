@@ -669,6 +669,7 @@
 .featureCopy h3 {
   margin-top: 8px;
   font: 400 var(--type-feature)/1.4 var(--font-song);
+  text-wrap: balance;
   letter-spacing: 0.04em;
   font-weight: 400;
 }
@@ -1173,6 +1174,9 @@
 
 /* iPad portrait: show the complete object within the existing hero field. */
 @media (min-width: 561px) and (max-width: 860px) {
+  .vajra {
+    right: calc(30% - 176px);
+  }
   .heroField { height: 540px; }
   .slide { justify-content: center; }
   .heroImageFrame:not(.framedArtwork) {

@@ -102,7 +102,7 @@ export default async function HomePage() {
   const publicArticles = getPublicArticles(content);
   const feature =
     publicArticles.find(
-      (article) => article.slug === "form-and-devotion-2026",
+      (article) => article.slug === "christies-lecture-sonam-gyaltsen-2026",
     ) ?? publicArticles[0];
   const otherArticles = publicArticles
     .filter((article) => article.slug !== feature?.slug)
@@ -190,7 +190,7 @@ export default async function HomePage() {
               alt="五股金刚杵，展览图录封面作品"
               width={900}
               height={1198}
-              sizes="600px"
+              sizes="(max-width: 860px) 353px, 541px"
               quality={86}
               wrapperClassName={styles.vajraFrame}
               className={styles.vajra}

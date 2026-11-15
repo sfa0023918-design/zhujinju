@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { getImageProps } from "next/image";
 
 import measuredSizes from "@/lib/data/artwork-image-sizes.json";
 import { packArtworkRows } from "@/lib/artwork-rows";
@@ -82,6 +83,13 @@ export function ArtworkGallery({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [native, setNative] = useState(false);
+  const [primaryReady, setPrimaryReady] = useState(false);
+  const ratio = width / height;
+  const fraction =
+    ratio <= 0.85 ? 0.5 : Math.min(0.6, 0.5 + (ratio - 0.85) * 0.6);
+  const gallerySizes = ratio > 1.5
+    ? "100vw"
+    : `(max-width: 860px) 100vw, ${Math.round(fraction * 100)}vw`;
   const normalizedPrimaryCandidates = useMemo(() => {
     const seen = new Set<string>();
     const candidates = [primaryImage, ...primaryImageCandidates]
@@ -142,6 +150,7 @@ export function ArtworkGallery({
   }, [normalizedPrimaryCandidates]);
 
   useEffect(() => {
+    setPrimaryReady(false);
     setActiveImage(resolvedPrimaryImage);
   }, [resolvedPrimaryImage]);
 
@@ -212,7 +221,7 @@ export function ArtworkGallery({
   });
 
   useEffect(() => {
-    if (!hasMultipleImages) return;
+    if (!primaryReady || !hasMultipleImages) return;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     if (connection?.saveData) return;
     // Cache only the adjacent views so a gesture does not wait for a new photo.
@@ -220,10 +229,17 @@ export function ArtworkGallery({
       const image = new window.Image();
       image.decoding = "async";
       image.fetchPriority = "low";
-      image.src = withImageVersion(thumbnailImages[(activeImageIndex + offset + thumbnailImages.length) % thumbnailImages.length]);
+      const src = thumbnailImages[(activeImageIndex + offset + thumbnailImages.length) % thumbnailImages.length];
+      const { props } = getImageProps({
+        src: withImageVersion(src), alt: "", width, height,
+        sizes: gallerySizes, quality: 85,
+      });
+      image.sizes = props.sizes ?? "";
+      image.srcset = props.srcSet ?? "";
+      image.src = props.src;
       void image.decode?.().catch(() => {});
     }
-  }, [activeImageIndex, hasMultipleImages, thumbnailImages]);
+  }, [activeImageIndex, primaryReady, hasMultipleImages, thumbnailImages, gallerySizes, width, height]);
 
   const stepLightboxImage = (direction: "prev" | "next") => {
     if (thumbnailImages.length < 2) {
@@ -249,9 +265,6 @@ export function ArtworkGallery({
     });
   };
 
-  const ratio = width / height;
-  const fraction =
-    ratio <= 0.85 ? 0.5 : Math.min(0.6, 0.5 + (ratio - 0.85) * 0.6);
   const imageSize = (src: string) => {
     const asset = galleryAssets.find(
       (a) => a && [a.original, a.detail, a.hero, a.card].includes(src),
@@ -334,16 +347,20 @@ export function ArtworkGallery({
                       width={imageSize(src).width}
                       height={imageSize(src).height}
                       priority={index === 0 && !clone}
-                      loading={index === 0 && !clone ? undefined : "eager"}
-                      unoptimized
+                      loading={index === 0 && !clone ? undefined : "lazy"}
+                      fetchPriority={index === 0 && !clone ? "high" : "low"}
+                      sizes={gallerySizes}
+                      quality={85}
                       wrapperClassName={styles.primaryImageFrame}
                       className={styles.primaryImage}
                       style={vajraImageStyle(src)}
                       onError={src === resolvedPrimaryImage ? tryFallbackPrimaryImage : undefined}
                       onLoad={(event) => {
                         const img = event.currentTarget;
-                        if (src === resolvedPrimaryImage && img.naturalWidth && img.naturalHeight)
+                        if (src === resolvedPrimaryImage && img.naturalWidth && img.naturalHeight) {
                           setNaturalRatio(img.naturalWidth / img.naturalHeight);
+                          setPrimaryReady(true);
+                        }
                       }}
                     />
                   </button>
@@ -411,7 +428,8 @@ export function ArtworkGallery({
                         alt={`${title} · 局部 ${index + 1}`}
                         width={imageSize(src).width}
                         height={imageSize(src).height}
-                        unoptimized
+                        sizes="(max-width: 860px) 100vw, 50vw"
+                        quality={85}
                         wrapperClassName={styles.detailImageFrame}
                         className={styles.detailImage}
                         style={vajraImageStyle(src)}

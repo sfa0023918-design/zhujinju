@@ -49,7 +49,20 @@ export function HomeHero({
   const [reducedMotion, setReducedMotion] = useState(false);
   const [visible, setVisible] = useState(true);
   const [native, setNative] = useState(false);
+  const [firstImageReady, setFirstImageReady] = useState(false);
+  const [readyImages, setReadyImages] = useState<number[]>([0]);
   const carousel = useNativeCarousel({ count: slides.length, active, onChange: setActive, enabled: native, loop: native });
+
+  useEffect(() => {
+    if (!firstImageReady || slides.length < 2) return;
+    // Let the opening photograph finish first; then warm both swipe directions.
+    // Keep visited photographs mounted so reversing direction stays immediate.
+    setReadyImages((previous) => {
+      const next = new Set(previous);
+      for (const offset of [-1, 0, 1]) next.add((active + offset + slides.length) % slides.length);
+      return next.size === previous.length ? previous : [...next];
+    });
+  }, [active, firstImageReady, slides.length]);
 
   useEffect(() => {
     const media = window.matchMedia("(any-pointer: coarse), (max-width: 1180px)");
@@ -115,19 +128,21 @@ export function HomeHero({
                 } as CSSProperties
               }
             >
-              <ProtectedImage
+              {index === active || readyImages.includes(index) ? <ProtectedImage
                 src={slide.image}
                 alt={`${slide.title.zh} ${slide.title.en}`}
                 width={slide.width}
                 height={slide.height}
-                priority={index === 0}
+                priority={index === 0 && !clone}
                 fetchPriority={index === 0 ? "high" : "low"}
                 loading={index === 0 ? undefined : "eager"}
+                onLoad={index === 0 ? () => setFirstImageReady(true) : undefined}
+                onError={index === 0 ? () => setFirstImageReady(true) : undefined}
                 quality={85}
                 sizes="(max-width: 860px) 100vw, 1024px"
                 wrapperClassName={`${styles.heroImageFrame} ${slide.topFade ? styles.topFade : ""} ${slide.bottomFade ? styles.bottomFade : ""} ${slide.framed ? styles.framedArtwork : ""}`}
                 className={styles.heroImage}
-              />
+              /> : null}
             </div>
           );
         })}
