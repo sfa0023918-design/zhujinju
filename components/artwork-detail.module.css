@@ -359,13 +359,17 @@
   color: var(--muted);
   letter-spacing: 0.08em;
 }
+.sectionNavBar {
+  margin-top: 24px;
+  background: var(--paper);
+}
 .sectionNav {
   position: relative;
   display: flex;
   flex-wrap: nowrap;
   gap: 32px;
   max-width: 1520px;
-  margin: 24px auto 0;
+  margin: 0 auto;
   padding: 0;
   border: 0;
   border-bottom: 1px solid var(--line);
@@ -860,8 +864,11 @@
     flex-direction: column;
     gap: 4px;
   }
+  .sectionNavBar {
+    margin-top: 16px;
+  }
   .sectionNav {
-    margin: 16px 20px 0;
+    margin: 0 20px;
     gap: 24px;
   }
   .sectionNav button {
@@ -1013,7 +1020,7 @@
   .inquirySupport {
     gap: 0 20px;
   }
-  .sectionNav {
+  .sectionNavBar {
     position: sticky;
     top: 0;
     z-index: 15;

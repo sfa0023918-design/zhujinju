@@ -76,7 +76,9 @@ function ArticleImageFigure({
         alt={caption || `Article reference ${index + 1}`}
         width={1600}
         height={1200}
-        unoptimized
+        unoptimized={!block.image.startsWith("/uploads/")}
+        sizes="(max-width: 860px) calc(100vw - 40px), 832px"
+        quality={85}
         wrapperClassName="block w-full"
         className="mx-auto h-auto max-h-[72vh] w-full bg-[var(--surface-strong)] object-contain"
         onLoad={(event) => setAspect(getArticleMediaAspect(event.currentTarget))}
@@ -117,7 +119,9 @@ function ArticleImagePairFigure({
         alt={caption || `Article reference ${index + 1}-${itemIndex + 1}`}
         width={1200}
         height={900}
-        unoptimized
+        unoptimized={!item.image.startsWith("/uploads/")}
+        sizes="(max-width: 640px) calc(100vw - 40px), 416px"
+        quality={85}
         wrapperClassName="block w-full"
         className="mx-auto h-auto max-h-[72vh] w-full bg-[var(--surface-strong)] object-contain"
         onLoad={(event) => setAspect(getArticleMediaAspect(event.currentTarget))}

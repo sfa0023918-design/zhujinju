@@ -122,7 +122,9 @@ function ArticleCover({ article }: { article: Article }) {
       width={1600}
       height={1200}
       priority
-      unoptimized
+      unoptimized={!cover.startsWith("/uploads/")}
+      sizes="(max-width: 744px) calc(100vw - 40px), 704px"
+      quality={85}
       wrapperClassName={styles.coverImage}
       className={styles.coverImageElement}
     />

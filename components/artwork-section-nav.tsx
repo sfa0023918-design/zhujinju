@@ -48,7 +48,8 @@ export function ArtworkSectionNav({ sections }: { sections: Section[] }) {
     }
   }, [active]);
 
-  return <nav ref={navRef} className={styles.sectionNav} aria-label="作品栏目 / Artwork sections">
+  return <div className={styles.sectionNavBar}>
+    <nav ref={navRef} className={styles.sectionNav} aria-label="作品栏目 / Artwork sections">
     {sections.map((section) => <button key={section.id} type="button" aria-current={active === section.id ? "location" : undefined}
       onClick={() => {
         manualUntil.current = performance.now() + 800;
@@ -57,5 +58,6 @@ export function ArtworkSectionNav({ sections }: { sections: Section[] }) {
       }}>
       {section.label.zh}<span lang="en">{section.label.en}</span>
     </button>)}
-  </nav>;
+    </nav>
+  </div>;
 }
