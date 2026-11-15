@@ -50,3 +50,18 @@ Rebuild with `python scripts/build-reading-fonts.py /path/to/source-fonts`, usin
 the original Regular and Medium OTFs. Content hashes in new asset filenames
 prevent cache conflicts. `lib/data/reading-fonts.json` records glyph counts,
 sizes and the preload filenames. Existing font assets are retained.
+
+## Page reading subsets (2026-11-16)
+
+`build-reading-fonts.py` also creates content-hashed Regular subsets for each
+published artwork, exhibition and article, plus the About page. These contain
+only that page's non-core glyphs, with the same outlines and metrics as the
+licensed Source Han Serif SC 2.003 source. `lib/data/page-reading-fonts.json`
+maps routes to assets. `SiteContentFrame` loads the active page's font and keeps
+the complete shared family as a fallback for new CMS text. Rebuild these subsets
+when preparing a content release; existing filenames remain immutable.
+
+Public English headings now use Instrument Sans in upright form, matching the
+site's English navigation and buttons. Decorative serif files are retained for
+compatibility but are no longer preloaded or used by the public theme. Missing
+transliteration glyphs use the theme's system sans-serif fallback.

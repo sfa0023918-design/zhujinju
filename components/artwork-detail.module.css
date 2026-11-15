@@ -159,7 +159,7 @@
 }
 .titleGroup > p {
   margin: 10px 0 0;
-  font: italic var(--type-page-en)/1.35 var(--font-editorial);
+  font: var(--type-page-en)/1.35 var(--font-editorial);
   text-wrap: pretty;
   overflow-wrap: anywhere;
 }
@@ -403,7 +403,7 @@
 .sectionNav span {
   display: block;
   color: var(--muted);
-  font: italic 15px/1.2 var(--font-editorial);
+  font: 13px/1.4 var(--font-editorial);
   letter-spacing: 0;
 }
 .sectionNav button[aria-current],
@@ -448,7 +448,7 @@
 }
 .recordsGrid h2 span {
   margin-left: 12px;
-  font: italic var(--type-reading-title-en)/1.3 var(--font-editorial);
+  font: var(--type-reading-title-en)/1.3 var(--font-editorial);
   color: var(--muted);
   letter-spacing: normal;
 }
@@ -529,7 +529,7 @@
 }
 .catalogueTitle p[lang="en"] {
   margin-top: 8px;
-  font: italic var(--type-feature-en)/1.35 var(--font-editorial);
+  font: var(--type-feature-en)/1.35 var(--font-editorial);
 }
 .cataloguePages {
   color: var(--catalogue-muted);
@@ -587,7 +587,7 @@
 .relatedHeading h2 span {
   display: block;
   margin-top: 6px;
-  font: italic var(--type-section-en)/1.3 var(--font-editorial);
+  font: var(--type-section-en)/1.3 var(--font-editorial);
   color: var(--muted);
 }
 .relatedHeading a {
@@ -809,7 +809,7 @@
     font: 400 var(--type-page)/1.3 var(--font-song);
   }
   .titleGroup > p {
-    font: italic var(--type-page-en)/1.35 var(--font-editorial);
+    font: var(--type-page-en)/1.35 var(--font-editorial);
   }
   .category {
     font-size: 12.5px;
@@ -890,7 +890,7 @@
     font: 400 var(--type-reading-title)/1.5 var(--font-song);
   }
   .recordsGrid h2 span {
-    font: italic var(--type-reading-title-en)/1.3 var(--font-editorial);
+    font: var(--type-reading-title-en)/1.3 var(--font-editorial);
   }
   .recordsGrid li {
     font-size: 15px;
@@ -919,7 +919,7 @@
     font: 400 var(--type-feature)/1.5 var(--font-song);
   }
   .catalogueTitle p[lang="en"] {
-    font: italic var(--type-feature-en)/1.35 var(--font-editorial);
+    font: var(--type-feature-en)/1.35 var(--font-editorial);
   }
   .relatedWorks {
     padding: 56px 20px 64px;
@@ -932,7 +932,7 @@
     font: 400 var(--type-section)/1.4 var(--font-song);
   }
   .relatedHeading h2 span {
-    font: italic var(--type-section-en)/1.3 var(--font-editorial);
+    font: var(--type-section-en)/1.3 var(--font-editorial);
   }
   .relatedHeading a span {
     display: none;
