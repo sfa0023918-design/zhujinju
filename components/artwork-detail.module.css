@@ -485,6 +485,10 @@
   border-bottom: 1px solid currentColor;
 }
 .lightbox {
+  /* The portal is attached to body, outside the site theme's font variables. */
+  --font-sans:
+    "Instrument Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", sans-serif;
   position: fixed;
   inset: 0;
   z-index: 120;
