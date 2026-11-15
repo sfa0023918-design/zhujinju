@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import type { Article, Exhibition, PageCopyContent } from "@/lib/site-data";
 import {
   COVER_VAJRA_CLIP,
@@ -17,15 +16,15 @@ export function ContemporaryExhibition({
   detailCopy,
   relatedArticles,
   pastExhibitions,
-  legacyHero,
   fallbackWorkCount,
+  showBackLink = true,
 }: {
   exhibition: Exhibition;
   detailCopy: PageCopyContent["exhibitionDetail"];
   relatedArticles: Article[];
   pastExhibitions: Exhibition[];
-  legacyHero: ReactNode;
   fallbackWorkCount: number;
+  showBackLink?: boolean;
 }) {
   const seasonal = e.slug === "himalayan-art-2026";
   const pages = e.cataloguePageImages?.filter(Boolean) ?? [];
@@ -55,31 +54,46 @@ export function ContemporaryExhibition({
   ];
   return (
     <div className={styles.exhibition}>
-      {seasonal ? (
-        <section className={styles.hero}>
-          <div className={styles.heroGrid}>
-            <div className={styles.wordmarkBlock}>
-              <div className={styles.wordmark} aria-hidden="true">
-                <div>HIMA</div>
-                <div>LAYAN</div>
-                <div>ART</div>
+      <section className={`${styles.hero}${seasonal ? "" : ` ${styles.archiveHero}`}`}>
+        <div className={styles.heroGrid}>
+          {seasonal ? (
+            <>
+              <div className={styles.wordmarkBlock}>
+                <div className={styles.wordmark} aria-hidden="true">
+                  <div>HIMA</div>
+                  <div>LAYAN</div>
+                  <div>ART</div>
+                </div>
+                <p>喜马拉雅艺术 2026</p>
               </div>
-              <p>喜马拉雅艺术 2026</p>
-            </div>
-            <div className={styles.vajra}>
-              <ProtectedImage
-                src={COVER_VAJRA_IMAGE}
-                alt="五股金刚杵，展览图录封面作品"
-                width={900}
-                height={1198}
-                priority
-                unoptimized
-                sizes="(max-width: 860px) 380px, 650px"
-                className={styles.vajraImage}
-                style={{ clipPath: COVER_VAJRA_CLIP }}
-              />
-            </div>
-            <div className={styles.heroCopy}>
+              <div className={styles.vajra}>
+                <ProtectedImage
+                  src={COVER_VAJRA_IMAGE}
+                  alt="五股金刚杵，展览图录封面作品"
+                  width={900}
+                  height={1198}
+                  priority
+                  unoptimized
+                  sizes="(max-width: 860px) 380px, 650px"
+                  className={styles.vajraImage}
+                  style={{ clipPath: COVER_VAJRA_CLIP }}
+                />
+              </div>
+            </>
+          ) : (
+            <ProtectedImage
+              src={withImageVersion(e.coverAsset?.hero ?? e.coverAsset?.detail ?? e.cover)}
+              alt={`${e.title.zh} 图录封面`}
+              width={e.coverAsset?.width ?? 1600}
+              height={e.coverAsset?.height ?? 1000}
+              priority
+              sizes="(max-width: 860px) calc(100vw - 40px), 56vw"
+              className={styles.archiveCover}
+              wrapperClassName={styles.archiveCoverFrame}
+            />
+          )}
+          <div className={styles.heroCopy}>
+            {showBackLink ? (
               <HistoryBackLink
                 fallbackHref="/exhibitions"
                 className={styles.backLink}
@@ -87,57 +101,58 @@ export function ContemporaryExhibition({
                 ← {detailCopy.backAction.zh}
                 <span lang="en">{detailCopy.backAction.en}</span>
               </HistoryBackLink>
+            ) : null}
+            {e.subtitle.zh || e.subtitle.en ? (
               <p className={styles.label}>
-                专题展览 <span lang="en">Special Exhibition</span>
+                {e.subtitle.zh} <span lang="en">{e.subtitle.en}</span>
               </p>
-              <div>
-                <h1>
-                  {e.title.zh.split("｜").map((part, i, all) => (
-                    <span key={i}>
-                      {part}
-                      {i < all.length - 1 ? "｜" : ""}
-                    </span>
-                  ))}
-                </h1>
-                <p className={styles.heroEnglish} lang="en">
-                  {e.title.en}
-                </p>
-              </div>
-              <div className={styles.heroIntro}>
-                <p>{note.zh}</p>
-                <p lang="en">{note.en}</p>
-              </div>
-              <div className={styles.actions}>
-                {pages.length ? (
-                  <Link href="#catalogue" className={styles.button}>
-                    阅读电子图录 <span lang="en">Read the catalogue</span> →
-                  </Link>
-                ) : null}
-                <Link href="#preface" className={styles.textLink}>
-                  阅读序言 <span lang="en">Read the preface</span> →
+            ) : null}
+            <div>
+              <h1>
+                {e.title.zh.split("｜").map((part, i, all) => (
+                  <span key={i}>
+                    {part}
+                    {i < all.length - 1 ? "｜" : ""}
+                  </span>
+                ))}
+              </h1>
+              <p className={styles.heroEnglish} lang="en">
+                {e.title.en}
+              </p>
+            </div>
+            <div className={styles.heroIntro}>
+              <p>{note.zh}</p>
+              <p lang="en">{note.en}</p>
+            </div>
+            <div className={styles.actions}>
+              {pages.length ? (
+                <Link href="#catalogue" className={styles.button}>
+                  阅读电子图录 <span lang="en">Read the catalogue</span> →
                 </Link>
-              </div>
+              ) : null}
+              <Link href="#preface" className={styles.textLink}>
+                阅读序言 <span lang="en">Read the preface</span> →
+              </Link>
             </div>
           </div>
-          <div className={styles.facts}>
-            {facts.map((fact) => (
-              <div key={fact.en}>
-                <p className={styles.label}>
-                  {fact.zh} <span lang="en">{fact.en}</span>
-                </p>
-                <p>{fact.value.zh}</p>
-                <p lang="en">{fact.value.en}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : (
-        legacyHero
-      )}
+        </div>
+        <div className={styles.facts}>
+          {facts.map((fact) => (
+            <div key={fact.en}>
+              <p className={styles.label}>
+                {fact.zh} <span lang="en">{fact.en}</span>
+              </p>
+              <p>{fact.value.zh}</p>
+              <p lang="en">{fact.value.en}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       <ContemporaryReading
         id="preface"
         title={introIsHeading ? e.intro : { zh: "序", en: "Preface" }}
         content={preface}
+        englishLeadSentence
       />
       {curatorial.zh || curatorial.en ? (
         <ContemporaryReading

@@ -1,5 +1,6 @@
 .pageShell {
-  width: min(100%, var(--content-width));
+  --page-inline: 40px;
+  width: min(100%, 1600px);
   margin-inline: auto;
   padding-inline: var(--page-inline);
 }
@@ -286,27 +287,6 @@
   align-self: start;
 }
 
-.contactSpace {
-  width: min(100%, 280px);
-  margin: 28px 0 0;
-}
-
-.contactSpaceImage {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.contactSpace figcaption {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-}
-
 .contactItem {
   padding-block: 18px 22px;
   border-top: 1px solid var(--line);
@@ -556,6 +536,12 @@
 
   .contactBody {
     gap: 48px;
+  }
+}
+
+@media (max-width: 860px) {
+  .pageShell {
+    --page-inline: 20px;
   }
 }
 

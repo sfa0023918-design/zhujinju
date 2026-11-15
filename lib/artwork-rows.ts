@@ -8,6 +8,7 @@ export type ArtworkRow = {
 export function packArtworkRows(
   ratios: number[],
   mode: "desktop" | "tablet" | "mobile" | "details",
+  options: { fillRows?: boolean } = {},
 ): ArtworkRow[] {
   const target = mode === "desktop" ? 2.75 : mode === "details" ? 2.3 : 2;
   const limit =
@@ -59,5 +60,41 @@ export function packArtworkRows(
     }
   });
   finish();
+  if (options.fillRows) {
+    // Rebalance sparse collection rows without changing the artwork order.
+    // Detail strips keep the original capped-height/spacer behavior by default.
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row.spacer) continue;
+      const previous = rows[i - 1];
+      const next = rows[i + 1];
+      const isWide = (candidate: ArtworkRow) =>
+        candidate.ratios.length === 1 && candidate.ratios[0] >= solo;
+
+      if (previous && !isWide(previous)) {
+        const allIndexes = [...previous.indexes, ...row.indexes];
+        const allRatios = [...previous.ratios, ...row.ratios];
+        if (allIndexes.length <= limit) {
+          previous.indexes = allIndexes;
+          previous.ratios = allRatios;
+          previous.spacer = 0;
+          rows.splice(i, 1);
+          i--;
+          continue;
+        }
+        // A full row plus a lone tail becomes two balanced rows.
+        const split = Math.ceil(allIndexes.length / 2);
+        previous.indexes = allIndexes.slice(0, split);
+        previous.ratios = allRatios.slice(0, split);
+        row.indexes = allIndexes.slice(split);
+        row.ratios = allRatios.slice(split);
+      } else if (next && mode !== "mobile" && row.indexes.length + next.indexes.length <= limit) {
+        row.indexes.push(...next.indexes);
+        row.ratios.push(...next.ratios);
+        rows.splice(i + 1, 1);
+      }
+    }
+    rows.forEach((row) => { row.spacer = 0; });
+  }
   return rows;
 }

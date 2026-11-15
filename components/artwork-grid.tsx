@@ -28,15 +28,12 @@ export function ArtworkGrid({
     <div className={styles.grid}>
       {(["desktop", "tablet", "mobile"] as const).map((mode) => (
         <div key={mode} className={`${styles.rows} ${styles[mode]}`}>
-          {packArtworkRows(ratios, mode).map((row, index) => (
+          {packArtworkRows(ratios, mode, { fillRows: true }).map((row, index) => (
             <div
               key={index}
               className={styles.row}
               style={{
-                gridTemplateColumns: [
-                  ...row.ratios,
-                  ...(row.spacer ? [row.spacer] : []),
-                ]
+                gridTemplateColumns: row.ratios
                   .map((r) => `minmax(0, ${r * 1000}fr)`)
                   .join(" "),
               }}

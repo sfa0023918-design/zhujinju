@@ -14,11 +14,13 @@ export function ContemporaryReading({
   title,
   content,
   expandable = true,
+  englishLeadSentence = false,
 }: {
   id?: string;
   title: BilingualValue;
   content: BilingualProseContent;
   expandable?: boolean;
+  englishLeadSentence?: boolean;
 }) {
   const [locale, setLocale] = useState<ReadingLocale>("zh");
   const sections = [
@@ -61,6 +63,7 @@ export function ContemporaryReading({
             manualSplitThresholdEn={420}
             paragraphClassName={styles.paragraph}
             collapseAtLineBoundary
+            englishLeadSentence={englishLeadSentence}
           />
         </div>
       ))}

@@ -45,3 +45,27 @@ test("all existing artwork scholarly texts survive paragraph splitting", () => {
   }
   assert.deepEqual(losses, []);
 });
+
+test("the 2025 exhibition preface separates its opening sentence from the body", () => {
+  const content = JSON.parse(fs.readFileSync(path.join(root, "content/site-content.json"), "utf8"));
+  const preface = content.exhibitions.find((item) => item.slug === "silent-radiance").description;
+  const paragraphs = getParagraphsByLocale(preface, "en", "soft", { ...options, englishLeadSentence: true });
+  assert.equal(paragraphs[0], "We often find ourselves pausing before the silent sculptures and paintings within the exhibition halls.");
+  assert.ok(paragraphs[1].startsWith("These lines—whether fluid or rugged—"));
+  assert.equal(compact(paragraphs.join("")), compact(preface.map((item) => item.en).join("")));
+  assert.notEqual(getParagraphsByLocale(preface, "en", "soft", options)[0], paragraphs[0]);
+});
+
+test("exhibition lead formatting preserves all bilingual text and the 2026 lead", () => {
+  const content = JSON.parse(fs.readFileSync(path.join(root, "content/site-content.json"), "utf8"));
+  for (const exhibition of content.exhibitions) {
+    for (const locale of ["zh", "en"]) {
+      const original = getParagraphsByLocale(exhibition.description, locale, "soft", options);
+      const formatted = getParagraphsByLocale(exhibition.description, locale, "soft", { ...options, englishLeadSentence: true });
+      assert.equal(compact(formatted.join("")), compact(original.join("")), `${exhibition.slug}:${locale}`);
+      if (locale === "zh" || exhibition.slug === "himalayan-art-2026") {
+        assert.deepEqual(formatted, original, `${exhibition.slug}:${locale} keeps existing paragraphs`);
+      }
+    }
+  }
+});

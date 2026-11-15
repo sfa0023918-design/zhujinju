@@ -1,7 +1,13 @@
 .journalShell {
-  width: min(100%, var(--content-width));
+  width: min(100%, 1600px);
   margin: 0 auto;
-  padding-inline: var(--page-inline);
+  padding-inline: 40px;
+}
+
+@media (max-width: 860px) {
+  .journalShell {
+    padding-inline: 20px;
+  }
 }
 
 .indexHero {

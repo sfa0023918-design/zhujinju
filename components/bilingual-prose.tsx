@@ -43,9 +43,11 @@ type BilingualReadingPanelProps = {
   manualSplitThresholdEn?: number;
   autoSplitLongSingleParagraph?: boolean;
   collapseAtLineBoundary?: boolean;
+  englishLeadSentence?: boolean;
 };
 
 type ParagraphSplitOptions = {
+  englishLeadSentence?: boolean;
   manualParagraphMode?: "preserve" | "split-long";
   manualSplitThresholdZh?: number;
   manualSplitThresholdEn?: number;
@@ -261,9 +263,22 @@ export function getParagraphsByLocale(
 ) {
   const items = Array.isArray(content) ? content : [content];
 
-  return items.flatMap((item) => {
+  const paragraphs = items.flatMap((item) => {
     return splitParagraphs(getLocalizedText(item, locale), locale, singleLineBreakMode, options);
   });
+
+  // Exhibition prefaces use a short editorial lead, followed by body copy.
+  // Keep this opt-in so artwork notes and other reading panels retain their layout.
+  if (locale === "en" && options?.englishLeadSentence && paragraphs.length) {
+    const first = paragraphs[0];
+    const segments = new Intl.Segmenter("en", { granularity: "sentence" }).segment(first);
+    const lead = segments[Symbol.iterator]().next().value?.segment;
+    if (lead && lead.length < first.length) {
+      return [lead.trim(), first.slice(lead.length).trim(), ...paragraphs.slice(1)];
+    }
+  }
+
+  return paragraphs;
 }
 
 function hasLocaleContent(content: BilingualProseContent, locale: ReadingLocale) {
@@ -523,6 +538,7 @@ export function BilingualReadingPanel({
   manualSplitThresholdEn,
   autoSplitLongSingleParagraph = true,
   collapseAtLineBoundary = false,
+  englishLeadSentence = false,
 }: BilingualReadingPanelProps) {
   const hasEnglish = sections.some((section) => hasLocaleContent(section.content, "en"));
   const [uncontrolledLocale, setUncontrolledLocale] = useState<ReadingLocale>(defaultLocale);
@@ -562,6 +578,7 @@ export function BilingualReadingPanel({
             manualSplitThresholdZh,
             manualSplitThresholdEn,
             autoSplitLongSingleParagraph,
+            englishLeadSentence,
           });
           const mergedParagraphClassName = [
             zhFirstLineIndent && locale === "zh" ? "indent-[2em]" : "",

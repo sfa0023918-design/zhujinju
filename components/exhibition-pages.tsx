@@ -11,7 +11,6 @@ import { withImageVersion } from "@/lib/image-url";
 
 import { ContemporaryExhibition } from "./contemporary-exhibition";
 import { BilingualText } from "./bilingual-text";
-import { HistoryBackLink } from "./history-back-link";
 import { MediaPlaceholder } from "./media-placeholder";
 import { ProtectedImage } from "./protected-image";
 import styles from "./exhibition-pages.module.css";
@@ -349,9 +348,6 @@ export function ExhibitionDetailPageContent({
   relatedArticles,
   pastExhibitions,
 }: ExhibitionDetailPageContentProps) {
-  const cataloguePages = exhibition.cataloguePageImages?.filter(Boolean) ?? [];
-  const pageCount = getCataloguePageCount(exhibition);
-  const catalogueUnit = getCatalogueMode(exhibition);
   return (
     <ContemporaryExhibition
       exhibition={exhibition}
@@ -359,75 +355,6 @@ export function ExhibitionDetailPageContent({
       relatedArticles={relatedArticles}
       pastExhibitions={pastExhibitions}
       fallbackWorkCount={highlightedArtworks.length}
-      legacyHero={
-        <section className={styles.detailHero}>
-          <div className={styles.detailCover}>
-            <ExhibitionImage exhibition={exhibition} priority />
-          </div>
-          <div className={styles.detailRecord}>
-            <HistoryBackLink
-              fallbackHref="/exhibitions"
-              className={styles.backLink}
-            >
-              <BilingualText
-                as="span"
-                text={detailCopy.backAction}
-                className={styles.bilingualPair}
-                zhClassName={styles.zh}
-                enClassName={styles.en}
-              />
-            </HistoryBackLink>
-            <p className={styles.year}>{getYear(exhibition)}</p>
-            <BilingualText
-              as="p"
-              text={exhibition.subtitle}
-              className={`${styles.bilingualPair} ${styles.subtitle}`}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-            <ExhibitionTitle
-              as="h1"
-              text={exhibition.title}
-              className={`${styles.bilingualPair} ${styles.detailTitle}`}
-            />
-            <ExhibitionRecord exhibition={exhibition} />
-            <dl className={styles.summaryFacts}>
-              <div>
-                <dt>{detailCopy.summaryLine.highlightUnit.zh}</dt>
-                <dd>
-                  {exhibition.featuredWorksCount ??
-                    exhibition.highlightCount ??
-                    highlightedArtworks.length}
-                </dd>
-              </div>
-              <div>
-                <dt>{catalogueUnit.zh}</dt>
-                <dd>{pageCount}</dd>
-              </div>
-            </dl>
-            {hasIntroSummary(exhibition) ? (
-              <BilingualText
-                as="div"
-                text={exhibition.intro}
-                className={`${styles.bilingualPair} ${styles.detailIntro}`}
-                zhClassName={styles.zh}
-                enClassName={styles.en}
-              />
-            ) : null}
-            {cataloguePages.length ? (
-              <Link href="#catalogue" className={styles.catalogueLink}>
-                <BilingualText
-                  as="span"
-                  text={{ zh: "查看电子图录", en: "View Catalogue" }}
-                  className={styles.bilingualPair}
-                  zhClassName={styles.zh}
-                  enClassName={styles.en}
-                />
-              </Link>
-            ) : null}
-          </div>
-        </section>
-      }
     />
   );
 }

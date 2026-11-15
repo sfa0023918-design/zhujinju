@@ -17,8 +17,8 @@ vm.runInNewContext(`(function(exports,module){${compiled}\n})`)(
   loaded.exports,
   loaded,
 );
-const pack = (ratios, mode) =>
-  JSON.parse(JSON.stringify(loaded.exports.packArtworkRows(ratios, mode)));
+const pack = (ratios, mode, options) =>
+  JSON.parse(JSON.stringify(loaded.exports.packArtworkRows(ratios, mode, options)));
 test("approved reference sequence keeps order across wide standalone works", () => {
   const rows = pack(
     [
@@ -66,4 +66,29 @@ test("detail rows retain sequence, cap five images, and avoid enlarged tails", (
     pack([0.8, 3.5], "details").map((row) => row.indexes),
     [[0, 1]],
   );
+});
+
+test("filled collection rows absorb the narrow-window lone portrait and keep order", () => {
+  const rows = pack([0.849, 1.72, 0.435, 0.847, 0.778, 0.837], "tablet", { fillRows: true });
+  assert.deepEqual(rows.map((row) => row.indexes), [[0, 1], [2, 3, 4, 5]]);
+  assert.ok(rows.every((row) => row.spacer === 0));
+  const secondPage = pack([0.587, 3.488, 0.936, 0.824, 0.849, 0.67], "tablet", { fillRows: true });
+  assert.deepEqual(secondPage.map((row) => row.indexes), [[0, 1], [2, 3, 4, 5]]);
+});
+
+test("all collection pages fill every row at every layout breakpoint", () => {
+  const content = JSON.parse(fs.readFileSync(new URL("../content/site-content.json", import.meta.url), "utf8"));
+  const ratios = content.artworks.filter((item) => item.publicationStatus !== "draft").map((item) =>
+    (item.imageAsset?.width ?? 800) / (item.imageAsset?.height ?? 1000));
+  for (const mode of ["desktop", "tablet", "mobile"]) {
+    const count = mode === "desktop" ? 15 : 6;
+    for (let i = 0; i < ratios.length; i += count) {
+      const page = ratios.slice(i, i + count);
+      const rows = pack(page, mode, { fillRows: true });
+      assert.deepEqual(rows.flatMap((row) => row.indexes), page.map((_, index) => index));
+      assert.ok(rows.every((row) => row.spacer === 0));
+    }
+  }
+  const reference = pack([0.849, 1.72, 0.435, 0.847, 0.778, 0.837, 0.587, 3.488, 0.936, 0.824, 0.849, 0.67, 1.695, 0.82, 0.849], "desktop", { fillRows: true });
+  assert.deepEqual(reference.map((row) => row.indexes.length), [3, 4, 1, 4, 3]);
 });

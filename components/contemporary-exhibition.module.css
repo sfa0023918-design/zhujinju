@@ -15,6 +15,29 @@
   column-gap: 24px;
   align-items: center;
 }
+.archiveHero {
+  --rust-muted: var(--muted);
+  --rust-line: var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+.archiveHero .heroGrid {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 48px;
+  padding-block: 40px 32px;
+}
+.archiveHero .heroCopy {
+  padding-block: 0;
+}
+.archiveCoverFrame,
+.archiveCover {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.archiveCover {
+  object-fit: contain;
+}
 .wordmarkBlock {
   display: flex;
   flex-direction: column;
@@ -131,6 +154,17 @@
 .hero .button:hover {
   color: var(--ink);
   background: white;
+}
+.archiveHero a:hover {
+  color: var(--accent-text);
+}
+.archiveHero .button {
+  color: var(--paper);
+  background: var(--ink);
+}
+.archiveHero .button:hover {
+  color: var(--paper);
+  background: var(--accent-text);
 }
 .facts {
   max-width: 1520px;
@@ -301,6 +335,12 @@
   }
 }
 @media (max-width: 860px) {
+  .archiveHero .heroGrid {
+    padding: 20px 20px 0;
+  }
+  .archiveHero .heroCopy {
+    padding-block: 28px;
+  }
   .heroGrid {
     position: relative;
     display: block;
