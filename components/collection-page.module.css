@@ -336,3 +336,6 @@
     margin-left: auto;
   }
 }
+
+.filterNote { margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.6; }
+.filterNote span { display: block; margin-top: 4px; }

@@ -110,11 +110,12 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
         enClassName={styles.en}
       />
 
+      <p className={styles.requiredNote}>* 必填 <span lang="en">Required fields</span></p>
       <div className={styles.formGrid}>
-        <ContactField label={copy.nameLabel}>
+        <ContactField label={copy.nameLabel} required>
           <input required name="name" />
         </ContactField>
-        <ContactField label={copy.emailLabel}>
+        <ContactField label={copy.emailLabel} required>
           <input required type="email" name="email" />
         </ContactField>
         <ContactField label={copy.organizationLabel}>
@@ -133,7 +134,7 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
         <ContactField label={copy.artworkLabel} className={styles.fullField}>
           <input name="artwork" defaultValue={initialArtwork} />
         </ContactField>
-        <ContactField label={copy.messageLabel} className={styles.fullField}>
+        <ContactField label={copy.messageLabel} className={styles.fullField} required>
           <textarea required name="message" rows={6} />
         </ContactField>
       </div>
@@ -162,16 +163,18 @@ function ContactField({
   label,
   children,
   className,
+  required = false,
 }: {
   label: BilingualValue;
   children: React.ReactNode;
   className?: string;
+  required?: boolean;
 }) {
   return (
     <label className={`${styles.formField} ${className ?? ""}`}>
       <BilingualText
         as="span"
-        text={label}
+        text={required ? { zh: `${label.zh} *`, en: label.en } : label}
         mode="inline"
         className={styles.formLabel}
         zhClassName={styles.inlineZh}

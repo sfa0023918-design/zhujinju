@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 import type { Article, Exhibition, PageCopyContent } from "@/lib/site-data";
 import {
   COVER_VAJRA_CLIP,
@@ -26,6 +27,7 @@ export function ContemporaryExhibition({
   fallbackWorkCount: number;
   showBackLink?: boolean;
 }) {
+  const status = getExhibitionStatus(e);
   const seasonal = e.slug === "himalayan-art-2026";
   const pages = e.cataloguePageImages?.filter(Boolean) ?? [];
   const count = e.cataloguePageCount ?? e.cataloguePages ?? pages.length;
@@ -43,7 +45,7 @@ export function ContemporaryExhibition({
   );
   const curatorial = e.curatorialNote ?? e.curatorialLead;
   const facts = [
-    { zh: "展期", en: "Dates", value: e.period },
+    { zh: "展期", en: "Dates", value: formatExhibitionPeriod(e.period) },
     { zh: "地点", en: "Venue", value: e.venue },
     {
       zh: "作品",
@@ -106,6 +108,7 @@ export function ContemporaryExhibition({
                 <span lang="en">{detailCopy.backAction.en}</span>
               </HistoryBackLink>
             ) : null}
+            {status ? <p className={styles.exhibitionStatus}>{status.zh} <span lang="en">{status.en}</span></p> : null}
             {e.subtitle.zh || e.subtitle.en ? (
               <p className={styles.label}>
                 {e.subtitle.zh} <span lang="en">{e.subtitle.en}</span>
@@ -263,10 +266,15 @@ export function ContemporaryExhibition({
                     {item.title.en}
                   </p>
                   <p className={styles.archiveFacts}>
-                    {item.period.zh} · {item.venue.zh}
+                    {formatExhibitionPeriod(item.period).zh} · {item.venue.zh}
                     <br />
                     {item.featuredWorksCount ?? item.highlightCount} 件重点作品
-                    · {item.cataloguePageCount ?? item.cataloguePages} 页图录
+                    {" · "}{item.cataloguePageCount ?? item.cataloguePages} 页图录
+                  </p>
+                  <p className={styles.archiveFacts} lang="en">
+                    {formatExhibitionPeriod(item.period).en} · {item.venue.en}
+                    <br />
+                    {item.featuredWorksCount ?? item.highlightCount} works · {item.cataloguePageCount ?? item.cataloguePages} catalogue pages
                   </p>
                 </Link>
               ))}

@@ -670,3 +670,6 @@
 
 a.contactValue,
 a.contactSecondaryValue { display: flex; align-items: center; min-height: 44px; }
+
+.requiredNote { margin: 0; color: var(--muted); font-size: 12px; }
+.requiredNote span { margin-left: 8px; }

@@ -10,6 +10,7 @@ import {
 } from "@/lib/artwork-presentation";
 import type { CollectionArtworkSummary } from "@/lib/collection-filtering";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
+import { formatDimensions } from "@/lib/display-format";
 import { getArtworkStatusText } from "@/lib/bilingual";
 import { ProtectedImage } from "./protected-image";
 import { ArtworkStrip } from "./artwork-strip";
@@ -95,9 +96,15 @@ export function ArtworkGrid({
                     <span className={styles.facts}>
                       {[a.region.zh, a.period.zh].filter(Boolean).join("，")}
                       <span className={styles.extra}>
-                        {[a.material.zh, a.dimensions.zh]
+                        {[a.material.zh, formatDimensions(a.dimensions.zh)]
                           .filter(Boolean)
                           .map((text) => ` · ${text}`)}
+                      </span>
+                      <span className={styles.factsEnglish} lang="en">
+                        {[a.region.en, a.period.en].filter(Boolean).join(", ")}
+                        <span className={styles.extra}>
+                          {[a.material.en, formatDimensions(a.dimensions.en)].filter(Boolean).map((text) => ` · ${text}`)}
+                        </span>
                       </span>
                     </span>
                     <span className={styles.status} data-artwork-status={a.status}>

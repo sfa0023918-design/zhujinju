@@ -4,6 +4,11 @@ import { ActionLabel } from "@/components/action-label";
 import { BilingualText } from "@/components/bilingual-text";
 import { bt } from "@/lib/bilingual";
 
+export const metadata = {
+  title: "页面未找到 | Page Not Found | 竹瑾居 | Zhu Jin Ju",
+  robots: { index: false, follow: true },
+};
+
 export default function NotFound() {
   return (
     <section className="mx-auto flex min-h-[60vh] w-full max-w-[920px] flex-col justify-center px-5 py-20 md:px-10">

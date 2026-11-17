@@ -53,7 +53,8 @@ export async function SiteFooter() {
         enClassName={styles.spaceNameEn}
       />
       <p className={styles.contactLine}>成都市青羊区草堂东路88号</p>
-      <p className={styles.contactLine}>邮编 610000</p>
+      <p className={styles.spaceNameEn} lang="en">No. 88 Caotang East Road, Qingyang District, Chengdu, China</p>
+      <p className={styles.contactLine}>邮编 / Postal code 610000</p>
     </div>
   );
   const socialLinks = (

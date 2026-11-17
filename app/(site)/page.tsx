@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDimensions, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 
 import { HomeArtworkGrid } from "@/components/home-artwork-grid";
 import { HomeHero, type HomeHeroSlide } from "@/components/home-hero";
@@ -60,6 +61,7 @@ export default async function HomePage() {
   const content = await loadSiteContent();
   const { homeContent, siteConfig } = content;
   const exhibition = getCurrentExhibition(content);
+  const exhibitionStatus = exhibition ? getExhibitionStatus(exhibition) : null;
   const artworks = getFeaturedArtworks(content).slice(0, 4);
   const publicArtworks = getPublicArtworks(content);
   const slides: HomeHeroSlide[] = homeHeroSlides.flatMap((config) => {
@@ -75,7 +77,7 @@ export default async function HomePage() {
         image: withImageVersion(resolveArtworkPrimaryImage(artwork)),
         width: artwork.imageAsset?.width ?? 800,
         height: artwork.imageAsset?.height ?? 1000,
-        facts: [regionPeriod, artwork.material.zh, artwork.dimensions.zh]
+        facts: [regionPeriod, artwork.material.zh, formatDimensions(artwork.dimensions.zh)]
           .filter(Boolean)
           .join(" · "),
         mobileFacts: regionPeriod,
@@ -170,7 +172,10 @@ export default async function HomePage() {
       {exhibition ? (
         <section id="exhibition" className={styles.exhibition}>
           <div className={`${styles.wrap} ${styles.exhibitionTop}`}>
-            <HomeLabel text={{ zh: "近期展览", en: "Recent Exhibition" }} />
+            <div className={styles.exhibitionLabel}>
+              <HomeLabel text={{ zh: "近期展览", en: "Recent Exhibition" }} />
+              {exhibitionStatus ? <span className={styles.exhibitionStatus}>{exhibitionStatus.zh} <span lang="en">{exhibitionStatus.en}</span></span> : null}
+            </div>
             <Link href="/exhibitions" className={styles.archiveLink}>
               <HomeLabel text={{ zh: "往期展览", en: "Exhibition archive" }} />
               <HomeArrow />
@@ -210,9 +215,9 @@ export default async function HomePage() {
                     <HomeLabel text={{ zh: "展期", en: "Dates" }} stacked />
                   </dt>
                   <dd>
-                    {exhibition.period.zh}
+                    {formatExhibitionPeriod(exhibition.period).zh}
                     <span className={styles.desktopFact} lang="en">
-                      {exhibition.period.en}
+                      {formatExhibitionPeriod(exhibition.period).en}
                     </span>
                   </dd>
                 </div>
