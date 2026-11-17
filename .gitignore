@@ -9,3 +9,11 @@ yarn-error.log*
 pnpm-debug.log*
 .vercel
 .playwright-cli
+
+# Local environment files (keep .env.example tracked)
+.env
+.env*.local
+
+# Generated locally
+*.tsbuildinfo
+output/
