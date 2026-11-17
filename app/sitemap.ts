@@ -9,26 +9,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const content = await loadSiteContent();
   const baseUrl = resolveSiteBaseUrl(content.siteConfig);
 
+  // Content has no reliable per-record update timestamp. Omit lastmod rather
+  // than telling crawlers every request represents an editorial update.
   const staticRoutes = ["", "/collection", "/exhibitions", "/journal", "/about", "/contact"].map(
     (path) => ({
       url: `${baseUrl}${path}`,
-      lastModified: new Date(),
     }),
   );
 
   const artworkRoutes = getPublicArtworks(content).map((artwork) => ({
     url: `${baseUrl}/collection/${artwork.slug}`,
-    lastModified: new Date(),
   }));
 
   const exhibitionRoutes = getPublicExhibitions(content).map((exhibition) => ({
     url: `${baseUrl}/exhibitions/${exhibition.slug}`,
-    lastModified: new Date(),
   }));
 
   const articleRoutes = getPublicArticles(content).map((article) => ({
     url: `${baseUrl}/journal/${article.slug}`,
-    lastModified: new Date(),
   }));
 
   return [...staticRoutes, ...artworkRoutes, ...exhibitionRoutes, ...articleRoutes];

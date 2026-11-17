@@ -97,7 +97,6 @@ export default async function ArtworkDetailPage({
       catalogue={catalogue}
       artwork={artwork}
       detailCopy={content.pageCopy.artworkDetail}
-      siteConfig={content.siteConfig}
       relatedWorks={relatedWorks}
       relatedArticles={relatedArticles}
       relatedExhibitions={relatedExhibitions}

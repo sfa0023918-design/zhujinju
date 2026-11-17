@@ -6,7 +6,9 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2678400,
     qualities: [75, 82, 84, 85, 86],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1536, 1920],
+    // Retina portrait tablets need about 1640–1720 physical pixels. Avoid
+    // jumping straight to 1920 while keeping a full-resolution photograph.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1536, 1728, 1920],
     imageSizes: [64, 80, 96, 128, 160, 192, 256, 320, 384, 640],
     localPatterns: [
       {

@@ -1193,3 +1193,7 @@
   .caption { top: 0; bottom: auto; right: 20px; height: 76px; padding: 0; }
   .ticks { top: auto; bottom: 0; right: 20px; height: 44px; }
 }
+
+.exhibitionLabel { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; }
+.exhibitionStatus { color: var(--rust-muted); font-size: 12px; white-space: nowrap; }
+.exhibitionStatus [lang="en"] { margin-left: 6px; }

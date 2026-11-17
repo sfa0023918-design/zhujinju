@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ExhibitionDetailPageContent } from "@/components/exhibition-pages";
 import { getAdminSession } from "@/lib/admin-auth";
+import { getExhibitionMetadataTitle } from "@/lib/display-format";
 import { buildMetadata } from "@/lib/metadata";
 import type { BilingualText, Exhibition } from "@/lib/site-data";
 import {
@@ -74,7 +75,7 @@ export async function generateMetadata({
   }
 
   return buildMetadata({
-    title: exhibition.title,
+    title: getExhibitionMetadataTitle(exhibition.title),
     description: getExhibitionShareDescription(exhibition),
     path: `/exhibitions/${exhibition.slug}`,
     site: content.siteConfig,

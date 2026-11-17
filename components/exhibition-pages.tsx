@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatExhibitionPeriod } from "@/lib/display-format";
 
 import type {
   Article,
@@ -160,7 +161,7 @@ function ExhibitionRecord({ exhibition }: { exhibition: Exhibition }) {
     <div className={styles.record}>
       <BilingualText
         as="p"
-        text={exhibition.period}
+        text={formatExhibitionPeriod(exhibition.period)}
         className={styles.bilingualPair}
         zhClassName={styles.zh}
         enClassName={styles.en}

@@ -1,14 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import type {
   Article,
   Artwork,
   Exhibition,
   PageCopyContent,
-  SiteConfigContent,
   BilingualText as BilingualValue,
 } from "@/lib/site-data";
+import { formatDimensions } from "@/lib/display-format";
 import { getArtworkStatusText } from "@/lib/bilingual";
 import type { ArtworkCatalogueReference } from "@/lib/data/catalogue-pages";
 import { cataloguePageGeometry } from "@/lib/catalogue-media";
@@ -30,7 +28,6 @@ import styles from "./artwork-detail.module.css";
 type Props = {
   artwork: Artwork;
   detailCopy: PageCopyContent["artworkDetail"];
-  siteConfig: SiteConfigContent;
   relatedWorks: Artwork[];
   relatedArticles: Article[];
   relatedExhibitions: Exhibition[];
@@ -106,7 +103,7 @@ export function ArtworkDetailTemplate({
     ...(hasText(artwork.technique)
       ? [{ key: "technique", label: { zh: "工艺", en: "Technique" }, value: artwork.technique! }]
       : []),
-    { key: "dimensions", label: detailCopy.fieldLabels.dimensions, value: artwork.dimensions },
+    { key: "dimensions", label: detailCopy.fieldLabels.dimensions, value: { zh: formatDimensions(artwork.dimensions.zh), en: formatDimensions(artwork.dimensions.en) } },
     { key: "status", label: { zh: "状态", en: "Status" }, value: status },
   ].filter((item) => hasText(item.value));
   const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
@@ -199,6 +196,7 @@ export function ArtworkDetailTemplate({
                       href={`${inquiryHref}&request=${encodeURIComponent(item.zh || item.en)}`}
                     >
                       {item.zh || item.en}
+                      {item.zh && item.en ? <span lang="en">{item.en}</span> : null}
                     </Link>
                   </li>
                 ))}

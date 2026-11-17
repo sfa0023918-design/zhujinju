@@ -283,7 +283,7 @@ export function ArtworkGallery({
       {hasMultipleImages ? (
         <div className={styles.imageNavigation}>
           <span>
-            图 {activeImageIndex + 1} / {thumbnailImages.length}
+            图 / Image {activeImageIndex + 1} / {thumbnailImages.length}
           </span>
           <div className={styles.imageDots}>
             {thumbnailImages.map((src, index) => (
@@ -441,7 +441,7 @@ export function ArtworkGallery({
             ))}
           </div>
           <p className={styles.detailsCaption}>
-            <span>图 2 – {thumbnailImages.length} · 局部 · Details</span>
+            <span>图 / {thumbnailImages.length === 2 ? "Image 2" : `Images 2–${thumbnailImages.length}`} · 局部 · Details</span>
             <span>点击图片放大 · Click to enlarge</span>
           </p>
         </section>

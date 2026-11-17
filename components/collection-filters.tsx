@@ -211,6 +211,12 @@ export function CollectionFilters({
 
               {isOpen ? (
                 <div className={styles.filterMenu}>
+                  {field.name === "period" || field.name === "region" ? (
+                    <p className={styles.filterNote}>
+                      跨年代或地区的作品可计入多个选项。
+                      <span lang="en">Works spanning periods or regions may appear in more than one group.</span>
+                    </p>
+                  ) : null}
                   <Link
                     href={buildFilterHref(current, field.name)}
                     aria-current={!current[field.name] ? "true" : undefined}
