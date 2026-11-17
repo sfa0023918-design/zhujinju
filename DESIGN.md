@@ -1,48 +1,47 @@
 ---
-name: "竹瑾居视觉设计基准"
-description: "以真实作品、研究资料和克制温度构成的当代喜马拉雅艺术网站基准。"
+name: "竹瑾居视觉设计基准（当代版）"
+description: "以真实作品、研究资料和克制温度构成的当代喜马拉雅艺术网站基准。2026-11-15 当代版上线后的现行基线。"
 colors:
-  wall-current: "#f4f0e8"
-  surface-current: "#f7f3ec"
-  surface-strong-current: "#fbf8f2"
-  ink: "#171512"
-  muted: "#5b554d"
-  accent: "#85715a"
-  accent-text: "#6f5d48"
+  paper: "#f3f1ec"
+  panel: "#e9e6df"
+  ink: "#141311"
+  muted: "#5c5852"
+  accent: "#8f3b2b"
+  accent-text: "#8f3b2b"
+  season-rust: "#9d4432"
+  rust-ink: "#f4ede4"
+  rust-muted: "#ead9cf"
+  display-ink: "#e6e1da"
+  dark-ink: "#efeae2"
+  dark-muted: "#a9a39a"
+  catalogue-surface: "#504d45"
+  status-available: "#356247"
+  status-acquired: "#984438"
   error: "#87372f"
   success: "#356247"
   warning: "#71521b"
-  line: "#1715121f"
-  line-strong: "#17151247"
+  line: "rgba(20, 19, 17, 0.2)"
+  line-strong: "#141311"
 typography:
+  song:
+    fontFamily: "Zhujinju Song, Source Han Serif SC, Noto Serif SC, Songti SC, serif"
+    fontWeight: "400 / 500"
+  serif-en:
+    fontFamily: "Instrument Serif, Source Serif 4, serif"
+    fontWeight: 400
+  sans:
+    fontFamily: "Instrument Sans, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans SC, sans-serif"
+    fontSize: "15px"
+    fontWeight: "400–600"
+    lineHeight: 1.7
   display:
-    fontFamily: "Songti SC, STSong, SimSun, Noto Serif CJK SC, Source Han Serif SC, serif"
-    fontSize: "clamp(2.5rem, 5vw, 4rem)"
+    fontFamily: "Anton, Arial Narrow, sans-serif"
     fontWeight: 400
-    lineHeight: 1.08
-    letterSpacing: "-0.035em"
-  headline:
-    fontFamily: "Songti SC, STSong, SimSun, Noto Serif CJK SC, Source Han Serif SC, serif"
-    fontSize: "clamp(2rem, 3vw, 3rem)"
-    fontWeight: 400
-    lineHeight: 1.08
-    letterSpacing: "-0.03em"
-  body:
-    fontFamily: "PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, Source Han Sans SC, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.85
-    letterSpacing: "normal"
-  label:
-    fontFamily: "PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, Source Han Sans SC, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 400
-    lineHeight: 1.5
-    letterSpacing: "0.12em"
+  reading:
+    fontSize: "17px desktop / 16px ≤860px"
+    lineHeight: "1.9 中文 / 1.8 英文"
 rounded:
   none: "0px"
-  soft: "12px"
-  pill: "9999px"
 spacing:
   xs: "4px"
   sm: "8px"
@@ -50,205 +49,131 @@ spacing:
   lg: "24px"
   xl: "40px"
   section: "64px"
-components:
-  action-link:
-    backgroundColor: "{colors.wall-current}"
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.none}"
-    padding: "8px 0"
-  button-outline:
-    backgroundColor: "{colors.wall-current}"
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.none}"
-    padding: "12px 24px"
-    height: "44px"
-  filter-chip:
-    backgroundColor: "{colors.surface-current}"
-    textColor: "{colors.muted}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pill}"
-    padding: "6px 12px"
-    height: "36px"
-  input-field:
-    backgroundColor: "{colors.wall-current}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body}"
-    rounded: "{rounded.none}"
-    padding: "0 12px"
-    height: "44px"
-  status-chip:
-    backgroundColor: "{colors.surface-current}"
-    textColor: "{colors.muted}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pill}"
-    padding: "4px 10px"
 ---
 
-# Design System: 竹瑾居
+# Design System: 竹瑾居（当代版）
 
-## Overview
+## 状态与依据
 
-**Creative North Star: "让作品先说话"**
+- 本文件记录 2026-11-15 当代版合并（PR #35）及后续 #36–#40 之后的**现行视觉基线**，取代 2026-07-12 的旧基线。
+- 数值的最终依据是代码：前台令牌在 `app/(site)/site-layout.module.css` 的 `.siteTheme`，组件细节在各 `*.module.css`。本文件与代码不一致时以代码为准，并修正本文件。
+- 每一项调整的来由和站主确认记录见 `docs/records/2026-11-15-contemporary-upgrade-review.md`。原始参考页与设计规范是交接资料，不在仓库内。
+- 产品定位与反面参照见 `PRODUCT.md`；协作与保护规则见 `AGENTS.md`。
 
-竹瑾居的界面是一座当代研究展厅。作品图像承担第一视觉判断，标题和资料紧随其后，界面只负责建立顺序、尺度和可信度。它既不表演传统，也不借冷白和空旷扮演西方画廊。
+**创作北极星：“让作品先说话”。** 作品图像承担第一视觉判断，标题和资料紧随其后，界面只负责顺序、尺度和可信度。设计出发点是把 2026 图录的气质搬到网页：作品按原始比例完整呈现，当季主色取自图录封面，中英文并置。
 
-这份文档是从当前线上系统、干净代码基线和已确认的视觉审核中提炼出的重设计基准。前置 YAML 是后续预览的规范层，不代表当前每个组件已经达到标准。当前令牌保留品牌连续性，已识别的小字、低对比、大圆角和过度阴影属于待修正的旧表现，不得被当作新组件依据。
+## 范围
 
-首页的板块、顺序、中英文文案和真实图片完全锁定。成都研究空间方向不能把空间照片加入首页。三套预览都必须在当前无 `current` 展览时显示真实的近期展览状态，并直接读取线上真实内容，不使用模拟记录。
+| 区域 | 主题 |
+| --- | --- |
+| 公开页面（首页、藏品、作品详情、展览与图录、文章、关于、联系、404） | 当代版 `.siteTheme` |
+| “形有所寄”专题 `/journal/form-and-devotion-2026` | 独立的 `.legacyEditorial` 主题与 `exhibition-journal.module.css`，章节色只属于该专题，不随全站令牌变化 |
+| 后台 `/admin` | `app/globals.css` 的原始基准，前台改动不修改它 |
 
-**Key Characteristics:**
+## 断点与栅格
 
-- 真实作品和资料优先，装饰退后。
-- 浅色但不冷白，温和但不泛黄成仿古纸。
-- 中文标题有书卷气，正文和数据使用清晰无衬线。
-- 以细线、比例和间距建立层级，平面化优先。
-- 动效克制，只承担反馈和层级提示。
-- 信息密度按页面任务分配：首页约 4，藏品列表约 6，作品与展览详情约 7，文章列表约 5，文章阅读约 4。数值只描述相对密度，不写入全站统一常量。
-- 布局必须适应藏品、展览、文章、相关推荐和图录页数持续增长。
+| 档位 | 宽度 |
+| --- | --- |
+| 手机 | ≤ 860px |
+| 平板 | 861–1279px |
+| 电脑 | ≥ 1280px |
 
-## Colors
+- 主要页面内容区最大宽度 1600px，居中；页边距手机 24px（< 768px），其余 40px。头部、首页、作品详情、藏品列表、展览与阅读组件都对齐到 1600px。
+- 1440px 以上字号与高度停在 1440px 时的数值，不再放大；整屏色块继续铺满。
+- 部分令牌在 768px、1100px 处分档（见下方字号表），这是令牌的细分，不是新的版式档位。
 
-当前源码中的暖米色只作为 **current baseline** 记录，不是最终目标色。三套预览可以分别探索不同程度的去黄和矿物白，但必须保持有人情温度，不能转为冷白西方画廊。任何新背景色都要作为预览方案单独验证，不能默认为全站最终令牌。
+## 颜色
 
-### Primary
+页面只使用下列令牌，不另造颜色。
 
-- **石褐强调色** (`accent`): 保留用于非文字强调，例如焦点轮廓、选中边界、图形标记和短暂状态指示。它不是正文或 12px 标签颜色。
-- **石褐文字色** (`accent-text`): 所有需要石褐语气的标签、英文辅助层和功能文字。它在三种 current baseline 浅色表面上的最低对比度为 5.54:1。
+| 令牌 | 值 | 用途 |
+| --- | --- | --- |
+| `--paper` / `--bg` | `#f3f1ec` | 页面底色 |
+| `--panel` / `--surface-strong` | `#e9e6df` | 浅色区块底（文章区、记录区、往期展览等） |
+| `--ink` | `#141311` | 标题、正文、强分隔线、页脚底色 |
+| `--muted` | `#5c5852` | 次要文字 |
+| `--accent` / `--accent-text` | `#8f3b2b` | 链接、悬停、当前栏目标识等功能文字 |
+| `--line` | `rgba(20, 19, 17, 0.2)` | 细分隔线 |
+| `--line-strong` | `#141311` | 表头线、筛选栏上沿、信息表上沿 |
+| 当季主色 | `#9d4432` | 铁锈红区块。只在 `lib/artwork-presentation.ts` 的 `COVER_VAJRA_BACKDROP` 定义一次，换季只改这里 |
+| `--rust-ink` / `--rust-muted` / `--rust-line` | `#f4ede4` / `#ead9cf` / `rgba(244,237,228,.42)` | 铁锈红上的文字、次要文字、分隔线 |
+| `--display-ink` | `#e6e1da` | 铁锈红上的 Anton 大字 |
+| `--dark-ink` / `--dark-muted` / `--dark-line` | `#efeae2` / `#a9a39a` / `rgba(239,234,226,.2)` | 深色区块与页脚上的文字和线 |
+| `--catalogue-*` | 底 `#504d45`，字 `#f0ede4`，次要 `#d1cbbf` | 电子图录阅读区 |
+| `--status-available` | `#356247` | 销售状态“可洽询”（文字与实心圆点） |
+| `--status-acquired` | `#984438` | 销售状态“已洽购”（文字与空心圆点） |
+| `--error` / `--success` / `--warning` | `#87372f` / `#356247` / `#71521b` | 只用于功能反馈 |
 
-### Semantic
+对比度（实测）：墨色在纸色上 16.45:1；次要文字在纸色上 6.26:1、在浅色区块上 5.67:1；`#8f3b2b` 在纸色上 6.58:1；两种状态色在纸色上分别为 6.22:1 和 5.78:1；铁锈红上的文字 5.47:1，次要文字 4.63:1。新增颜色组合必须达到 4.5:1。
 
-- **错误红** (`error`): 仅用于验证失败、保存失败、上传失败和阻断性错误文字或图标。
-- **成功绿** (`success`): 仅用于保存成功、上传完成和状态确认。
-- **警告赭** (`warning`): 仅用于需要注意但不阻断的内容风险、过期状态和发布前提醒。
-- 语义颜色不得成为品牌装饰、分类配色、藏品状态美化或页面背景。
+规则：
 
-### Neutral
+- 销售状态用颜色加图形（实心/空心）共同表达，不只靠颜色；状态是信息，不叠加在作品图像上。
+- 语义色只表达功能状态，不作品牌装饰或分类配色。
+- 往届展览使用各自的原封面，不套用当季铁锈红和金刚杵主视觉。
+- 首页轮播每件作品的背景渐变属于该作品的固定配置，不属于全站色板。
 
-- **暖展墙 current baseline** (`wall-current`): 当前源码背景和品牌连续性的起点，不是最终目标色。
-- **安静表面 current baseline** (`surface-current`): 当前菜单、筛选展开层和轻量分组的表面快照。
-- **作品衬底 current baseline** (`surface-strong-current`): 当前图片加载区和内容面的表面快照。
-- **墨色正文** (`ink`): 标题、正文、关键数据和主要操作。
-- **研究灰** (`muted`): 次级正文、说明和非主导元数据。
-- **结构线** (`line`, `line-strong`): 分节、字段和控件边界。线条组织内容，不承担装饰。
+## 字体
 
-**The Warmth Without Parchment Rule.** 温度由真实作品、空间经验、文字和比例产生。禁止用泛黄、纸纹、木纹或铜金色替代品牌温度。
+全部自托管在 `public/fonts/`，来源与 SIL OFL 1.1 许可登记在 `public/fonts/README.md`。不使用外部字体服务，不加载大型原始字体。
 
-**The Accent Split Rule.** `accent` 只做非文字强调，`accent-text` 承担石褐文字。任何 12px 标签都禁止继续使用 `#85715a`，也禁止通过透明度降低 `accent-text` 的对比度。
+| 角色 | 字体 | 用途 |
+| --- | --- | --- |
+| 中文宋体 `--font-song` / `--font-serif` | `Zhujinju Song`（思源宋体子集，400 与 500） | 中文标题、作品名、陈述句、观看描述与序言的中文正文 |
+| 英文衬线 | Instrument Serif（多为斜体），Source Serif 4 作缺字后备（如带变音符的转写） | 英文标题、作品英文名 |
+| 无衬线 `--font-sans` | Instrument Sans 400–600；中文落到系统字体 | 导航、按钮、标签、信息表、说明、英文长段正文、数字。全站默认 15px / 1.7 |
+| 展览大字 `--font-display` | Anton | 只用于 “HIMALAYAN ART” 大字 |
 
-**The Functional Semantics Rule.** `error`、`success` 和 `warning` 只表达功能状态，不参与品牌装饰和内容分类。
+首屏字体按页面子集与预加载生成，相关脚本见 `scripts/build-*-fonts.py`、`scripts/prepare-reading-fonts.mjs`；生成的 CSS 在 `app/(site)/*fonts*.css`。新增 CMS 文字所需的字形由分块子集按需加载。
 
-## Typography
+## 字号
 
-**Display Font:** Songti SC 系统宋体栈。
+令牌（中文 / 英文，单位 px）：
 
-**Body Font:** PingFang SC 系统无衬线栈。
+| 令牌 | < 768 | 768–1099 | ≥ 1100 |
+| --- | --- | --- | --- |
+| `--type-hero` | 30 / 20 | 32 / 22 | 36 / 24 |
+| `--type-page` | 26 / 17 | 30 / 18 | 32 / 20 |
+| `--type-section` | 22 / 16 | 24 / 17 | 26 / 18 |
+| `--type-feature` | 20 / 16 | 22 / 17 | 24 / 18 |
+| `--type-card` | 16 / 14 | 18 / 15 | 19 / 16 |
+| `--type-artwork` | 20 | 22 | 24 |
+| `--type-reading-title` | 20 / 16 | 20 / 16 | 22 / 16 |
 
-**Character:** 中文标题保留竹瑾居现有的书卷与图录气质，正文和字段保持直接、清晰、可核对。英文是完整信息层，不是装饰性微文字。
+首页、展览首屏等少数大标题和 Anton 大字使用 `clamp()` 随屏宽收缩，各自定义在对应模块 CSS 中，1440px 时取上限。
 
-### Hierarchy
+**阅读正文**（展览序言、藏品观看描述与比较说明、普通文章、关于页理念）：
 
-- **Display** (400, 40-64px, 1.08): 首页主标题和少量一级标题，桌面最大 64px，手机控制在 40-46px。
-- **Headline** (400, 32-48px, 1.08): 展览、文章和内容区标题，字距不得小于 -0.04em。
-- **Title** (400, 20-32px, 1.2): 作品名、列表标题和字段组标题。
-- **Body** (400, 16-18px 中文，15-17px 英文): 中文长文行高约 1.75-1.95，英文约 1.55-1.75。中文阅读宽度约 32-38字，英文约 60-70字符。
-- **Label** (400, 最低 12px, 最大 0.12em): 字段、状态和双语辅助层。大写只用于短英文标签，不得承担正文。石褐标签必须使用 `accent-text`，不得使用 `accent`。
+- 字号 `--reading-size`：桌面 17px，≤ 860px 为 16px。段间距 20px / 18px。
+- 中文用宋体，行高 1.9，两端对齐；英文用 Instrument Sans，行高 1.8，左对齐。
+- 不再放大首段，不用英文首句斜体冒充摘要。
+- 电脑端中英双栏并列；手机端切换语言，切换后保持折叠位置和展开状态。
+- 长文默认显示约 10 行，在完整句子处结束，用一个双语“阅读全文 / 收起”按钮。短文不折叠。展开后保留原文和段落，不改写、不删节。
 
-**The Readable Scholarship Rule.** 资料可信度首先取决于可读性。禁止 6-10px 英文、低于 4.5:1 的功能文字，以及依靠过宽字距掩盖字号不足。
+## 版式与组件
 
-**The Two-Family Rule.** 除品牌图片字标外，页面只使用一套中文显示字体和一套正文无衬线。不得为了显得编辑化而继续叠加衬线、等宽或手写字体。
+- **平面化**：不加阴影、圆角、渐变、玻璃感和装饰性动效。层级靠图片尺度、顺序、背景色微差和细线。浮层（菜单、灯箱、微信二维码弹窗）用遮罩区分。
+- **作品图像**：按原始比例完整显示，不裁切、不加滤镜，不用生成或放大图替代原图。详情页按宽高比分为竖幅（≤ 0.95）、横幅和长卷三种首屏。局部图标明“局部”。
+- **等高成行拼排**（`lib/artwork-rows.ts`）：藏品列表与相关推荐按图片比例组成等高行，每行铺满内容区，不留空白占位列。目标行比例：电脑 2.75、平板 2.0、详情局部图 2.3；长卷单独成行。
+- **藏品分页**：电脑每页 15 件，平板和手机每页 6 件（`components/collection-results.tsx`）。
+- **首页精选**：≥ 861px 一行四件；≤ 860px 单行左右滑动，图片统一高度、宽度随原比例。
+- **作品详情资料表**：中文在上、英文在下，标签与值对应。摘要与同语言标题完全相同时省略重复显示。已洽购作品不开放询洽。
+- **栏目导航**（作品详情）：无外框，当前栏目用 `--accent` 文字加 1px 底线；手机和平板吸顶，窄屏横向滚动。
+- **电子图录**：保留真实图录页、页码、翻页、缩略索引、全屏与缩放、页码地址，以及只预取相邻页组的有限预加载。
+- **头部导航**：六项，首项“首页 Home”，Logo 回首页。手机菜单打开时背景不滚动。
+- **页脚**：深色三栏紧凑排列；保留栏目链接、全部联系方式、地址、五个社交图标、微信二维码弹窗；手机两个折叠项。
+- **按钮与输入**：直角细边框，最小触控 44px；表单输入字号 16px（避免 iOS 聚焦时自动放大）。
 
-## Elevation
+## 无障碍与动效
 
-系统默认平面化。层级通过图片尺度、内容顺序、背景色微差和细线完成。阴影只允许用于移动导航遮罩、模态灯箱和真正浮出文档流的临时界面，静态卡片和普通按钮不使用宽模糊阴影。
+- 正文、字段、状态和交互文字对比度不低于 4.5:1。
+- 键盘可达，焦点可见（`:focus-visible` 2px 墨色轮廓）。
+- 触控目标不小于 44 × 44px。
+- `prefers-reduced-motion` 下轮播不自动切换，取消位移动效。
+- 英文是完整的第二信息层，不压缩成装饰性小字。
 
-### Shadow Vocabulary
+## 保持不变的约定
 
-- **临时浮层** (`0 8px 24px rgba(23, 21, 18, 0.10)`): 仅用于菜单、弹层和灯箱。
-- **焦点轮廓** (`0 0 0 2px rgba(133, 113, 90, 0.42)`): 用于键盘焦点，不与装饰阴影叠加。
-
-**The Flat Archive Rule.** 数字图录应像清晰的档案桌面，不像带柔光、厚阴影和 24-34px 圆角的消费产品卡片。
-
-**The Border Or Shadow Rule.** 同一静态元素不得同时使用 1px 边框和 16px 以上模糊阴影。结构边界与浮层高度只能选择一种主要表达。
-
-## Components
-
-### Buttons
-
-- **Shape:** 主要和次要按钮使用直角或极轻微圆角，当前基准为直角 (`0px`)。只有短标签型控件允许全圆角。
-- **Primary:** 透明暖展墙背景、墨色文字、清晰边框，最小高度 44px，单行标签。
-- **Hover / Focus:** 150-240ms 的颜色或 1px 位移反馈。键盘焦点必须清楚，减少动态模式下取消位移。
-- **Secondary:** 文本链接和细边框按钮，不使用实心金色、黑色或暗红背景。
-
-### Chips
-
-- **Style:** 仅用于真实状态、筛选和语言切换。全圆角边界必须配合至少 12px 信息文字和 36-44px 触控高度。
-- **State:** 选中状态通过文字、边框和轻微表面色共同表达，不只依赖颜色。
-
-### Cards / Containers
-
-- **Corner Style:** 藏品、文章和展览列表默认无卡片外壳，使用图片、间距和分隔线。真正需要容器时最大 12px。
-- **Background:** current baseline 使用 `wall-current`、`surface-current` 或 `surface-strong-current`。预览可探索去黄和矿物白，但不使用独立的奶油色家族，也不转为冷白。
-- **Shadow Strategy:** 静态内容无阴影。
-- **Border:** 单条细线或完整 1px 边界，禁止每一行同时上下双线。
-- **Internal Padding:** 16-24px 控件内容，40-64px 页面分节。
-
-### Inputs / Fields
-
-- **Style:** 44px 以上高度，直角细边框，标签位于字段上方，不使用占位符代替标签。
-- **Focus:** 墨色或石褐实线焦点，满足可见性要求。
-- **Error / Disabled:** 错误信息使用 `error` 并紧邻字段；成功和非阻断提醒分别使用 `success`、`warning`。禁用状态仍保留文本识别度。
-
-### Navigation
-
-- 桌面导航单行显示，目标高度 72-80px。品牌标识保持完整但不挤压首屏。
-- 手机导航使用清晰遮罩和 44px 以上链接行。关闭操作与品牌标识保持空间关系，英文标签不得缩成装饰点。
-
-### Bilingual Content
-
-- 中文是主要阅读入口，英文是完整的第二信息层。
-- 标题、字段、按钮、筛选和文章都保留现有中英文内容，不删减、不改写。
-- 同屏堆叠导致不可读时，可以通过层级、换行或语言切换改善，但不能把英文缩小到失去功能。
-
-### Artwork Records
-
-- 藏品列表以作品图像为主，筛选和分页必须支持动态记录数量。
-- 作品详情保留现有字段、顺序和相关内容，使用字段组和阅读宽度处理高密度资料。
-- 状态标签是信息，不是装饰，不叠加在作品图像上。
-
-### Exhibition Catalogue Viewer
-
-- 保留真实图录页、页码、翻页、缩略索引和移动触控逻辑。
-- 视觉材料应回归平整档案界面，逐步移除大圆角、暖色渐变、模糊高光和厚阴影。
-
-## Do's and Don'ts
-
-### Do:
-
-- **Do** 完整保留首页现有板块、顺序、中英文文案和真实图片。
-- **Do** 在没有 `current` 展览时真实显示近期展览状态。
-- **Do** 直接读取线上真实藏品、展览、文章和图录记录。
-- **Do** 让网格、分页、筛选、相关推荐和图录索引适应未来内容增长。
-- **Do** 分别设定首页、藏品列表、作品详情、展览详情、文章列表和长文阅读的视觉密度。
-- **Do** 在减少背景泛黄时保留温度，使用暖展墙而不是冷白。
-- **Do** 保留 CMS、上传、保存、API、内容字段和部署逻辑的完整边界。
-- **Do** 保持正文、字段、状态和交互文字可读，并维持 44px 触控目标。
-- **Do** 使用 `accent-text` 呈现 12px 石褐标签，并在每个预览背景上重新验证 4.5:1。
-- **Do** 只在功能反馈中使用 `error`、`success` 和 `warning`。
-
-### Don't:
-
-- **Don't** 增加、删除、改写或重新命名首页板块和文案。
-- **Don't** 在成都研究空间方向中擅自把空间照片加入首页。
-- **Don't** 使用模拟藏品、模拟展览、模拟文章、模拟数量或占位记录。
-- **Don't** 把当前 32 件藏品、3 个展览和 6 篇文章写死为布局容量。
-- **Don't** 把 VISUAL_DENSITY 5 或任何单一密度值应用到全站。
-- **Don't** 把背景改成冷白西方画廊，也不要使用仿古纸、泛黄纸纹、木纹或暖金商城色。
-- **Don't** 使用黑金、暗红、莲花、祥云、印章、宗教光效或商业海报语言。
-- **Don't** 使用巨大中文口号、无内容依据的过度空白、过小过淡正文或花哨视差。
-- **Don't** 直接照搬 David Zwirner、Hauser & Wirth、Eskenazi 或 The Met 的品牌表面。
-- **Don't** 将数字图录做成大圆角、宽阴影、玻璃感或消费产品式卡片。
-- **Don't** 将 `#f4f0e8`、`#f7f3ec` 和 `#fbf8f2` 宣布为最终目标色，它们只是 current baseline。
-- **Don't** 将 `#85715a` 用于 12px 标签或正文文字。
-- **Don't** 把错误红、成功绿或警告赭扩展为品牌装饰、栏目配色或作品分类色。
+- 不使用模拟藏品、展览、文章或编造的数量；所有列表适应内容增长，不把当前数量写进布局。
+- 不使用仿古纸、木纹、莲花、祥云、印章、宗教光效、黑金或商业海报语言。
+- 页面视觉或交互变更须在约 390 / 820 / 1180 / 1440px 出三端可比预览，由站主确认；浏览器模拟不等于真机验收。
