@@ -45,8 +45,8 @@ export const siteConfig: SiteConfigContent = {
     eyebrow: bt("联系", "Contact"),
     title: bt("联系", "Contact"),
     description: bt(
-      "欢迎藏家、机构、策展人与我们联系。竹瑾居以收藏、咨询、展览、学术研究为主要联络方向。",
-      "Collectors, institutions, and curators are welcome to contact us. Zhu Jin Ju's primary communication focus includes collecting, consultation, exhibitions, and academic research."
+      "作品咨询、研究交流或预约到访，欢迎联系竹瑾居。",
+      "For artwork inquiries, research or a visit to our Chengdu gallery, please get in touch."
     ),
     aside: bt(
       "如咨询具体作品，可在表单中填写作品名称；若由作品页进入，意向作品将自动带入。成都会面采用预约制，期待与您相见。",
@@ -66,7 +66,7 @@ export const siteConfig: SiteConfigContent = {
     appointment: bt("By Appointment in Chengdu", "By Appointment in Chengdu"),
     copyrightLabel: bt("版权所有", "Copyright"),
     contactHeading: bt("联络", "Contact"),
-    informationHeading: bt("信息与请求", "Information"),
+    informationHeading: bt("网站信息", "Information"),
     collectionLink: bt("藏品浏览", "Browse Collection"),
     exhibitionsLink: bt("展览与图录", "Exhibitions & Catalogues"),
     journalLink: bt("文章与动态", "Journal"),

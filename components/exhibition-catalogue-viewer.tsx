@@ -9,6 +9,7 @@ import {
 } from "@/lib/catalogue-media";
 
 import styles from "./exhibition-catalogue-viewer.module.css";
+import { formatPlateProgress } from "@/lib/catalogue-reading";
 import { ProtectedImage } from "./protected-image";
 import { MobileCatalogueReader } from "./mobile-catalogue-reader";
 import { CatalogueThumbnails } from "./catalogue-thumbnails";
@@ -240,16 +241,6 @@ export function ExhibitionCatalogueViewer({
   const canGoNext = usesDesktopPairing
     ? currentIndex + 2 < totalPages
     : currentIndex + 1 < totalPages;
-  const currentLabel = usesDesktopPairing
-    ? `${currentIndex + 1}${cataloguePages[currentIndex + 1] ? ` - ${currentIndex + 2}` : ""}`
-    : `${currentIndex + 1}`;
-  const visiblePageNumbers = visiblePages
-    .map((page, index) => (page ? currentIndex + index + 1 : null))
-    .filter((pageNumber): pageNumber is number => pageNumber !== null);
-  const stageSummary =
-    visiblePageNumbers.length > 1
-      ? `${visiblePageNumbers[0]} - ${visiblePageNumbers[visiblePageNumbers.length - 1]}`
-      : `${visiblePageNumbers[0] ?? 1}`;
   function jumpTo(index: number) {
     if (!totalPages) {
       return;
@@ -366,7 +357,7 @@ export function ExhibitionCatalogueViewer({
                 <ProtectedImage
                   key={`slot-${index}-${page}`}
                   src={nearViewport ? page : thumbPages[currentIndex + index]}
-                  alt={`${title.zh || title.en} page ${currentIndex + index + 1}`}
+                  alt={`${title.zh || title.en}，图版 ${currentIndex + index + 1}`}
                   width={geometries[currentIndex + index]?.width ?? 4000}
                   height={geometries[currentIndex + index]?.height ?? 2358}
                   unoptimized
@@ -383,7 +374,7 @@ export function ExhibitionCatalogueViewer({
           </div>
           <div className={styles.controls}>
             <span aria-live="polite">
-              第 {currentLabel} 页 · {stageSummary} / {totalPages}
+              {formatPlateProgress(currentIndex, totalPages, usesDesktopPairing)}
             </span>
             <div className={styles.progress} aria-hidden="true">
               <span

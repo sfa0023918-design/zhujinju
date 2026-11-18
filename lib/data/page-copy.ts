@@ -20,13 +20,13 @@ export const pageCopy = {
     },
     contactForm: {
       introIdle: bt(
-        "欢迎藏家、机构、策展人与研究者联系。",
-        "Collectors, institutions, curators, and researchers are welcome to get in touch.",
+        "填写咨询",
+        "Inquiry form",
       ),
       introSubmitting: bt("提交中", "Sending"),
       introSuccess: bt(
-        "已收到信息。竹瑾居通常会于一个工作日内回复。",
-        "Message received. Zhu Jin Ju usually replies within one working day.",
+        "已收到你的咨询，感谢联系竹瑾居。",
+        "Thank you. Your inquiry has been received.",
       ),
       introError: bt("提交失败，请稍后再试。", "Submission failed. Please try again later."),
       nameLabel: bt("姓名", "Name"),
@@ -96,7 +96,7 @@ export const pageCopy = {
     },
     contact: {
       eyebrow: bt("联系", "Contact"),
-      title: bt("欢迎藏家、机构、策展人与研究者联系。", "Collectors, Institutions, Curators, and Researchers Are Welcome."),
+      title: bt("填写咨询", "Collectors, Institutions, Curators, and Researchers Are Welcome."),
       description: bt(
         "如需咨询具体作品、专题合作、机构借展、图录交换或研究交流，可通过联系页面提交信息。",
         "For inquiries about individual works, collaborations, institutional loans, catalogue exchange, or research discussion, please use the contact page.",
@@ -110,8 +110,8 @@ export const pageCopy = {
       eyebrow: bt("关于", "About"),
       title: bt("关于竹瑾居", "About Zhu Jin Ju"),
       description: bt(
-        "竹瑾居创立于2016年，位于中国成都，是一家专注于喜马拉雅艺术收藏、研究与交流的艺术空间。我们持续关注喜马拉雅艺术的历史脉络、文化语境、审美精神与收藏价值，并以长期研究与实践为基础，致力于为藏家提供兼具学术视野与审美判断的观察方式，协助建立更具系统性与长期价值的收藏体系。",
-        "Founded in 2016 and based in Chengdu, China, Zhu Jin Ju is an art space dedicated to the collection, research, and exchange of Himalayan art. We maintain a sustained engagement with its historical lineages, cultural contexts, aesthetic ethos, and significance as a field of collecting. Grounded in long-term research and practice, we seek to offer collectors an approach informed by both scholarly insight and connoisseurial judgment, supporting them in building more coherent collections of enduring value.",
+        "竹瑾居于 2016 年创立于成都，专注喜马拉雅艺术的收藏与研究。我们通过展览、图录与访谈，记录对作品的观察。",
+        "Founded in Chengdu in 2016, Zhu Jin Ju collects and studies Himalayan art. We share our observations through exhibitions, catalogues and interviews.",
       ),
       aside: bt("", ""),
     },
@@ -186,7 +186,7 @@ export const pageCopy = {
     errorTitle: bt("作品未找到", "Artwork Not Found"),
     errorDescription: bt("当前作品不存在或尚未公开。", "This work is unavailable or not yet published."),
     breadcrumb: bt("藏品", "Collection"),
-    inquireAction: bt("询洽此件作品", "Inquire"),
+    inquireAction: bt("咨询这件作品", "Inquire about this work"),
     backAction: bt("返回藏品浏览", "Back to Collection"),
     scholarlyNote: bt("学术说明", "Scholarly Note"),
     viewingNote: bt("观看描述", "Visual Description"),
@@ -197,7 +197,7 @@ export const pageCopy = {
     relatedExhibitions: bt("相关展览", "Related Exhibitions"),
     relatedArticles: bt("相关文章", "Related Articles"),
     relatedWorks: bt("相关推荐", "Related Works"),
-    relatedWorksTitle: bt("同类方向中的其他作品", "Other Works in the Same Direction"),
+    relatedWorksTitle: bt("相关作品", "Related works"),
     fieldLabels: {
       period: bt("年代", "Period"),
       regionOrigin: bt("地区 / 产地", "Region / Origin"),
@@ -240,8 +240,8 @@ export const pageCopy = {
       eyebrow: bt("文章", "Journal"),
       title: bt("文章", "Journal"),
       description: bt(
-        "用于发布研究短文、展览札记与市场观察。",
-        "A space for short research writing, exhibition notes, and market observations.",
+        "从一件作品、一场展览或一次对谈，走进喜马拉雅艺术。",
+        "Himalayan art through works, exhibitions and conversations.",
       ),
       aside: bt("", ""),
     },

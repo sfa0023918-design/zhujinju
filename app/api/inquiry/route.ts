@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { getArtworkBySlug, loadSiteContent } from "@/lib/site-data";
+import { getInquiryRequest, getInquiryWork } from "@/lib/artwork-inquiry";
 import { isInquiryConfigError, sendInquiryEmail } from "@/lib/inquiry-mail";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,6 +56,8 @@ export async function POST(request: Request) {
     organization?: string;
     identity?: string;
     artwork?: string;
+    work?: string;
+    request?: string;
     website?: string;
     submittedAt?: string;
   };
@@ -71,6 +75,8 @@ export async function POST(request: Request) {
   const organization = normalizeText(body.organization);
   const identity = normalizeText(body.identity);
   const artwork = normalizeText(body.artwork);
+  const workSlug = normalizeText(body.work);
+  const requested = normalizeText(body.request);
   const website = normalizeText(body.website);
   const submittedAt = Number.parseInt(normalizeText(body.submittedAt), 10);
 
@@ -82,7 +88,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "提交过快，请稍候再试。" }, { status: 400 });
   }
 
-  if (!name || !email || !message) {
+  if (!name || !email || (!message && !(workSlug && requested))) {
     return NextResponse.json({ error: "请填写姓名、邮箱和留言内容。" }, { status: 400 });
   }
 
@@ -95,12 +101,20 @@ export async function POST(request: Request) {
     organization.length > MAX_ORGANIZATION_LENGTH ||
     identity.length > MAX_IDENTITY_LENGTH ||
     artwork.length > MAX_ARTWORK_LENGTH ||
+    workSlug.length > MAX_ARTWORK_LENGTH ||
+    requested.length > MAX_ARTWORK_LENGTH ||
     message.length > MAX_MESSAGE_LENGTH
   ) {
     return NextResponse.json({ error: "提交内容过长，请精简后再试。" }, { status: 400 });
   }
 
   try {
+    const record = workSlug ? getArtworkBySlug(await loadSiteContent(), workSlug) : undefined;
+    const selection = record ? getInquiryRequest(record, requested) : undefined;
+    if (workSlug && (!record || record.status === "sold" || (requested && !selection))) {
+      return NextResponse.json({ error: "作品或资料选项已更新，请返回作品页重新选择。" }, { status: 400 });
+    }
+    const work = record ? getInquiryWork(record) : undefined;
     const receivedAt = new Date(now).toISOString();
 
     await sendInquiryEmail(
@@ -109,7 +123,9 @@ export async function POST(request: Request) {
         email,
         organization,
         identity,
-        artwork,
+        artwork: work ? [work.title.zh, work.title.en, work.details.zh, work.details.en].filter(Boolean).join(" / ") : artwork,
+        workSlug,
+        requested: selection ? [selection.zh, selection.en].filter(Boolean).join(" / ") : requested,
         message,
       },
       {

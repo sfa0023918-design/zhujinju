@@ -44,3 +44,9 @@ test("deferred font styles preserve every original face, glyph range and weight"
   const manifest = JSON.parse(read("lib/data/reading-fallback-stylesheet.json"));
   assert.deepEqual(faces(read("app/(site)/reading-fonts.css")), faces(read("app/(site)/reading-critical-fonts.css") + read(`public${manifest.href}`)));
 });
+
+test("catalogue extent counts available digital images separately from printed-only records", () => {
+  const extent = loaded.exports.formatCatalogueExtent;
+  assert.equal(extent({ cataloguePages: 240, cataloguePageImages: ["one", "", "two"] }).en, "2 digital plates");
+  assert.equal(extent({ cataloguePages: 240 }).en, "240 catalogue pages");
+});

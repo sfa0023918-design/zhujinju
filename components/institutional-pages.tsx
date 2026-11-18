@@ -1,5 +1,7 @@
 import { ExpandableReadingText } from "@/components/bilingual-prose";
 import { BilingualText } from "@/components/bilingual-text";
+import type { InquiryWork } from "@/lib/artwork-inquiry";
+import type { BilingualText as BilingualValue } from "@/lib/data/types";
 import { ContactForm } from "@/components/contact-form";
 import { ProtectedImage } from "@/components/protected-image";
 import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
@@ -21,6 +23,8 @@ type ContactPageContentProps = {
   siteConfig: SiteConfigContent;
   pageCopy: PageCopyContent;
   initialArtwork?: string;
+  work?: InquiryWork;
+  request?: BilingualValue;
 };
 
 const aboutSpaceImage = "/uploads/branding/about-space-himalayan-art-20260930.png";
@@ -139,6 +143,8 @@ export function ContactPageContent({
   siteConfig,
   pageCopy,
   initialArtwork,
+  work,
+  request,
 }: ContactPageContentProps) {
   const labels = siteConfig.contactPage.infoLabels;
   const phoneHref = getTelHref(siteConfig.contact.phone);
@@ -150,14 +156,6 @@ export function ContactPageContent({
     <div className={styles.pageShell}>
       <section className={styles.contactHero}>
         <div>
-          <BilingualText
-            as="p"
-            text={siteConfig.contactPage.eyebrow}
-            mode="inline"
-            className={styles.kicker}
-            zhClassName={styles.inlineZh}
-            enClassName={styles.inlineEn}
-          />
           <BilingualText
             as="h1"
             text={siteConfig.contactPage.title}
@@ -174,31 +172,22 @@ export function ContactPageContent({
             zhClassName={styles.zh}
             enClassName={styles.en}
           />
-          <BilingualText
-            as="div"
-            text={siteConfig.contactPage.aside}
-            className={styles.contactAside}
-            zhClassName={styles.zh}
-            enClassName={styles.en}
-          />
+          <div className={styles.contactActions}>
+            <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a>
+            <a href="#inquiry">填写咨询 <span lang="en">Inquiry form</span> ↓</a>
+          </div>
         </div>
       </section>
 
       <section className={styles.contactBody}>
+        <ContactForm
+          key={JSON.stringify([work?.slug, initialArtwork, request])}
+          work={work}
+          request={request}
+          initialArtwork={initialArtwork}
+          copy={pageCopy.siteChrome.contactForm}
+        />
         <div className={styles.contactRegister}>
-          <div className={styles.contactItem}>
-            <BilingualText
-              as="h2"
-              text={labels.email}
-              className={styles.contactLabel}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-            <a href={`mailto:${siteConfig.contact.email}`} className={styles.contactValue}>
-              {siteConfig.contact.email}
-            </a>
-          </div>
-
           <div className={styles.contactItem}>
             <BilingualText
               as="h2"
@@ -235,7 +224,7 @@ export function ContactPageContent({
           <div className={styles.contactItem}>
             <BilingualText
               as="div"
-              text={siteConfig.contact.address}
+              text={siteConfig.contact.replyWindow}
               className={styles.contactAddress}
               zhClassName={styles.zh}
               enClassName={styles.en}
@@ -248,29 +237,7 @@ export function ContactPageContent({
               enClassName={styles.en}
             />
           </div>
-
-          <div className={styles.contactItem}>
-            <BilingualText
-              as="div"
-              text={siteConfig.contact.replyWindow}
-              className={styles.contactAddress}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-            <BilingualText
-              as="div"
-              text={siteConfig.contact.collaborationNote}
-              className={styles.contactNote}
-              zhClassName={styles.zh}
-              enClassName={styles.en}
-            />
-          </div>
         </div>
-
-        <ContactForm
-          initialArtwork={initialArtwork}
-          copy={pageCopy.siteChrome.contactForm}
-        />
       </section>
     </div>
   );

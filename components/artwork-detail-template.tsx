@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { artworkInquiryHref } from "@/lib/artwork-inquiry";
 import type {
   Article,
   Artwork,
@@ -106,7 +107,6 @@ export function ArtworkDetailTemplate({
     { key: "dimensions", label: detailCopy.fieldLabels.dimensions, value: { zh: formatDimensions(artwork.dimensions.zh), en: formatDimensions(artwork.dimensions.en) } },
     { key: "status", label: { zh: "状态", en: "Status" }, value: status },
   ].filter((item) => hasText(item.value));
-  const inquiryHref = `/contact?artwork=${encodeURIComponent(`${artwork.title.zh} / ${artwork.title.en}`)}`;
   const viewingNote = artwork.viewingNote;
   const sections = [
     { id: "artwork-info", label: { zh: "作品信息", en: "Artwork Info" } },
@@ -182,7 +182,7 @@ export function ArtworkDetailTemplate({
                 <span lang="en">{status.en}</span>
               </div>
             ) : (
-              <Link href={inquiryHref} className={styles.inquiryAction}>
+              <Link href={artworkInquiryHref(artwork.slug)} className={styles.inquiryAction}>
                 {detailCopy.inquireAction.zh}
                 <span lang="en">{detailCopy.inquireAction.en}</span>
                 <span aria-hidden="true">→</span>
@@ -193,7 +193,7 @@ export function ArtworkDetailTemplate({
                 {artwork.inquirySupport.filter(hasText).map((item) => (
                   <li key={item.zh || item.en}>
                     <Link
-                      href={`${inquiryHref}&request=${encodeURIComponent(item.zh || item.en)}`}
+                      href={artworkInquiryHref(artwork.slug, item)}
                     >
                       {item.zh || item.en}
                       {item.zh && item.en ? <span lang="en">{item.en}</span> : null}

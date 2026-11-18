@@ -28,6 +28,7 @@ export async function generateMetadata() {
 export default async function CollectionPage() {
   const content = await loadSiteContent();
   const publicArtworks = getPublicArtworks(content);
+  const available = publicArtworks.filter((artwork) => artwork.status === "inquiry").length;
   const artworkSummaries = publicArtworks.map(toCollectionArtworkSummary);
   const { pageCopy } = content;
   const filterLabels = {
@@ -43,10 +44,10 @@ export default async function CollectionPage() {
           <p lang="en">{pageCopy.collection.hero.title.en}</p>
         </div>
         <p className={styles.totalCount}>
-          <span>共 {publicArtworks.length} 件作品</span>
+          <span>{publicArtworks.length} 件作品 · {available} 件可洽询</span>
           <span lang="en">
             {publicArtworks.length} works ·{" "}
-            {publicArtworks.filter((a) => a.status === "inquiry").length}{" "}
+            {available}{" "}
             available<span className={styles.desktopOnly}> on request</span>
           </span>
         </p>

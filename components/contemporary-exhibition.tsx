@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
+import { formatCatalogueExtent, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 import type { Article, Exhibition, PageCopyContent } from "@/lib/site-data";
 import {
   COVER_VAJRA_CLIP,
@@ -30,7 +30,6 @@ export function ContemporaryExhibition({
   const status = getExhibitionStatus(e);
   const seasonal = e.slug === "himalayan-art-2026";
   const pages = e.cataloguePageImages?.filter(Boolean) ?? [];
-  const count = e.cataloguePageCount ?? e.cataloguePages ?? pages.length;
   const works = e.featuredWorksCount ?? e.highlightCount ?? fallbackWorkCount;
   const note = e.catalogueNote ?? e.catalogueIntro;
   const introIsHeading =
@@ -55,7 +54,7 @@ export function ContemporaryExhibition({
     {
       zh: "图录",
       en: "Catalogue",
-      value: { zh: `${count} 页`, en: `${count} catalogue pages` },
+      value: formatCatalogueExtent(e),
     },
   ];
   return (
@@ -269,12 +268,12 @@ export function ContemporaryExhibition({
                     {formatExhibitionPeriod(item.period).zh} · {item.venue.zh}
                     <br />
                     {item.featuredWorksCount ?? item.highlightCount} 件重点作品
-                    {" · "}{item.cataloguePageCount ?? item.cataloguePages} 页图录
+                    {" · "}{formatCatalogueExtent(item).zh}
                   </p>
                   <p className={styles.archiveFacts} lang="en">
                     {formatExhibitionPeriod(item.period).en} · {item.venue.en}
                     <br />
-                    {item.featuredWorksCount ?? item.highlightCount} works · {item.cataloguePageCount ?? item.cataloguePages} catalogue pages
+                    {item.featuredWorksCount ?? item.highlightCount} works · {formatCatalogueExtent(item).en}
                   </p>
                 </Link>
               ))}

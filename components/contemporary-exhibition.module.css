@@ -492,3 +492,27 @@
 
 .exhibitionStatus { display: flex; gap: 10px; margin: 0; color: var(--rust-muted); font-size: 12px; letter-spacing: 0.04em; }
 .archiveHero .exhibitionStatus { color: var(--muted); }
+
+
+@media (min-width: 600px) and (max-width: 860px), (min-width: 861px) and (max-width: 1024px) and (orientation: portrait) {
+  .hero:not(.archiveHero) .heroGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    padding: 24px var(--page-inline, 24px) 0;
+  }
+  .wordmarkBlock {
+    height: auto;
+    justify-self: start;
+    padding: 0;
+  }
+  .wordmark { font-size: clamp(72px, 10vw, 100px); }
+  .vajra { position: static; justify-self: center; }
+  .vajraImage { height: clamp(330px, 46vw, 460px); margin: 0; }
+  .hero:not(.archiveHero) .heroCopy {
+    grid-column: 1 / -1;
+    justify-self: start;
+    max-width: none;
+    padding-block: 20px 28px;
+  }
+}

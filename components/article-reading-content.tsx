@@ -305,14 +305,16 @@ export function ArticleReadingContent({
                 <button
                   key={option}
                   type="button"
+                  aria-pressed={active}
+                  lang={option === "en" ? "en" : "zh-CN"}
                   onClick={() => setLocale(option)}
-                  className={`min-h-11 min-w-11 rounded-full px-3 py-1 text-xs uppercase tracking-[0.12em] transition-colors ${
+                  className={`min-h-11 min-w-11 rounded-full px-3 py-1 text-xs tracking-[0.03em] transition-colors ${
                     active
                       ? "bg-[var(--surface)] text-[var(--ink)]"
                       : "text-[var(--accent-text)] hover:text-[var(--ink)]"
                   }`}
                 >
-                  {option.toUpperCase()}
+                  {option === "zh" ? "中文" : "English"}
                 </button>
               );
             })}
@@ -324,7 +326,7 @@ export function ArticleReadingContent({
         {readingBlocks.map((block, index) => {
           if (block.type === "reading") {
             return <div key={`reading-${index}`} className={`article-reading-copy mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS}`}>
-              <ExpandableReadingText translations={hasEnglish ? block.paragraphs : undefined}
+              <ExpandableReadingText expandLabel={{ zh: "展开本节", en: "Read this section" }} translations={hasEnglish ? block.paragraphs : undefined}
                 paragraphs={block.paragraphs.zh} locale={locale} />
             </div>;
           }

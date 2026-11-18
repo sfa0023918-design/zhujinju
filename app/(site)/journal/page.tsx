@@ -59,7 +59,12 @@ function ArticleCard({
   readAction: BilingualValue;
 }) {
   const href = `/journal/${article.slug}`;
-  const excerpt = getArticleDisplayExcerpt(article);
+  const isLecture = article.slug === "christies-lecture-sonam-gyaltsen-2026";
+  const title = isLecture ? bt("佳士得成都讲座｜索南坚赞的影响与传承", "The Legacy of Sonam Gyaltsen") : article.title;
+  const excerpt = isLecture ? bt(
+    "竹瑾居主理人张弥在佳士得成都讲座中谈十五世纪铸造大师索南坚赞。",
+    "At Christie’s in Chengdu, Zhang Mi discusses the work of the 15th-century master caster Sonam Gyaltsen.",
+  ) : getArticleDisplayExcerpt(article);
 
   return (
     <article className={styles.card} data-layout={index === 0 ? "lead" : "regular"} data-editorial={article.editorial ? "exhibition" : undefined}>
@@ -70,7 +75,7 @@ function ArticleCard({
         <Link href={href} className={styles.titleLink}>
           <BilingualText
             as="h2"
-            text={article.title}
+            text={title}
             className={styles.cardTitle}
             zhClassName={styles.zh}
             enClassName={styles.en}
