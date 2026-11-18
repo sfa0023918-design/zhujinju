@@ -13,6 +13,7 @@ import slidePhotos from "@/lib/data/home-slide-photos.json";
 import openingPhoto from "@/lib/data/home-opening-photo.json";
 import { withImageVersion } from "@/lib/image-url";
 import { HomeArrow } from "@/components/home-ui";
+import { useNavigationPending } from "./navigation-preview";
 import { useSiteMenu } from "./site-menu-state";
 import { useNativeCarousel } from "./use-native-carousel";
 import styles from "@/app/(site)/home.module.css";
@@ -83,12 +84,13 @@ export function HomeHero({
   const [visible, setVisible] = useState(true);
   const [native, setNative] = useState(false);
   const { open: menuOpen } = useSiteMenu();
+  const leaving = useNavigationPending();
   const section = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
   const [requested, setRequested] = useState<number[]>([0]);
   const [status, setStatus] = useState<Partial<Record<number, PhotoStatus>>>({});
   const carousel = useNativeCarousel({ count: slides.length, active, onChange: setActive, enabled: native, loop: native });
-  const canWarm = visible && inView && !menuOpen;
+  const canWarm = visible && inView && !menuOpen && !leaving;
   const currentSettled = isReady(status[active]) || status[active] === "failed";
   // Skip a photograph only after both sources failed. Its manual control stays available.
   let next = active;

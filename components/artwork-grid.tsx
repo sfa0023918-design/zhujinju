@@ -73,7 +73,8 @@ export function ArtworkGrid({
                 return (
                   <ArtworkGridLink
                     source={source}
-                    warmRoute={fillRows && mode !== "desktop" && index === 0}
+                    title={a.title}
+                    facts={{ zh: [a.region.zh, a.period.zh].filter(Boolean).join("，"), en: [a.region.en, a.period.en].filter(Boolean).join(", ") }}
                     width={width}
                     height={height}
                     key={a.slug}

@@ -3,6 +3,7 @@ import { COVER_VAJRA_BACKDROP } from "@/lib/artwork-presentation";
 import { SiteContentFrame } from "@/components/site-content-frame";
 import { Analytics } from "@vercel/analytics/next";
 
+import { NavigationPreviewProvider } from "@/components/navigation-preview";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteMenuProvider } from "@/components/site-menu-state";
 import { SiteHeader } from "@/components/site-header";
@@ -25,10 +26,12 @@ export default function SiteLayout({
       {/* Resolve streamed children inside a boundary, not the theme host node. */}
       <Suspense fallback={null}>
         <SiteFontPreloads />
-        <SiteMenuProvider>
-          <SiteHeader />
-          <SiteContentFrame>{children}</SiteContentFrame>
-        </SiteMenuProvider>
+        <NavigationPreviewProvider>
+          <SiteMenuProvider>
+            <SiteHeader />
+            <SiteContentFrame>{children}</SiteContentFrame>
+          </SiteMenuProvider>
+        </NavigationPreviewProvider>
         <SiteFooter />
         <Analytics />
       </Suspense>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { formatExhibitionPeriod } from "@/lib/display-format";
 import { bt } from "@/lib/bilingual";
 import { getCurrentExhibition, loadSiteContent } from "@/lib/site-data";
 
@@ -19,6 +20,7 @@ const navigation = [
 export async function SiteHeader() {
   const content = await loadSiteContent();
   const { siteConfig } = content;
+  const current = getCurrentExhibition(content);
 
   return (
     <SiteHeaderFrame>
@@ -64,7 +66,10 @@ export async function SiteHeader() {
           className={`${styles.logo} ${styles.seasonLogo}`}
         />
       </Link>
-      <SiteHeaderNav items={navigation} seasonalCover={getCurrentExhibition(content)?.slug === "himalayan-art-2026"} />
+      <SiteHeaderNav items={navigation} exhibition={current?.slug === "himalayan-art-2026" ? {
+        title: current.title,
+        facts: bt([formatExhibitionPeriod(current.period).zh, current.venue.zh].filter(Boolean).join(" · "), [formatExhibitionPeriod(current.period).en, current.venue.en].filter(Boolean).join(" · ")),
+      } : undefined} />
     </SiteHeaderFrame>
   );
 }

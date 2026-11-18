@@ -48,7 +48,7 @@ export function HomeAction({
   return (
     <Link
       href={href}
-      prefetch={subtle ? false : null}
+      prefetch={false}
       className={`${subtle ? styles.textLink : styles.button} ${className}`}
     >
       <span>

@@ -50,7 +50,7 @@ function SectionHeading({
         subtle
         className={styles.desktopHeadingAction}
       />
-      <Link href={href} className={styles.mobileHeadingAction}>
+      <Link prefetch={false} href={href} className={styles.mobileHeadingAction}>
         <span className={styles.labelZh}>{mobileAction}</span>
         <HomeArrow />
       </Link>
@@ -176,7 +176,7 @@ export default async function HomePage() {
               <HomeLabel text={{ zh: "近期展览", en: "Recent Exhibition" }} />
               {exhibitionStatus ? <span className={styles.exhibitionStatus}>{exhibitionStatus.zh} <span lang="en">{exhibitionStatus.en}</span></span> : null}
             </div>
-            <Link href="/exhibitions" className={styles.archiveLink}>
+            <Link prefetch={false} href="/exhibitions" className={styles.archiveLink}>
               <HomeLabel text={{ zh: "往期展览", en: "Exhibition archive" }} />
               <HomeArrow />
             </Link>
@@ -293,6 +293,7 @@ export default async function HomePage() {
             />
             <div className={styles.journalGrid}>
               <Link
+                prefetch={false}
                 href={`/journal/${feature.slug}`}
                 className={styles.featureImage}
               >
@@ -308,6 +309,7 @@ export default async function HomePage() {
                 />
               </Link>
               <Link
+                prefetch={false}
                 href={`/journal/${feature.slug}`}
                 className={styles.featureCopy}
               >
@@ -354,6 +356,7 @@ export default async function HomePage() {
               <div className={styles.articleList}>
                 {otherArticles.map((article) => (
                   <Link
+                    prefetch={false}
                     href={`/journal/${article.slug}`}
                     className={styles.articleItem}
                     key={article.slug}

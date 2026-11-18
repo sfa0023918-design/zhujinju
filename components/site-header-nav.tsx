@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { preload } from "react-dom";
 import exhibitionCover from "@/lib/data/exhibition-cover-photo.json";
-import { EXHIBITION_COVER_SIZES } from "@/lib/artwork-presentation";
+import { useNavigationPreview } from "./navigation-preview";
+import { COVER_VAJRA_IMAGE, EXHIBITION_COVER_SIZES } from "@/lib/artwork-presentation";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 import { BilingualText } from "./bilingual-text";
@@ -20,7 +21,7 @@ type NavItem = {
 
 type SiteHeaderNavProps = {
   items: NavItem[];
-  seasonalCover: boolean;
+  exhibition?: { title: BilingualValue; facts: BilingualValue };
 };
 
 function MenuLinkStatus() {
@@ -32,13 +33,20 @@ function MenuLinkStatus() {
   );
 }
 
-export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
+export function SiteHeaderNav({ items, exhibition }: SiteHeaderNavProps) {
   const pathname = usePathname();
   const { open, setOpenPath } = useSiteMenu();
   const router = useRouter();
 
-  function warmExhibitionCover(href: string) {
-    if (seasonalCover && href === "/exhibitions") {
+  const openPreview = useNavigationPreview();
+
+  function navigateToExhibition(event: { preventDefault(): void }, href: string) {
+    if (exhibition && href === "/exhibitions" && pathname !== href) {
+      if (openPreview) {
+        event.preventDefault();
+        setOpenPath(null);
+        openPreview(href, { ...exhibition, source: COVER_VAJRA_IMAGE, width: 900, height: 1198, sizes: EXHIBITION_COVER_SIZES, exhibition: true });
+      }
       preload(exhibitionCover.href, {
         as: "image", type: exhibitionCover.type, imageSrcSet: exhibitionCover.srcSet,
         imageSizes: EXHIBITION_COVER_SIZES, fetchPriority: "high",
@@ -94,7 +102,7 @@ export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
               onFocus={event => {
                 if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
               }}
-              onNavigate={() => warmExhibitionCover(item.href)}
+              onNavigate={event => navigateToExhibition(event, item.href)}
               aria-current={active ? "page" : undefined}
               className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
             >
@@ -143,7 +151,7 @@ export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
                     onFocus={(event) => {
                       if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
                     }}
-                    onNavigate={() => warmExhibitionCover(item.href)}
+                    onNavigate={event => navigateToExhibition(event, item.href)}
                     onClick={() => {
                       // Other destinations close when pathname changes; keep
                       // their Link mounted until the navigation commits.
