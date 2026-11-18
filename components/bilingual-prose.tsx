@@ -276,6 +276,7 @@ export function ExpandableReadingText({
   translations,
   locale: controlledLocale,
   showBoth = false,
+  renderLocaleOptions = false,
   expandable = true,
   expandLabel = { zh: "阅读全文", en: "Read more" },
   variant = "body",
@@ -285,6 +286,7 @@ export function ExpandableReadingText({
   translations?: ReadingParagraphs;
   locale?: ReadingLocale;
   showBoth?: boolean;
+  renderLocaleOptions?: boolean;
   expandable?: boolean;
   expandLabel?: { zh: string; en: string };
   variant?: ProseVariant;
@@ -360,7 +362,7 @@ export function ExpandableReadingText({
         {(["zh", "en"] as const).map(value => <button key={value} type="button" aria-pressed={locale === value} onClick={() => setSelectedLocale(value)}>{value === "zh" ? "中文" : "English"}</button>)}
       </div> : null}
       <div id={contentId} className={showBoth ? "reading-excerpt-columns" : undefined}>
-        {(showBoth ? ["zh", "en"] as const : [locale]).map(value => (
+        {(showBoth || renderLocaleOptions ? ["zh", "en"] as const : [locale]).map(value => (
           <div key={value} data-reading-locale={value} data-active={locale === value}>
             {visible[value].map((paragraph, index) => (
               <p key={index} lang={value === "en" ? "en" : "zh-CN"}

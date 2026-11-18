@@ -478,6 +478,12 @@
   margin-top: 44px;
 }
 
+/* Native radio selection works as soon as the article HTML is visible. */
+.readingFrame[data-reading-picker]:not(:has(input[value="en"]:checked)) [data-reading-locale="en"],
+.readingFrame[data-reading-picker]:has(input[value="en"]:checked) [data-reading-locale="zh"] {
+  display: none;
+}
+
 .readingFrame :global(.article-reading-flow) {
   display: flex;
   flex-direction: column;
