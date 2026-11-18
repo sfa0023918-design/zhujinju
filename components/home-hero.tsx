@@ -3,18 +3,29 @@
 import Link from "next/link";
 import {
   useEffect,
+  useRef,
   useState,
   type CSSProperties,
   type ReactNode,
 } from "react";
 import { ProtectedImage } from "@/components/protected-image";
+import slidePhotos from "@/lib/data/home-slide-photos.json";
 import openingPhoto from "@/lib/data/home-opening-photo.json";
 import { withImageVersion } from "@/lib/image-url";
 import { HomeArrow } from "@/components/home-ui";
+import { useSiteMenu } from "./site-menu-state";
 import { useNativeCarousel } from "./use-native-carousel";
 import styles from "@/app/(site)/home.module.css";
 
-const openingImage = withImageVersion(openingPhoto.source);
+type HeroPhoto = typeof openingPhoto & { preview?: string };
+const photosBySource = new Map<string, HeroPhoto>(
+  [openingPhoto, ...slidePhotos].map(photo => [withImageVersion(photo.source), photo]),
+);
+
+type PhotoStatus = "ready" | "fallback" | "fallback-ready" | "failed";
+function isReady(status?: PhotoStatus) {
+  return status === "ready" || status === "fallback-ready";
+}
 
 export type HomeHeroSlide = {
   slug: string;
@@ -71,20 +82,46 @@ export function HomeHero({
   const [reducedMotion, setReducedMotion] = useState(false);
   const [visible, setVisible] = useState(true);
   const [native, setNative] = useState(false);
-  const [firstImageReady, setFirstImageReady] = useState(false);
-  const [readyImages, setReadyImages] = useState<number[]>([0]);
+  const { open: menuOpen } = useSiteMenu();
+  const section = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  const [requested, setRequested] = useState<number[]>([0]);
+  const [status, setStatus] = useState<Partial<Record<number, PhotoStatus>>>({});
   const carousel = useNativeCarousel({ count: slides.length, active, onChange: setActive, enabled: native, loop: native });
+  const canWarm = visible && inView && !menuOpen;
+  const currentSettled = isReady(status[active]) || status[active] === "failed";
+  // Skip a photograph only after both sources failed. Its manual control stays available.
+  let next = active;
+  for (let offset = 1; offset < slides.length; offset++) {
+    const index = (active + offset) % slides.length;
+    if (status[index] !== "failed") { next = index; break; }
+  }
+  const nextReady = isReady(status[next]);
+  const canPlay = canWarm && !paused && !hovered && !focused && !reducedMotion && !carousel.interacting;
+  const earliestAdvance = useRef(0);
+
+  function mark(index: number, value: PhotoStatus | undefined) {
+    setStatus(previous => previous[index] === value ? previous : { ...previous, [index]: value });
+  }
 
   useEffect(() => {
-    if (!firstImageReady || slides.length < 2) return;
-    // Let the opening photograph finish first; then warm both swipe directions.
-    // Keep visited photographs mounted so reversing direction stays immediate.
-    setReadyImages((previous) => {
-      const next = new Set(previous);
-      for (const offset of [-1, 0, 1]) next.add((active + offset + slides.length) % slides.length);
-      return next.size === previous.length ? previous : [...next];
-    });
-  }, [active, firstImageReady, slides.length]);
+    const element = section.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    // Keep visited works mounted. Warm forwards first, then the reverse swipe.
+    const wanted = [active];
+    if (canWarm && currentSettled && slides.length > 1) {
+      wanted.push(next);
+      if (nextReady) wanted.push((active + slides.length - 1) % slides.length);
+    }
+    setRequested(previous => wanted.every(i => previous.includes(i))
+      ? previous : [...new Set([...previous, ...wanted])]);
+  }, [active, canWarm, currentSettled, next, nextReady, slides.length]);
 
   useEffect(() => {
     const media = window.matchMedia("(any-pointer: coarse), (max-width: 1180px)");
@@ -109,13 +146,17 @@ export function HomeHero({
   }, []);
 
   useEffect(() => {
-    if (!firstImageReady || paused || hovered || focused || reducedMotion || !visible || carousel.interacting || slides.length < 2) return;
-    const timer = window.setTimeout(() => setActive((index) => (index + 1) % slides.length), 5000);
+    earliestAdvance.current = performance.now() + 5000;
+  }, [active, canPlay, currentSettled]);
+
+  useEffect(() => {
+    if (!canPlay || !currentSettled || !nextReady || active === next) return;
+    const timer = window.setTimeout(() => setActive(next), Math.max(0, earliestAdvance.current - performance.now()));
     return () => window.clearTimeout(timer);
-  }, [active, firstImageReady, paused, hovered, focused, reducedMotion, visible, slides.length, carousel.interacting]);
+  }, [active, canPlay, currentSettled, next, nextReady]);
 
   return (
-    <section className={styles.hero} aria-label="首页作品"
+    <section ref={section} className={styles.hero} aria-label="首页作品"
       data-native-carousel={native}
       data-hero-tone={slides[active]?.lightInk ? "light" : "dark"}
       onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(true); }}
@@ -129,7 +170,13 @@ export function HomeHero({
         {carousel.indexes.map((index, position) => {
           const slide = slides[index];
           const clone = native && slides.length > 1 && (position === 0 || position === slides.length + 1);
-          const isOpeningPhoto = slide.image === openingImage;
+          const photo = photosBySource.get(slide.image);
+          const backup = status[index] === "fallback" || status[index] === "fallback-ready";
+          const frameClass = [
+            styles.heroImageFrame, photo === openingPhoto && styles.openingPhoto,
+            slide.topFade && styles.topFade, slide.bottomFade && styles.bottomFade,
+            slide.framed && styles.framedArtwork,
+          ].filter(Boolean).join(" ");
           return (
             <div
               key={clone ? `clone-${slide.slug}` : slide.slug}
@@ -141,6 +188,7 @@ export function HomeHero({
                 {
                   "--slide-background": slide.background,
                   "--fade": slide.fade,
+                  "--photo-preview": (native || currentSettled || active !== 0) && photo?.preview ? `url("${photo.preview}")` : undefined,
                   "--image-height": slide.imageHeight,
                   "--image-ratio": slide.height / slide.width,
                   "--mobile-scale": parseFloat(slide.mobileHeight) / 100,
@@ -151,22 +199,26 @@ export function HomeHero({
                 } as CSSProperties
               }
             >
-              {index === active || readyImages.includes(index) ? <ProtectedImage
+              {(index === active || requested.includes(index)) && status[index] !== "failed" ? <ProtectedImage
+                key={backup ? "fallback" : "primary"}
                 src={slide.image}
-                pictureSource={isOpeningPhoto ? openingPhoto : undefined}
+                pictureSource={backup ? undefined : photo}
                 alt={`${slide.title.zh} ${slide.title.en}`}
                 width={slide.width}
                 height={slide.height}
                 priority={index === 0 && !clone}
-                fetchPriority={index === 0 ? "high" : "low"}
+                fetchPriority={index === active && !clone ? "high" : "low"}
                 loading={index === 0 ? undefined : "eager"}
-                onLoad={index === 0 ? () => setFirstImageReady(true) : undefined}
-                onError={index === 0 ? () => setFirstImageReady(true) : undefined}
+                onLoad={clone ? undefined : (event) => {
+                  // Next/Image invokes onLoad after decoding, including browser-cache hits.
+                  if (event.currentTarget.naturalWidth) mark(index, backup ? "fallback-ready" : "ready");
+                }}
+                onError={clone ? undefined : () => mark(index, photo && !backup ? "fallback" : "failed")}
                 quality={85}
                 sizes={heroImageSizes(slide)}
-                wrapperClassName={`${styles.heroImageFrame} ${isOpeningPhoto ? styles.openingPhoto : ""} ${slide.topFade ? styles.topFade : ""} ${slide.bottomFade ? styles.bottomFade : ""} ${slide.framed ? styles.framedArtwork : ""}`}
+                wrapperClassName={frameClass}
                 className={styles.heroImage}
-              /> : null}
+              /> : <span aria-hidden="true" className={frameClass} />}
             </div>
           );
         })}
@@ -177,7 +229,7 @@ export function HomeHero({
             <Link
               key={slide.slug}
               href={`/collection/${slide.slug}`}
-              prefetch={index === active ? undefined : false}
+              prefetch={false}
               className={styles.caption}
               tabIndex={index === active ? 0 : -1}
               aria-hidden={index !== active}
@@ -237,6 +289,11 @@ export function HomeHero({
           </div>
         </div>
       ) : null}
+      {status[active] === "failed" && (
+        <button type="button" className={styles.retryPhoto} onClick={() => mark(active, undefined)}>
+          重新加载图片 <span lang="en">Retry photo</span>
+        </button>
+      )}
       <div className={`${styles.wrap} ${styles.heroCopy}`}>{children}</div>
     </section>
   );

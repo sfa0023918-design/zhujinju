@@ -138,6 +138,8 @@
   transition: opacity 1.4s ease;
 }
 .heroImageFrame {
+  aspect-ratio: 1 / var(--image-ratio);
+  background: center / contain no-repeat var(--photo-preview, none);
   --photo-mask: linear-gradient(to right, transparent, #000 var(--fade));
   --photo-top-mask: linear-gradient(#000, #000);
   height: var(--image-height);
@@ -1202,3 +1204,13 @@
 .exhibitionLabel { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; }
 .exhibitionStatus { color: var(--rust-muted); font-size: 12px; white-space: nowrap; }
 .exhibitionStatus [lang="en"] { margin-left: 6px; }
+
+.retryPhoto {
+  display: block;
+  margin: 8px auto;
+  padding: 8px 14px;
+  color: var(--accent-text);
+  background: transparent;
+  font: 400 13px/1.5 var(--font-sans);
+  text-decoration: underline;
+}

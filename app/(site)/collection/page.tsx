@@ -5,9 +5,9 @@ import { toCollectionArtworkSummary } from "@/lib/collection-filtering";
 import { buildMetadata } from "@/lib/metadata";
 import { getPublicArtworks, loadSiteContent } from "@/lib/site-data";
 
-// Filters and pages are read from the address in the browser, so every request
-// renders with its own query (same as before) while later changes stay client-side.
-export const dynamic = "force-dynamic";
+// The public landing page is identical for all visitors. Query-specific visits
+// use the same template through the collection-query rewrite.
+export const dynamic = "force-static";
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();

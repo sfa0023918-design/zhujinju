@@ -100,7 +100,15 @@
 .mobileLinks {
   display: grid;
 }
+
+@font-face {
+  font-family: "Zhujinju Menu Song";
+  src: url("/fonts/reading-ui-400-f9a0d06f07ae.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
 .mobileLink {
+  position: relative;
   min-height: 52px;
   border-bottom: 1px solid var(--line);
 }
@@ -111,7 +119,7 @@
   padding-block: 12px;
 }
 .mobileZh {
-  font-family: var(--font-song);
+  font-family: "Zhujinju Menu Song", "Songti SC", serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
@@ -124,6 +132,14 @@
   font-style: normal;
   line-height: 1.6;
   letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.linkStatus {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 400 12px/1.5 var(--font-sans);
   color: var(--muted);
 }
 .mobileLinkActive {

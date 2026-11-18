@@ -46,8 +46,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return {
+      beforeFiles: ["category", "region", "period", "material", "status", "page"].map(key => ({
+        source: "/collection",
+        has: [{ type: "query" as const, key }],
+        destination: "/collection-query",
+      })),
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async redirects() {
     return [
+      { source: "/collection-query", destination: "/collection", permanent: false },
       {
         source: "/:path*",
         has: [
