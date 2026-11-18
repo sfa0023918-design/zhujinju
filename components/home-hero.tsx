@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -113,7 +114,7 @@ export function HomeHero({
   }, []);
 
   useEffect(() => {
-    // Autoplay needs the next photograph. Warm the previous one on the first touch.
+    // Autoplay needs the next full-resolution photograph first.
     const wanted = [active];
     if (canWarm && currentSettled && slides.length > 1) {
       wanted.push(next);
@@ -121,6 +122,19 @@ export function HomeHero({
     setRequested(previous => wanted.every(i => previous.includes(i))
       ? previous : [...new Set([...previous, ...wanted])]);
   }, [active, canWarm, currentSettled, next, slides.length]);
+
+  const warmPrevious = useCallback(() => {
+    if (slides.length < 2) return;
+    const previous = (active + slides.length - 1) % slides.length;
+    setRequested(visited => visited.includes(previous) ? visited : [...visited, previous]);
+  }, [active, slides.length]);
+
+  useEffect(() => {
+    if (!canWarm || !currentSettled || !nextReady || slides.length < 2) return;
+    // A reader staying in the gallery can swipe back to a sharp photograph.
+    const timer = window.setTimeout(warmPrevious, 3000);
+    return () => window.clearTimeout(timer);
+  }, [canWarm, currentSettled, nextReady, slides.length, warmPrevious]);
 
   useEffect(() => {
     const media = window.matchMedia("(any-pointer: coarse), (max-width: 1180px)");
@@ -163,11 +177,7 @@ export function HomeHero({
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       <div className={styles.heroField} ref={carousel.ref}
-        onTouchStart={() => {
-          if (!native || slides.length < 2) return;
-          const previous = (active + slides.length - 1) % slides.length;
-          setRequested(visited => visited.includes(previous) ? visited : [...visited, previous]);
-        }}
+        onTouchStart={native ? warmPrevious : undefined}
         role={native ? "region" : undefined}
         aria-label={native ? "首页作品图片 Featured artwork images" : undefined}
         tabIndex={native ? 0 : undefined}>
