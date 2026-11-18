@@ -20,7 +20,7 @@ const panel=document.getElementById('panel'),out=document.getElementById('output
 const storageKey='zjj-ipad-taps-v1';let rows=[];
 try{rows=JSON.parse(localStorage.getItem(storageKey)||'[]')}catch{}
 const now=()=>performance.timeOrigin+performance.now(), seconds=t=>t==null?'未观察到':(t/1000).toFixed(2)+' 秒';
-let frame,doc,row,raf,decodeTarget;
+let frame,doc,row,raf,decodeTarget,lastNet=0;
 function print(){
  out.textContent=rows.map((r,i)=>[
   (i+1)+' · '+r.kind+' · '+r.name+' · '+r.date,
@@ -40,7 +40,7 @@ function capture(e){
  (from==='/collection'&&a.closest('main')&&/^\/collection\/[^/]+$/.test(url.pathname));
  if(url.origin!==location.origin||!valid)return;
  const name=(a.textContent||'').trim().replace(/\s+/g,' ').slice(0,45);
- row={path:url.pathname,at:now(),name,kind:document.getElementById('kind').value,date:new Date().toLocaleTimeString(),details:[]};
+ row={path:url.pathname,at:now(),expected:a.querySelector('span[class*=title]')?.textContent.trim(),name,kind:document.getElementById('kind').value,date:new Date().toLocaleTimeString(),details:[]};
  rows.push(row);save();
 }
 function scan(){
@@ -49,6 +49,7 @@ function scan(){
   if(doc!==d&&d){doc=d;d.addEventListener('pointerdown',capture,true);d.addEventListener('click',capture,true);w.performance.setResourceTimingBufferSize(1000)}
   if(row){
    const t0=w.performance.timeOrigin;
+   if(now()-lastNet>750){lastNet=now();
    for(const entry of [...w.performance.getEntriesByType('navigation'),...w.performance.getEntriesByType('resource')]){
     const u=new URL(entry.name);if(u.pathname!==row.path||u.origin!==location.origin)continue;
     const start=Math.round(t0+entry.startTime-row.at),end=Math.round(t0+entry.responseEnd-row.at);
@@ -57,10 +58,11 @@ function scan(){
     row.request=Math.min(row.request??Infinity,start);
     row.response=Math.max(row.response??-Infinity,end);
    }
+   }
    if(w.location.pathname===row.path&&!d.querySelector('dialog[open]')){
     const exhibition=row.path==='/exhibitions',listing=row.path==='/collection';
     const h=d.querySelector('main h1');
-    if(h&&(!exhibition||h.textContent.includes('喜马拉雅'))&&(!listing||h.textContent.includes('藏品'))){
+    if(h&&(!row.expected||h.textContent.trim()===row.expected)&&(!exhibition||h.textContent.includes('喜马拉雅'))&&(!listing||h.textContent.includes('藏品'))){
      if(visible(h,w)||(exhibition&&visible(d.querySelector('[class*="wordmarkBlock"] p'),w)))row.read??=Math.round(now()-row.at);
      const sel=exhibition?'main img[alt^="五股金刚杵"]':listing?'main a[href^="/collection/"] img':'#artwork-info button[aria-hidden="false"] img';
      const img=[...d.querySelectorAll(sel)].find(i=>visible(i,w));
@@ -77,7 +79,7 @@ function scan(){
  if(frame)raf=requestAnimationFrame(scan);
 }
 function start(route){
- doc=null;row=null;decodeTarget=null;frame=document.createElement('iframe');frame.title='竹瑾居网站浏览体验';frame.src=route;
+ doc=null;row=null;lastNet=0;decodeTarget=null;frame=document.createElement('iframe');frame.title='竹瑾居网站浏览体验';frame.src=route;
  panel.hidden=true;document.body.append(frame);finish.hidden=false;raf=requestAnimationFrame(scan);
 }
 finish.onclick=()=>{cancelAnimationFrame(raf);if(row){row.stopped=Math.round(now()-row.at);save()}frame.remove();frame=null;doc=null;row=null;finish.hidden=true;panel.hidden=false;print()};
