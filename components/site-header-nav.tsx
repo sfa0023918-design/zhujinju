@@ -132,8 +132,11 @@ export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
                     key={item.href}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    prefetch={item.href === "/exhibitions" ? null : false}
-                    onTouchStart={() => { if (!active) router.prefetch(item.href); }}
+                    prefetch={false}
+                    onTouchStart={() => {
+                      // Start the exhibition navigation at tap priority, outside the prefetch queue.
+                      if (!active && item.href !== "/exhibitions") router.prefetch(item.href);
+                    }}
                     onPointerEnter={(event) => {
                       if (!active && event.pointerType === "mouse") router.prefetch(item.href);
                     }}
