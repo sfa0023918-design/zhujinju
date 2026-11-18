@@ -87,6 +87,13 @@ export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
+              onPointerEnter={event => {
+                if (!active && event.pointerType === "mouse") router.prefetch(item.href);
+              }}
+              onFocus={event => {
+                if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
+              }}
               onNavigate={() => warmExhibitionCover(item.href)}
               aria-current={active ? "page" : undefined}
               className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}

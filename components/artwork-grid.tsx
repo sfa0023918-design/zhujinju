@@ -73,7 +73,7 @@ export function ArtworkGrid({
                 return (
                   <ArtworkGridLink
                     source={source}
-                    warmRoute={fillRows && index === 0}
+                    warmRoute={fillRows && mode !== "desktop" && index === 0}
                     width={width}
                     height={height}
                     key={a.slug}
