@@ -4,6 +4,7 @@ import { SiteContentFrame } from "@/components/site-content-frame";
 import { Analytics } from "@vercel/analytics/next";
 
 import { SiteFooter } from "@/components/site-footer";
+import { SiteMenuProvider } from "@/components/site-menu-state";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFontPreloads } from "@/components/site-font-preloads";
 
@@ -24,8 +25,10 @@ export default function SiteLayout({
       {/* Resolve streamed children inside a boundary, not the theme host node. */}
       <Suspense fallback={null}>
         <SiteFontPreloads />
-        <SiteHeader />
-        <SiteContentFrame>{children}</SiteContentFrame>
+        <SiteMenuProvider>
+          <SiteHeader />
+          <SiteContentFrame>{children}</SiteContentFrame>
+        </SiteMenuProvider>
         <SiteFooter />
         <Analytics />
       </Suspense>
