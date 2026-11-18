@@ -8,9 +8,13 @@ import {
   type ReactNode,
 } from "react";
 import { ProtectedImage } from "@/components/protected-image";
+import openingPhoto from "@/lib/data/home-opening-photo.json";
+import { withImageVersion } from "@/lib/image-url";
 import { HomeArrow } from "@/components/home-ui";
 import { useNativeCarousel } from "./use-native-carousel";
 import styles from "@/app/(site)/home.module.css";
+
+const openingImage = withImageVersion(openingPhoto.source);
 
 export type HomeHeroSlide = {
   slug: string;
@@ -34,6 +38,24 @@ export type HomeHeroSlide = {
   mobileHeight: string;
   mobileShift: string;
 };
+
+function heroImageSizes(slide: HomeHeroSlide) {
+  const ratio = slide.height / slide.width;
+  const desktopScale = parseFloat(slide.imageHeight) / 100 / ratio;
+  const mobileScale = slide.framed ? 0.9 : parseFloat(slide.mobileHeight) / 100;
+  const mobileWidth = (height: number) => Math.ceil(height * mobileScale / ratio);
+  const phone = slide.framed
+    ? `min(calc(100vw - 40px), ${mobileWidth(460)}px)`
+    : `min(${mobileScale * 100}vw, ${mobileWidth(460)}px)`;
+  // The phone and portrait-tablet fields are 460px and 540px tall respectively.
+  return [
+    `(max-width: 560px) ${phone}`,
+    `(max-width: 860px) ${mobileWidth(540)}px`,
+    `(max-width: 895px) ${Math.ceil(520 * desktopScale)}px`,
+    `(max-width: 1440px) ${(58.06 * desktopScale).toFixed(2)}vw`,
+    `${Math.ceil(836 * desktopScale)}px`,
+  ].join(", ");
+}
 
 export function HomeHero({
   slides,
@@ -87,10 +109,10 @@ export function HomeHero({
   }, []);
 
   useEffect(() => {
-    if (paused || hovered || focused || reducedMotion || !visible || carousel.interacting || slides.length < 2) return;
+    if (!firstImageReady || paused || hovered || focused || reducedMotion || !visible || carousel.interacting || slides.length < 2) return;
     const timer = window.setTimeout(() => setActive((index) => (index + 1) % slides.length), 5000);
     return () => window.clearTimeout(timer);
-  }, [active, paused, hovered, focused, reducedMotion, visible, slides.length, carousel.interacting]);
+  }, [active, firstImageReady, paused, hovered, focused, reducedMotion, visible, slides.length, carousel.interacting]);
 
   return (
     <section className={styles.hero} aria-label="首页作品"
@@ -107,17 +129,10 @@ export function HomeHero({
         {carousel.indexes.map((index, position) => {
           const slide = slides[index];
           const clone = native && slides.length > 1 && (position === 0 || position === slides.length + 1);
-          const ratio = slide.height / slide.width;
-          const desktopScale = parseFloat(slide.imageHeight) / 100 / ratio;
-          const mobileScale = parseFloat(slide.mobileHeight) / 100;
-          // The photograph follows the hero height, not the full screen width.
-          // In particular, portrait tablets still use the 460px mobile field.
-          const imageSizes = slide.framed
-            ? `(max-width: 860px) ${Math.ceil(414 / ratio)}px, (max-width: 895px) ${Math.ceil(520 * desktopScale)}px, (max-width: 1440px) ${(58.06 * desktopScale).toFixed(2)}vw, ${Math.ceil(836 * desktopScale)}px`
-            : `(max-width: ${Math.floor(460 / ratio)}px) ${(mobileScale * 100).toFixed(2)}vw, (max-width: 860px) ${Math.ceil(460 * mobileScale / ratio)}px, (max-width: 895px) ${Math.ceil(520 * desktopScale)}px, (max-width: 1440px) ${(58.06 * desktopScale).toFixed(2)}vw, ${Math.ceil(836 * desktopScale)}px`;
+          const isOpeningPhoto = slide.image === openingImage;
           return (
             <div
-              key={`${slide.slug}-${position}`}
+              key={clone ? `clone-${slide.slug}` : slide.slug}
               className={styles.slide}
               aria-hidden={clone || index !== active}
               data-active={index === active}
@@ -138,6 +153,7 @@ export function HomeHero({
             >
               {index === active || readyImages.includes(index) ? <ProtectedImage
                 src={slide.image}
+                pictureSource={isOpeningPhoto ? openingPhoto : undefined}
                 alt={`${slide.title.zh} ${slide.title.en}`}
                 width={slide.width}
                 height={slide.height}
@@ -147,8 +163,8 @@ export function HomeHero({
                 onLoad={index === 0 ? () => setFirstImageReady(true) : undefined}
                 onError={index === 0 ? () => setFirstImageReady(true) : undefined}
                 quality={85}
-                sizes={imageSizes}
-                wrapperClassName={`${styles.heroImageFrame} ${slide.topFade ? styles.topFade : ""} ${slide.bottomFade ? styles.bottomFade : ""} ${slide.framed ? styles.framedArtwork : ""}`}
+                sizes={heroImageSizes(slide)}
+                wrapperClassName={`${styles.heroImageFrame} ${isOpeningPhoto ? styles.openingPhoto : ""} ${slide.topFade ? styles.topFade : ""} ${slide.bottomFade ? styles.bottomFade : ""} ${slide.framed ? styles.framedArtwork : ""}`}
                 className={styles.heroImage}
               /> : null}
             </div>

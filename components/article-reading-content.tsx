@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import type {
   ArticleContentBlock,
@@ -10,16 +10,21 @@ import type {
 } from "@/lib/site-data";
 import { withImageVersion } from "@/lib/image-url";
 
-import { ExpandableReadingText, getLocalizedText, getParagraphsByLocale, type ReadingLocale } from "./bilingual-prose";
+import { ExpandableReadingText, getLocalizedText, getParagraphsByLocale } from "./bilingual-prose";
 import { ProtectedImage } from "./protected-image";
 
 const ARTICLE_TEXT_MAX_WIDTH_CLASS = "max-w-[40rem]";
 const ARTICLE_LANDSCAPE_MEDIA_MAX_WIDTH_CLASS = "max-w-[52rem]";
 const ARTICLE_BALANCED_MEDIA_MAX_WIDTH_CLASS = "max-w-[40rem]";
 const ARTICLE_INLINE_MEDIA_MAX_WIDTH_CLASS = "max-w-[31rem]";
-const ARTICLE_FIGURE_CAPTION_CLASS_ZH = "mx-auto max-w-full pt-1 text-center text-[0.8125rem] leading-[1.72] text-[var(--muted)]";
-const ARTICLE_FIGURE_CAPTION_CLASS_EN =
-  "mx-auto max-w-full pt-1 text-center text-[0.8125rem] leading-[1.72] text-[var(--muted)]";
+function ArticleCaption({ caption, bilingual, id }: { caption: BilingualValue; bilingual: boolean; id: string }) {
+  return (
+    <figcaption id={id} className="mx-auto max-w-full pt-1 text-center text-[0.8125rem] leading-[1.72] text-[var(--muted)]">
+      <span lang="zh-CN" data-reading-locale="zh">{getLocalizedText(caption, "zh")}</span>
+      {bilingual ? <span lang="en" data-reading-locale="en">{getLocalizedText(caption, "en")}</span> : null}
+    </figcaption>
+  );
+}
 
 type ArticleMediaAspect = "portrait" | "balanced" | "landscape";
 
@@ -54,14 +59,15 @@ function articleMediaWidthClass(layout: ArticleImageBlock["layout"], aspect: Art
 function ArticleImageFigure({
   block,
   index,
-  locale,
+  bilingual,
 }: {
   block: ArticleImageBlock;
   index: number;
-  locale: ReadingLocale;
+  bilingual: boolean;
 }) {
   const [aspect, setAspect] = useState<ArticleMediaAspect>("balanced");
-  const caption = getLocalizedText(block.caption, locale);
+  const caption = getLocalizedText(block.caption, "zh");
+  const captionId = useId();
 
   return (
     <figure
@@ -73,6 +79,7 @@ function ArticleImageFigure({
     >
       <ProtectedImage
         src={withImageVersion(block.image)}
+        aria-labelledby={caption ? captionId : undefined}
         alt={caption || `Article reference ${index + 1}`}
         width={1600}
         height={1200}
@@ -84,12 +91,7 @@ function ArticleImageFigure({
         onLoad={(event) => setAspect(getArticleMediaAspect(event.currentTarget))}
       />
       {caption ? (
-        <figcaption
-          lang={locale === "en" ? "en" : "zh-CN"}
-          className={locale === "zh" ? ARTICLE_FIGURE_CAPTION_CLASS_ZH : ARTICLE_FIGURE_CAPTION_CLASS_EN}
-        >
-          {caption}
-        </figcaption>
+        <ArticleCaption id={captionId} caption={block.caption} bilingual={bilingual} />
       ) : null}
     </figure>
   );
@@ -99,15 +101,16 @@ function ArticleImagePairFigure({
   item,
   index,
   itemIndex,
-  locale,
+  bilingual,
 }: {
   item: ArticleImagePairItem;
   index: number;
   itemIndex: number;
-  locale: ReadingLocale;
+  bilingual: boolean;
 }) {
   const [aspect, setAspect] = useState<ArticleMediaAspect>("balanced");
-  const caption = getLocalizedText(item.caption, locale);
+  const caption = getLocalizedText(item.caption, "zh");
+  const captionId = useId();
 
   return (
     <figure
@@ -116,6 +119,7 @@ function ArticleImagePairFigure({
     >
       <ProtectedImage
         src={withImageVersion(item.image)}
+        aria-labelledby={caption ? captionId : undefined}
         alt={caption || `Article reference ${index + 1}-${itemIndex + 1}`}
         width={1200}
         height={900}
@@ -127,19 +131,10 @@ function ArticleImagePairFigure({
         onLoad={(event) => setAspect(getArticleMediaAspect(event.currentTarget))}
       />
       {caption ? (
-        <figcaption
-          lang={locale === "en" ? "en" : "zh-CN"}
-          className={locale === "zh" ? ARTICLE_FIGURE_CAPTION_CLASS_ZH : ARTICLE_FIGURE_CAPTION_CLASS_EN}
-        >
-          {caption}
-        </figcaption>
+        <ArticleCaption id={captionId} caption={item.caption} bilingual={bilingual} />
       ) : null}
     </figure>
   );
-}
-
-function hasLocalizedContent(content: BilingualValue | undefined, locale: ReadingLocale) {
-  return Boolean(locale === "zh" ? content?.zh?.trim() : content?.en?.trim());
 }
 
 function isSentenceLikeExcerpt(value: string) {
@@ -260,7 +255,7 @@ export function ArticleReadingContent({
   blocks: ArticleContentBlock[];
   className?: string;
 }) {
-  const [locale, setLocale] = useState<ReadingLocale>("zh");
+  const languageGroup = useId();
   const hasEnglish = useMemo(() => articleHasCompleteEnglish(excerpt, blocks), [blocks, excerpt]);
   const readingBlocks = useMemo(() => {
     type ProseRun = { type: "reading"; paragraphs: { zh: string[]; en: string[] } };
@@ -295,29 +290,17 @@ export function ArticleReadingContent({
   }, [blocks, excerpt]);
 
   return (
-    <div className={className}>
+    <div className={className} data-reading-picker={hasEnglish || undefined}>
       {hasEnglish ? (
         <div className="article-reading-toolbar mx-auto mb-5 flex max-w-[40rem] justify-end md:mb-6">
-          <div className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
-            {(["zh", "en"] as const).map((option) => {
-              const active = locale === option;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  aria-pressed={active}
-                  lang={option === "en" ? "en" : "zh-CN"}
-                  onClick={() => setLocale(option)}
-                  className={`min-h-11 min-w-11 rounded-full px-3 py-1 text-xs tracking-[0.03em] transition-colors ${
-                    active
-                      ? "bg-[var(--surface)] text-[var(--ink)]"
-                      : "text-[var(--accent-text)] hover:text-[var(--ink)]"
-                  }`}
-                >
-                  {option === "zh" ? "中文" : "English"}
-                </button>
-              );
-            })}
+          <div role="radiogroup" aria-label="阅读语言 / Reading language" className="inline-flex items-center rounded-full border border-[var(--line)]/28 p-1">
+            {(["zh", "en"] as const).map((option) => (
+              <label key={option} lang={option === "en" ? "en" : "zh-CN"}
+                className="relative inline-grid min-h-11 min-w-11 cursor-pointer place-items-center rounded-full px-3 py-1 text-xs tracking-[0.03em] text-[var(--accent-text)] transition-colors hover:text-[var(--ink)] has-checked:bg-[var(--surface)] has-checked:text-[var(--ink)] has-focus-visible:outline-2">
+                <input className="sr-only" type="radio" name={languageGroup} value={option} defaultChecked={option === "zh"} />
+                {option === "zh" ? "中文" : "English"}
+              </label>
+            ))}
           </div>
         </div>
       ) : null}
@@ -327,12 +310,12 @@ export function ArticleReadingContent({
           if (block.type === "reading") {
             return <div key={`reading-${index}`} className={`article-reading-copy mx-auto ${ARTICLE_TEXT_MAX_WIDTH_CLASS}`}>
               <ExpandableReadingText expandLabel={{ zh: "展开本节", en: "Read this section" }} translations={hasEnglish ? block.paragraphs : undefined}
-                paragraphs={block.paragraphs.zh} locale={locale} />
+                paragraphs={block.paragraphs.zh} renderLocaleOptions={hasEnglish} />
             </div>;
           }
 
           if (block.type === "image") {
-            return <ArticleImageFigure key={`image-${index}`} block={block} index={index} locale={locale} />;
+            return <ArticleImageFigure key={`image-${index}`} block={block} index={index} bilingual={hasEnglish} />;
           }
 
           const visibleItems = block.items.filter((item) => item.image.trim());
@@ -354,7 +337,7 @@ export function ArticleReadingContent({
                   item={item}
                   index={index}
                   itemIndex={itemIndex}
-                  locale={locale}
+                  bilingual={hasEnglish}
                 />
               ))}
             </div>
