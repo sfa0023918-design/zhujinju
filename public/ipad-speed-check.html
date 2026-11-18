@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>竹瑾居 · iPad 浏览计时</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f0e9;color:#282722;font:16px/1.6 system-ui,sans-serif}main{max-width:42rem;margin:8vh auto;padding:0 1.4rem}h1{font:normal 1.7rem/1.35 Georgia,"Songti SC",serif}button,select{font:inherit;color:inherit;padding:.5rem .8rem;background:#f7f4ee;border:1px solid #a39c8f;border-radius:.25rem;margin:.2rem 0;cursor:pointer}button:focus-visible,select:focus-visible{outline:2px solid #973e28}iframe{display:block;border:0;position:fixed;inset:0;width:100%;height:100%;background:#f3f0e9}#finish{position:fixed;right:.5rem;bottom:max(.5rem,env(safe-area-inset-bottom));z-index:1;font-size:.8rem}pre{white-space:pre-wrap;font-size:.86rem} [hidden]{display:none!important}
+</style>
+</head><body><main id="panel"><h1>iPad 浏览计时</h1>
+<p>选好入口后，在网站里照常点菜单或藏品卡片。看到目标标题和主图后，点右下角「查看计时」。如果卡住，也可以随时回来查看。</p>
+<label>本轮访问 <select id="kind"><option>首次</option><option>再次</option></select></label>
+<div><button data-go="/">从首页点展览或藏品</button> <button data-go="/collection">从藏品列表点一件作品</button></div>
+<p>首次与再次请分别记录。重复测试时使用同一件作品。结果只存于本机浏览器，可复制回传。</p>
+<button id="copy">复制本机记录</button><pre id="output"></pre>
+</main><button id="finish" hidden>查看计时</button>
+<script>
+const panel=document.getElementById('panel'),out=document.getElementById('output'),finish=document.getElementById('finish');
+const storageKey='zjj-ipad-taps-v1';let rows=[];
+try{rows=JSON.parse(localStorage.getItem(storageKey)||'[]')}catch{}
+const now=()=>performance.timeOrigin+performance.now(), seconds=t=>t==null?'未观察到':(t/1000).toFixed(2)+' 秒';
+let frame,doc,row,raf,decodeTarget;
+function print(){
+ out.textContent=rows.map((r,i)=>[
+  (i+1)+' · '+r.kind+' · '+r.name+' · '+r.date,
+  '首个目标导航请求相对点按 '+seconds(r.request)+'，数据收完 '+seconds(r.response),
+  '标题可见 '+seconds(r.read)+'，主图清晰 '+seconds(r.sharp)+(r.stopped?'，停止观察 '+seconds(r.stopped):'')
+ ].join('\n')).join('\n\n');
+}
+function save(){try{localStorage.setItem(storageKey,JSON.stringify(rows))}catch{}print()}
+function visible(el,w){
+ if(!el)return false;const r=el.getBoundingClientRect();
+ return r.width>1&&r.height>1&&r.left<w.innerWidth&&r.right>0&&r.top<w.innerHeight&&r.bottom>0&&w.getComputedStyle(el).visibility!=='hidden';
+}
+function capture(e){
+ const a=e.target.closest('a');if(!a||row)return;
+ const url=new URL(a.href),from=frame.contentWindow.location.pathname;
+ const valid=(from==='/'&&a.closest('#site-mobile-nav')&&['/exhibitions','/collection'].includes(url.pathname))||
+ (from==='/collection'&&a.closest('main')&&/^\/collection\/[^/]+$/.test(url.pathname));
+ if(url.origin!==location.origin||!valid)return;
+ const name=(a.textContent||'').trim().replace(/\s+/g,' ').slice(0,45);
+ row={path:url.pathname,at:now(),name,kind:document.getElementById('kind').value,date:new Date().toLocaleTimeString(),details:[]};
+ rows.push(row);save();
+}
+function scan(){
+ try{
+  const w=frame.contentWindow,d=frame.contentDocument;
+  if(doc!==d&&d){doc=d;d.addEventListener('pointerdown',capture,true);d.addEventListener('click',capture,true);w.performance.setResourceTimingBufferSize(1000)}
+  if(row){
+   const t0=w.performance.timeOrigin;
+   for(const entry of [...w.performance.getEntriesByType('navigation'),...w.performance.getEntriesByType('resource')]){
+    const u=new URL(entry.name);if(u.pathname!==row.path||u.origin!==location.origin)continue;
+    const start=Math.round(t0+entry.startTime-row.at),end=Math.round(t0+entry.responseEnd-row.at);
+    if(!entry.responseEnd||row.details.some(x=>x.start===start&&x.end===end))continue;
+    row.details.push({start,end,bytes:entry.transferSize});
+    row.request=Math.min(row.request??Infinity,start);
+    row.response=Math.max(row.response??-Infinity,end);
+   }
+   if(w.location.pathname===row.path&&!d.querySelector('dialog[open]')){
+    const exhibition=row.path==='/exhibitions',listing=row.path==='/collection';
+    const h=d.querySelector('main h1');
+    if(h&&(!exhibition||h.textContent.includes('喜马拉雅'))&&(!listing||h.textContent.includes('藏品'))){
+     if(visible(h,w)||(exhibition&&visible(d.querySelector('[class*="wordmarkBlock"] p'),w)))row.read??=Math.round(now()-row.at);
+     const sel=exhibition?'main img[alt^="五股金刚杵"]':listing?'main a[href^="/collection/"] img':'#artwork-info button[aria-hidden="false"] img';
+     const img=[...d.querySelectorAll(sel)].find(i=>visible(i,w));
+     if(row.sharp==null&&img&&img.complete&&img.naturalWidth>64&&!img.currentSrc.startsWith('data:')&&decodeTarget!==img){
+      decodeTarget=img;const active=row;
+      img.decode().then(()=>w.requestAnimationFrame(()=>w.requestAnimationFrame(()=>{
+       if(row===active&&img.isConnected&&visible(img,w))row.sharp??=Math.round(now()-row.at);
+      }))).catch(()=>decodeTarget=null);
+     }
+    }
+   }
+  }
+ }catch{}
+ if(frame)raf=requestAnimationFrame(scan);
+}
+function start(route){
+ doc=null;row=null;decodeTarget=null;frame=document.createElement('iframe');frame.title='竹瑾居网站浏览体验';frame.src=route;
+ panel.hidden=true;document.body.append(frame);finish.hidden=false;raf=requestAnimationFrame(scan);
+}
+finish.onclick=()=>{cancelAnimationFrame(raf);if(row){row.stopped=Math.round(now()-row.at);save()}frame.remove();frame=null;doc=null;row=null;finish.hidden=true;panel.hidden=false;print()};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>start(b.dataset.go));
+document.getElementById('copy').onclick=async()=>{const body=location.host+'\n'+out.textContent;try{await navigator.clipboard.writeText(body);document.getElementById('copy').textContent='已复制'}catch{const r=document.createRange();r.selectNodeContents(out);const s=getSelection();s.removeAllRanges();s.addRange(r)}};
+print();
+</script></body></html>
