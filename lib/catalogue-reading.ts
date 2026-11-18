@@ -36,3 +36,9 @@ export function clampCataloguePan(x: number, y: number, scale: number, width: nu
     y: Math.min(limitY, Math.max(-limitY, y)),
   };
 }
+
+export function formatPlateProgress(index: number, total: number, paired: boolean) {
+  const first = index + 1;
+  const range = paired && first < total ? `${first}–${first + 1}` : String(first);
+  return `图版 Plate ${range} / ${total}`;
+}

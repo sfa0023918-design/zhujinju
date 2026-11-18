@@ -1,9 +1,13 @@
+import { absoluteUrl } from "./site-config";
+
 type InquiryPayload = {
   name: string;
   email: string;
   organization: string;
   identity: string;
   artwork: string;
+  workSlug: string;
+  requested: string;
   message: string;
 };
 
@@ -64,6 +68,7 @@ export function isInquiryConfigError(error: unknown): error is InquiryConfigErro
 export async function sendInquiryEmail(payload: InquiryPayload, meta: InquiryMeta) {
   const { apiKey, from, to } = getInquiryMailConfig();
   const subject = `New inquiry from ${payload.name} | Zhu Jin Ju`;
+  const artworkUrl = payload.workSlug ? absoluteUrl(`/collection/${encodeURIComponent(payload.workSlug)}`) : "";
   const text = [
     "A new inquiry has been submitted on zhujinju.com.",
     "",
@@ -72,6 +77,8 @@ export async function sendInquiryEmail(payload: InquiryPayload, meta: InquiryMet
     formatOptional("Organization", payload.organization),
     formatOptional("Role", payload.identity),
     formatOptional("Artwork", payload.artwork),
+    ...(artworkUrl ? [`Artwork link: ${artworkUrl}`] : []),
+    ...(payload.requested ? [`Requested: ${payload.requested}`] : []),
     "",
     "Message:",
     payload.message,
@@ -92,6 +99,8 @@ export async function sendInquiryEmail(payload: InquiryPayload, meta: InquiryMet
           <tr><td style="padding: 6px 0;"><strong>Organization</strong></td><td style="padding: 6px 0;">${escapeHtml(payload.organization || "-")}</td></tr>
           <tr><td style="padding: 6px 0;"><strong>Role</strong></td><td style="padding: 6px 0;">${escapeHtml(payload.identity || "-")}</td></tr>
           <tr><td style="padding: 6px 0;"><strong>Artwork</strong></td><td style="padding: 6px 0;">${escapeHtml(payload.artwork || "-")}</td></tr>
+          ${artworkUrl ? `<tr><td><strong>Artwork link</strong></td><td><a href="${escapeHtml(artworkUrl)}">${escapeHtml(payload.workSlug)}</a></td></tr>` : ""}
+          ${payload.requested ? `<tr><td><strong>Requested</strong></td><td>${escapeHtml(payload.requested)}</td></tr>` : ""}
           <tr><td style="padding: 6px 0; vertical-align: top;"><strong>Message</strong></td><td style="padding: 6px 0; white-space: pre-wrap;">${escapeHtml(payload.message)}</td></tr>
         </tbody>
       </table>

@@ -33,6 +33,7 @@ function Card({ artwork }: { artwork: Artwork }) {
     <Link
       href={`/collection/${artwork.slug}`}
       className={styles.artworkCard}
+      aria-label={[artwork.title.zh, artwork.title.en, regionPeriod, status.zh, status.en].filter(Boolean).join(" · ")}
       style={{ "--artwork-ratio": width / height } as CSSProperties}
     >
       <ProtectedImage

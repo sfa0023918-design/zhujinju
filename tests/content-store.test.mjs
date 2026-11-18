@@ -87,6 +87,7 @@ function harness({ failure, env = {}, withDraft = false } = {}) {
     state,
     store: load(path.join(root, "lib/content-store.ts")),
     github: load(path.join(root, "lib/github-repo.ts")),
+    artworkInquiry: load(path.join(root, "lib/artwork-inquiry.ts")),
     copyQuality: load(path.join(root, "lib/copy-quality.ts")),
     collectionFiltering: {
       ...load(path.join(root, "lib/collection-filtering.ts")),
@@ -325,4 +326,23 @@ test("sequential media saves preserve all earlier images and other records", asy
   assert.equal(state.reads, 3);
   assert.equal(state.puts, 3);
   assert.equal(state.localReads + state.localWrites, 0);
+});
+
+test("same-title works and each of their requested materials survive the inquiry link", async () => {
+  const { store, artworkInquiry } = harness();
+  const content = await store.readSiteContentFresh();
+  const slugs = ["artwork-1773132602982", "artwork-1773424056330"];
+  const records = slugs.map((slug) => store.getArtworkBySlug(content, slug));
+  assert.equal(records[0].title.en, records[1].title.en);
+  assert.notEqual(records[0].dimensions.en, records[1].dimensions.en);
+  for (const artwork of records) {
+    for (const option of artwork.inquirySupport) {
+      const url = new URL(artworkInquiry.artworkInquiryHref(artwork.slug, option), "https://www.zhujinju.com");
+      const selected = store.getArtworkBySlug(content, url.searchParams.get("work"));
+      assert.equal(artworkInquiry.getInquiryWork(selected).slug, artwork.slug);
+      assert.equal(artworkInquiry.getInquiryRequest(selected, url.searchParams.get("request")).en, option.en);
+      assert.equal(url.hash, "#inquiry");
+    }
+    assert.equal(artworkInquiry.getInquiryRequest(artwork, "unknown"), undefined);
+  }
 });

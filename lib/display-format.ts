@@ -30,3 +30,10 @@ export function getExhibitionMetadataTitle(title: BilingualText): BilingualText 
     en: title.en.replace(/^Zhu Jin Ju\s*[|｜]\s*/i, ""),
   };
 }
+
+export function formatCatalogueExtent(exhibition: Exhibition): BilingualText {
+  const plates = exhibition.cataloguePageImages?.filter(Boolean).length;
+  if (plates) return { zh: `${plates} 幅电子图版`, en: `${plates} digital plates` };
+  const pages = exhibition.cataloguePageCount ?? exhibition.cataloguePages;
+  return { zh: `${pages} 页图录`, en: `${pages} catalogue pages` };
+}

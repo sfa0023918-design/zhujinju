@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import type { BilingualText } from "@/lib/site-data";
 import type { CataloguePageGeometry } from "@/lib/catalogue-media";
-import { clampCataloguePan, moveCataloguePosition } from "@/lib/catalogue-reading";
+import { clampCataloguePan, formatPlateProgress, moveCataloguePosition } from "@/lib/catalogue-reading";
 import { ProtectedImage } from "./protected-image";
 import { CatalogueThumbnails } from "./catalogue-thumbnails";
 import { useSwipeNavigation } from "./use-swipe-navigation";
@@ -104,7 +104,7 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   const secondRatio = pairedPages ? geometries[currentIndex + 1].width / geometries[currentIndex + 1].height : 0;
   const displayRatio = pairedPages ? sourceRatio + secondRatio : splitPage ? sourceRatio / 2 : sourceRatio;
   const pageLabel = currentIndex === 0 && hasRightCover ? "封面" : splitPage ? half === 0 ? "左页" : "右页" : geometry.spread ? "完整跨页" : pairedPages ? "双页" : "单页";
-  const progress = `图版 ${currentIndex + 1}${pairedPages ? `–${currentIndex + 2}` : ""} / ${pages.length} · ${pageLabel}`;
+  const progress = formatPlateProgress(currentIndex, pages.length, pairedPages);
   const inlineSwipe = useSwipeNavigation<HTMLButtonElement>({
     enabled: pages.length > 1,
     ignoreControls: false,
@@ -220,7 +220,7 @@ export function MobileCatalogueReader({ title, pages, readerPages, thumbPages, g
   function sheet(source: string, full = false) {
     return <div className={styles.sheet} style={full ? { transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` } : undefined}>
       <div className={`${styles.imageWindow} ${splitPage ? styles.doubleWidth : ""}`} style={splitPage ? { left: half === 1 ? "-100%" : "0" } : pairedPages ? { width: `${sourceRatio / displayRatio * 100}%`, right: "auto" } : undefined}>
-        <ProtectedImage src={full || loadPreview ? source : thumbPages[currentIndex]} alt={`${title.zh || title.en}，${progress}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />
+        <ProtectedImage src={full || loadPreview ? source : thumbPages[currentIndex]} alt={`${title.zh || title.en}，${progress} · ${pageLabel}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />
       </div>
       {pairedPages && <div className={styles.imageWindow} style={{ left: `${sourceRatio / displayRatio * 100}%` }}>
         <ProtectedImage src={full ? pages[currentIndex + 1] : loadPreview ? readerPages[currentIndex + 1] : thumbPages[currentIndex + 1]} alt={`${title.zh || title.en}，图版 ${currentIndex + 2}`} fill unoptimized sizes={full ? "2000px" : "100vw"} loading="eager" className={styles.image} />

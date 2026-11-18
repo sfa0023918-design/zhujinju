@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatDimensions, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
+import { formatCatalogueExtent, formatDimensions, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 
 import { HomeArtworkGrid } from "@/components/home-artwork-grid";
 import { HomeHero, type HomeHeroSlide } from "@/components/home-hero";
@@ -121,10 +121,9 @@ export default async function HomePage() {
   const exhibitionHref = exhibition
     ? `/exhibitions/${exhibition.slug}`
     : "/exhibitions";
+  const catalogueExtent = exhibition ? formatCatalogueExtent(exhibition) : undefined;
   const workCount =
     exhibition?.featuredWorksCount ?? exhibition?.highlightCount ?? 0;
-  const pageCount =
-    exhibition?.cataloguePageCount ?? exhibition?.cataloguePages ?? 0;
 
   return (
     <div className={`${styles.home} zj`}>
@@ -237,9 +236,9 @@ export default async function HomePage() {
                     <HomeLabel text={{ zh: "图录", en: "Catalogue" }} stacked />
                   </dt>
                   <dd>
-                    {workCount} 件作品 · {pageCount} 页图录
+                    {workCount} 件作品 · {catalogueExtent?.zh}
                     <span className={styles.desktopFact} lang="en">
-                      {workCount} works · {pageCount} catalogue pages
+                      {workCount} works · {catalogueExtent?.en}
                     </span>
                   </dd>
                 </div>
@@ -249,7 +248,7 @@ export default async function HomePage() {
                   href={exhibitionHref}
                   text={{ zh: "查看展览", en: "View exhibition" }}
                 />
-                {pageCount > 0 ? (
+                {exhibition.cataloguePageImages?.some(Boolean) ? (
                   <HomeAction
                     href={`${exhibitionHref}#catalogue`}
                     text={{ zh: "阅读电子图录", en: "Read the catalogue" }}

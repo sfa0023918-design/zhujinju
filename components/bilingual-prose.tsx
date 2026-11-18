@@ -277,6 +277,7 @@ export function ExpandableReadingText({
   locale: controlledLocale,
   showBoth = false,
   expandable = true,
+  expandLabel = { zh: "阅读全文", en: "Read more" },
   variant = "body",
   paragraphClassName,
 }: {
@@ -285,6 +286,7 @@ export function ExpandableReadingText({
   locale?: ReadingLocale;
   showBoth?: boolean;
   expandable?: boolean;
+  expandLabel?: { zh: string; en: string };
   variant?: ProseVariant;
   paragraphClassName?: string;
 }) {
@@ -372,8 +374,8 @@ export function ExpandableReadingText({
       {canExpand ? (
         <button type="button" aria-expanded={expanded} aria-controls={contentId}
           onClick={toggleExpanded} className="reading-excerpt-toggle">
-          {translations ? <><span>{expanded ? "收起" : "阅读全文"}</span><span lang="en">{expanded ? "Show less" : "Read more"}</span></>
-            : locale === "zh" ? (expanded ? "收起" : "阅读全文") : expanded ? "Show less" : "Read more"}
+          {translations ? <><span>{expanded ? "收起" : expandLabel.zh}</span><span lang="en">{expanded ? "Show less" : expandLabel.en}</span></>
+            : locale === "zh" ? (expanded ? "收起" : expandLabel.zh) : expanded ? "Show less" : expandLabel.en}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={expanded ? { transform: "rotate(180deg)" } : undefined}>
             <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.2" />
           </svg>

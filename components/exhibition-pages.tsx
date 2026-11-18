@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatExhibitionPeriod } from "@/lib/display-format";
+import { formatCatalogueExtent, formatExhibitionPeriod } from "@/lib/display-format";
 
 import type {
   Article,
@@ -73,21 +73,6 @@ function getYear(exhibition: Exhibition) {
   );
 }
 
-function getCataloguePageCount(exhibition: Exhibition) {
-  return (
-    exhibition.cataloguePageCount ??
-    exhibition.cataloguePages ??
-    exhibition.cataloguePageImages?.length ??
-    0
-  );
-}
-
-function getCatalogueMode(exhibition: Exhibition) {
-  return exhibition.catalogueViewMode === "spread-images"
-    ? { zh: "幅图录版面", en: "catalogue spreads" }
-    : { zh: "页图录", en: "catalogue pages" };
-}
-
 function ExhibitionImage({
   exhibition,
   priority = false,
@@ -130,9 +115,6 @@ function ExhibitionImage({
 }
 
 function CatalogueFact({ exhibition }: { exhibition: Exhibition }) {
-  const pageCount = getCataloguePageCount(exhibition);
-  const unit = getCatalogueMode(exhibition);
-
   return (
     <div className={styles.catalogueFact}>
       <BilingualText
@@ -144,10 +126,7 @@ function CatalogueFact({ exhibition }: { exhibition: Exhibition }) {
       />
       <BilingualText
         as="p"
-        text={{
-          zh: `${pageCount}${unit.zh}`,
-          en: `${pageCount} ${unit.en}`,
-        }}
+        text={formatCatalogueExtent(exhibition)}
         className={`${styles.bilingualPair} ${styles.catalogueCount}`}
         zhClassName={styles.zh}
         enClassName={styles.en}

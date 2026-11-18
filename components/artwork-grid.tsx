@@ -45,7 +45,7 @@ export function ArtworkGrid({
             id: "related-artworks-track",
             "data-artwork-track": "swipe",
             role: "region",
-            "aria-label": "同类方向中的其他作品 / Other works in the same direction",
+            "aria-label": "相关作品 / Related works",
             tabIndex: 0,
           } : {})}
         >

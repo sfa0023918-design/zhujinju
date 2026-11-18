@@ -2,6 +2,8 @@
 
 import { type FormEvent, useRef, useState } from "react";
 
+import type { InquiryWork } from "@/lib/artwork-inquiry";
+import { ProtectedImage } from "@/components/protected-image";
 import { BilingualText } from "@/components/bilingual-text";
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 
@@ -9,6 +11,8 @@ import styles from "./institutional-pages.module.css";
 
 type ContactFormProps = {
   initialArtwork?: string;
+  work?: InquiryWork;
+  request?: BilingualValue;
   copy: {
     introIdle: BilingualValue;
     introSubmitting: BilingualValue;
@@ -26,7 +30,7 @@ type ContactFormProps = {
   };
 };
 
-export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
+export function ContactForm({ initialArtwork, work, request, copy }: ContactFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -44,6 +48,8 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
       email: formData.get("email"),
       identity: formData.get("identity"),
       artwork: formData.get("artwork"),
+      work: work?.slug,
+      request: request?.zh || request?.en,
       message: formData.get("message"),
       website: formData.get("website"),
       submittedAt: formData.get("submittedAt"),
@@ -64,12 +70,6 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
       }
 
       formRef.current?.reset();
-      const artworkField = formRef.current?.elements.namedItem("artwork");
-
-      if (artworkField instanceof HTMLInputElement && initialArtwork) {
-        artworkField.value = initialArtwork;
-      }
-
       setSubmittedAt(Date.now().toString());
       setStatus("success");
     } catch (error) {
@@ -88,6 +88,9 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
 
   return (
     <form
+      id="inquiry"
+      aria-label="咨询表单 / Inquiry form"
+      tabIndex={-1}
       ref={formRef}
       onSubmit={handleSubmit}
       className={styles.inquiryForm}
@@ -110,6 +113,21 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
         enClassName={styles.en}
       />
 
+      {work ? (
+        <div className={styles.selectedWork}>
+          {work.image ? <ProtectedImage src={work.image} alt="" width={72} height={88} sizes="72px" /> : null}
+          <div>
+            <p>{work.title.zh} <span lang="en">{work.title.en}</span></p>
+            <p>{work.details.zh} <span lang="en">{work.details.en}</span></p>
+          </div>
+        </div>
+      ) : null}
+      {request ? (
+        <p className={styles.selectedRequest}>
+          所选资料 · {request.zh.replace(/^可索取/, "") || request.en}
+          <span lang="en">Requested material{request.en ? ` · ${request.en.replace(/ available on request$/i, "")}` : ""}</span>
+        </p>
+      ) : null}
       <p className={styles.requiredNote}>* 必填 <span lang="en">Required fields</span></p>
       <div className={styles.formGrid}>
         <ContactField label={copy.nameLabel} required>
@@ -131,11 +149,13 @@ export function ContactForm({ initialArtwork, copy }: ContactFormProps) {
             ))}
           </select>
         </ContactField>
-        <ContactField label={copy.artworkLabel} className={styles.fullField}>
-          <input name="artwork" defaultValue={initialArtwork} />
-        </ContactField>
-        <ContactField label={copy.messageLabel} className={styles.fullField} required>
-          <textarea required name="message" rows={6} />
+        {!work ? (
+          <ContactField label={copy.artworkLabel} className={styles.fullField}>
+            <input name="artwork" maxLength={200} defaultValue={initialArtwork} />
+          </ContactField>
+        ) : null}
+        <ContactField label={copy.messageLabel} className={styles.fullField} required={!(work && request)}>
+          <textarea required={!(work && request)} name="message" rows={6} />
         </ContactField>
       </div>
 
