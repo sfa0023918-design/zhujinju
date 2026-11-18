@@ -113,15 +113,14 @@ export function HomeHero({
   }, []);
 
   useEffect(() => {
-    // Keep visited works mounted. Warm forwards first, then the reverse swipe.
+    // Autoplay needs the next photograph. Warm the previous one on the first touch.
     const wanted = [active];
     if (canWarm && currentSettled && slides.length > 1) {
       wanted.push(next);
-      if (nextReady) wanted.push((active + slides.length - 1) % slides.length);
     }
     setRequested(previous => wanted.every(i => previous.includes(i))
       ? previous : [...new Set([...previous, ...wanted])]);
-  }, [active, canWarm, currentSettled, next, nextReady, slides.length]);
+  }, [active, canWarm, currentSettled, next, slides.length]);
 
   useEffect(() => {
     const media = window.matchMedia("(any-pointer: coarse), (max-width: 1180px)");
@@ -164,6 +163,11 @@ export function HomeHero({
       onFocusCapture={() => setFocused(true)}
       onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       <div className={styles.heroField} ref={carousel.ref}
+        onTouchStart={() => {
+          if (!native || slides.length < 2) return;
+          const previous = (active + slides.length - 1) % slides.length;
+          setRequested(visited => visited.includes(previous) ? visited : [...visited, previous]);
+        }}
         role={native ? "region" : undefined}
         aria-label={native ? "首页作品图片 Featured artwork images" : undefined}
         tabIndex={native ? 0 : undefined}>
