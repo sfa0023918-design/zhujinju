@@ -10,6 +10,8 @@ import {
 import { createPortal } from "react-dom";
 import { getImageProps } from "next/image";
 
+import { artworkGallerySize } from "@/lib/artwork-gallery-size";
+import { artworkCardPreview } from "./artwork-grid-link";
 import measuredSizes from "@/lib/data/artwork-image-sizes.json";
 import { packArtworkRows } from "@/lib/artwork-rows";
 import { withImageVersion } from "@/lib/image-url";
@@ -84,12 +86,8 @@ export function ArtworkGallery({
   const [isMounted, setIsMounted] = useState(false);
   const [native, setNative] = useState(false);
   const [primaryReady, setPrimaryReady] = useState(false);
-  const ratio = width / height;
-  const fraction =
-    ratio <= 0.85 ? 0.5 : Math.min(0.6, 0.5 + (ratio - 0.85) * 0.6);
-  const gallerySizes = ratio > 1.5
-    ? "100vw"
-    : `(max-width: 860px) 100vw, ${Math.round(fraction * 100)}vw`;
+  const { ratio, fraction, sizes: gallerySizes } = artworkGallerySize(width, height);
+  const [cardPreview, setCardPreview] = useState<string>();
   const normalizedPrimaryCandidates = useMemo(() => {
     const seen = new Set<string>();
     const candidates = [primaryImage, ...primaryImageCandidates]
@@ -151,6 +149,7 @@ export function ArtworkGallery({
 
   useEffect(() => {
     setPrimaryReady(false);
+    setCardPreview(artworkCardPreview(resolvedPrimaryImage));
     setActiveImage(resolvedPrimaryImage);
   }, [resolvedPrimaryImage]);
 
@@ -333,7 +332,7 @@ export function ArtworkGallery({
                 const clone = native && hasMultipleImages && (position === 0 || position === thumbnailImages.length + 1);
                 return (
                   <button
-                    key={`${src}-${position}`}
+                    key={clone ? `clone-${position}-${src}` : src}
                     type="button"
                     aria-label={`放大 ${title}${index ? ` · 局部 ${index}` : ""}`}
                     aria-hidden={clone || index !== activeImageIndex}
@@ -353,7 +352,10 @@ export function ArtworkGallery({
                       quality={85}
                       wrapperClassName={styles.primaryImageFrame}
                       className={styles.primaryImage}
-                      style={vajraImageStyle(src)}
+                      style={index === 0 && cardPreview && !primaryReady ? {
+                        ...vajraImageStyle(src),
+                        background: `center / contain no-repeat url(${JSON.stringify(cardPreview)})`,
+                      } : vajraImageStyle(src)}
                       onError={src === resolvedPrimaryImage ? tryFallbackPrimaryImage : undefined}
                       onLoad={(event) => {
                         const img = event.currentTarget;

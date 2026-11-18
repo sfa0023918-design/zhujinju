@@ -1,7 +1,9 @@
+import exhibitionCover from "@/lib/data/exhibition-cover-photo.json";
 import Link from "next/link";
 import { formatCatalogueExtent, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 import type { Article, Exhibition, PageCopyContent } from "@/lib/site-data";
 import {
+  EXHIBITION_COVER_SIZES,
   COVER_VAJRA_CLIP,
   COVER_VAJRA_IMAGE,
 } from "@/lib/artwork-presentation";
@@ -73,13 +75,14 @@ export function ContemporaryExhibition({
               </div>
               <div className={styles.vajra}>
                 <ProtectedImage
+                  pictureSource={exhibitionCover}
                   src={COVER_VAJRA_IMAGE}
                   alt="五股金刚杵，展览图录封面作品"
                   width={900}
                   height={1198}
                   priority
                   quality={86}
-                  sizes="(max-width: 860px) 380px, 650px"
+                  sizes={EXHIBITION_COVER_SIZES}
                   className={styles.vajraImage}
                   style={{ clipPath: COVER_VAJRA_CLIP }}
                 />

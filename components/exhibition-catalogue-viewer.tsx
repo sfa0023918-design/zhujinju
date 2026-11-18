@@ -72,7 +72,7 @@ export function ExhibitionCatalogueViewer({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreenReading, setIsFullscreenReading] = useState(false);
   const [isDesktopReaderOpen, setIsDesktopReaderOpen] = useState(false);
-  const [nearViewport, setNearViewport] = useState(false);
+  const [loadReaderImages, setLoadReaderImages] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
   const hasNavigatedRef = useRef(false);
   const desktopFullscreenButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -83,20 +83,25 @@ export function ExhibitionCatalogueViewer({
     const viewer = viewerRef.current;
     if (!viewer) return;
     if (typeof IntersectionObserver === "undefined") {
-      setNearViewport(true);
+      setLoadReaderImages(true);
       return;
     }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setNearViewport(true);
+    // Crossing the reader on the way to the archive should only load its thumbnail.
+    let dwell: ReturnType<typeof setTimeout>;
+    const observer = new IntersectionObserver(([entry]) => {
+      clearTimeout(dwell);
+      if (entry.isIntersecting) {
+        dwell = setTimeout(() => {
+          setLoadReaderImages(true);
           observer.disconnect();
-        }
-      },
-      { rootMargin: "400px" },
-    );
+        }, 250);
+      }
+    });
     observer.observe(viewer);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(dwell);
+      observer.disconnect();
+    };
   }, []);
   const totalPages = cataloguePages.length;
   const showsSpreadImage = viewMode === "spread-images";
@@ -140,6 +145,7 @@ export function ExhibitionCatalogueViewer({
     // A linked entry must remain the first visible page. The 2023 edition starts
     // at printed page 3, so rounding array indexes to even pairs opens the wrong
     // spread and hides the facing artwork photograph.
+    setLoadReaderImages(true);
     setCurrentIndex(requestedIndex);
     document.getElementById("catalogue")?.scrollIntoView();
   }, [totalPages, usesPairedPages]);
@@ -176,7 +182,7 @@ export function ExhibitionCatalogueViewer({
   );
 
   useEffect(() => {
-    if (!readerPages.length || !isLayoutReady || !nearViewport) {
+    if (!readerPages.length || !isLayoutReady || !loadReaderImages) {
       return;
     }
 
@@ -228,7 +234,7 @@ export function ExhibitionCatalogueViewer({
       preloadedPagesRef.current.add(src);
       void image.decode?.().catch(() => {});
     });
-  }, [readerPages, currentIndex, isLayoutReady, preloadsPairedPages, nearViewport]);
+  }, [readerPages, currentIndex, isLayoutReady, preloadsPairedPages, loadReaderImages]);
 
   if (!totalPages) {
     return null;
@@ -279,7 +285,8 @@ export function ExhibitionCatalogueViewer({
   }
 
   return (
-    <div ref={viewerRef} className={styles.viewer}>
+    <div ref={viewerRef} className={styles.viewer}
+      onPointerDownCapture={() => setLoadReaderImages(true)} onFocusCapture={() => setLoadReaderImages(true)}>
       <div className={styles.heading}>
         <h2>
           电子图录 <span lang="en">Catalogue</span>
@@ -315,7 +322,7 @@ export function ExhibitionCatalogueViewer({
           currentIndex={currentIndex}
           onIndexChange={jumpTo}
           onFullscreenChange={handleMobileFullscreenChange}
-          loadPreview={nearViewport}
+          loadPreview={loadReaderImages}
         />
       ) : (
         <div id="catalogue-reader" className={styles.desktopReader}>
@@ -356,7 +363,7 @@ export function ExhibitionCatalogueViewer({
               page ? (
                 <ProtectedImage
                   key={`slot-${index}-${page}`}
-                  src={nearViewport ? page : thumbPages[currentIndex + index]}
+                  src={loadReaderImages ? page : thumbPages[currentIndex + index]}
                   alt={`${title.zh || title.en}，图版 ${currentIndex + index + 1}`}
                   width={geometries[currentIndex + index]?.width ?? 4000}
                   height={geometries[currentIndex + index]?.height ?? 2358}
@@ -398,7 +405,7 @@ export function ExhibitionCatalogueViewer({
               →
             </button>
           </div>
-          <CatalogueThumbnails pages={thumbPages} currentIndex={currentIndex} paired={usesDesktopPairing} enabled={nearViewport} onSelect={jumpTo} />
+          <CatalogueThumbnails pages={thumbPages} currentIndex={currentIndex} paired={usesDesktopPairing} enabled={loadReaderImages} onSelect={jumpTo} />
           {isDesktopReaderOpen ? (
             <MobileCatalogueReader
               presentation="dialog"

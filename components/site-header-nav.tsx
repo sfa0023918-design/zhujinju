@@ -3,6 +3,9 @@
 import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { preload } from "react-dom";
+import exhibitionCover from "@/lib/data/exhibition-cover-photo.json";
+import { EXHIBITION_COVER_SIZES } from "@/lib/artwork-presentation";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
 import { BilingualText } from "./bilingual-text";
@@ -17,6 +20,7 @@ type NavItem = {
 
 type SiteHeaderNavProps = {
   items: NavItem[];
+  seasonalCover: boolean;
 };
 
 function MenuLinkStatus() {
@@ -28,10 +32,19 @@ function MenuLinkStatus() {
   );
 }
 
-export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
+export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
   const pathname = usePathname();
   const { open, setOpenPath } = useSiteMenu();
   const router = useRouter();
+
+  function warmExhibitionCover(href: string) {
+    if (seasonalCover && href === "/exhibitions") {
+      preload(exhibitionCover.href, {
+        as: "image", type: exhibitionCover.type, imageSrcSet: exhibitionCover.srcSet,
+        imageSizes: EXHIBITION_COVER_SIZES, fetchPriority: "high",
+      });
+    }
+  }
 
   const isActive = (href: string) =>
     href === "/"
@@ -74,6 +87,7 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
             <Link
               key={item.href}
               href={item.href}
+              onNavigate={() => warmExhibitionCover(item.href)}
               aria-current={active ? "page" : undefined}
               className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
             >
@@ -111,13 +125,14 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
                     key={item.href}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    prefetch={item.href === "/collection" || item.href === "/journal" ? null : false}
+                    prefetch={item.href === "/collection" || item.href === "/exhibitions" || item.href === "/journal" ? null : false}
                     onPointerEnter={(event) => {
                       if (!active && event.pointerType === "mouse") router.prefetch(item.href);
                     }}
                     onFocus={(event) => {
                       if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
                     }}
+                    onNavigate={() => warmExhibitionCover(item.href)}
                     onClick={() => {
                       // Other destinations close when pathname changes; keep
                       // their Link mounted until the navigation commits.

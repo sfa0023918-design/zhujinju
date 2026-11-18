@@ -1,6 +1,7 @@
 export const COVER_VAJRA_SLUG = "artwork-1790510831618";
 export const COVER_VAJRA_IMAGE =
   "/uploads/artworks/five-pronged-vajra-cover-cutout-2026.png";
+export const EXHIBITION_COVER_SIZES = "(max-width: 860px) 380px, 650px";
 export const COVER_VAJRA_BACKDROP = "#9d4432";
 
 // The embedded cover image includes an unrelated mark beside the very bottom of the object.

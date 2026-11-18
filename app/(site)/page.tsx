@@ -1,3 +1,4 @@
+import exhibitionCover from "@/lib/data/exhibition-cover-photo.json";
 import Link from "next/link";
 import { formatCatalogueExtent, formatDimensions, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 
@@ -190,6 +191,7 @@ export default async function HomePage() {
               <div className={styles.wordmarkCaption}>{exhibitionTitle}</div>
             </div>
             <ProtectedImage
+              pictureSource={exhibitionCover}
               src={COVER_VAJRA_IMAGE}
               alt="五股金刚杵，展览图录封面作品"
               width={900}
