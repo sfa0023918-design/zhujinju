@@ -10,6 +10,7 @@ import {
 } from "@/lib/artwork-presentation";
 import type { CollectionArtworkSummary } from "@/lib/collection-filtering";
 import { resolveArtworkPrimaryImage, withImageVersion } from "@/lib/image-url";
+import { artworkDisplayPhoto } from "@/lib/artwork-display-photo";
 import { formatDimensions } from "@/lib/display-format";
 import { getArtworkStatusText } from "@/lib/bilingual";
 import { ProtectedImage } from "./protected-image";
@@ -82,6 +83,7 @@ export function ArtworkGrid({
                   >
                     <ProtectedImage
                       src={withImageVersion(source)}
+                      pictureSource={artworkDisplayPhoto(source)}
                       alt={`${a.title.zh} ${a.title.en}`}
                       width={width}
                       height={height}

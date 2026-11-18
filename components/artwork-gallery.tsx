@@ -10,6 +10,7 @@ import {
 import { createPortal } from "react-dom";
 import { getImageProps } from "next/image";
 
+import { artworkDisplayPhoto } from "@/lib/artwork-display-photo";
 import { artworkGallerySize } from "@/lib/artwork-gallery-size";
 import { artworkCardPreview } from "./artwork-grid-link";
 import measuredSizes from "@/lib/data/artwork-image-sizes.json";
@@ -229,6 +230,7 @@ export function ArtworkGallery({
       image.decoding = "async";
       image.fetchPriority = "low";
       const src = thumbnailImages[(activeImageIndex + offset + thumbnailImages.length) % thumbnailImages.length];
+      if (src === resolvedPrimaryImage) continue;
       const { props } = getImageProps({
         src: withImageVersion(src), alt: "", width, height,
         sizes: gallerySizes, quality: 85,
@@ -238,7 +240,7 @@ export function ArtworkGallery({
       image.src = props.src;
       void image.decode?.().catch(() => {});
     }
-  }, [activeImageIndex, primaryReady, hasMultipleImages, thumbnailImages, gallerySizes, width, height]);
+  }, [activeImageIndex, primaryReady, hasMultipleImages, thumbnailImages, gallerySizes, width, height, resolvedPrimaryImage]);
 
   const stepLightboxImage = (direction: "prev" | "next") => {
     if (thumbnailImages.length < 2) {
@@ -345,6 +347,7 @@ export function ArtworkGallery({
                       alt={index ? `${title} · 局部 ${index}` : title}
                       width={imageSize(src).width}
                       height={imageSize(src).height}
+                      pictureSource={index === 0 ? artworkDisplayPhoto(src) : undefined}
                       priority={index === 0 && !clone}
                       loading={index === 0 && !clone ? undefined : "lazy"}
                       fetchPriority={index === 0 && !clone ? "high" : "low"}

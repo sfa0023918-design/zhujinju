@@ -1,8 +1,8 @@
 "use client";
 
-import Image, { type ImageProps } from "next/image";
+import Image, { getImageProps, type ImageProps } from "next/image";
 import { preload } from "react-dom";
-import type { DragEvent, MouseEvent } from "react";
+import { useState, type DragEvent, type MouseEvent } from "react";
 
 type ProtectedImageProps = ImageProps & {
   wrapperClassName?: string;
@@ -17,15 +17,18 @@ function joinClassNames(...classNames: Array<string | undefined>) {
 export function ProtectedImage({
   wrapperClassName,
   shieldClassName,
-  pictureSource,
+  pictureSource: preferredSource,
   priority,
   className,
   alt,
   onContextMenu,
+  onError,
   onDragStart,
   draggable,
   ...props
 }: ProtectedImageProps) {
+  const [failedSource, setFailedSource] = useState<string>();
+  const pictureSource = preferredSource?.href === failedSource ? undefined : preferredSource;
   const handleContextMenu = (event: MouseEvent<HTMLElement>) => {
     event.preventDefault();
     onContextMenu?.(event as never);
@@ -45,15 +48,22 @@ export function ProtectedImage({
       fetchPriority: "high",
     });
   }
+  // WebKit can start a detached img's srcset while React inserts a picture
+  // during navigation. Keep both real candidates in source elements so only
+  // the selected format uses the network, including before hydration.
+  const fallback = pictureSource ? getImageProps({ ...props, alt }).props : undefined;
   const image = (
     <Image
       {...props}
+      unoptimized={pictureSource ? true : props.unoptimized}
+      overrideSrc={pictureSource ? "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" : props.overrideSrc}
       priority={priority && !pictureSource}
       loading={priority && pictureSource ? "eager" : props.loading}
       alt={alt}
       className={className}
       draggable={draggable ?? false}
       data-protect="true"
+      onError={pictureSource ? () => setFailedSource(pictureSource.href) : onError}
       onContextMenu={handleContextMenu as never}
       onDragStart={handleDragStart as never}
     />
@@ -66,9 +76,10 @@ export function ProtectedImage({
       onDragStart={handleDragStart}
       data-protect-wrap="true"
     >
-      {pictureSource ? (
+      {pictureSource && fallback ? (
         <picture style={{ display: "contents" }}>
           <source type={pictureSource.type} srcSet={pictureSource.srcSet} sizes={props.sizes} />
+          <source srcSet={fallback.srcSet ?? fallback.src} sizes={fallback.sizes} />
           {image}
         </picture>
       ) : image}

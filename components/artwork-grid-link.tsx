@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { preload } from "react-dom";
 import type { CSSProperties, ReactNode } from "react";
 
+import { artworkDisplayPhoto } from "@/lib/artwork-display-photo";
 import { artworkGallerySize } from "@/lib/artwork-gallery-size";
 import { withImageVersion } from "@/lib/image-url";
 
@@ -38,9 +39,15 @@ export function ArtworkGridLink({ href, source, width, height, warmRoute, childr
         if (card?.complete && card.naturalWidth && card.currentSrc) {
           lastCard = { source, preview: card.currentSrc };
         }
+        const sizes = artworkGallerySize(width, height).sizes;
+        const photo = artworkDisplayPhoto(source);
+        if (photo) {
+          preload(photo.href, { as: "image", type: photo.type, imageSrcSet: photo.srcSet, imageSizes: sizes, fetchPriority: "high" });
+          return;
+        }
         const { props: image } = getImageProps({
           src: withImageVersion(source), width, height, alt: "", quality: 85,
-          sizes: artworkGallerySize(width, height).sizes,
+          sizes,
         });
         preload(image.src, { as: "image", imageSrcSet: image.srcSet, imageSizes: image.sizes, fetchPriority: "high" });
       }}

@@ -125,7 +125,8 @@ export function SiteHeaderNav({ items, seasonalCover }: SiteHeaderNavProps) {
                     key={item.href}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    prefetch={item.href === "/collection" || item.href === "/exhibitions" || item.href === "/journal" ? null : false}
+                    prefetch={item.href === "/exhibitions" ? null : false}
+                    onTouchStart={() => { if (!active) router.prefetch(item.href); }}
                     onPointerEnter={(event) => {
                       if (!active && event.pointerType === "mouse") router.prefetch(item.href);
                     }}
