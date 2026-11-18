@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
+import { warmImage } from "@/lib/warm-image";
+import { COVER_VAJRA_IMAGE, EXHIBITION_COVER_SIZES } from "@/lib/artwork-presentation";
 import { BilingualText } from "./bilingual-text";
 import { useSiteMenu } from "./site-menu-state";
 import { ModalDialog } from "./modal-dialog";
@@ -17,6 +19,7 @@ type NavItem = {
 
 type SiteHeaderNavProps = {
   items: NavItem[];
+  hasSeasonalCover: boolean;
 };
 
 function MenuLinkStatus() {
@@ -28,7 +31,7 @@ function MenuLinkStatus() {
   );
 }
 
-export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
+export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
   const pathname = usePathname();
   const { open, setOpenPath } = useSiteMenu();
   const router = useRouter();
@@ -57,7 +60,10 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
         aria-label={open ? "关闭菜单 Close menu" : "打开菜单 Open menu"}
         aria-expanded={open}
         aria-controls="site-mobile-nav"
-        onClick={() => setOpenPath(open ? null : pathname)}
+        onClick={() => {
+          if (!open && pathname !== "/exhibitions") router.prefetch("/exhibitions");
+          setOpenPath(open ? null : pathname);
+        }}
         className={styles.menuButton}
       >
         <span className={styles.menuLabel}>
@@ -117,6 +123,11 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
                     }}
                     onFocus={(event) => {
                       if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
+                    }}
+                    onNavigate={() => {
+                      if (!active && hasSeasonalCover && item.href === "/exhibitions") {
+                        warmImage(COVER_VAJRA_IMAGE, 900, 1198, EXHIBITION_COVER_SIZES, 86);
+                      }
                     }}
                     onClick={() => {
                       // Other destinations close when pathname changes; keep

@@ -1,28 +1,7 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { getPublicArtworks, loadSiteContent } from "@/lib/site-data";
+import { detailMetadata, renderDetail } from "./detail";
 
-import { getArtworkCatalogueReference } from "@/lib/data/catalogue-pages";
-import { ArtworkDetailTemplate } from "@/components/artwork-detail-template";
-import { getAdminSession } from "@/lib/admin-auth";
-import { resolveArtworkPrimaryImage } from "@/lib/image-url";
-import { buildMetadata } from "@/lib/metadata";
-import {
-  getArticlesBySlugs,
-  getArtworkBySlug,
-  getExhibitionsBySlugs,
-  getPublicArtworks,
-  getRelatedArtworks,
-  loadSiteContent,
-} from "@/lib/site-data";
-
-type ArtworkDetailPageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
-  searchParams?: Promise<{
-    preview?: string;
-  }>;
-};
+type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
   const content = await loadSiteContent();
@@ -32,74 +11,10 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: ArtworkDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const query = (await searchParams) ?? {};
-  const content = await loadSiteContent();
-  const includeDrafts =
-    query.preview === "1" ? Boolean(await getAdminSession()) : false;
-  const artwork = getArtworkBySlug(content, slug, { includeDrafts });
-
-  if (!artwork) {
-    return buildMetadata({
-      title: content.pageCopy.artworkDetail.errorTitle,
-      description: content.pageCopy.artworkDetail.errorDescription,
-      path: "/collection",
-      site: content.siteConfig,
-    });
-  }
-
-  return buildMetadata({
-    title: artwork.title,
-    description: artwork.excerpt,
-    path: `/collection/${artwork.slug}`,
-    site: content.siteConfig,
-    image: { path: resolveArtworkPrimaryImage(artwork), alt: artwork.title },
-  });
+export async function generateMetadata({ params }: Props) {
+  return detailMetadata((await params).slug);
 }
 
-export default async function ArtworkDetailPage({
-  params,
-  searchParams,
-}: ArtworkDetailPageProps) {
-  const { slug } = await params;
-  const query = (await searchParams) ?? {};
-  const content = await loadSiteContent();
-  const includeDrafts =
-    query.preview === "1" ? Boolean(await getAdminSession()) : false;
-  const artwork = getArtworkBySlug(content, slug, { includeDrafts });
-
-  if (!artwork) {
-    notFound();
-  }
-
-  const relatedWorks = getRelatedArtworks(
-    content,
-    artwork.slug,
-    artwork.category.zh,
-  );
-  const relatedArticles = getArticlesBySlugs(
-    content,
-    artwork.relatedArticleSlugs,
-  );
-  const relatedExhibitions = getExhibitionsBySlugs(
-    content,
-    artwork.relatedExhibitionSlugs,
-  );
-
-  const catalogue = getArtworkCatalogueReference(artwork, content.exhibitions);
-
-  return (
-    <ArtworkDetailTemplate
-      catalogue={catalogue}
-      artwork={artwork}
-      detailCopy={content.pageCopy.artworkDetail}
-      relatedWorks={relatedWorks}
-      relatedArticles={relatedArticles}
-      relatedExhibitions={relatedExhibitions}
-    />
-  );
+export default async function Page({ params }: Props) {
+  return renderDetail((await params).slug);
 }

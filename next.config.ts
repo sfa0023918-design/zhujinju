@@ -48,11 +48,18 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return {
-      beforeFiles: ["category", "region", "period", "material", "status", "page"].map(key => ({
-        source: "/collection",
-        has: [{ type: "query" as const, key }],
-        destination: "/collection-query",
-      })),
+      beforeFiles: [
+        {
+          source: "/collection/:slug",
+          has: [{ type: "query", key: "preview", value: "1" }],
+          destination: "/collection/:slug/preview",
+        },
+        ...["category", "region", "period", "material", "status", "page"].map(key => ({
+          source: "/collection",
+          has: [{ type: "query" as const, key }],
+          destination: "/collection-query",
+        })),
+      ],
       afterFiles: [],
       fallback: [],
     };

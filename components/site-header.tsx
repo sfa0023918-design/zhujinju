@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { bt } from "@/lib/bilingual";
-import { loadSiteContent } from "@/lib/site-data";
+import { getPublicExhibitions, loadSiteContent } from "@/lib/site-data";
 
 import { SiteHeaderNav } from "./site-header-nav";
 import { SiteHeaderFrame } from "./site-header-frame";
@@ -17,7 +17,10 @@ const navigation = [
 ];
 
 export async function SiteHeader() {
-  const { siteConfig } = await loadSiteContent();
+  const content = await loadSiteContent();
+  const { siteConfig } = content;
+  const exhibitions = getPublicExhibitions(content);
+  const featured = exhibitions.find((item) => item.current) ?? exhibitions[0];
 
   return (
     <SiteHeaderFrame>
@@ -63,7 +66,7 @@ export async function SiteHeader() {
           className={`${styles.logo} ${styles.seasonLogo}`}
         />
       </Link>
-      <SiteHeaderNav items={navigation} />
+      <SiteHeaderNav items={navigation} hasSeasonalCover={featured?.slug === "himalayan-art-2026"} />
     </SiteHeaderFrame>
   );
 }

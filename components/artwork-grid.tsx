@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArtworkGridLink } from "./artwork-grid-link";
 import type { CSSProperties } from "react";
 import { packArtworkRows } from "@/lib/artwork-rows";
 import { getArtworkGridImageSizes } from "@/lib/artwork-image-sizes";
@@ -66,22 +66,25 @@ export function ArtworkGrid({
                 const a = artworks[i];
                 const vajra = a.slug === COVER_VAJRA_SLUG;
                 const status = getArtworkStatusText(a.status);
+                const source = withImageVersion(vajra ? COVER_VAJRA_IMAGE : resolveArtworkPrimaryImage(a));
+                const width = vajra ? 900 : (a.imageAsset?.width ?? 800);
+                const height = vajra ? 1198 : (a.imageAsset?.height ?? 1000);
                 return (
-                  <Link
+                  <ArtworkGridLink
                     key={a.slug}
                     href={`/collection/${a.slug}`}
+                    warmWhenVisible={index === 0 && !swipeOnTablet}
+                    source={source}
+                    width={width}
+                    height={height}
                     className={styles.card}
                     style={swipeOnTablet ? { "--artwork-ratio": ratios[i] } as CSSProperties : undefined}
                   >
                     <ProtectedImage
-                      src={withImageVersion(
-                        vajra
-                          ? COVER_VAJRA_IMAGE
-                          : resolveArtworkPrimaryImage(a),
-                      )}
+                      src={source}
                       alt={`${a.title.zh} ${a.title.en}`}
-                      width={vajra ? 900 : (a.imageAsset?.width ?? 800)}
-                      height={vajra ? 1198 : (a.imageAsset?.height ?? 1000)}
+                      width={width}
+                      height={height}
                       quality={84}
                       priority={priority && i < 3}
                       sizes={imageSizes[i]}
@@ -118,7 +121,7 @@ export function ArtworkGrid({
                             : "Available"}
                       </span>
                     </span>
-                  </Link>
+                  </ArtworkGridLink>
                 );
               })}
             </div>

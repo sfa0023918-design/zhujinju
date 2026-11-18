@@ -1,5 +1,6 @@
 "use client";
 
+import { artworkGallerySize } from "@/lib/artwork-gallery-size";
 import {
   useEffect,
   useMemo,
@@ -84,12 +85,7 @@ export function ArtworkGallery({
   const [isMounted, setIsMounted] = useState(false);
   const [native, setNative] = useState(false);
   const [primaryReady, setPrimaryReady] = useState(false);
-  const ratio = width / height;
-  const fraction =
-    ratio <= 0.85 ? 0.5 : Math.min(0.6, 0.5 + (ratio - 0.85) * 0.6);
-  const gallerySizes = ratio > 1.5
-    ? "100vw"
-    : `(max-width: 860px) 100vw, ${Math.round(fraction * 100)}vw`;
+  const { ratio, fraction, sizes: gallerySizes } = artworkGallerySize(width, height);
   const normalizedPrimaryCandidates = useMemo(() => {
     const seen = new Set<string>();
     const candidates = [primaryImage, ...primaryImageCandidates]
