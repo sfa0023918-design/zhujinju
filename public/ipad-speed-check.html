@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>竹瑾居 · iPad 浏览计时</title>
+<title>竹瑾居 · 浏览计时</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f0e9;color:#282722;font:16px/1.6 system-ui,sans-serif}main{max-width:42rem;margin:8vh auto;padding:0 1.4rem}h1{font:normal 1.7rem/1.35 Georgia,"Songti SC",serif}button,select{font:inherit;color:inherit;padding:.5rem .8rem;background:#f7f4ee;border:1px solid #a39c8f;border-radius:.25rem;margin:.2rem 0;cursor:pointer}button:focus-visible,select:focus-visible{outline:2px solid #973e28}iframe{display:block;border:0;position:fixed;inset:0;width:100%;height:100%;background:#f3f0e9}#finish{position:fixed;right:.5rem;bottom:max(.5rem,env(safe-area-inset-bottom));z-index:1;font-size:.8rem}pre{white-space:pre-wrap;font-size:.86rem} [hidden]{display:none!important}
 </style>
-</head><body><main id="panel"><h1>iPad 浏览计时</h1>
+</head><body><main id="panel"><h1>浏览计时</h1>
 <p>选好入口后，在网站里照常点菜单或藏品卡片。看到目标标题和主图后，点右下角「查看计时」。如果卡住，也可以随时回来查看。</p>
 <label>本轮访问 <select id="kind"><option>首次</option><option>再次</option></select></label>
 <div><button data-go="/">从首页点展览或藏品</button> <button data-go="/collection">从藏品列表点一件作品</button></div>
@@ -36,7 +36,7 @@ function visible(el,w){
 function capture(e){
  const a=e.target.closest('a');if(!a||row)return;
  const url=new URL(a.href),from=frame.contentWindow.location.pathname;
- const valid=(from==='/'&&a.closest('#site-mobile-nav')&&['/exhibitions','/collection'].includes(url.pathname))||
+ const valid=(from==='/'&&a.closest('#site-mobile-nav, header nav')&&['/exhibitions','/collection'].includes(url.pathname))||
  (from==='/collection'&&a.closest('main')&&/^\/collection\/[^/]+$/.test(url.pathname));
  if(url.origin!==location.origin||!valid)return;
  const name=(a.textContent||'').trim().replace(/\s+/g,' ').slice(0,45);

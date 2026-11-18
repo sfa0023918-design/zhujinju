@@ -2,11 +2,10 @@
 
 import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
-import { warmImage } from "@/lib/warm-image";
-import { COVER_VAJRA_IMAGE, EXHIBITION_COVER_SIZES } from "@/lib/artwork-presentation";
+import { PublicDocumentLink } from "./public-document-link";
 import { BilingualText } from "./bilingual-text";
 import { useSiteMenu } from "./site-menu-state";
 import { ModalDialog } from "./modal-dialog";
@@ -19,22 +18,38 @@ type NavItem = {
 
 type SiteHeaderNavProps = {
   items: NavItem[];
-  hasSeasonalCover: boolean;
 };
 
-function MenuLinkStatus() {
+function NavigationLink({ href, children, ...props }: ComponentPropsWithoutRef<"a"> & { href: string }) {
+  return href === "/exhibitions"
+    ? <PublicDocumentLink href={href} {...props}>{children}</PublicDocumentLink>
+    : <Link href={href} prefetch={false} {...props}>{children}</Link>;
+}
+
+function MenuLinkStatus({ opening }: { opening: boolean }) {
   const { pending } = useLinkStatus();
   return (
     <span className={styles.linkStatus} role="status">
-      {pending ? "正在打开…" : ""}
+      {pending || opening ? "正在打开…" : ""}
     </span>
   );
 }
 
-export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
+export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
   const pathname = usePathname();
   const { open, setOpenPath } = useSiteMenu();
   const router = useRouter();
+  const [opening, setOpening] = useState(false);
+  useEffect(() => {
+    const restore = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setOpening(false);
+        setOpenPath(null);
+      }
+    };
+    window.addEventListener("pageshow", restore);
+    return () => window.removeEventListener("pageshow", restore);
+  }, [setOpenPath]);
 
   const isActive = (href: string) =>
     href === "/"
@@ -61,7 +76,7 @@ export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
         aria-expanded={open}
         aria-controls="site-mobile-nav"
         onClick={() => {
-          if (!open && pathname !== "/exhibitions") router.prefetch("/exhibitions");
+          setOpening(false);
           setOpenPath(open ? null : pathname);
         }}
         className={styles.menuButton}
@@ -77,7 +92,7 @@ export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
           const active = isActive(item.href);
 
           return (
-            <Link
+            <NavigationLink
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
@@ -91,7 +106,7 @@ export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
                 zhClassName={styles.navZh}
                 enClassName={styles.navEn}
               />
-            </Link>
+            </NavigationLink>
           );
         })}
       </nav>
@@ -113,23 +128,18 @@ export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
                 const active = isActive(item.href);
 
                 return (
-                  <Link
+                  <NavigationLink
                     key={item.href}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    prefetch={item.href === "/collection" || item.href === "/journal" ? null : false}
                     onPointerEnter={(event) => {
-                      if (!active && event.pointerType === "mouse") router.prefetch(item.href);
+                      if (!active && item.href !== "/exhibitions" && event.pointerType === "mouse") router.prefetch(item.href);
                     }}
                     onFocus={(event) => {
-                      if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
+                      if (!active && item.href !== "/exhibitions" && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
                     }}
-                    onNavigate={() => {
-                      if (!active && hasSeasonalCover && item.href === "/exhibitions") {
-                        warmImage(COVER_VAJRA_IMAGE, 900, 1198, EXHIBITION_COVER_SIZES, 86);
-                      }
-                    }}
-                    onClick={() => {
+                    onClick={(event) => {
+                      if (!active && item.href === "/exhibitions" && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) setOpening(true);
                       // Other destinations close when pathname changes; keep
                       // their Link mounted until the navigation commits.
                       if (item.href === pathname) setOpenPath(null);
@@ -144,8 +154,8 @@ export function SiteHeaderNav({ items, hasSeasonalCover }: SiteHeaderNavProps) {
                       zhClassName={styles.mobileZh}
                       enClassName={styles.mobileEn}
                     />
-                    <MenuLinkStatus />
-                  </Link>
+                    <MenuLinkStatus opening={opening && item.href === "/exhibitions"} />
+                  </NavigationLink>
                 );
               })}
             </div>

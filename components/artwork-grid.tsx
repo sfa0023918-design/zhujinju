@@ -1,4 +1,4 @@
-import { ArtworkGridLink } from "./artwork-grid-link";
+import { PublicDocumentLink } from "./public-document-link";
 import type { CSSProperties } from "react";
 import { packArtworkRows } from "@/lib/artwork-rows";
 import { getArtworkGridImageSizes } from "@/lib/artwork-image-sizes";
@@ -70,13 +70,9 @@ export function ArtworkGrid({
                 const width = vajra ? 900 : (a.imageAsset?.width ?? 800);
                 const height = vajra ? 1198 : (a.imageAsset?.height ?? 1000);
                 return (
-                  <ArtworkGridLink
+                  <PublicDocumentLink
                     key={a.slug}
                     href={`/collection/${a.slug}`}
-                    warmWhenVisible={index === 0 && !swipeOnTablet}
-                    source={source}
-                    width={width}
-                    height={height}
                     className={styles.card}
                     style={swipeOnTablet ? { "--artwork-ratio": ratios[i] } as CSSProperties : undefined}
                   >
@@ -121,7 +117,7 @@ export function ArtworkGrid({
                             : "Available"}
                       </span>
                     </span>
-                  </ArtworkGridLink>
+                  </PublicDocumentLink>
                 );
               })}
             </div>

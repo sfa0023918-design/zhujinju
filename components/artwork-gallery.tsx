@@ -4,6 +4,7 @@ import { artworkGallerySize } from "@/lib/artwork-gallery-size";
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type ReactNode,
@@ -69,6 +70,61 @@ function vajraImageStyle(image: string): CSSProperties | undefined {
   };
 }
 
+function LightboxTrack({ images, active, select, title, sizeOf, previews }: {
+  images: string[];
+  active: number;
+  select: (index: number) => void;
+  title: string;
+  sizeOf: (src: string) => { width: number; height: number };
+  previews: ReadonlyMap<string, string>;
+}) {
+  const carousel = useNativeCarousel({ count: images.length, active, onChange: select, loop: true });
+  const [decoded, setDecoded] = useState<ReadonlySet<string>>(() => new Set());
+  const [adjacent, setAdjacent] = useState<{ from: string; to: string } | null>(null);
+  const previous = useRef(active);
+  const direction = useRef(1);
+  const current = images[active];
+  useEffect(() => {
+    const count = images.length;
+    const distance = (active - previous.current + count) % count;
+    if (distance) direction.current = distance > count / 2 ? -1 : 1;
+    previous.current = active;
+    if (count < 2 || !decoded.has(current)) return;
+    const to = images[(active + direction.current + count) % count];
+    if (!decoded.has(to)) setAdjacent({ from: current, to });
+  }, [active, current, images, decoded]);
+
+  return (
+    <div className={styles.lightboxViewport} ref={carousel.ref}
+      role="region" aria-label="作品图片 Artwork images" tabIndex={0}>
+      {carousel.indexes.map((index, position) => {
+        const src = images[index];
+        const clone = images.length > 1 && (position === 0 || position === images.length + 1);
+        const showOriginal = index === active || decoded.has(src) || (adjacent?.from === current && adjacent.to === src);
+        const preview = previews.get(src);
+        const dimensions = sizeOf(src);
+        const media = {
+          ...dimensions,
+          unoptimized: true,
+          wrapperClassName: styles.lightboxMedia,
+          className: "relative z-30 h-auto w-auto max-h-full max-w-full object-contain object-center",
+          style: vajraImageStyle(src),
+        };
+        return (
+          <div className={styles.lightboxPanel} key={`${src}-${position}`} aria-hidden={clone || index !== active}>
+            {preview && !decoded.has(src) ? <ProtectedImage {...media} src={preview} alt="" /> : null}
+            {showOriginal ? <ProtectedImage
+              {...media} src={withImageVersion(src)} alt={index ? `${title} · 局部 ${index}` : title}
+              loading="eager" fetchPriority={index === active ? "high" : "low"}
+              onLoad={() => setDecoded(last => last.has(src) ? last : new Set(last).add(src))}
+            /> : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ArtworkGallery({
   title,
   primaryImage,
@@ -85,6 +141,7 @@ export function ArtworkGallery({
   const [isMounted, setIsMounted] = useState(false);
   const [native, setNative] = useState(false);
   const [primaryReady, setPrimaryReady] = useState(false);
+  const previews = useRef(new Map<string, string>());
   const { ratio, fraction, sizes: gallerySizes } = artworkGallerySize(width, height);
   const normalizedPrimaryCandidates = useMemo(() => {
     const seen = new Set<string>();
@@ -210,12 +267,6 @@ export function ArtworkGallery({
     onChange: (index) => setActiveImage(thumbnailImages[index]),
     enabled: native, loop: native,
   });
-  const lightboxCarousel = useNativeCarousel({
-    count: thumbnailImages.length, active: activeImageIndex,
-    onChange: (index) => setActiveImage(thumbnailImages[index]),
-    enabled: isLightboxOpen, loop: true,
-  });
-
   useEffect(() => {
     if (!primaryReady || !hasMultipleImages) return;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
@@ -353,6 +404,7 @@ export function ArtworkGallery({
                       onError={src === resolvedPrimaryImage ? tryFallbackPrimaryImage : undefined}
                       onLoad={(event) => {
                         const img = event.currentTarget;
+                        previews.current.set(src, img.currentSrc);
                         if (src === resolvedPrimaryImage && img.naturalWidth && img.naturalHeight) {
                           setNaturalRatio(img.naturalWidth / img.naturalHeight);
                           setPrimaryReady(true);
@@ -426,6 +478,7 @@ export function ArtworkGallery({
                         height={imageSize(src).height}
                         sizes="(max-width: 860px) 100vw, 50vw"
                         quality={85}
+                        onLoad={event => previews.current.set(src, event.currentTarget.currentSrc)}
                         wrapperClassName={styles.detailImageFrame}
                         className={styles.detailImage}
                         style={vajraImageStyle(src)}
@@ -500,28 +553,9 @@ export function ArtworkGallery({
                       : undefined
                   }
                 >
-                  <div className={styles.lightboxViewport} ref={lightboxCarousel.ref}
-                    role="region" aria-label="作品图片 Artwork images" tabIndex={0}>
-                    {lightboxCarousel.indexes.map((index, position) => {
-                      const src = thumbnailImages[index];
-                      const clone = hasMultipleImages && (position === 0 || position === thumbnailImages.length + 1);
-                      return (
-                        <div className={styles.lightboxPanel} key={`${src}-${position}`} aria-hidden={clone || index !== activeImageIndex}>
-                          <ProtectedImage
-                            src={withImageVersion(src)}
-                            alt={index ? `${title} · 局部 ${index}` : title}
-                            width={imageSize(src).width}
-                            height={imageSize(src).height}
-                            unoptimized
-                            loading="eager"
-                            wrapperClassName={styles.lightboxMedia}
-                            className="relative z-30 h-auto w-auto max-h-full max-w-full object-contain object-center"
-                            style={vajraImageStyle(src)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <LightboxTrack images={thumbnailImages} active={activeImageIndex}
+                    select={index => setActiveImage(thumbnailImages[index])} title={title}
+                    sizeOf={imageSize} previews={previews.current} />
                 </div>
                 {thumbnailImages.length > 1 ? (
                   <div className="relative z-20 mt-3 flex justify-center gap-2 overflow-x-auto pb-1">

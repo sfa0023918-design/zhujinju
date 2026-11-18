@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PublicDocumentLink } from "./public-document-link";
 import type { CSSProperties } from "react";
 import { HomeHighlights } from "@/components/home-highlights";
 import { ProtectedImage } from "@/components/protected-image";
@@ -30,7 +30,7 @@ function Card({ artwork }: { artwork: Artwork }) {
     .filter(Boolean)
     .join("，");
   return (
-    <Link
+    <PublicDocumentLink
       href={`/collection/${artwork.slug}`}
       className={styles.artworkCard}
       aria-label={[artwork.title.zh, artwork.title.en, regionPeriod, status.zh, status.en].filter(Boolean).join(" · ")}
@@ -74,7 +74,7 @@ function Card({ artwork }: { artwork: Artwork }) {
               : "Available"}
         </span>
       </span>
-    </Link>
+    </PublicDocumentLink>
   );
 }
 

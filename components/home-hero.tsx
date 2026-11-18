@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { PublicDocumentLink } from "./public-document-link";
 import {
   useEffect,
   useRef,
@@ -226,10 +226,9 @@ export function HomeHero({
       {slides.length ? (
         <div className={styles.captionBar}>
           {slides.map((slide, index) => (
-            <Link
+            <PublicDocumentLink
               key={slide.slug}
               href={`/collection/${slide.slug}`}
-              prefetch={false}
               className={styles.caption}
               tabIndex={index === active ? 0 : -1}
               aria-hidden={index !== active}
@@ -259,7 +258,7 @@ export function HomeHero({
                 查看作品 <small lang="en">View work</small>
                 <HomeArrow />
               </span>
-            </Link>
+            </PublicDocumentLink>
           ))}
           <div role="group" aria-label="切换首页作品" className={styles.ticks}>
             {!reducedMotion && slides.length > 1 ? (

@@ -1,3 +1,4 @@
+import { PublicDocumentLink } from "./public-document-link";
 import Link from "next/link";
 import type { BilingualText } from "@/lib/site-data";
 import styles from "@/app/(site)/home.module.css";
@@ -45,8 +46,9 @@ export function HomeAction({
   arrow?: boolean;
   className?: string;
 }) {
+  const Action = href.startsWith("/exhibitions") ? PublicDocumentLink : Link;
   return (
-    <Link
+    <Action
       href={href}
       className={`${subtle ? styles.textLink : styles.button} ${className}`}
     >
@@ -55,6 +57,6 @@ export function HomeAction({
         <small lang="en">{text.en}</small>
       </span>
       {arrow ? <HomeArrow /> : null}
-    </Link>
+    </Action>
   );
 }

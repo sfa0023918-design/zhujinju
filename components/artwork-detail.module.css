@@ -57,7 +57,8 @@
 .galleryColumn[data-native-carousel="true"] .primaryImageFrame,
 .galleryColumn[data-native-carousel="true"] .primaryImage { height: 100%; }
 .lightboxViewport { position: relative; z-index: 20; width: 100%; height: 100%; }
-.lightboxPanel { display: flex; align-items: center; justify-content: center; padding: 12px; }
+.lightboxPanel { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; padding: 12px; }
+.lightboxPanel > .lightboxMedia { grid-area: 1 / 1; }
 .gallerySwipeHint {
   display: none;
 }

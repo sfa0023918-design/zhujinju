@@ -1,3 +1,4 @@
+import { PublicDocumentLink } from "@/components/public-document-link";
 import Link from "next/link";
 import { formatCatalogueExtent, formatDimensions, formatExhibitionPeriod, getExhibitionStatus } from "@/lib/display-format";
 
@@ -175,10 +176,10 @@ export default async function HomePage() {
               <HomeLabel text={{ zh: "近期展览", en: "Recent Exhibition" }} />
               {exhibitionStatus ? <span className={styles.exhibitionStatus}>{exhibitionStatus.zh} <span lang="en">{exhibitionStatus.en}</span></span> : null}
             </div>
-            <Link href="/exhibitions" className={styles.archiveLink}>
+            <PublicDocumentLink href="/exhibitions" className={styles.archiveLink}>
               <HomeLabel text={{ zh: "往期展览", en: "Exhibition archive" }} />
               <HomeArrow />
-            </Link>
+            </PublicDocumentLink>
           </div>
           <div className={`${styles.wrap} ${styles.exhibitionGrid}`}>
             <div className={styles.exhibitionGraphic}>
