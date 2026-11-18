@@ -19,9 +19,9 @@ export function SiteContentFrame({ children }: { children: ReactNode }) {
     .concat('"Zhujinju Song", "Songti SC", serif')
     .join(", ");
   for (const file of [titleFont, font]) {
-    // On the home page the first photograph and styles take precedence. The
-    // browser discovers the same local face from the visible title below.
-    if (file && pathname !== "/") preload(`/fonts/${file}`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+    // On image-led pages, let visible text request its face after the main
+    // photograph starts. The same local faces remain registered below.
+    if (file && pathname !== "/" && !pathname.startsWith("/collection/") && !pathname.startsWith("/exhibitions")) preload(`/fonts/${file}`, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   }
   return (
     <main

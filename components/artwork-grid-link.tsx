@@ -20,15 +20,16 @@ type Props = {
   source: string;
   width: number;
   height: number;
+  warmRoute: boolean;
   className: string;
   style?: CSSProperties;
   children: ReactNode;
 };
 
-export function ArtworkGridLink({ href, source, width, height, children, ...props }: Props) {
+export function ArtworkGridLink({ href, source, width, height, warmRoute, children, ...props }: Props) {
   const router = useRouter();
   return (
-    <Link {...props} href={href} prefetch={false}
+    <Link {...props} href={href} prefetch={warmRoute ? null : false}
       onPointerEnter={event => { if (event.pointerType === "mouse") router.prefetch(href); }}
       onFocus={event => { if (event.currentTarget.matches(":focus-visible")) router.prefetch(href); }}
       onClick={event => {
