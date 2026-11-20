@@ -22,6 +22,21 @@ export function getInquiryWork(artwork: Artwork) {
 
 export type InquiryWork = ReturnType<typeof getInquiryWork>;
 
+export type InquiryCatalogItem = InquiryWork & {
+  inquirySupport: BilingualText[];
+};
+
+export function getInquiryCatalogItem(artwork: Artwork): InquiryCatalogItem {
+  return {
+    ...getInquiryWork(artwork),
+    inquirySupport: artwork.inquirySupport,
+  };
+}
+
+export function findInquiryRequest(inquirySupport: BilingualText[], value?: string) {
+  return value ? inquirySupport.find((item) => item.zh === value || item.en === value) : undefined;
+}
+
 export function getInquiryRequest(artwork: Artwork, value?: string) {
-  return value ? artwork.inquirySupport.find((item) => item.zh === value || item.en === value) : undefined;
+  return findInquiryRequest(artwork.inquirySupport, value);
 }

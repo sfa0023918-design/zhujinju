@@ -1,7 +1,7 @@
 "use client";
 
 import Link, { useLinkStatus } from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import type { BilingualText as BilingualValue } from "@/lib/site-data";
@@ -31,7 +31,6 @@ function MenuLinkStatus() {
 export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
   const pathname = usePathname();
   const { open, setOpenPath } = useSiteMenu();
-  const router = useRouter();
 
   const isActive = (href: string) =>
     href === "/"
@@ -111,13 +110,6 @@ export function SiteHeaderNav({ items }: SiteHeaderNavProps) {
                     key={item.href}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    prefetch={item.href === "/collection" || item.href === "/journal" ? null : false}
-                    onPointerEnter={(event) => {
-                      if (!active && event.pointerType === "mouse") router.prefetch(item.href);
-                    }}
-                    onFocus={(event) => {
-                      if (!active && event.currentTarget.matches(":focus-visible")) router.prefetch(item.href);
-                    }}
                     onClick={() => {
                       // Other destinations close when pathname changes; keep
                       // their Link mounted until the navigation commits.
