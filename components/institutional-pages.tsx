@@ -1,8 +1,11 @@
+import { Suspense } from "react";
+
 import { ExpandableReadingText } from "@/components/bilingual-prose";
 import { BilingualText } from "@/components/bilingual-text";
-import type { InquiryWork } from "@/lib/artwork-inquiry";
+import type { InquiryCatalogItem, InquiryWork } from "@/lib/artwork-inquiry";
 import type { BilingualText as BilingualValue } from "@/lib/data/types";
 import { ContactForm } from "@/components/contact-form";
+import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { ProtectedImage } from "@/components/protected-image";
 import { getTelHref, getWhatsAppHref } from "@/lib/contact-links";
 import type {
@@ -25,6 +28,7 @@ type ContactPageContentProps = {
   initialArtwork?: string;
   work?: InquiryWork;
   request?: BilingualValue;
+  inquiryWorks?: InquiryCatalogItem[];
 };
 
 const aboutSpaceImage = "/uploads/branding/about-space-himalayan-art-20260930.png";
@@ -145,6 +149,7 @@ export function ContactPageContent({
   initialArtwork,
   work,
   request,
+  inquiryWorks,
 }: ContactPageContentProps) {
   const labels = siteConfig.contactPage.infoLabels;
   const phoneHref = getTelHref(siteConfig.contact.phone);
@@ -180,13 +185,26 @@ export function ContactPageContent({
       </section>
 
       <section className={styles.contactBody}>
-        <ContactForm
-          key={JSON.stringify([work?.slug, initialArtwork, request])}
-          work={work}
-          request={request}
-          initialArtwork={initialArtwork}
-          copy={pageCopy.siteChrome.contactForm}
-        />
+        {inquiryWorks ? (
+          <Suspense
+            fallback={
+              <ContactForm copy={pageCopy.siteChrome.contactForm} />
+            }
+          >
+            <ContactInquiryForm
+              inquiryWorks={inquiryWorks}
+              copy={pageCopy.siteChrome.contactForm}
+            />
+          </Suspense>
+        ) : (
+          <ContactForm
+            key={JSON.stringify([work?.slug, initialArtwork, request])}
+            work={work}
+            request={request}
+            initialArtwork={initialArtwork}
+            copy={pageCopy.siteChrome.contactForm}
+          />
+        )}
         <div className={styles.contactRegister}>
           <div className={styles.contactItem}>
             <BilingualText

@@ -1,0 +1,77 @@
+.loadingShell {
+  min-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  opacity: 0;
+  animation: zhujinjuFadeIn 0.24s ease-out 0.15s forwards;
+}
+
+.progressTrack {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  overflow: hidden;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.progressBar {
+  width: 38%;
+  height: 100%;
+  background: var(--accent, #9d4432);
+  opacity: 0.72;
+  animation: zhujinjuSlide 1.3s ease-in-out infinite;
+}
+
+.loadingText {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  color: var(--muted, #6f665c);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+}
+
+.loadingTextEn {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+@keyframes zhujinjuFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zhujinjuSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(360%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingShell {
+    animation: none;
+    opacity: 1;
+  }
+
+  .progressBar {
+    animation: none;
+    width: 100%;
+    opacity: 0.35;
+  }
+}
