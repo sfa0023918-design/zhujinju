@@ -4,8 +4,6 @@ import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { getPublicArtworks, loadSiteContent } from "@/lib/site-data";
 
-export const dynamic = "force-static";
-
 export async function generateMetadata() {
   const { siteConfig } = await loadSiteContent();
 
