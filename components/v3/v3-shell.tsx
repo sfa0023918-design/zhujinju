@@ -439,18 +439,83 @@ export function V3Shell({
     };
   }, [activeNav, lang, syncIndicators]);
 
-  // Reset transient header state & close overlays on route change
+  const popStateRef = useRef(false);
+  const prevPathRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const onPopState = () => {
+      popStateRef.current = true;
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  // Reset transient overlays & guarantee reliable top/anchor scroll on forward route transitions
+  // while preserving browser & HistoryBackLink scroll restoration on back/forward (popstate).
   useEffect(() => {
     setMenuOpen(false);
     setCmdOpen(false);
+    setDrawerOpen(false);
+    setWechatQrOpen(false);
+    setLightbox(null);
     setHeaderTucked(false);
-    setHeaderScrolled(window.scrollY > 24);
-    lastYRef.current = window.scrollY;
     // Flagship exhibitions route starts over deep oxblood hero
     const isDarkRoute = pathname === "/exhibitions" || pathname === "/exhibitions/himalayan-art-2026";
     setDarkHero(isDarkRoute);
     if (followBoxRef.current) followBoxRef.current.classList.remove("is-on");
+
+    const prevPath = prevPathRef.current;
+    prevPathRef.current = pathname;
+
+    const isBackForward = popStateRef.current;
+    popStateRef.current = false;
+
+    let rafId = 0;
+    if (prevPath !== null && prevPath !== pathname && !isBackForward) {
+      document.body.style.overflow = "";
+      const hash = window.location.hash;
+      if (!hash) {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        rafId = requestAnimationFrame(() => {
+          if (!window.location.hash && window.scrollY !== 0) {
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+          }
+          setHeaderScrolled(window.scrollY > 24);
+          lastYRef.current = window.scrollY;
+        });
+      } else if (!/^#catalogue-(?:p\d+|full)$/i.test(hash)) {
+        rafId = requestAnimationFrame(() => {
+          const targetEl = document.getElementById(decodeURIComponent(hash.slice(1)));
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "instant", block: "start" });
+          }
+          setHeaderScrolled(window.scrollY > 24);
+          lastYRef.current = window.scrollY;
+        });
+      }
+    }
+
+    setHeaderScrolled(window.scrollY > 24);
+    lastYRef.current = window.scrollY;
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, [pathname]);
+
+  const handleSameRouteScrollTop = useCallback(
+    (href: string) => {
+      setMenuOpen(false);
+      setCmdOpen(false);
+      if (href === pathname) {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      }
+    },
+    [pathname],
+  );
 
   // Unified scroll frame: header tuck, light-ink over dark hero, progress bar, parallax & float-top
   useEffect(() => {
@@ -791,7 +856,12 @@ export function V3Shell({
           className={`site-header${headerScrolled ? " is-scrolled" : ""}${headerTucked ? " is-tucked" : ""}${headerLightInk ? " is-light-ink" : ""}`}
         >
           <div className="header-inner">
-            <Link href="/" className="brand-link" aria-label="竹瑾居首页">
+            <Link
+              href="/"
+              className="brand-link"
+              aria-label="竹瑾居首页"
+              onClick={() => handleSameRouteScrollTop("/")}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="brand-logo brand-logo-dark"
@@ -814,6 +884,7 @@ export function V3Shell({
                   href={item.href}
                   className={`nav-item${activeNav === item.key ? " is-active" : ""}`}
                   data-nav={item.key}
+                  onClick={() => handleSameRouteScrollTop(item.href)}
                 >
                   <span className="t-zh">{item.zh}</span>
                   <span className="t-en" lang="en">
@@ -925,7 +996,7 @@ export function V3Shell({
               <Link
                 key={item.key}
                 href={item.href}
-                onClick={() => setMenuOpen(false)}
+                onClick={() => handleSameRouteScrollTop(item.href)}
               >
                 <span className="m-num">{padNumber(idx + 1)}</span>
                 <span className="t-zh">{item.zh}</span>
@@ -967,7 +1038,11 @@ export function V3Shell({
                   private collecting.
                 </span>
               </p>
-              <Link href="/contact" className="v3-footer-link">
+              <Link
+                href="/contact"
+                className="v3-footer-link"
+                onClick={() => handleSameRouteScrollTop("/contact")}
+              >
                 <i className="dot-spark" aria-hidden="true" />
                 <span className="t-zh">与竹瑾居联系</span>
                 <span className="t-en" lang="en">
@@ -986,25 +1061,28 @@ export function V3Shell({
                 </p>
                 <ul className="footer-links">
                   <li>
-                    <Link href="/collection">
+                    <Link href="/collection" onClick={() => handleSameRouteScrollTop("/collection")}>
                       <span className="t-zh">藏品浏览</span>
                       <span className="t-en">Collection</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/exhibitions">
+                    <Link
+                      href="/exhibitions"
+                      onClick={() => handleSameRouteScrollTop("/exhibitions")}
+                    >
                       <span className="t-zh">展览与图录</span>
                       <span className="t-en">Exhibitions</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/journal">
+                    <Link href="/journal" onClick={() => handleSameRouteScrollTop("/journal")}>
                       <span className="t-zh">文章与动态</span>
                       <span className="t-en">Journal</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/about">
+                    <Link href="/about" onClick={() => handleSameRouteScrollTop("/about")}>
                       <span className="t-zh">关于竹瑾居</span>
                       <span className="t-en">About</span>
                     </Link>

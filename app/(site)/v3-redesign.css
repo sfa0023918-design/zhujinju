@@ -56,7 +56,6 @@
 
 html:has(.v3-site) {
   background: var(--canvas);
-  scroll-behavior: smooth;
 }
 
 .v3-site {
@@ -4016,6 +4015,15 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
 .v3-col-body {
   padding-top: clamp(28px, 3.6vw, 44px);
   padding-bottom: clamp(64px, 8vw, 108px);
+  overflow-anchor: none;
+}
+.v3-site #catalogue,
+.v3-site #preface,
+.v3-site #in-catalogue,
+.v3-site #inquiry,
+.v3-site #col-toolbar,
+.v3-site #col-status-bar {
+  scroll-margin-top: 88px;
 }
 .v3-col-status {
   display: flex;
@@ -4101,6 +4109,10 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
   height: auto;
   display: block;
   transition: transform 820ms var(--ease-expo);
+}
+.v3-wall-justified .tile-media img {
+  height: 100%;
+  object-fit: contain;
 }
 .tile:hover .tile-media img { transform: scale(1.028); }
 

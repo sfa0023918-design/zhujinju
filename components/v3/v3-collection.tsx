@@ -65,7 +65,11 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
   const [legacyMaterial, setLegacyMaterial] = useState(() => searchParams.get("material") ?? "");
 
   const [mode, setMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [modeReady, setModeReady] = useState(false);
+  const toolbarAnchorRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLElement>(null);
+  const pendingScrollRef = useRef<"results" | "toolbar-if-below" | null>(null);
   const catSegRef = useRef<HTMLDivElement>(null);
   const statusSegRef = useRef<HTMLDivElement>(null);
   const viewSegRef = useRef<HTMLDivElement>(null);
@@ -77,6 +81,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
     const update = () => {
       const w = window.innerWidth;
       setMode(w >= 1081 ? "desktop" : w >= 760 ? "tablet" : "mobile");
+      setModeReady(true);
     };
     update();
     window.addEventListener("resize", update, { passive: true });
@@ -172,6 +177,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
 
   // Sync URL query params cleanly without triggering server rerender or losing history state
   useEffect(() => {
+    if (!modeReady) return;
     const p = new URLSearchParams();
     if (cat !== "all") p.set("cat", cat);
     if (status !== "all") p.set("status", status);
@@ -186,7 +192,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
     if (`${window.location.pathname}${window.location.search}` !== target) {
       window.history.replaceState(window.history.state, "", target);
     }
-  }, [cat, status, view, query, legacyRegion, legacyPeriod, legacyMaterial, currentPage]);
+  }, [modeReady, cat, status, view, query, legacyRegion, legacyPeriod, legacyMaterial, currentPage]);
 
   const rows = useMemo(() => {
     const packed = packArtworkRows(shown.map(getArtworkRatio), mode, { fillRows: true });
@@ -214,7 +220,37 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
   const to = start + shown.length;
   const pageNumbers = getPaginationItems(currentPage, totalPages);
 
+  const scrollToCollectionPosition = useCallback((kind: "results" | "toolbar-if-below") => {
+    const headerH = document.getElementById("site-header")?.getBoundingClientRect().height || 64;
+    // Use non-sticky anchors so sticky .v3-toolbar never reports current viewport Y
+    const isMobile = window.innerWidth < 760;
+    const anchor =
+      kind === "results" && isMobile
+        ? resultsRef.current ?? toolbarAnchorRef.current
+        : toolbarAnchorRef.current ?? resultsRef.current;
+    if (!anchor) return;
+    const targetTop = Math.max(
+      0,
+      Math.round(anchor.getBoundingClientRect().top + window.scrollY - headerH - (isMobile ? 8 : 10)),
+    );
+    if (kind === "toolbar-if-below" && window.scrollY <= targetTop + 24) {
+      return;
+    }
+    window.scrollTo({ top: targetTop, left: 0, behavior: "instant" });
+  }, []);
+
+  // Execute pagination / filter scroll AFTER React commits the new page so iOS Safari never cancels or anchors to the bottom pager
+  useEffect(() => {
+    const pending = pendingScrollRef.current;
+    if (!pending) return;
+    pendingScrollRef.current = null;
+    scrollToCollectionPosition(pending);
+    const raf = requestAnimationFrame(() => scrollToCollectionPosition(pending));
+    return () => cancelAnimationFrame(raf);
+  }, [currentPage, cat, status, view, legacyRegion, legacyPeriod, legacyMaterial, scrollToCollectionPosition]);
+
   const resetAll = () => {
+    pendingScrollRef.current = "toolbar-if-below";
     setCat("all");
     setStatus("all");
     setQuery("");
@@ -226,9 +262,15 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
 
   const goPage = (next: number) => {
     const clamped = Math.max(1, Math.min(totalPages, next));
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    if (clamped === currentPage) {
+      scrollToCollectionPosition("results");
+      return;
+    }
+    pendingScrollRef.current = "results";
     setPage(clamped);
-    const top = Math.max(0, (toolbarRef.current?.getBoundingClientRect().top ?? 0) + window.scrollY - 76);
-    window.scrollTo({ top, behavior: "smooth" });
   };
 
   return (
@@ -270,6 +312,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
         </p>
       </section>
 
+      <div ref={toolbarAnchorRef} className="v3-col-anchor" aria-hidden="true" />
       <div className="v3-toolbar" id="col-toolbar" ref={toolbarRef}>
         <div className="container v3-toolbar-inner">
           <div className="segmented-control" role="group" aria-label="类别" ref={catSegRef}>
@@ -280,6 +323,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                 type="button"
                 className={`seg-btn${cat === t.key ? " is-active" : ""}`}
                 onClick={() => {
+                  pendingScrollRef.current = "toolbar-if-below";
                   setCat(t.key);
                   setPage(1);
                 }}
@@ -300,6 +344,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                   type="button"
                   className={`seg-btn${status === t.key ? " is-active" : ""}`}
                   onClick={() => {
+                    pendingScrollRef.current = "toolbar-if-below";
                     setStatus(t.key);
                     setPage(1);
                   }}
@@ -340,7 +385,10 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                 type="button"
                 className={`seg-btn${view === "wall" ? " is-active" : ""}`}
                 aria-label="展墙"
-                onClick={() => setView("wall")}
+                onClick={() => {
+                  pendingScrollRef.current = "toolbar-if-below";
+                  setView("wall");
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                   <rect x="1" y="1" width="6" height="6" rx="1" />
@@ -353,7 +401,10 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                 type="button"
                 className={`seg-btn${view === "index" ? " is-active" : ""}`}
                 aria-label="索引"
-                onClick={() => setView("index")}
+                onClick={() => {
+                  pendingScrollRef.current = "toolbar-if-below";
+                  setView("index");
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                   <rect x="1" y="2" width="14" height="1.6" />
@@ -366,7 +417,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
         </div>
       </div>
 
-      <section className="container v3-col-body">
+      <section className="container v3-col-body" ref={resultsRef}>
         <div className="v3-col-status" id="col-status-bar">
           {filtered.length ? (
             <>
@@ -435,11 +486,12 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                   className="v3-jrow"
                   style={{ gridTemplateColumns: cols }}
                 >
-                  {row.indexes.map((ri) => {
+                  {row.indexes.map((ri, colIdx) => {
                     const a = shown[ri];
                     const globalIdx = indexMap.get(a.slug) ?? ri;
                     const cardSrc = getArtworkCardSrc(a);
                     const facts = getArtworkFacts(a, ["region", "period"]);
+                    const tileRatio = row.ratios[colIdx] ?? getArtworkRatio(a);
                     return (
                       <Link
                         key={a.slug}
@@ -447,12 +499,12 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                         href={`/collection/${a.slug}`}
                         data-cursor="view"
                       >
-                        <div className="tile-media">
+                        <div className="tile-media" style={{ aspectRatio: String(tileRatio) }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={cardSrc}
                             alt={a.title.zh}
-                            loading={rIdx === 0 && currentPage === 1 ? "eager" : "lazy"}
+                            loading={rIdx <= 1 ? "eager" : "lazy"}
                             decoding="async"
                           />
                         </div>
