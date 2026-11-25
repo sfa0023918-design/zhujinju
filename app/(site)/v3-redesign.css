@@ -2059,7 +2059,7 @@ html:has(.v3-site) {
 
 .hero-sub {
   margin: clamp(10px, 1.8vh, 18px) auto 0;
-  max-width: 34em;
+  max-width: 38em;
   font-size: 14.5px;
   line-height: 1.8;
   color: var(--ink-muted);
@@ -2331,8 +2331,10 @@ html:has(.v3-site) {
   padding-inline: 0;
 }
 .hero-stage-wrap.is-compact .hl-line { white-space: normal; }
-.hero-stage-wrap.is-compact .hero-headline { font-size: clamp(30px, 8.4vw, 40px); }
-.hero-stage-wrap.is-compact .hero-sub { display: block; font-size: 14px; }
+.hero-stage-wrap.is-compact .hero-headline { font-size: clamp(30px, 8.2vw, 40px); }
+.v3-site.lang-en .hero-stage-wrap.is-compact .hero-headline { font-size: clamp(28px, 7.6vw, 38px); }
+.hero-stage-wrap.is-compact .hl-line { white-space: normal; text-wrap: balance; }
+.hero-stage-wrap.is-compact .hero-sub { display: block; font-size: 13.5px; }
 .hero-stage-wrap.is-compact .hero-facts { display: inline-grid; }
 .hero-stage-wrap.is-compact .hero-cta { gap: 6px 24px; }
 .hero-stage-wrap.is-compact .hero-plate-stage {

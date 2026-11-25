@@ -313,29 +313,27 @@ export function V3Home({
               </p>
               <h1 className="hero-headline">
                 <span className="hl-line">
-                  <span className="t-zh">在当代光影中，</span>
+                  <span className="t-zh">以当代之眼，</span>
                   <span className="t-en" lang="en">
-                    Timeless devotion,
+                    Himalayan Art,
                   </span>
                 </span>
                 <span className="hl-line">
-                  <span className="t-zh">
-                    重遇 <em>Himalayan Art</em>
-                  </span>
+                  <span className="t-zh">重看喜马拉雅艺术</span>
                   <span className="t-en" lang="en">
-                    in <em>living stillness</em>
+                    through <em>contemporary eyes</em>
                   </span>
                 </span>
               </h1>
               <p className="hero-sub">
                 <span className="t-zh">
-                  以学术考据与国际藏家视野，
+                  聚焦喜马拉雅与亚洲古代艺术，
                   <br className="mob-only-br" />
-                  呈现喜马拉雅古代造像、唐卡与法器。
+                  以研究、展览与图录，让作品在当下被真正看见。
                 </span>
                 <span className="t-en" lang="en">
-                  Himalayan sculpture, thangkas and ritual objects, presented through scholarship
-                  and a collector&apos;s eye.
+                  Research, annual exhibitions, and catalogues — bringing ancient Asian works into
+                  living dialogue today.
                 </span>
               </p>
               <div className="hero-cta">
