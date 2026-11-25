@@ -59,16 +59,48 @@ export function V3InlineCatalogue({
   const [displayedIdx, setDisplayedIdx] = useState(0);
   const [turnPhase, setTurnPhase] = useState<"idle" | "out" | "in">("idle");
   const [turnDir, setTurnDir] = useState(1);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomPan, setZoomPan] = useState({ x: 0, y: 0 });
+  const [swipeX, setSwipeX] = useState(0);
+  const [gesturing, setGesturing] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
   const [gridOpen, setGridOpen] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+
+  const zoomed = zoomScale > 1.05;
+  const zoomScaleRef = useRef(1);
+  const zoomPanRef = useRef({ x: 0, y: 0 });
+  const setZoomTransform = useCallback((scale: number, pan: { x: number; y: number }) => {
+    zoomScaleRef.current = scale;
+    zoomPanRef.current = pan;
+    setZoomScale(scale);
+    setZoomPan(pan);
+  }, []);
+  const setZoomed = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)) => {
+      const target = typeof next === "function" ? next(zoomScaleRef.current > 1.05) : next;
+      setGesturing(false);
+      setZoomTransform(target ? 2.05 : 1, { x: 0, y: 0 });
+      if (!target) setZoomOrigin("50% 50%");
+    },
+    [setZoomTransform],
+  );
 
   const inlineStripRef = useRef<HTMLDivElement>(null);
   const fullStripRef = useRef<HTMLDivElement>(null);
   const inlineGridRef = useRef<HTMLDivElement>(null);
   const fullGridRef = useRef<HTMLDivElement>(null);
-  const touchXRef = useRef<number | null>(null);
+  const pageTouchRef = useRef<{
+    mode: "idle" | "swipe" | "pan" | "pinch";
+    startX: number;
+    startY: number;
+    panX: number;
+    panY: number;
+    pinchDist: number;
+    pinchScale: number;
+    pinchMidX: number;
+    pinchMidY: number;
+  } | null>(null);
   const turnTimerRef = useRef<number | null>(null);
 
   // Open fullscreen modal when hero/section CTA signals it
@@ -78,7 +110,7 @@ export function V3InlineCatalogue({
       setGridOpen(false);
       setZoomed(false);
     }
-  }, [openFullscreenSignal, pages.length]);
+  }, [openFullscreenSignal, pages.length, setZoomed]);
 
   // Reset when switching exhibitions
   useEffect(() => {
@@ -88,7 +120,7 @@ export function V3InlineCatalogue({
     setZoomed(false);
     setGridOpen(false);
     setFullscreen(false);
-  }, [exhibition.slug]);
+  }, [exhibition.slug, setZoomed]);
 
   // Honour deep links like /exhibitions/himalayan-art-2026#catalogue-p74
   useEffect(() => {
@@ -111,7 +143,7 @@ export function V3InlineCatalogue({
     applyHash();
     window.addEventListener("hashchange", applyHash);
     return () => window.removeEventListener("hashchange", applyHash);
-  }, [pages.length, exhibition.slug]);
+  }, [pages.length, exhibition.slug, setZoomed]);
 
   // Strictly finite neighbour-only full-res preloading (AGENTS.md Section 5)
   useEffect(() => {
@@ -125,13 +157,18 @@ export function V3InlineCatalogue({
     });
   }, [cur, pages]);
 
-  // Lock body scroll while fullscreen studio modal is open
+  // Lock body scroll & prevent Safari native pinch hijacking while fullscreen modal is open
   useEffect(() => {
     if (!fullscreen) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const preventGesture = (e: Event) => e.preventDefault();
+    document.addEventListener("gesturestart", preventGesture, { passive: false });
+    document.addEventListener("gesturechange", preventGesture, { passive: false });
     return () => {
       document.body.style.overflow = prevOverflow;
+      document.removeEventListener("gesturestart", preventGesture);
+      document.removeEventListener("gesturechange", preventGesture);
     };
   }, [fullscreen]);
 
@@ -158,7 +195,7 @@ export function V3InlineCatalogue({
         }
       }
     },
-    [cur, pages.length],
+    [cur, pages.length, setZoomed],
   );
 
   useEffect(() => {
@@ -305,9 +342,21 @@ export function V3InlineCatalogue({
     turnPhase === "out" ? " turn-out" : turnPhase === "in" ? " turn-in" : "";
 
   const handlePageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!zoomed) return;
+    if (!zoomed || gesturing) return;
+    if (zoomPanRef.current.x !== 0 || zoomPanRef.current.y !== 0) return;
     const r = e.currentTarget.getBoundingClientRect();
     setZoomOrigin(`${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`);
+  };
+
+  const clampReaderPan = (el: HTMLElement, x: number, y: number, scale: number) => {
+    if (scale <= 1.02) return { x: 0, y: 0 };
+    const r = el.getBoundingClientRect();
+    const maxX = Math.max(0, (r.width * (scale - 1)) / 2 + 24);
+    const maxY = Math.max(0, (r.height * (scale - 1)) / 2 + 24);
+    return {
+      x: Math.max(-maxX, Math.min(maxX, x)),
+      y: Math.max(-maxY, Math.min(maxY, y)),
+    };
   };
 
   const renderReaderBody = (isFull: boolean) => (
@@ -328,20 +377,146 @@ export function V3InlineCatalogue({
           onDoubleClick={() => setZoomed((z) => !z)}
           onMouseMove={handlePageMouseMove}
           onTouchStart={(e) => {
-            touchXRef.current = e.touches[0].clientX;
+            if (e.touches.length === 2) {
+              const [t1, t2] = [e.touches[0], e.touches[1]];
+              const r = e.currentTarget.getBoundingClientRect();
+              const cx = r.left + r.width / 2;
+              const cy = r.top + r.height / 2;
+              setZoomOrigin("50% 50%");
+              setSwipeX(0);
+              setGesturing(true);
+              pageTouchRef.current = {
+                mode: "pinch",
+                startX: (t1.clientX + t2.clientX) / 2,
+                startY: (t1.clientY + t2.clientY) / 2,
+                panX: zoomPanRef.current.x,
+                panY: zoomPanRef.current.y,
+                pinchDist: Math.max(10, Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)),
+                pinchScale: zoomScaleRef.current,
+                pinchMidX: (t1.clientX + t2.clientX) / 2 - cx,
+                pinchMidY: (t1.clientY + t2.clientY) / 2 - cy,
+              };
+            } else if (e.touches.length === 1) {
+              const t = e.touches[0];
+              pageTouchRef.current = {
+                mode: zoomScaleRef.current > 1.05 ? "pan" : "idle",
+                startX: t.clientX,
+                startY: t.clientY,
+                panX: zoomPanRef.current.x,
+                panY: zoomPanRef.current.y,
+                pinchDist: 0,
+                pinchScale: zoomScaleRef.current,
+                pinchMidX: 0,
+                pinchMidY: 0,
+              };
+            }
+          }}
+          onTouchMove={(e) => {
+            const st = pageTouchRef.current;
+            if (!st) return;
+            if (e.touches.length === 2) {
+              const [t1, t2] = [e.touches[0], e.touches[1]];
+              const dist = Math.max(10, Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY));
+              const r = e.currentTarget.getBoundingClientRect();
+              const midX = (t1.clientX + t2.clientX) / 2 - (r.left + r.width / 2);
+              const midY = (t1.clientY + t2.clientY) / 2 - (r.top + r.height / 2);
+              if (st.mode !== "pinch") {
+                st.mode = "pinch";
+                st.pinchDist = dist;
+                st.pinchScale = zoomScaleRef.current;
+                st.panX = zoomPanRef.current.x;
+                st.panY = zoomPanRef.current.y;
+                st.pinchMidX = midX;
+                st.pinchMidY = midY;
+                setZoomOrigin("50% 50%");
+                setSwipeX(0);
+                setGesturing(true);
+                return;
+              }
+              const nextScale = Math.max(0.85, Math.min(3.8, st.pinchScale * (dist / st.pinchDist)));
+              const ratio = nextScale / st.pinchScale;
+              setZoomTransform(nextScale, {
+                x: midX - (st.pinchMidX - st.panX) * ratio,
+                y: midY - (st.pinchMidY - st.panY) * ratio,
+              });
+              return;
+            }
+            if (e.touches.length === 1) {
+              const t = e.touches[0];
+              const dx = t.clientX - st.startX;
+              const dy = t.clientY - st.startY;
+              if (st.mode === "pan" || zoomScaleRef.current > 1.05) {
+                setGesturing(true);
+                setZoomTransform(
+                  zoomScaleRef.current,
+                  clampReaderPan(e.currentTarget, st.panX + dx, st.panY + dy, zoomScaleRef.current),
+                );
+                return;
+              }
+              if (st.mode === "idle" && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+                st.mode = "swipe";
+                setGesturing(true);
+              }
+              if (st.mode === "swipe") {
+                setSwipeX(Math.max(-220, Math.min(220, dx * 0.85)));
+              }
+            }
           }}
           onTouchEnd={(e) => {
-            if (touchXRef.current === null) return;
-            const dx = e.changedTouches[0].clientX - touchXRef.current;
-            if (Math.abs(dx) > 40) showPage(cur + (dx < 0 ? 1 : -1));
-            touchXRef.current = null;
+            const st = pageTouchRef.current;
+            if (!st) return;
+            if (e.touches.length === 1 && st.mode === "pinch") {
+              const t = e.touches[0];
+              st.mode = "pan";
+              st.startX = t.clientX;
+              st.startY = t.clientY;
+              st.panX = zoomPanRef.current.x;
+              st.panY = zoomPanRef.current.y;
+              return;
+            }
+            pageTouchRef.current = null;
+            setGesturing(false);
+            if (st.mode === "pinch" || st.mode === "pan") {
+              const s = zoomScaleRef.current;
+              if (s < 1.08) {
+                setZoomTransform(1, { x: 0, y: 0 });
+              } else {
+                const clampedS = Math.min(3.5, s);
+                setZoomTransform(
+                  clampedS,
+                  clampReaderPan(e.currentTarget, zoomPanRef.current.x, zoomPanRef.current.y, clampedS),
+                );
+              }
+              return;
+            }
+            if (st.mode === "swipe") {
+              const t = e.changedTouches[0];
+              const dx = t ? t.clientX - st.startX : 0;
+              setSwipeX(0);
+              if (Math.abs(dx) > 38) showPage(cur + (dx < 0 ? 1 : -1));
+            }
+          }}
+          onTouchCancel={() => {
+            pageTouchRef.current = null;
+            setGesturing(false);
+            setSwipeX(0);
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={displayed.readerSrc}
             alt={`${exhibition.title.zh} 第 ${displayed.index + 1} 页`}
-            style={{ transformOrigin: zoomOrigin }}
+            draggable={false}
+            style={{
+              transformOrigin: zoomOrigin,
+              transform:
+                zoomScale !== 1 || zoomPan.x !== 0 || zoomPan.y !== 0
+                  ? `translate3d(${zoomPan.x.toFixed(1)}px, ${zoomPan.y.toFixed(1)}px, 0) scale(${zoomScale.toFixed(3)})`
+                  : swipeX !== 0
+                    ? `translate3d(${swipeX.toFixed(1)}px, 0, 0)`
+                    : undefined,
+              transition: gesturing ? "none" : undefined,
+            }}
           />
         </div>
         <button
@@ -370,10 +545,10 @@ export function V3InlineCatalogue({
           />
           <span className="reader-hint">
             <span className="t-zh">
-              {isFull ? "← → 翻页 · 双击放大" : "点选缩略图或拖动滑轨 · 双击放大"}
+              {isFull ? "双指缩放 / 双击放大 · 左右滑动翻页" : "双指缩放 / 双击放大 · 点选下方缩略图"}
             </span>
             <span className="t-en" lang="en">
-              {isFull ? "← → turn · dbl-click zoom" : "Select spread or scrub · dbl-click zoom"}
+              {isFull ? "Pinch or dbl-tap to zoom · Swipe to turn" : "Pinch or dbl-tap to zoom · Select spread"}
             </span>
           </span>
         </div>

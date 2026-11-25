@@ -107,10 +107,11 @@ export function V3Shell({
   const [drawerStatus, setDrawerStatus] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [drawerError, setDrawerError] = useState("");
   const [lightbox, setLightbox] = useState<LightboxState>(null);
-  const [lbZoomed, setLbZoomed] = useState(false);
-  const [lbOrigin, setLbOrigin] = useState("50% 50%");
+  const [lbScale, setLbScale] = useState(1);
   const [lbPan, setLbPan] = useState({ x: 0, y: 0 });
-  const [lbDragX, setLbDragX] = useState(0);
+  const [lbTrackX, setLbTrackX] = useState(0);
+  const [lbTrackAnimating, setLbTrackAnimating] = useState(false);
+  const [lbGestureActive, setLbGestureActive] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastOn, setToastOn] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -130,16 +131,27 @@ export function V3Shell({
   const followImgRef = useRef<HTMLImageElement>(null);
   const toastTimerRef = useRef<number | null>(null);
   const lastYRef = useRef(0);
+  const lbStageRef = useRef<HTMLDivElement>(null);
   const lbImgRef = useRef<HTMLImageElement>(null);
   const lbTapTimerRef = useRef<number | null>(null);
+  const lbSlideTimerRef = useRef<number | null>(null);
   const lbSuppressClickRef = useRef(false);
+  const lbScaleRef = useRef(1);
+  const lbPanRef = useRef({ x: 0, y: 0 });
   const lbTouchRef = useRef<{
+    mode: "idle" | "swipe" | "pan" | "pinch";
     startX: number;
     startY: number;
+    lastX: number;
+    lastTime: number;
+    vx: number;
     panX: number;
     panY: number;
+    pinchDist: number;
+    pinchScale: number;
+    pinchMidX: number;
+    pinchMidY: number;
     moved: boolean;
-    axis: "x" | "y" | null;
   } | null>(null);
 
   // Hydrate persisted language preference safely on client
@@ -227,31 +239,81 @@ export function V3Shell({
     [lang, pathname, searchIndex.artworks],
   );
 
+  const clampLbPan = useCallback((x: number, y: number, scale: number) => {
+    if (scale <= 1.02) return { x: 0, y: 0 };
+    const stage = lbStageRef.current?.getBoundingClientRect();
+    const img = lbImgRef.current;
+    const baseW = img ? img.offsetWidth : (stage?.width ?? window.innerWidth) * 0.85;
+    const baseH = img ? img.offsetHeight : (stage?.height ?? window.innerHeight) * 0.85;
+    const stageW = stage?.width ?? window.innerWidth;
+    const stageH = stage?.height ?? window.innerHeight;
+    const maxX = Math.max(0, (baseW * scale - stageW) / 2 + 24);
+    const maxY = Math.max(0, (baseH * scale - stageH) / 2 + 24);
+    return {
+      x: Math.max(-maxX, Math.min(maxX, x)),
+      y: Math.max(-maxY, Math.min(maxY, y)),
+    };
+  }, []);
+
+  const setLbTransform = useCallback((scale: number, pan: { x: number; y: number }) => {
+    lbScaleRef.current = scale;
+    lbPanRef.current = pan;
+    setLbScale(scale);
+    setLbPan(pan);
+  }, []);
+
   const closeLightbox = useCallback(() => {
     if (lbTapTimerRef.current !== null) {
       window.clearTimeout(lbTapTimerRef.current);
       lbTapTimerRef.current = null;
     }
-    setLbZoomed(false);
-    setLbPan({ x: 0, y: 0 });
-    setLbDragX(0);
-    setLightbox(null);
-  }, []);
-
-  const stepLightbox = useCallback((delta: number) => {
-    if (lbTapTimerRef.current !== null) {
-      window.clearTimeout(lbTapTimerRef.current);
-      lbTapTimerRef.current = null;
+    if (lbSlideTimerRef.current !== null) {
+      window.clearTimeout(lbSlideTimerRef.current);
+      lbSlideTimerRef.current = null;
     }
-    setLbZoomed(false);
-    setLbPan({ x: 0, y: 0 });
-    setLbDragX(0);
-    setLightbox((prev) =>
-      prev && prev.photos.length > 1
-        ? { ...prev, index: (prev.index + delta + prev.photos.length) % prev.photos.length }
-        : prev,
-    );
-  }, []);
+    setLbGestureActive(false);
+    setLbTrackAnimating(false);
+    setLbTrackX(0);
+    setLbTransform(1, { x: 0, y: 0 });
+    setLightbox(null);
+  }, [setLbTransform]);
+
+  const animateSlideTo = useCallback(
+    (delta: number) => {
+      if (!lightbox || lightbox.photos.length <= 1) return;
+      if (lbTapTimerRef.current !== null) {
+        window.clearTimeout(lbTapTimerRef.current);
+        lbTapTimerRef.current = null;
+      }
+      if (lbSlideTimerRef.current !== null) {
+        window.clearTimeout(lbSlideTimerRef.current);
+        lbSlideTimerRef.current = null;
+      }
+      const stride = (lbStageRef.current?.clientWidth || window.innerWidth) + 24;
+      setLbTransform(1, { x: 0, y: 0 });
+      setLbGestureActive(false);
+      setLbTrackAnimating(true);
+      setLbTrackX(delta > 0 ? -stride : stride);
+      lbSlideTimerRef.current = window.setTimeout(() => {
+        lbSlideTimerRef.current = null;
+        setLbTrackAnimating(false);
+        setLbTrackX(0);
+        setLightbox((prev) =>
+          prev && prev.photos.length > 1
+            ? { ...prev, index: (prev.index + delta + prev.photos.length) % prev.photos.length }
+            : prev,
+        );
+      }, 280);
+    },
+    [lightbox, setLbTransform],
+  );
+
+  const stepLightbox = useCallback(
+    (delta: number) => {
+      animateSlideTo(delta);
+    },
+    [animateSlideTo],
+  );
 
   const openLightbox = useCallback(
     (photos: string[], index: number, titleZh: string, titleEn = "") => {
@@ -259,28 +321,64 @@ export function V3Shell({
         window.clearTimeout(lbTapTimerRef.current);
         lbTapTimerRef.current = null;
       }
-      setLbZoomed(false);
-      setLbPan({ x: 0, y: 0 });
-      setLbDragX(0);
-      setLbOrigin("50% 50%");
+      if (lbSlideTimerRef.current !== null) {
+        window.clearTimeout(lbSlideTimerRef.current);
+        lbSlideTimerRef.current = null;
+      }
+      setLbGestureActive(false);
+      setLbTrackAnimating(false);
+      setLbTrackX(0);
+      setLbTransform(1, { x: 0, y: 0 });
       setLightbox({ photos, index, titleZh, titleEn });
     },
-    [],
+    [setLbTransform],
   );
 
-  // Lock background scroll while full-screen lightbox is open
+  // Lock background scroll & prevent Safari native pinch-zoom hijacking while lightbox is open
   useEffect(() => {
     if (!lightbox) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const stageEl = lbStageRef.current;
+
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const stage = stageEl?.getBoundingClientRect();
+      if (!stage) return;
+      const prevScale = lbScaleRef.current;
+      const nextScale = Math.max(1, Math.min(4, prevScale * Math.exp(-e.deltaY * 0.01)));
+      const ux = e.clientX - (stage.left + stage.width / 2);
+      const uy = e.clientY - (stage.top + stage.height / 2);
+      const ratio = nextScale / prevScale;
+      const rawX = ux - (ux - lbPanRef.current.x) * ratio;
+      const rawY = uy - (uy - lbPanRef.current.y) * ratio;
+      setLbTransform(nextScale, clampLbPan(rawX, rawY, nextScale));
+    };
+
+    const preventSafariGesture = (e: Event) => {
+      e.preventDefault();
+    };
+
+    stageEl?.addEventListener("wheel", onWheel, { passive: false });
+    stageEl?.addEventListener("gesturestart", preventSafariGesture, { passive: false });
+    stageEl?.addEventListener("gesturechange", preventSafariGesture, { passive: false });
+
     return () => {
       document.body.style.overflow = prevOverflow;
+      stageEl?.removeEventListener("wheel", onWheel);
+      stageEl?.removeEventListener("gesturestart", preventSafariGesture);
+      stageEl?.removeEventListener("gesturechange", preventSafariGesture);
       if (lbTapTimerRef.current !== null) {
         window.clearTimeout(lbTapTimerRef.current);
         lbTapTimerRef.current = null;
       }
+      if (lbSlideTimerRef.current !== null) {
+        window.clearTimeout(lbSlideTimerRef.current);
+        lbSlideTimerRef.current = null;
+      }
     };
-  }, [lightbox]);
+  }, [lightbox, clampLbPan, setLbTransform]);
 
   // Sync sliding mercury indicator in header pill nav & language segmented pill
   const syncIndicators = useCallback(() => {
@@ -1310,7 +1408,7 @@ export function V3Shell({
           </aside>
         </div>
 
-        {/* Full-Screen High-Res Lightbox */}
+        {/* Full-Screen High-Res Lightbox (Silky 1:1 Carousel + Two-Finger Pinch Zoom) */}
         <div
           id="lightbox"
           className={`lightbox${lightbox ? " is-open" : ""}`}
@@ -1335,14 +1433,17 @@ export function V3Shell({
             <div className="lightbox-controls">
               <button
                 type="button"
-                className={`lightbox-pill${lbZoomed ? " is-on" : ""}`}
+                className={`lightbox-pill${lbScale > 1.05 ? " is-on" : ""}`}
                 onClick={() => {
-                  setLbPan({ x: 0, y: 0 });
-                  setLbOrigin("50% 50%");
-                  setLbZoomed((z) => !z);
+                  setLbGestureActive(false);
+                  if (lbScaleRef.current > 1.05) {
+                    setLbTransform(1, { x: 0, y: 0 });
+                  } else {
+                    setLbTransform(2.25, { x: 0, y: 0 });
+                  }
                 }}
               >
-                {lbZoomed ? (
+                {lbScale > 1.05 ? (
                   <>
                     <span className="t-zh">还原</span>
                     <span className="t-en">Fit</span>
@@ -1368,70 +1469,191 @@ export function V3Shell({
           </div>
 
           <div
-            className={`lightbox-stage${lbZoomed ? " is-zoomed" : ""}`}
+            ref={lbStageRef}
+            className={`lightbox-stage${lbScale > 1.05 ? " is-zoomed" : ""}`}
             onTouchStart={(e) => {
-              if (!lightbox || e.touches.length !== 1) return;
-              const t = e.touches[0];
-              lbTouchRef.current = {
-                startX: t.clientX,
-                startY: t.clientY,
-                panX: lbPan.x,
-                panY: lbPan.y,
-                moved: false,
-                axis: null,
-              };
+              if (!lightbox) return;
+              if (lbSlideTimerRef.current !== null) return;
+              if (e.touches.length === 2) {
+                if (lbTapTimerRef.current !== null) {
+                  window.clearTimeout(lbTapTimerRef.current);
+                  lbTapTimerRef.current = null;
+                }
+                const [t1, t2] = [e.touches[0], e.touches[1]];
+                const dist = Math.max(10, Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY));
+                const stage = lbStageRef.current?.getBoundingClientRect();
+                const cx = stage ? stage.left + stage.width / 2 : window.innerWidth / 2;
+                const cy = stage ? stage.top + stage.height / 2 : window.innerHeight / 2;
+                setLbTrackAnimating(false);
+                setLbTrackX(0);
+                setLbGestureActive(true);
+                lbTouchRef.current = {
+                  mode: "pinch",
+                  startX: (t1.clientX + t2.clientX) / 2,
+                  startY: (t1.clientY + t2.clientY) / 2,
+                  lastX: (t1.clientX + t2.clientX) / 2,
+                  lastTime: performance.now(),
+                  vx: 0,
+                  panX: lbPanRef.current.x,
+                  panY: lbPanRef.current.y,
+                  pinchDist: dist,
+                  pinchScale: lbScaleRef.current,
+                  pinchMidX: (t1.clientX + t2.clientX) / 2 - cx,
+                  pinchMidY: (t1.clientY + t2.clientY) / 2 - cy,
+                  moved: true,
+                };
+              } else if (e.touches.length === 1) {
+                const t = e.touches[0];
+                setLbTrackAnimating(false);
+                lbTouchRef.current = {
+                  mode: lbScaleRef.current > 1.05 ? "pan" : "idle",
+                  startX: t.clientX,
+                  startY: t.clientY,
+                  lastX: t.clientX,
+                  lastTime: performance.now(),
+                  vx: 0,
+                  panX: lbPanRef.current.x,
+                  panY: lbPanRef.current.y,
+                  pinchDist: 0,
+                  pinchScale: lbScaleRef.current,
+                  pinchMidX: 0,
+                  pinchMidY: 0,
+                  moved: false,
+                };
+              }
             }}
             onTouchMove={(e) => {
               const st = lbTouchRef.current;
-              if (!st || !lightbox || e.touches.length !== 1) return;
-              const t = e.touches[0];
-              const dx = t.clientX - st.startX;
-              const dy = t.clientY - st.startY;
-              if (Math.hypot(dx, dy) > 8) st.moved = true;
-              if (!st.moved) return;
+              if (!st || !lightbox) return;
 
-              if (lbZoomed) {
-                const maxPanX = Math.max(180, window.innerWidth * 0.55);
-                const maxPanY = Math.max(180, window.innerHeight * 0.45);
-                setLbPan({
-                  x: Math.max(-maxPanX, Math.min(maxPanX, st.panX + dx)),
-                  y: Math.max(-maxPanY, Math.min(maxPanY, st.panY + dy)),
-                });
-              } else if (lightbox.photos.length > 1) {
-                if (!st.axis) st.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-                if (st.axis === "x") {
-                  setLbDragX(Math.max(-140, Math.min(140, dx * 0.45)));
+              if (e.touches.length === 2) {
+                const [t1, t2] = [e.touches[0], e.touches[1]];
+                const dist = Math.max(10, Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY));
+                const stage = lbStageRef.current?.getBoundingClientRect();
+                const cx = stage ? stage.left + stage.width / 2 : window.innerWidth / 2;
+                const cy = stage ? stage.top + stage.height / 2 : window.innerHeight / 2;
+                const midX = (t1.clientX + t2.clientX) / 2 - cx;
+                const midY = (t1.clientY + t2.clientY) / 2 - cy;
+
+                if (st.mode !== "pinch") {
+                  st.mode = "pinch";
+                  st.moved = true;
+                  st.pinchDist = dist;
+                  st.pinchScale = lbScaleRef.current;
+                  st.panX = lbPanRef.current.x;
+                  st.panY = lbPanRef.current.y;
+                  st.pinchMidX = midX;
+                  st.pinchMidY = midY;
+                  setLbTrackX(0);
+                  setLbGestureActive(true);
+                  return;
+                }
+
+                const nextScale = Math.max(0.82, Math.min(4.5, st.pinchScale * (dist / st.pinchDist)));
+                const ratio = nextScale / st.pinchScale;
+                const nextX = midX - (st.pinchMidX - st.panX) * ratio;
+                const nextY = midY - (st.pinchMidY - st.panY) * ratio;
+                setLbTransform(nextScale, { x: nextX, y: nextY });
+                return;
+              }
+
+              if (e.touches.length === 1) {
+                const t = e.touches[0];
+                const dx = t.clientX - st.startX;
+                const dy = t.clientY - st.startY;
+                if (Math.hypot(dx, dy) > 6) st.moved = true;
+                if (!st.moved) return;
+
+                if (st.mode === "pan" || lbScaleRef.current > 1.05) {
+                  setLbGestureActive(true);
+                  const clamped = clampLbPan(st.panX + dx, st.panY + dy, lbScaleRef.current);
+                  setLbTransform(lbScaleRef.current, clamped);
+                  return;
+                }
+
+                if (st.mode === "idle") {
+                  if (lightbox.photos.length > 1 && Math.abs(dx) >= Math.abs(dy) * 0.9) {
+                    st.mode = "swipe";
+                    setLbGestureActive(true);
+                  } else {
+                    return;
+                  }
+                }
+
+                if (st.mode === "swipe") {
+                  const now = performance.now();
+                  const dt = Math.max(1, now - st.lastTime);
+                  st.vx = (t.clientX - st.lastX) / dt;
+                  st.lastX = t.clientX;
+                  st.lastTime = now;
+                  const maxDrag = (lbStageRef.current?.clientWidth || window.innerWidth) * 0.98;
+                  setLbTrackX(Math.max(-maxDrag, Math.min(maxDrag, dx)));
                 }
               }
             }}
             onTouchEnd={(e) => {
               const st = lbTouchRef.current;
-              lbTouchRef.current = null;
               if (!st || !lightbox) return;
+
+              // Hand off seamlessly from 2-finger pinch to 1-finger pan when 1 finger stays down
+              if (e.touches.length === 1 && st.mode === "pinch") {
+                const t = e.touches[0];
+                st.mode = "pan";
+                st.startX = t.clientX;
+                st.startY = t.clientY;
+                st.panX = lbPanRef.current.x;
+                st.panY = lbPanRef.current.y;
+                st.moved = true;
+                return;
+              }
+
+              lbTouchRef.current = null;
+
               if (st.moved) {
                 lbSuppressClickRef.current = true;
                 window.setTimeout(() => {
                   lbSuppressClickRef.current = false;
                 }, 360);
+              }
+
+              if (st.mode === "pinch" || st.mode === "pan") {
+                setLbGestureActive(false);
+                const s = lbScaleRef.current;
+                if (s < 1.08) {
+                  setLbTransform(1, { x: 0, y: 0 });
+                } else {
+                  const clampedScale = Math.min(4, s);
+                  const clampedPan = clampLbPan(lbPanRef.current.x, lbPanRef.current.y, clampedScale);
+                  setLbTransform(clampedScale, clampedPan);
+                }
+                return;
+              }
+
+              if (st.mode === "swipe") {
                 const t = e.changedTouches[0];
                 const dx = t ? t.clientX - st.startX : 0;
-                const dy = t ? t.clientY - st.startY : 0;
-                if (
-                  !lbZoomed &&
-                  lightbox.photos.length > 1 &&
-                  st.axis === "x" &&
-                  Math.abs(dx) > 42 &&
-                  Math.abs(dx) > Math.abs(dy) * 1.1
-                ) {
-                  stepLightbox(dx < 0 ? 1 : -1);
+                const stageW = lbStageRef.current?.clientWidth || window.innerWidth;
+                const shouldAdvance =
+                  Math.abs(dx) > Math.min(82, stageW * 0.18) ||
+                  (Math.abs(dx) > 22 && Math.abs(st.vx) > 0.28);
+                if (shouldAdvance && lightbox.photos.length > 1) {
+                  animateSlideTo(dx < 0 ? 1 : -1);
                 } else {
-                  setLbDragX(0);
+                  setLbGestureActive(false);
+                  setLbTrackAnimating(true);
+                  setLbTrackX(0);
+                  window.setTimeout(() => setLbTrackAnimating(false), 260);
                 }
               }
             }}
             onTouchCancel={() => {
               lbTouchRef.current = null;
-              setLbDragX(0);
+              setLbGestureActive(false);
+              setLbTrackAnimating(true);
+              setLbTrackX(0);
+              if (lbScaleRef.current < 1.08) {
+                setLbTransform(1, { x: 0, y: 0 });
+              }
             }}
             onClick={(e) => {
               if (!lightbox) return;
@@ -1441,27 +1663,26 @@ export function V3Shell({
               if (lbTapTimerRef.current !== null) {
                 window.clearTimeout(lbTapTimerRef.current);
                 lbTapTimerRef.current = null;
-                if (!lbZoomed) {
-                  const imgEl = lbImgRef.current;
-                  if (imgEl) {
-                    const r = imgEl.getBoundingClientRect();
-                    const ox = Math.max(12, Math.min(88, ((clickX - r.left) / Math.max(1, r.width)) * 100));
-                    const oy = Math.max(12, Math.min(88, ((clickY - r.top) / Math.max(1, r.height)) * 100));
-                    setLbOrigin(`${ox.toFixed(1)}% ${oy.toFixed(1)}%`);
+                setLbGestureActive(false);
+                if (lbScaleRef.current <= 1.05) {
+                  const stage = lbStageRef.current?.getBoundingClientRect();
+                  const nextScale = 2.25;
+                  if (stage) {
+                    const ux = clickX - (stage.left + stage.width / 2);
+                    const uy = clickY - (stage.top + stage.height / 2);
+                    const pan = clampLbPan(-ux * (nextScale - 1), -uy * (nextScale - 1), nextScale);
+                    setLbTransform(nextScale, pan);
                   } else {
-                    setLbOrigin("50% 50%");
+                    setLbTransform(nextScale, { x: 0, y: 0 });
                   }
-                  setLbPan({ x: 0, y: 0 });
-                  setLbZoomed(true);
                 } else {
-                  setLbPan({ x: 0, y: 0 });
-                  setLbZoomed(false);
+                  setLbTransform(1, { x: 0, y: 0 });
                 }
               } else {
                 lbTapTimerRef.current = window.setTimeout(() => {
                   lbTapTimerRef.current = null;
                   closeLightbox();
-                }, 240);
+                }, 230);
               }
             }}
           >
@@ -1480,26 +1701,64 @@ export function V3Shell({
             ) : null}
 
             {lightbox ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                ref={lbImgRef}
-                className={`lightbox-img${lbZoomed ? " is-zoomed" : ""}`}
-                src={lightbox.photos[lightbox.index]}
-                alt={lightbox.titleZh}
-                draggable={false}
-                style={{
-                  transformOrigin: lbOrigin,
-                  transform: lbZoomed
-                    ? `translate3d(${lbPan.x.toFixed(1)}px, ${lbPan.y.toFixed(1)}px, 0) scale(2.15)`
-                    : lbDragX !== 0
-                      ? `translate3d(${lbDragX.toFixed(1)}px, 0, 0)`
-                      : undefined,
-                  transition:
-                    lbDragX !== 0 || lbTouchRef.current?.moved
-                      ? "none"
-                      : undefined,
-                }}
-              />
+              lightbox.photos.length > 1 ? (
+                <div
+                  className={`lightbox-track${lbTrackAnimating ? " is-animating" : ""}`}
+                  style={{
+                    transform: `translate3d(calc(-100% - 24px + ${lbTrackX.toFixed(1)}px), 0, 0)`,
+                  }}
+                >
+                  <div className="lightbox-slide">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="lightbox-img"
+                      src={
+                        lightbox.photos[
+                          (lightbox.index - 1 + lightbox.photos.length) % lightbox.photos.length
+                        ]
+                      }
+                      alt=""
+                      draggable={false}
+                    />
+                  </div>
+                  <div className="lightbox-slide">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      ref={lbImgRef}
+                      className={`lightbox-img${lbScale > 1.05 ? " is-zoomed" : ""}${lbGestureActive ? " is-gesturing" : ""}`}
+                      src={lightbox.photos[lightbox.index]}
+                      alt={lightbox.titleZh}
+                      draggable={false}
+                      style={{
+                        transform: `translate3d(${lbPan.x.toFixed(1)}px, ${lbPan.y.toFixed(1)}px, 0) scale(${lbScale.toFixed(3)})`,
+                      }}
+                    />
+                  </div>
+                  <div className="lightbox-slide">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="lightbox-img"
+                      src={lightbox.photos[(lightbox.index + 1) % lightbox.photos.length]}
+                      alt=""
+                      draggable={false}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="lightbox-slide">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    ref={lbImgRef}
+                    className={`lightbox-img${lbScale > 1.05 ? " is-zoomed" : ""}${lbGestureActive ? " is-gesturing" : ""}`}
+                    src={lightbox.photos[lightbox.index]}
+                    alt={lightbox.titleZh}
+                    draggable={false}
+                    style={{
+                      transform: `translate3d(${lbPan.x.toFixed(1)}px, ${lbPan.y.toFixed(1)}px, 0) scale(${lbScale.toFixed(3)})`,
+                    }}
+                  />
+                </div>
+              )
             ) : null}
 
             {lightbox && lightbox.photos.length > 1 ? (
@@ -1528,9 +1787,10 @@ export function V3Shell({
                     aria-label={`第 ${idx + 1} 张`}
                     aria-current={idx === lightbox.index ? "true" : undefined}
                     onClick={() => {
-                      setLbZoomed(false);
-                      setLbPan({ x: 0, y: 0 });
-                      setLbDragX(0);
+                      setLbGestureActive(false);
+                      setLbTrackAnimating(false);
+                      setLbTrackX(0);
+                      setLbTransform(1, { x: 0, y: 0 });
                       setLightbox((prev) => (prev ? { ...prev, index: idx } : null));
                     }}
                   />
@@ -1540,16 +1800,16 @@ export function V3Shell({
             <p className="lightbox-hint micro-label">
               {lightbox && lightbox.photos.length > 1 ? (
                 <>
-                  <span className="t-zh">双击放大 · 左右滑动切换 · 单击关闭</span>
+                  <span className="t-zh">双指缩放 / 双击放大 · 左右滑动切换 · 单击关闭</span>
                   <span className="t-en" lang="en">
-                    Double-tap to zoom · Swipe to browse · Tap to close
+                    Pinch or double-tap to zoom · Swipe to browse · Tap to close
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="t-zh">双击放大 · 单击关闭</span>
+                  <span className="t-zh">双指缩放 / 双击放大 · 单击关闭</span>
                   <span className="t-en" lang="en">
-                    Double-tap to zoom · Tap to close
+                    Pinch or double-tap to zoom · Tap to close
                   </span>
                 </>
               )}
