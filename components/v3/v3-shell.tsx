@@ -109,6 +109,8 @@ export function V3Shell({
   const [lightbox, setLightbox] = useState<LightboxState>(null);
   const [lbZoomed, setLbZoomed] = useState(false);
   const [lbOrigin, setLbOrigin] = useState("50% 50%");
+  const [lbPan, setLbPan] = useState({ x: 0, y: 0 });
+  const [lbDragX, setLbDragX] = useState(0);
   const [toastMsg, setToastMsg] = useState("");
   const [toastOn, setToastOn] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -128,6 +130,17 @@ export function V3Shell({
   const followImgRef = useRef<HTMLImageElement>(null);
   const toastTimerRef = useRef<number | null>(null);
   const lastYRef = useRef(0);
+  const lbImgRef = useRef<HTMLImageElement>(null);
+  const lbTapTimerRef = useRef<number | null>(null);
+  const lbSuppressClickRef = useRef(false);
+  const lbTouchRef = useRef<{
+    startX: number;
+    startY: number;
+    panX: number;
+    panY: number;
+    moved: boolean;
+    axis: "x" | "y" | null;
+  } | null>(null);
 
   // Hydrate persisted language preference safely on client
   useEffect(() => {
@@ -214,13 +227,60 @@ export function V3Shell({
     [lang, pathname, searchIndex.artworks],
   );
 
+  const closeLightbox = useCallback(() => {
+    if (lbTapTimerRef.current !== null) {
+      window.clearTimeout(lbTapTimerRef.current);
+      lbTapTimerRef.current = null;
+    }
+    setLbZoomed(false);
+    setLbPan({ x: 0, y: 0 });
+    setLbDragX(0);
+    setLightbox(null);
+  }, []);
+
+  const stepLightbox = useCallback((delta: number) => {
+    if (lbTapTimerRef.current !== null) {
+      window.clearTimeout(lbTapTimerRef.current);
+      lbTapTimerRef.current = null;
+    }
+    setLbZoomed(false);
+    setLbPan({ x: 0, y: 0 });
+    setLbDragX(0);
+    setLightbox((prev) =>
+      prev && prev.photos.length > 1
+        ? { ...prev, index: (prev.index + delta + prev.photos.length) % prev.photos.length }
+        : prev,
+    );
+  }, []);
+
   const openLightbox = useCallback(
     (photos: string[], index: number, titleZh: string, titleEn = "") => {
+      if (lbTapTimerRef.current !== null) {
+        window.clearTimeout(lbTapTimerRef.current);
+        lbTapTimerRef.current = null;
+      }
       setLbZoomed(false);
+      setLbPan({ x: 0, y: 0 });
+      setLbDragX(0);
+      setLbOrigin("50% 50%");
       setLightbox({ photos, index, titleZh, titleEn });
     },
     [],
   );
+
+  // Lock background scroll while full-screen lightbox is open
+  useEffect(() => {
+    if (!lightbox) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      if (lbTapTimerRef.current !== null) {
+        window.clearTimeout(lbTapTimerRef.current);
+        lbTapTimerRef.current = null;
+      }
+    };
+  }, [lightbox]);
 
   // Sync sliding mercury indicator in header pill nav & language segmented pill
   const syncIndicators = useCallback(() => {
@@ -342,20 +402,9 @@ export function V3Shell({
         return;
       }
       if (lightbox) {
-        if (e.key === "Escape") setLightbox(null);
-        else if (e.key === "ArrowRight") {
-          setLbZoomed(false);
-          setLightbox((prev) =>
-            prev ? { ...prev, index: (prev.index + 1) % prev.photos.length } : null,
-          );
-        } else if (e.key === "ArrowLeft") {
-          setLbZoomed(false);
-          setLightbox((prev) =>
-            prev
-              ? { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length }
-              : null,
-          );
-        }
+        if (e.key === "Escape") closeLightbox();
+        else if (e.key === "ArrowRight") stepLightbox(1);
+        else if (e.key === "ArrowLeft") stepLightbox(-1);
         return;
       }
       if (e.key === "Escape") {
@@ -455,7 +504,7 @@ export function V3Shell({
       document.removeEventListener("mouseover", onMouseOver);
       document.removeEventListener("mouseleave", onMouseLeave);
     };
-  }, [lang, lightbox, openCmd]);
+  }, [lang, lightbox, openCmd, closeLightbox, stepLightbox]);
 
   // Search filtering for ⌘K modal
   const cmdResults = useMemo(() => {
@@ -1265,83 +1314,247 @@ export function V3Shell({
         <div
           id="lightbox"
           className={`lightbox${lightbox ? " is-open" : ""}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="全屏作品大图"
           aria-hidden={!lightbox}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setLightbox(null);
-          }}
         >
-          <div className="lightbox-bar">
-            <span className="lightbox-meta">
-              {lightbox ? <Bi text={{ zh: lightbox.titleZh, en: lightbox.titleEn || lightbox.titleZh }} /> : null}
-            </span>
-            <span className="lightbox-count">
-              {lightbox ? `${padNumber(lightbox.index + 1)} / ${padNumber(lightbox.photos.length)}` : ""}
-            </span>
-            <button
-              type="button"
-              className="modal-close"
-              aria-label="关闭大图"
-              onClick={() => setLightbox(null)}
-            >
-              ✕
-            </button>
+          <div className="lightbox-top">
+            <div className="lightbox-title-group">
+              <span className="lightbox-meta">
+                {lightbox ? (
+                  <Bi text={{ zh: lightbox.titleZh, en: lightbox.titleEn || lightbox.titleZh }} />
+                ) : null}
+              </span>
+              {lightbox ? (
+                <span className="lightbox-count">
+                  {padNumber(lightbox.index + 1)} / {padNumber(lightbox.photos.length)}
+                </span>
+              ) : null}
+            </div>
+            <div className="lightbox-controls">
+              <button
+                type="button"
+                className={`lightbox-pill${lbZoomed ? " is-on" : ""}`}
+                onClick={() => {
+                  setLbPan({ x: 0, y: 0 });
+                  setLbOrigin("50% 50%");
+                  setLbZoomed((z) => !z);
+                }}
+              >
+                {lbZoomed ? (
+                  <>
+                    <span className="t-zh">还原</span>
+                    <span className="t-en">Fit</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="t-zh">放大</span>
+                    <span className="t-en">Zoom</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                className="lightbox-close-btn"
+                aria-label="关闭大图"
+                onClick={closeLightbox}
+              >
+                <span className="t-zh">关闭</span>
+                <span className="t-en">Close</span>
+                <i aria-hidden="true">✕</i>
+              </button>
+            </div>
           </div>
-          {lightbox && lightbox.photos.length > 1 ? (
-            <button
-              type="button"
-              className="lightbox-nav lightbox-prev"
-              aria-label="上一张"
-              onClick={() => {
-                setLbZoomed(false);
-                setLightbox((prev) =>
-                  prev
-                    ? { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length }
-                    : null,
-                );
-              }}
-            >
-              ←
-            </button>
-          ) : null}
-          <div className="lightbox-stage">
+
+          <div
+            className={`lightbox-stage${lbZoomed ? " is-zoomed" : ""}`}
+            onTouchStart={(e) => {
+              if (!lightbox || e.touches.length !== 1) return;
+              const t = e.touches[0];
+              lbTouchRef.current = {
+                startX: t.clientX,
+                startY: t.clientY,
+                panX: lbPan.x,
+                panY: lbPan.y,
+                moved: false,
+                axis: null,
+              };
+            }}
+            onTouchMove={(e) => {
+              const st = lbTouchRef.current;
+              if (!st || !lightbox || e.touches.length !== 1) return;
+              const t = e.touches[0];
+              const dx = t.clientX - st.startX;
+              const dy = t.clientY - st.startY;
+              if (Math.hypot(dx, dy) > 8) st.moved = true;
+              if (!st.moved) return;
+
+              if (lbZoomed) {
+                const maxPanX = Math.max(180, window.innerWidth * 0.55);
+                const maxPanY = Math.max(180, window.innerHeight * 0.45);
+                setLbPan({
+                  x: Math.max(-maxPanX, Math.min(maxPanX, st.panX + dx)),
+                  y: Math.max(-maxPanY, Math.min(maxPanY, st.panY + dy)),
+                });
+              } else if (lightbox.photos.length > 1) {
+                if (!st.axis) st.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+                if (st.axis === "x") {
+                  setLbDragX(Math.max(-140, Math.min(140, dx * 0.45)));
+                }
+              }
+            }}
+            onTouchEnd={(e) => {
+              const st = lbTouchRef.current;
+              lbTouchRef.current = null;
+              if (!st || !lightbox) return;
+              if (st.moved) {
+                lbSuppressClickRef.current = true;
+                window.setTimeout(() => {
+                  lbSuppressClickRef.current = false;
+                }, 360);
+                const t = e.changedTouches[0];
+                const dx = t ? t.clientX - st.startX : 0;
+                const dy = t ? t.clientY - st.startY : 0;
+                if (
+                  !lbZoomed &&
+                  lightbox.photos.length > 1 &&
+                  st.axis === "x" &&
+                  Math.abs(dx) > 42 &&
+                  Math.abs(dx) > Math.abs(dy) * 1.1
+                ) {
+                  stepLightbox(dx < 0 ? 1 : -1);
+                } else {
+                  setLbDragX(0);
+                }
+              }
+            }}
+            onTouchCancel={() => {
+              lbTouchRef.current = null;
+              setLbDragX(0);
+            }}
+            onClick={(e) => {
+              if (!lightbox) return;
+              if (lbSuppressClickRef.current) return;
+              const clickX = e.clientX;
+              const clickY = e.clientY;
+              if (lbTapTimerRef.current !== null) {
+                window.clearTimeout(lbTapTimerRef.current);
+                lbTapTimerRef.current = null;
+                if (!lbZoomed) {
+                  const imgEl = lbImgRef.current;
+                  if (imgEl) {
+                    const r = imgEl.getBoundingClientRect();
+                    const ox = Math.max(12, Math.min(88, ((clickX - r.left) / Math.max(1, r.width)) * 100));
+                    const oy = Math.max(12, Math.min(88, ((clickY - r.top) / Math.max(1, r.height)) * 100));
+                    setLbOrigin(`${ox.toFixed(1)}% ${oy.toFixed(1)}%`);
+                  } else {
+                    setLbOrigin("50% 50%");
+                  }
+                  setLbPan({ x: 0, y: 0 });
+                  setLbZoomed(true);
+                } else {
+                  setLbPan({ x: 0, y: 0 });
+                  setLbZoomed(false);
+                }
+              } else {
+                lbTapTimerRef.current = window.setTimeout(() => {
+                  lbTapTimerRef.current = null;
+                  closeLightbox();
+                }, 240);
+              }
+            }}
+          >
+            {lightbox && lightbox.photos.length > 1 ? (
+              <button
+                type="button"
+                className="lightbox-nav lightbox-prev"
+                aria-label="上一张"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  stepLightbox(-1);
+                }}
+              >
+                ←
+              </button>
+            ) : null}
+
             {lightbox ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                className={lbZoomed ? "is-zoomed" : undefined}
+                ref={lbImgRef}
+                className={`lightbox-img${lbZoomed ? " is-zoomed" : ""}`}
                 src={lightbox.photos[lightbox.index]}
                 alt={lightbox.titleZh}
-                style={{ transformOrigin: lbOrigin }}
-                onClick={(e) => {
-                  const r = e.currentTarget.getBoundingClientRect();
-                  setLbOrigin(
-                    `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}% ${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`,
-                  );
-                  setLbZoomed((z) => !z);
+                draggable={false}
+                style={{
+                  transformOrigin: lbOrigin,
+                  transform: lbZoomed
+                    ? `translate3d(${lbPan.x.toFixed(1)}px, ${lbPan.y.toFixed(1)}px, 0) scale(2.15)`
+                    : lbDragX !== 0
+                      ? `translate3d(${lbDragX.toFixed(1)}px, 0, 0)`
+                      : undefined,
+                  transition:
+                    lbDragX !== 0 || lbTouchRef.current?.moved
+                      ? "none"
+                      : undefined,
                 }}
               />
             ) : null}
+
+            {lightbox && lightbox.photos.length > 1 ? (
+              <button
+                type="button"
+                className="lightbox-nav lightbox-next"
+                aria-label="下一张"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  stepLightbox(1);
+                }}
+              >
+                →
+              </button>
+            ) : null}
           </div>
-          {lightbox && lightbox.photos.length > 1 ? (
-            <button
-              type="button"
-              className="lightbox-nav lightbox-next"
-              aria-label="下一张"
-              onClick={() => {
-                setLbZoomed(false);
-                setLightbox((prev) =>
-                  prev ? { ...prev, index: (prev.index + 1) % prev.photos.length } : null,
-                );
-              }}
-            >
-              →
-            </button>
-          ) : null}
-          <p className="lightbox-hint micro-label">
-            <span className="t-zh">点击图片放大 · 方向键切换 · ESC 关闭</span>
-            <span className="t-en" lang="en">
-              Click to zoom · Arrow keys · ESC to close
-            </span>
-          </p>
+
+          <div className="lightbox-foot">
+            {lightbox && lightbox.photos.length > 1 ? (
+              <div className="lightbox-dots" role="group" aria-label="图版切换">
+                {lightbox.photos.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`lightbox-dot${idx === lightbox.index ? " is-active" : ""}`}
+                    aria-label={`第 ${idx + 1} 张`}
+                    aria-current={idx === lightbox.index ? "true" : undefined}
+                    onClick={() => {
+                      setLbZoomed(false);
+                      setLbPan({ x: 0, y: 0 });
+                      setLbDragX(0);
+                      setLightbox((prev) => (prev ? { ...prev, index: idx } : null));
+                    }}
+                  />
+                ))}
+              </div>
+            ) : null}
+            <p className="lightbox-hint micro-label">
+              {lightbox && lightbox.photos.length > 1 ? (
+                <>
+                  <span className="t-zh">双击放大 · 左右滑动切换 · 单击关闭</span>
+                  <span className="t-en" lang="en">
+                    Double-tap to zoom · Swipe to browse · Tap to close
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="t-zh">双击放大 · 单击关闭</span>
+                  <span className="t-en" lang="en">
+                    Double-tap to zoom · Tap to close
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
         </div>
 
         {/* Quiet Frosted Back-to-Top Capsule (auto-hides near footer) */}
