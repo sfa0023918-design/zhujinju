@@ -211,7 +211,7 @@ export function V3InlineCatalogue({
             io?.unobserve(en.target);
           });
         },
-        { root: strip, rootMargin: "0px 300px", threshold: 0.01 },
+        { root: strip, rootMargin: "0px 420px", threshold: 0.01 },
       );
       imgs.forEach((im) => io?.observe(im));
     } else {
@@ -385,7 +385,8 @@ export function V3InlineCatalogue({
           aria-label="整册图录页面选择"
         >
           {pages.map((p, k) => {
-            const eager = Math.abs(k - cur) <= 10;
+            const eager = Math.abs(k - cur) <= 12;
+            const ratio = Math.max(0.55, Math.min(1.85, p.width / Math.max(1, p.height)));
             return (
               <button
                 key={p.index}
@@ -396,7 +397,10 @@ export function V3InlineCatalogue({
                 aria-current={k === cur ? "page" : undefined}
                 onClick={() => showPage(k)}
               >
-                <span className="rf-frame" style={{ aspectRatio: `${p.width}/${p.height}` }}>
+                <span
+                  className="rf-frame"
+                  style={{ ["--rf-ratio" as string]: ratio.toFixed(4) }}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={eager ? p.thumbSrc : undefined}

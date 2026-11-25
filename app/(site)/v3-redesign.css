@@ -3405,23 +3405,22 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
 }
 .ch-touch-tabs {
   display: none;
-  gap: 8px;
-  margin-top: 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  overflow: visible;
 }
-.ch-touch-tabs::-webkit-scrollbar { display: none; }
 .ch-tab {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 13px;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
   border-radius: 999px;
   border: 1px solid var(--line-strong);
   background: var(--canvas);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--ink-muted);
   white-space: nowrap;
   transition: all 220ms ease;
@@ -3429,7 +3428,7 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
 .ch-tab em {
   font-style: normal;
   font-family: var(--font-serif-en);
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--accent);
 }
 .ch-tab.is-on {
@@ -5125,10 +5124,12 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
 
 /* Selectable All-Pages Bottom Thumbnail Filmstrip */
 .reader-filmstrip {
+  --rf-h: 50px;
   display: flex;
   align-items: flex-end;
   gap: 8px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 3px 2px 2px;
   scrollbar-width: thin;
   scrollbar-color: rgba(244, 239, 230, 0.22) transparent;
@@ -5159,7 +5160,10 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
 }
 .rf-frame {
   display: block;
-  height: 50px;
+  flex: 0 0 auto;
+  height: var(--rf-h, 50px);
+  width: calc(var(--rf-h, 50px) * var(--rf-ratio, 1.65));
+  min-width: 0;
   border-radius: 2px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.06);
@@ -5167,6 +5171,7 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
 .rf-frame img {
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: contain;
   display: block;
 }
@@ -5926,7 +5931,8 @@ body:has(.v3-site.menu-open) { overflow: hidden; }
   .reader-hit { width: 34px; opacity: 0.42; }
   .reader-hit span { width: 30px; height: 30px; font-size: 12px; }
   .reader-page img { max-height: calc(100svh - var(--header-h) - 204px); max-width: calc(100vw - 24px); }
-  .rf-frame { height: 42px; }
+  .reader-filmstrip { --rf-h: 42px; gap: 6px; }
+  .rf-frame { height: var(--rf-h, 42px); width: calc(var(--rf-h, 42px) * var(--rf-ratio, 1.65)); }
   .rg-thumb.is-spread { grid-column: span 1; }
   .ed-work-media img { max-height: 340px; }
   .stage-nav { width: 30px; height: 30px; font-size: 12px; }
@@ -6084,4 +6090,64 @@ html.no-anim .v3-site [data-draw] { transform: scaleX(1) !important; }
   height: 1px;
   opacity: 0;
   pointer-events: none;
+}
+
+/* Touch-device uncropped inline cover thumbnail for editorial rows (Home & Journal) */
+.v3-site .row-thumb {
+  display: none;
+}
+@media (hover: none), (pointer: coarse) {
+  .v3-site .v3-row:has(.row-thumb) {
+    grid-template-columns: 88px 94px minmax(0, 1fr) 82px 20px;
+    align-items: center;
+  }
+  .v3-site .row-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 82px;
+    height: 60px;
+    padding: 3px;
+    border-radius: 4px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    transition: transform 240ms var(--ease-expo), border-color 200ms ease, box-shadow 240ms ease;
+  }
+  .v3-site .row-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 2px;
+  }
+  .v3-site .v3-row:active .row-thumb,
+  .v3-site .v3-row:hover .row-thumb {
+    border-color: var(--cinnabar);
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(20, 19, 17, 0.12);
+  }
+}
+@media (hover: none) and (max-width: 759px), (pointer: coarse) and (max-width: 759px) {
+  .v3-site .v3-row:has(.row-thumb) {
+    grid-template-columns: auto minmax(0, 1fr) 74px 16px;
+    align-items: center;
+    row-gap: 6px;
+    column-gap: 10px;
+  }
+  .v3-site .v3-row:has(.row-thumb) .row-date { grid-column: 1; grid-row: 1; }
+  .v3-site .v3-row:has(.row-thumb) .row-cat { grid-column: 2; grid-row: 1; }
+  .v3-site .v3-row:has(.row-thumb) .row-title { grid-column: 1 / 3; grid-row: 2; }
+  .v3-site .v3-row:has(.row-thumb) .row-thumb {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    width: 74px;
+    height: 56px;
+    align-self: center;
+  }
+  .v3-site .v3-row:has(.row-thumb) .row-arrow {
+    grid-column: 4;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
 }

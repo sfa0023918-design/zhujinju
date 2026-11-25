@@ -733,6 +733,12 @@ export function V3Home({
                 <span className="row-title">
                   <Bi text={a.title} />
                 </span>
+                {a.cover ? (
+                  <span className="row-thumb" aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={a.cover} alt="" loading="lazy" />
+                  </span>
+                ) : null}
                 <i className="row-arrow" aria-hidden="true">
                   →
                 </i>

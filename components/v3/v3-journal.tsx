@@ -207,6 +207,12 @@ export function V3JournalIndex({ articles }: { articles: Article[] }) {
                       <Bi text={excerpt} />
                     </small>
                   </span>
+                  {cover ? (
+                    <span className="row-thumb" aria-hidden="true">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={cover} alt="" loading="lazy" />
+                    </span>
+                  ) : null}
                   <i className="row-arrow" aria-hidden="true">
                     →
                   </i>
