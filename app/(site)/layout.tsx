@@ -1,37 +1,33 @@
-import { Suspense, type CSSProperties } from "react";
-import { COVER_VAJRA_BACKDROP } from "@/lib/artwork-presentation";
-import { SiteContentFrame } from "@/components/site-content-frame";
+import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteMenuProvider } from "@/components/site-menu-state";
-import { SiteHeader } from "@/components/site-header";
 import { SiteFontPreloads } from "@/components/site-font-preloads";
+import { V3Shell } from "@/components/v3/v3-shell";
+import { resolveArticleCover } from "@/lib/article-content";
+import { getPublicArticles, getPublicArtworks, loadSiteContent } from "@/lib/site-data";
+import { buildSearchIndex } from "@/lib/v3-helpers";
 
 import "./reading-critical-fonts.css";
 import "./reading-ui-fonts.css";
-import styles from "./site-layout.module.css";
+import "./v3-redesign.css";
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const content = await loadSiteContent();
+  const publicArtworks = getPublicArtworks(content);
+  const publicArticles = getPublicArticles(content);
+  const searchIndex = buildSearchIndex(publicArtworks, publicArticles, resolveArticleCover);
+
   return (
-    <div
-      className={styles.siteTheme}
-      style={{ "--season-color": COVER_VAJRA_BACKDROP } as CSSProperties}
-    >
-      {/* Resolve streamed children inside a boundary, not the theme host node. */}
-      <Suspense fallback={null}>
-        <SiteFontPreloads />
-        <SiteMenuProvider>
-          <SiteHeader />
-          <SiteContentFrame>{children}</SiteContentFrame>
-        </SiteMenuProvider>
-        <SiteFooter />
-        <Analytics />
-      </Suspense>
-    </div>
+    <Suspense fallback={null}>
+      <SiteFontPreloads />
+      <V3Shell searchIndex={searchIndex} contact={content.siteConfig.contact}>
+        {children}
+      </V3Shell>
+      <Analytics />
+    </Suspense>
   );
 }

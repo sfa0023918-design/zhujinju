@@ -81,10 +81,10 @@ export const siteConfig: SiteConfigContent = {
     whatsapp: "+86 188 0738 1234",
     instagram: "@zhujinju_arts",
     pdfRequest: "contact@zhujinju.com",
-    address: bt("中国成都·竹瑾居艺术空间", "Chengdu, China · By Appointment"),
+    address: bt("中国成都·竹瑾居艺术空间", "Zhu Jin Ju Gallery, Chengdu · By Appointment"),
     replyWindow: bt(
       "地址：成都市青羊区草堂东路88号竹瑾居艺术空间",
-      "Address: Zhu Jin Ju Art Space, No. 88 Caotang East Road, Qingyang District, Chengdu"
+      "Address: Zhu Jin Ju Gallery, Chengdu, No. 88 Caotang East Road, Qingyang District, Chengdu"
     ),
     collaborationNote: bt(
       "咨询通常于 24 小时内回复。可作品咨询、预约看件、学术展开。",

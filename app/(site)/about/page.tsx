@@ -1,7 +1,12 @@
-import { AboutPageContent } from "@/components/institutional-pages";
+import { V3AboutPage } from "@/components/v3/v3-institutional";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
-import { getOperationalFacts, loadSiteContent } from "@/lib/site-data";
+import {
+  getPublicArticles,
+  getPublicArtworks,
+  getPublicExhibitions,
+  loadSiteContent,
+} from "@/lib/site-data";
 
 export async function generateMetadata() {
   const { siteConfig } = await loadSiteContent();
@@ -16,12 +21,18 @@ export async function generateMetadata() {
 
 export default async function AboutPage() {
   const content = await loadSiteContent();
+  const artworks = getPublicArtworks(content);
+  const exhibitions = getPublicExhibitions(content);
+  const articles = getPublicArticles(content);
 
   return (
-    <AboutPageContent
+    <V3AboutPage
       siteConfig={content.siteConfig}
-      pageCopy={content.pageCopy}
-      operationalFacts={getOperationalFacts(content)}
+      brandIntro={content.brandIntro}
+      collectingDirections={content.collectingDirections}
+      artworks={artworks}
+      exhibitionsCount={exhibitions.length}
+      articlesCount={articles.length}
     />
   );
 }

@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ExhibitionDetailPageContent } from "@/components/exhibition-pages";
+import { V3FlagshipExhibition, V3PastExhibition } from "@/components/v3/v3-exhibitions";
 import { getAdminSession } from "@/lib/admin-auth";
 import { getExhibitionMetadataTitle } from "@/lib/display-format";
 import { buildMetadata } from "@/lib/metadata";
 import type { BilingualText, Exhibition } from "@/lib/site-data";
 import {
-  getArticlesBySlugs,
   getExhibitionBySlug,
-  getHighlightedArtworks,
-  getPublicArticles,
+  getPublicArtworks,
   getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
+import {
+  countExhibitionWorks,
+  isFlagshipExhibition,
+  sortExhibitionsNewest,
+} from "@/lib/v3-helpers";
 
 function summarize(text: string, maxLength: number, joinWith: string) {
   const flat = text.split(/\s+/).filter(Boolean).join(joinWith).trim();
@@ -82,27 +85,26 @@ export async function renderExhibitionDetail(
     notFound();
   }
 
+  const allExhibitions = sortExhibitionsNewest(getPublicExhibitions(content));
+  const others = allExhibitions.filter((item) => item.slug !== exhibition.slug);
+
+  if (isFlagshipExhibition(exhibition, allExhibitions)) {
+    const artworks = getPublicArtworks(content);
+    return (
+      <V3FlagshipExhibition
+        exhibition={exhibition}
+        pastExhibitions={others}
+        allExhibitions={allExhibitions}
+        worksCount={countExhibitionWorks(exhibition, artworks)}
+      />
+    );
+  }
+
   return (
-    <ExhibitionDetailPageContent
+    <V3PastExhibition
       exhibition={exhibition}
-      detailCopy={content.pageCopy.exhibitionDetail}
-      highlightedArtworks={getHighlightedArtworks(
-        content,
-        exhibition.highlightArtworkSlugs,
-      )}
-      relatedArticles={Array.from(
-        new Map(
-          [
-            ...getArticlesBySlugs(content, exhibition.relatedArticleSlugs),
-            ...getPublicArticles(content).filter((article) =>
-              article.relatedExhibitionSlugs.includes(exhibition.slug),
-            ),
-          ].map((article) => [article.slug, article]),
-        ).values(),
-      )}
-      pastExhibitions={getPublicExhibitions(content)
-        .filter((item) => item.slug !== exhibition.slug)
-        .sort((a, b) => b.period.zh.localeCompare(a.period.zh))}
+      otherExhibitions={others}
+      allExhibitions={allExhibitions}
     />
   );
 }
