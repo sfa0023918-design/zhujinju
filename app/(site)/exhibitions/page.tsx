@@ -1,14 +1,12 @@
-import { ExhibitionsPageContent } from "@/components/exhibition-pages";
-import { ContemporaryExhibition } from "@/components/contemporary-exhibition";
+import { V3FlagshipExhibition } from "@/components/v3/v3-exhibitions";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import {
-  getArticlesBySlugs,
-  getHighlightedArtworks,
-  getPublicArticles,
+  getPublicArtworks,
   getPublicExhibitions,
   loadSiteContent,
 } from "@/lib/site-data";
+import { countExhibitionWorks, sortExhibitionsNewest } from "@/lib/v3-helpers";
 
 export async function generateMetadata() {
   const { siteConfig, pageCopy } = await loadSiteContent();
@@ -23,31 +21,22 @@ export async function generateMetadata() {
 
 export default async function ExhibitionsPage() {
   const content = await loadSiteContent();
-  const exhibitions = getPublicExhibitions(content);
-  const featured = exhibitions.find((item) => item.current) ?? exhibitions[0];
+  const sorted = sortExhibitionsNewest(getPublicExhibitions(content));
+  const featured = sorted.find((item) => item.current) ?? sorted[0];
 
-  if (featured) {
-    const relatedArticles = Array.from(new Map([
-      ...getArticlesBySlugs(content, featured.relatedArticleSlugs),
-      ...getPublicArticles(content).filter((item) => item.relatedExhibitionSlugs.includes(featured.slug)),
-    ].map((item) => [item.slug, item])).values());
-
-    return (
-      <ContemporaryExhibition
-        exhibition={featured}
-        detailCopy={content.pageCopy.exhibitionDetail}
-        relatedArticles={relatedArticles}
-        pastExhibitions={exhibitions.filter((item) => item.slug !== featured.slug)}
-        fallbackWorkCount={getHighlightedArtworks(content, featured.highlightArtworkSlugs).length}
-        showBackLink={false}
-      />
-    );
+  if (!featured) {
+    return null;
   }
 
+  const artworks = getPublicArtworks(content);
+  const past = sorted.filter((item) => item.slug !== featured.slug);
+
   return (
-    <ExhibitionsPageContent
-      exhibitions={exhibitions}
-      pageCopy={content.pageCopy}
+    <V3FlagshipExhibition
+      exhibition={featured}
+      pastExhibitions={past}
+      allExhibitions={sorted}
+      worksCount={countExhibitionWorks(featured, artworks)}
     />
   );
 }

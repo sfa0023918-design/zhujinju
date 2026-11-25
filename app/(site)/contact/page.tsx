@@ -1,5 +1,6 @@
-import { ContactPageContent } from "@/components/institutional-pages";
-import { getInquiryCatalogItem } from "@/lib/artwork-inquiry";
+import { Suspense } from "react";
+
+import { V3ContactPage } from "@/components/v3/v3-institutional";
 import { bt } from "@/lib/bilingual";
 import { buildMetadata } from "@/lib/metadata";
 import { getPublicArtworks, loadSiteContent } from "@/lib/site-data";
@@ -17,15 +18,11 @@ export async function generateMetadata() {
 
 export default async function ContactPage() {
   const content = await loadSiteContent();
-  const inquiryWorks = getPublicArtworks(content)
-    .filter((artwork) => artwork.status !== "sold")
-    .map(getInquiryCatalogItem);
+  const artworks = getPublicArtworks(content);
 
   return (
-    <ContactPageContent
-      siteConfig={content.siteConfig}
-      pageCopy={content.pageCopy}
-      inquiryWorks={inquiryWorks}
-    />
+    <Suspense fallback={null}>
+      <V3ContactPage siteConfig={content.siteConfig} artworks={artworks} />
+    </Suspense>
   );
 }
