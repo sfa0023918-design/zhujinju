@@ -436,7 +436,11 @@ export function V3ContactPage({
           CONTACT · 联系与预约
         </p>
         <h1 className="v3-h1">
-          <span className="t-zh">作品咨询、研究交流或预约到访。</span>
+          <span className="t-zh">
+            作品咨询、研究交流
+            <br className="mob-only-br" />
+            或预约到访。
+          </span>
           <span className="t-en" lang="en">
             Inquiries, research, or a visit.
           </span>

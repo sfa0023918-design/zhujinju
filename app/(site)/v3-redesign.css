@@ -76,6 +76,10 @@ html:has(.v3-site) {
 
 .v3-site.lang-zh .t-en { display: none !important; }
 .v3-site.lang-en .t-zh { display: none !important; }
+.v3-site .mob-only-br { display: none; }
+@media (max-width: 640px) {
+  .v3-site .mob-only-br { display: inline; }
+}
 .is-hidden { display: none !important; }
 
 .container {

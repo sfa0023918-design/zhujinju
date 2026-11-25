@@ -832,14 +832,16 @@ export function V3ArtworkDetail({
                 <span className="t-zh">图录中的这件作品</span>
                 <em lang="en">IN THE CATALOGUE</em>
               </p>
-              <h2 className="v3-cat-band-title">{catalogue.title.zh}</h2>
-              {catalogue.title.en ? (
+              <h2 className="v3-cat-band-title">
+                {lang === "en" ? catalogue.title.en || catalogue.title.zh : catalogue.title.zh}
+              </h2>
+              {lang === "zh" && catalogue.title.en ? (
                 <p className="v3-cat-band-en" lang="en">
                   {catalogue.title.en}
                 </p>
               ) : null}
               <p className="v3-cat-band-pages">
-                {catPageLabel.zh} · {catPageLabel.en}
+                {lang === "en" ? catPageLabel.en : `${catPageLabel.zh} · ${catPageLabel.en}`}
               </p>
               <Link className="v3-cat-band-link" href={catalogue.href}>
                 <span>

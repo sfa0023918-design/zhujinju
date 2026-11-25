@@ -16,6 +16,7 @@ import {
   padNumber,
   type V3CategoryKey,
 } from "@/lib/v3-helpers";
+import { useV3 } from "./v3-shell";
 import { Bi, StatusPill, useV3Reveal } from "./v3-ui";
 
 type StatusFilter = "all" | "inquiry" | "sold";
@@ -44,6 +45,7 @@ function mapIncomingCategoryParam(param: string | null): V3CategoryKey {
 }
 
 export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[] }) {
+  const { lang } = useV3();
   const searchParams = useSearchParams();
   const [cat, setCat] = useState<V3CategoryKey>(() =>
     mapIncomingCategoryParam(searchParams.get("cat") ?? searchParams.get("category")),
@@ -174,6 +176,23 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
     () => filtered.slice(start, start + pageSize),
     [filtered, start, pageSize],
   );
+
+  // Finite next-page card-thumbnail pre-warming (max 6 small cards, never whole collection)
+  useEffect(() => {
+    if (!modeReady || currentPage >= totalPages) return;
+    const nextSlice = filtered.slice(start + pageSize, start + pageSize + Math.min(pageSize, 6));
+    if (!nextSlice.length) return;
+    const timer = window.setTimeout(() => {
+      nextSlice.forEach((a) => {
+        const src = getArtworkCardSrc(a);
+        if (!src) return;
+        const im = new Image();
+        im.decoding = "async";
+        im.src = src;
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [modeReady, filtered, start, pageSize, currentPage, totalPages]);
 
   // Sync URL query params cleanly without triggering server rerender or losing history state
   useEffect(() => {
@@ -370,7 +389,8 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
               </svg>
               <input
                 type="search"
-                placeholder="搜索作品…"
+                placeholder={lang === "en" ? "Search works…" : "搜索作品…"}
+                aria-label={lang === "en" ? "Search works" : "搜索作品"}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);

@@ -329,7 +329,9 @@ export function V3Home({
               </h1>
               <p className="hero-sub">
                 <span className="t-zh">
-                  以学术考据与国际藏家视野，呈现喜马拉雅古代造像、唐卡与法器。
+                  以学术考据与国际藏家视野，
+                  <br className="mob-only-br" />
+                  呈现喜马拉雅古代造像、唐卡与法器。
                 </span>
                 <span className="t-en" lang="en">
                   Himalayan sculpture, thangkas and ritual objects, presented through scholarship
