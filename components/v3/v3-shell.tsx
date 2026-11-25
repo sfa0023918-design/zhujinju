@@ -14,9 +14,33 @@ import {
   type ReactNode,
 } from "react";
 
+import { FooterSocialIcon, type FooterPlatform } from "@/components/footer-social-icon";
+import { getWhatsAppHref } from "@/lib/contact-links";
 import type { ContactDetails } from "@/lib/data/types";
 import { padNumber, type V3SearchIndex } from "@/lib/v3-helpers";
 import { Bi, StatusPill } from "./v3-ui";
+
+export const OFFICIAL_SOCIAL_LINKS = {
+  douyin: "https://v.douyin.com/YbUx9r1vtZo/",
+  xiaohongshu: "https://xhslink.com/m/9oVMiPqVb3P",
+  youtube: "https://youtube.com/channel/UCMF53nCKLqokRaTcF2HdRig?si=YIq1Uo7nXFk-BBIZ",
+} as const;
+
+export function resolveInstagramHref(instagram: string) {
+  const val = (instagram || "").trim();
+  if (!val) return "https://www.instagram.com/zhujinju_arts/";
+  return val.startsWith("http") ? val : `https://www.instagram.com/${val.replace(/^@/, "")}/`;
+}
+
+export function buildOfficialPlatforms(instagram: string): FooterPlatform[] {
+  return [
+    { key: "douyin", label: "抖音", href: OFFICIAL_SOCIAL_LINKS.douyin },
+    { key: "xiaohongshu", label: "小红书", href: OFFICIAL_SOCIAL_LINKS.xiaohongshu },
+    { key: "wechat", label: "微信" },
+    { key: "youtube", label: "YouTube", href: OFFICIAL_SOCIAL_LINKS.youtube },
+    { key: "instagram", label: "Instagram", href: resolveInstagramHref(instagram) },
+  ];
+}
 
 export type V3Lang = "zh" | "en";
 
@@ -40,6 +64,7 @@ type V3ContextValue = {
   openCmd: () => void;
   openInquiry: (seed?: InquirySeed) => void;
   openLightbox: (photos: string[], index: number, titleZh: string, titleEn?: string) => void;
+  openWechatQr: () => void;
   setDarkHero: (dark: boolean) => void;
 };
 
@@ -112,6 +137,7 @@ export function V3Shell({
   const [lbTrackX, setLbTrackX] = useState(0);
   const [lbTrackAnimating, setLbTrackAnimating] = useState(false);
   const [lbGestureActive, setLbGestureActive] = useState(false);
+  const [wechatQrOpen, setWechatQrOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [toastOn, setToastOn] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -509,6 +535,7 @@ export function V3Shell({
         setCmdOpen(false);
         setDrawerOpen(false);
         setMenuOpen(false);
+        setWechatQrOpen(false);
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -706,6 +733,18 @@ export function V3Shell({
     }
   };
 
+  const openWechatQr = useCallback(() => {
+    setWechatQrOpen(true);
+  }, []);
+
+  const whatsappValue = (contact.whatsapp || contact.phone || "").trim();
+  const whatsappHref = getWhatsAppHref(whatsappValue);
+  const instagramHref = resolveInstagramHref(contact.instagram);
+  const socialPlatforms = useMemo(
+    () => buildOfficialPlatforms(contact.instagram),
+    [contact.instagram],
+  );
+
   const ctxValue = useMemo<V3ContextValue>(
     () => ({
       lang,
@@ -715,9 +754,10 @@ export function V3Shell({
       openCmd,
       openInquiry,
       openLightbox,
+      openWechatQr,
       setDarkHero,
     }),
-    [lang, setLang, toast, copyText, openCmd, openInquiry, openLightbox],
+    [lang, setLang, toast, copyText, openCmd, openInquiry, openLightbox, openWechatQr],
   );
 
   return (
@@ -978,41 +1018,27 @@ export function V3Shell({
                 </p>
                 <ul className="footer-links">
                   <li>
-                    <button
-                      type="button"
-                      className={copiedKey === contact.email ? "is-copied" : undefined}
-                      onClick={() => copyText(contact.email)}
-                    >
-                      {contact.email}
-                    </button>
+                    <a href={`mailto:${contact.email}`}>{contact.email}</a>
                   </li>
                   <li>
-                    <button
-                      type="button"
-                      className={copiedKey === contact.wechat ? "is-copied" : undefined}
-                      onClick={() => copyText(contact.wechat)}
-                    >
+                    <button type="button" onClick={openWechatQr}>
                       <span className="t-zh">微信</span>
                       <span className="t-en">WeChat</span> · {contact.wechat}
                     </button>
                   </li>
                   <li>
-                    <button
-                      type="button"
-                      className={copiedKey === contact.phone ? "is-copied" : undefined}
-                      onClick={() => copyText(contact.phone)}
-                    >
-                      {contact.phone}
-                    </button>
+                    {whatsappHref ? (
+                      <a href={whatsappHref} target="_blank" rel="noreferrer">
+                        WhatsApp · {whatsappValue}
+                      </a>
+                    ) : (
+                      <span>{contact.phone}</span>
+                    )}
                   </li>
                   <li>
-                    <button
-                      type="button"
-                      className={copiedKey === contact.instagram ? "is-copied" : undefined}
-                      onClick={() => copyText(contact.instagram)}
-                    >
+                    <a href={instagramHref} target="_blank" rel="noreferrer">
                       Instagram · {contact.instagram}
-                    </button>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -1041,6 +1067,34 @@ export function V3Shell({
                     </span>
                   </li>
                 </ul>
+                <div className="v3-footer-socials" aria-label="官方社交平台">
+                  {socialPlatforms.map((platform) =>
+                    platform.key === "wechat" ? (
+                      <button
+                        key={platform.key}
+                        type="button"
+                        className="v3-social-btn"
+                        aria-label={platform.label}
+                        title={platform.label}
+                        onClick={openWechatQr}
+                      >
+                        <FooterSocialIcon platform={platform.key} />
+                      </button>
+                    ) : (
+                      <a
+                        key={platform.key}
+                        href={platform.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="v3-social-btn"
+                        aria-label={platform.label}
+                        title={platform.label}
+                      >
+                        <FooterSocialIcon platform={platform.key} />
+                      </a>
+                    ),
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1356,47 +1410,42 @@ export function V3Shell({
               <div className="drawer-direct-links">
                 <button
                   type="button"
-                  className={`drawer-copy-chip${copiedKey === contact.wechat ? " is-copied" : ""}`}
-                  onClick={() => copyText(contact.wechat)}
+                  className="drawer-copy-chip"
+                  onClick={openWechatQr}
                 >
                   <span>
                     <span className="t-zh">微信</span>
                     <span className="t-en">WeChat</span> · {contact.wechat}
                   </span>
                   <em>
-                    {copiedKey === contact.wechat ? (
-                      <>
-                        <span className="t-zh">已复制</span>
-                        <span className="t-en">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="t-zh">复制</span>
-                        <span className="t-en">Copy</span>
-                      </>
-                    )}
+                    <span className="t-zh">二维码</span>
+                    <span className="t-en">QR Code</span>
                   </em>
                 </button>
-                <button
-                  type="button"
-                  className={`drawer-copy-chip${copiedKey === contact.email ? " is-copied" : ""}`}
-                  onClick={() => copyText(contact.email)}
+                <a
+                  href={`mailto:${contact.email}`}
+                  className="drawer-copy-chip"
                 >
                   <span>{contact.email}</span>
                   <em>
-                    {copiedKey === contact.email ? (
-                      <>
-                        <span className="t-zh">已复制</span>
-                        <span className="t-en">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="t-zh">复制</span>
-                        <span className="t-en">Copy</span>
-                      </>
-                    )}
+                    <span className="t-zh">发送邮件 ↗</span>
+                    <span className="t-en">Email ↗</span>
                   </em>
-                </button>
+                </a>
+                {whatsappHref ? (
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="drawer-copy-chip"
+                  >
+                    <span>WhatsApp · {whatsappValue}</span>
+                    <em>
+                      <span className="t-zh">对话 ↗</span>
+                      <span className="t-en">Chat ↗</span>
+                    </em>
+                  </a>
+                ) : null}
               </div>
               <p className="drawer-direct-addr">
                 <span className="t-zh">竹瑾居艺术空间 · 成都市青羊区草堂东路 88 号（预约制）</span>
@@ -1689,7 +1738,7 @@ export function V3Shell({
             {lightbox && lightbox.photos.length > 1 ? (
               <button
                 type="button"
-                className="lightbox-nav lightbox-prev"
+                className={`lightbox-nav lightbox-prev${lbScale > 1.05 ? " is-hidden-zoom" : ""}`}
                 aria-label="上一张"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1764,7 +1813,7 @@ export function V3Shell({
             {lightbox && lightbox.photos.length > 1 ? (
               <button
                 type="button"
-                className="lightbox-nav lightbox-next"
+                className={`lightbox-nav lightbox-next${lbScale > 1.05 ? " is-hidden-zoom" : ""}`}
                 aria-label="下一张"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1778,23 +1827,41 @@ export function V3Shell({
 
           <div className="lightbox-foot">
             {lightbox && lightbox.photos.length > 1 ? (
-              <div className="lightbox-dots" role="group" aria-label="图版切换">
-                {lightbox.photos.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className={`lightbox-dot${idx === lightbox.index ? " is-active" : ""}`}
-                    aria-label={`第 ${idx + 1} 张`}
-                    aria-current={idx === lightbox.index ? "true" : undefined}
-                    onClick={() => {
-                      setLbGestureActive(false);
-                      setLbTrackAnimating(false);
-                      setLbTrackX(0);
-                      setLbTransform(1, { x: 0, y: 0 });
-                      setLightbox((prev) => (prev ? { ...prev, index: idx } : null));
-                    }}
-                  />
-                ))}
+              <div className="lightbox-pager" role="group" aria-label="图版切换">
+                <button
+                  type="button"
+                  className="lightbox-foot-arrow"
+                  aria-label="上一张"
+                  onClick={() => stepLightbox(-1)}
+                >
+                  ←
+                </button>
+                <div className="lightbox-dots">
+                  {lightbox.photos.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`lightbox-dot${idx === lightbox.index ? " is-active" : ""}`}
+                      aria-label={`第 ${idx + 1} 张`}
+                      aria-current={idx === lightbox.index ? "true" : undefined}
+                      onClick={() => {
+                        setLbGestureActive(false);
+                        setLbTrackAnimating(false);
+                        setLbTrackX(0);
+                        setLbTransform(1, { x: 0, y: 0 });
+                        setLightbox((prev) => (prev ? { ...prev, index: idx } : null));
+                      }}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="lightbox-foot-arrow"
+                  aria-label="下一张"
+                  onClick={() => stepLightbox(1)}
+                >
+                  →
+                </button>
               </div>
             ) : null}
             <p className="lightbox-hint micro-label">
@@ -1814,6 +1881,71 @@ export function V3Shell({
                 </>
               )}
             </p>
+          </div>
+        </div>
+
+        {/* WeChat QR Code Modal (Shared by Footer, Contact Page, and Drawer) */}
+        <div
+          className={`v3-qr-backdrop${wechatQrOpen ? " is-open" : ""}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="竹瑾居微信二维码"
+          aria-hidden={!wechatQrOpen}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setWechatQrOpen(false);
+          }}
+        >
+          <div className="v3-qr-card">
+            <div className="v3-qr-head">
+              <div>
+                <p className="micro-label">WECHAT · 微信</p>
+                <h3>
+                  <span className="t-zh">竹瑾居微信联络</span>
+                  <span className="t-en" lang="en">
+                    Connect on WeChat
+                  </span>
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="v3-qr-close"
+                aria-label="关闭二维码"
+                onClick={() => setWechatQrOpen(false)}
+              >
+                <span className="t-zh">关闭</span>
+                <span className="t-en">Close</span>
+                <i aria-hidden="true">✕</i>
+              </button>
+            </div>
+            <div className="v3-qr-img-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/contact/wechat-qr.jpg" alt="竹瑾居微信二维码" />
+            </div>
+            <p className="v3-qr-desc">
+              <span className="t-zh">
+                长按或扫描二维码添加竹瑾居微信（微信号：{contact.wechat}）。
+              </span>
+              <span className="t-en" lang="en">
+                Scan or long-press the QR code to add Zhu Jin Ju on WeChat ({contact.wechat}).
+              </span>
+            </p>
+            <button
+              type="button"
+              className={`v3-qr-copy${copiedKey === contact.wechat ? " is-copied" : ""}`}
+              onClick={() => copyText(contact.wechat)}
+            >
+              {copiedKey === contact.wechat ? (
+                <>
+                  ✓ <span className="t-zh">已复制微信号：{contact.wechat}</span>
+                  <span className="t-en">Copied: {contact.wechat}</span>
+                </>
+              ) : (
+                <>
+                  <span className="t-zh">复制微信号：{contact.wechat}</span>
+                  <span className="t-en">Copy WeChat ID: {contact.wechat}</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 

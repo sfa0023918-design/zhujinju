@@ -69,6 +69,21 @@ export function V3Home({
   const chapterRefs = useRef<Array<HTMLElement | null>>([]);
   const hoveredRef = useRef<number>(-1);
   const [activeCh, setActiveCh] = useState(0);
+  const [mobIdx, setMobIdx] = useState(() => (plates.length >= 3 ? 2 : 0));
+  const [mobDragX, setMobDragX] = useState(0);
+  const [mobDragging, setMobDragging] = useState(false);
+  const mobTouchRef = useRef<{
+    startX: number;
+    startY: number;
+    axis: "x" | "y" | null;
+    moved: boolean;
+  } | null>(null);
+  const mobSuppressClickRef = useRef(false);
+
+  const stepMobDeck = (delta: number) => {
+    if (!plates.length) return;
+    setMobIdx((prev) => (prev + delta + plates.length) % plates.length);
+  };
 
   // Hero 2-zone fan → row (Desktop 5-col / iPad Portrait 3+2 Salon Bloom / Mobile horizontal strip)
   useEffect(() => {
@@ -416,6 +431,173 @@ export function V3Home({
               </Link>
             ))}
           </div>
+
+          {/* Bespoke Mobile Sculptural Fan-Deck Showcase (< 760px only) */}
+          {plates.length ? (
+            <div className="mob-deck-wrap">
+              <div
+                className="mob-deck-stage"
+                onTouchStart={(e) => {
+                  if (e.touches.length !== 1) return;
+                  const t = e.touches[0];
+                  mobTouchRef.current = {
+                    startX: t.clientX,
+                    startY: t.clientY,
+                    axis: null,
+                    moved: false,
+                  };
+                }}
+                onTouchMove={(e) => {
+                  const st = mobTouchRef.current;
+                  if (!st || e.touches.length !== 1) return;
+                  const t = e.touches[0];
+                  const dx = t.clientX - st.startX;
+                  const dy = t.clientY - st.startY;
+                  if (!st.axis && Math.hypot(dx, dy) > 8) {
+                    st.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+                  }
+                  if (st.axis === "x") {
+                    st.moved = true;
+                    setMobDragging(true);
+                    setMobDragX(Math.max(-130, Math.min(130, dx)));
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  const st = mobTouchRef.current;
+                  mobTouchRef.current = null;
+                  setMobDragging(false);
+                  if (!st) return;
+                  if (st.moved) {
+                    mobSuppressClickRef.current = true;
+                    window.setTimeout(() => {
+                      mobSuppressClickRef.current = false;
+                    }, 320);
+                    const t = e.changedTouches[0];
+                    const dx = t ? t.clientX - st.startX : 0;
+                    setMobDragX(0);
+                    if (Math.abs(dx) > 34) {
+                      stepMobDeck(dx < 0 ? 1 : -1);
+                    }
+                  } else {
+                    setMobDragX(0);
+                  }
+                }}
+                onTouchCancel={() => {
+                  mobTouchRef.current = null;
+                  setMobDragging(false);
+                  setMobDragX(0);
+                }}
+              >
+                {plates.map((w, idx) => {
+                  const n = plates.length;
+                  let rel = idx - mobIdx;
+                  if (rel > Math.floor(n / 2)) rel -= n;
+                  if (rel < -Math.floor(n / 2)) rel += n;
+                  const abs = Math.abs(rel);
+                  const tx =
+                    rel === 0
+                      ? mobDragX
+                      : abs === 1
+                        ? rel * 62 + mobDragX * 0.32
+                        : rel * 48 + mobDragX * 0.14;
+                  const ty = abs === 0 ? 0 : abs === 1 ? 14 : 26;
+                  const sc = abs === 0 ? 1 : abs === 1 ? 0.86 : 0.74;
+                  const rot = rel === 0 ? mobDragX * 0.035 : rel * (abs === 1 ? 6.2 : 10.5);
+                  const z = abs === 0 ? 10 : abs === 1 ? 6 : 3;
+                  const op = abs === 0 ? 1 : abs === 1 ? 0.92 : 0.54;
+                  const active = rel === 0;
+
+                  const cardStyle = {
+                    transform: `translate3d(${tx.toFixed(1)}px, ${ty}px, 0) rotate(${rot.toFixed(2)}deg) scale(${sc})`,
+                    zIndex: z,
+                    opacity: op,
+                  };
+
+                  return active ? (
+                    <Link
+                      key={w.slug}
+                      href={`/collection/${w.slug}`}
+                      className={`mob-deck-card is-active${mobDragging ? " is-dragging" : ""}`}
+                      style={cardStyle}
+                      onClick={(e) => {
+                        if (mobSuppressClickRef.current) e.preventDefault();
+                      }}
+                    >
+                      <div className="mob-deck-frame">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={w.card} alt={w.title.zh} fetchPriority="high" draggable={false} />
+                      </div>
+                    </Link>
+                  ) : (
+                    <button
+                      key={w.slug}
+                      type="button"
+                      className={`mob-deck-card${mobDragging ? " is-dragging" : ""}`}
+                      style={cardStyle}
+                      aria-label={`查看 ${w.title.zh}`}
+                      onClick={() => {
+                        if (!mobSuppressClickRef.current) setMobIdx(idx);
+                      }}
+                    >
+                      <div className="mob-deck-frame">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={w.card} alt={w.title.zh} draggable={false} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {(() => {
+                const activeWork = plates[mobIdx] ?? plates[0];
+                return (
+                  <div className="mob-deck-plaque">
+                    <div className="mob-deck-meta-row">
+                      <span className="mob-deck-counter">
+                        <em>{padNumber(mobIdx + 1)}</em> / {padNumber(plates.length)}
+                      </span>
+                      <i className="mob-deck-rule" aria-hidden="true" />
+                      <Link href={`/collection/${activeWork.slug}`} className="mob-deck-enter">
+                        <span className="t-zh">进入观赏室</span>
+                        <span className="t-en" lang="en">
+                          View work
+                        </span>{" "}
+                        ↗
+                      </Link>
+                    </div>
+                    <h3 className="mob-deck-title">
+                      <Link href={`/collection/${activeWork.slug}`}>
+                        <Bi text={activeWork.title} />
+                      </Link>
+                    </h3>
+                    <p className="mob-deck-facts">
+                      <Bi text={activeWork.facts} />
+                    </p>
+                  </div>
+                );
+              })()}
+
+              <div className="mob-deck-dock" role="tablist" aria-label="精选五件馆藏">
+                {plates.map((w, idx) => (
+                  <button
+                    key={w.slug}
+                    type="button"
+                    role="tab"
+                    aria-selected={idx === mobIdx}
+                    aria-label={w.title.zh}
+                    className={`mob-dock-item${idx === mobIdx ? " is-active" : ""}`}
+                    onClick={() => setMobIdx(idx)}
+                  >
+                    <span className="mob-dock-thumb">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={w.card} alt="" draggable={false} />
+                    </span>
+                    <em>{padNumber(idx + 1)}</em>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div id="scroll-cue" className="hero-scroll-cue" ref={cueRef} aria-hidden="true">
             <span className="t-zh">向下滑动</span>

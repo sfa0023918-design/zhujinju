@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
+import { FooterSocialIcon } from "@/components/footer-social-icon";
+import { getWhatsAppHref } from "@/lib/contact-links";
 import type {
   Artwork,
   BrandIntroContent,
@@ -16,7 +18,7 @@ import {
   getV3CategoryKey,
   padNumber,
 } from "@/lib/v3-helpers";
-import { useV3 } from "./v3-shell";
+import { buildOfficialPlatforms, resolveInstagramHref, useV3 } from "./v3-shell";
 import { ArrowLink, Bi, SectionHead, useV3Reveal, V3Button } from "./v3-ui";
 
 /* ======================================================================
@@ -307,7 +309,7 @@ export function V3ContactPage({
   siteConfig: SiteConfigContent;
   artworks: Artwork[];
 }) {
-  const { lang, toast, copyText, setDarkHero } = useV3();
+  const { lang, toast, openWechatQr, setDarkHero } = useV3();
   const searchParams = useSearchParams();
   const workSlugParam = searchParams.get("work") || "";
   const requestParam = searchParams.get("request") || "";
@@ -333,7 +335,6 @@ export function V3ContactPage({
   const [mountedAt] = useState(() => Date.now());
   const [status, setStatus] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [feedback, setFeedback] = useState("");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedWork) {
@@ -350,25 +351,13 @@ export function V3ContactPage({
     }
   }, [selectedWork, requestParam, lang]);
 
-  const contactItems = [
-    { id: "email", zh: "邮箱", en: "Email", value: siteConfig.contact.email },
-    { id: "wechat", zh: "微信", en: "WeChat", value: siteConfig.contact.wechat },
-    {
-      id: "phone",
-      zh: "电话 / WhatsApp",
-      en: "Phone / WhatsApp",
-      value: siteConfig.contact.phone || siteConfig.contact.whatsapp,
-    },
-    { id: "instagram", zh: "Instagram", en: "Instagram", value: siteConfig.contact.instagram },
-  ].filter((item) => item.value?.trim());
-
-  const handleCopy = (id: string, value: string) => {
-    copyText(value);
-    setCopiedId(id);
-    window.setTimeout(() => {
-      setCopiedId((prev) => (prev === id ? null : prev));
-    }, 1800);
-  };
+  const whatsappValue = (siteConfig.contact.whatsapp || siteConfig.contact.phone || "").trim();
+  const whatsappHref = getWhatsAppHref(whatsappValue);
+  const instagramHref = resolveInstagramHref(siteConfig.contact.instagram);
+  const socialPlatforms = useMemo(
+    () => buildOfficialPlatforms(siteConfig.contact.instagram),
+    [siteConfig.contact.instagram],
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -457,35 +446,95 @@ export function V3ContactPage({
       <section className="container v3-contact" id="inquiry">
         <div className="v3-contact-info">
           <ul className="v3-info-list">
-            {contactItems.map((item) => (
-              <li key={item.id}>
+            {siteConfig.contact.email ? (
+              <li>
                 <span className="micro-label">
-                  <span className="t-zh">{item.zh}</span>
+                  <span className="t-zh">邮箱</span>
                   <span className="t-en" lang="en">
-                    {item.en}
+                    Email
                   </span>
                 </span>
-                <button
-                  type="button"
-                  className={`v3-copy${copiedId === item.id ? " is-copied" : ""}`}
-                  onClick={() => handleCopy(item.id, item.value)}
-                >
-                  <b>{item.value}</b>
-                  <em className="copy-hint">
-                    <span className="t-zh">复制</span>
+                <a className="v3-contact-action" href={`mailto:${siteConfig.contact.email}`}>
+                  <b>{siteConfig.contact.email}</b>
+                  <em className="v3-action-pill">
+                    <span className="t-zh">发送邮件 ↗</span>
                     <span className="t-en" lang="en">
-                      Copy
+                      Email ↗
                     </span>
                   </em>
-                  <em className="copy-done">
-                    ✓ <span className="t-zh">已复制</span>
+                </a>
+              </li>
+            ) : null}
+
+            {siteConfig.contact.wechat ? (
+              <li>
+                <span className="micro-label">
+                  <span className="t-zh">微信</span>
+                  <span className="t-en" lang="en">
+                    WeChat
+                  </span>
+                </span>
+                <button type="button" className="v3-contact-action" onClick={openWechatQr}>
+                  <b>{siteConfig.contact.wechat}</b>
+                  <em className="v3-action-pill">
+                    <span className="t-zh">查看二维码</span>
                     <span className="t-en" lang="en">
-                      Copied
+                      QR Code
                     </span>
                   </em>
                 </button>
               </li>
-            ))}
+            ) : null}
+
+            {whatsappValue ? (
+              <li>
+                <span className="micro-label">
+                  <span className="t-zh">电话 / WhatsApp</span>
+                  <span className="t-en" lang="en">
+                    Phone / WhatsApp
+                  </span>
+                </span>
+                {whatsappHref ? (
+                  <a
+                    className="v3-contact-action"
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <b>{whatsappValue}</b>
+                    <em className="v3-action-pill">WhatsApp ↗</em>
+                  </a>
+                ) : (
+                  <b>{whatsappValue}</b>
+                )}
+              </li>
+            ) : null}
+
+            {siteConfig.contact.instagram ? (
+              <li>
+                <span className="micro-label">
+                  <span className="t-zh">Instagram</span>
+                  <span className="t-en" lang="en">
+                    Instagram
+                  </span>
+                </span>
+                <a
+                  className="v3-contact-action"
+                  href={instagramHref}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <b>{siteConfig.contact.instagram}</b>
+                  <em className="v3-action-pill">
+                    <span className="t-zh">打开主页 ↗</span>
+                    <span className="t-en" lang="en">
+                      Open ↗
+                    </span>
+                  </em>
+                </a>
+              </li>
+            ) : null}
+
             <li>
               <span className="micro-label">
                 <span className="t-zh">地址</span>
@@ -513,6 +562,34 @@ export function V3ContactPage({
               We usually reply within 24 hours. Meetings in Chengdu are by appointment.
             </span>
           </p>
+          <div className="v3-contact-socials" aria-label="官方社交平台">
+            {socialPlatforms.map((platform) =>
+              platform.key === "wechat" ? (
+                <button
+                  key={platform.key}
+                  type="button"
+                  className="v3-contact-social-btn"
+                  aria-label={platform.label}
+                  title={platform.label}
+                  onClick={openWechatQr}
+                >
+                  <FooterSocialIcon platform={platform.key} />
+                </button>
+              ) : (
+                <a
+                  key={platform.key}
+                  href={platform.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="v3-contact-social-btn"
+                  aria-label={platform.label}
+                  title={platform.label}
+                >
+                  <FooterSocialIcon platform={platform.key} />
+                </a>
+              ),
+            )}
+          </div>
         </div>
 
         <form className="v3-form v3-contact-form" onSubmit={handleSubmit}>
