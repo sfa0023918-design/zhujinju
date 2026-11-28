@@ -6837,3 +6837,209 @@ html.no-anim .v3-site [data-draw] { transform: scaleX(1) !important; }
   border-color: var(--cinnabar);
   color: #ffffff;
 }
+
+/* ==========================================================================
+   14. V3.8 UX AUDIT FIXES — DRAWER, SEARCH, MOBILE MENU, READER & POLISH
+   ========================================================================== */
+
+/* P0: Inquiry Drawer backdrop & slide-in alignment (JSX uses .modal-backdrop-drawer + .drawer-head + .modal-close) */
+.v3-site .modal-backdrop-drawer {
+  z-index: 210;
+  padding: 0;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+.v3-site .modal-backdrop-drawer.is-open .inquiry-drawer {
+  transform: translateX(0);
+}
+.v3-site .drawer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.v3-site .modal-close {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink-muted);
+  border: 1px solid transparent;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+.v3-site .modal-close:hover {
+  background: rgba(20, 19, 17, 0.06);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+/* P0: Command Palette (⌘K) header row alignment & native search X cleanup */
+.v3-site .cmd-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 14px 20px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-muted);
+}
+.v3-site .cmd-head .cmd-icon {
+  flex: 0 0 auto;
+  display: block;
+  color: var(--ink-muted);
+}
+.v3-site .cmd-head .cmd-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.v3-site .cmd-head .cmd-input::-webkit-search-cancel-button,
+.v3-site .cmd-head .cmd-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.v3-site .cmd-clear {
+  flex: 0 0 auto;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  background: rgba(20, 19, 17, 0.06);
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.v3-site .cmd-clear:hover {
+  background: rgba(20, 19, 17, 0.12);
+  color: var(--ink);
+}
+.v3-site .cmd-result-thumb-empty {
+  display: block;
+}
+
+/* P0: Mobile Full-Screen Menu header alignment & scroll containment */
+.v3-site .mobile-menu {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+.v3-site .mobile-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-light);
+}
+.v3-site .mobile-menu .modal-close {
+  color: var(--light-ink);
+  border-color: rgba(244, 239, 230, 0.24);
+}
+.v3-site .mobile-menu .modal-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(244, 239, 230, 0.5);
+  color: #ffffff;
+}
+html:has(.v3-site.menu-open) {
+  overflow: hidden;
+}
+
+/* P1: Catalogue TOC overlay layering, scroll offset & loading indicator */
+.v3-site .reader-grid {
+  z-index: 290;
+  scroll-padding-top: 76px;
+}
+.v3-site .reader-grid-head {
+  background: #0e0d0b;
+  padding: 18px 0 16px;
+  margin-bottom: 20px;
+}
+.v3-site .reader-page {
+  position: relative;
+}
+.v3-site .reader-loading-dot {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(244, 239, 230, 0.28);
+  border-top-color: #ebd5b4;
+  animation: v3Spin 0.7s linear infinite;
+  pointer-events: none;
+}
+@keyframes v3Spin {
+  to { transform: rotate(360deg); }
+}
+
+/* P1: Distinguish desktop vs touch hint copy in Lightbox & Catalogue Reader */
+.v3-site .hint-touch { display: none; }
+.v3-site .hint-desktop { display: inline; }
+@media (hover: none), (pointer: coarse) {
+  .v3-site .hint-touch { display: inline; }
+  .v3-site .hint-desktop { display: none; }
+}
+
+/* P1/P2: Framing light-ground artwork tiles cleanly without altering image color */
+.v3-site .tile-media {
+  background: #eae6de;
+  box-shadow: inset 0 0 0 1px rgba(20, 19, 17, 0.08), 0 2px 10px rgba(20, 19, 17, 0.04);
+}
+
+/* P2: Editorial English language notice */
+.v3-site .ed-en-note {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-left: 2px solid var(--cinnabar);
+  background: rgba(157, 68, 50, 0.06);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+/* P2: Contact page inline one-click copy action */
+.v3-site .v3-contact-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.v3-site .v3-contact-action-row .v3-contact-action {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.v3-site .v3-copy-pill {
+  flex: 0 0 auto;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease;
+}
+.v3-site .v3-copy-pill:hover {
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
+  background: var(--cinnabar-soft);
+}
+
+/* P2: Prevent narrow footer WhatsApp phone wrap & add mobile filmstrip scroll-fade cue */
+.v3-site .v3-footer-nowrap {
+  white-space: nowrap;
+}
+@media (max-width: 759px) {
+  .v3-site .reader-filmstrip {
+    mask-image: linear-gradient(to right, #000 0%, #000 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 90%, transparent 100%);
+    padding-right: 24px;
+  }
+}

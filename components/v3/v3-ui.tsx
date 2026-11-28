@@ -60,21 +60,44 @@ export function StatusPill({ status }: { status: ArtworkStatus }) {
   );
 }
 
+export function Eyebrow({
+  en,
+  zh,
+}: {
+  en: string;
+  zh?: string;
+}) {
+  return (
+    <>
+      {en}
+      {zh ? <span className="t-zh"> · {zh}</span> : null}
+    </>
+  );
+}
+
 export function SectionHead({
   eyebrow,
+  eyebrowZh,
   zh,
   en,
   right,
 }: {
   eyebrow: string;
+  eyebrowZh?: string;
   zh: string;
   en: string;
   right?: ReactNode;
 }) {
+  const parts = !eyebrowZh && eyebrow.includes(" · ") ? eyebrow.split(" · ") : null;
+  const enPart = parts ? parts[0] : eyebrow;
+  const zhPart = eyebrowZh ?? (parts && /[\u4e00-\u9fff]/.test(parts[1] || "") ? parts.slice(1).join(" · ") : undefined);
+
   return (
     <div className="v3-sec-head">
       <div>
-        <p className="micro-label v3-eyebrow">{eyebrow}</p>
+        <p className="micro-label v3-eyebrow">
+          <Eyebrow en={enPart} zh={zhPart} />
+        </p>
         <h2 className="v3-h2">
           <span className="t-zh">{zh}</span>
           <span className="t-en" lang="en">
@@ -223,48 +246,48 @@ export function attachDragScroll(el: HTMLElement | null): () => void {
 
 /**
  * Observes [data-reveal], [data-draw], [data-stagger], and [data-count] elements inside the page.
+ * Renders exact archival numbers immediately (no mid-count distortion) and guarantees no element
+ * remains stuck hidden after scrolling, filtering, or switching languages.
  */
 export function useV3Reveal(depKey: string) {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const countUp = (el: HTMLElement) => {
+    const setFinalCount = (el: HTMLElement) => {
       const to = parseFloat(el.dataset.count || "0");
       const padN = Number(el.dataset.pad || 0);
-      const fmt = (n: number) => (padN ? String(n).padStart(padN, "0") : String(n));
-      if (reduce) {
-        el.textContent = fmt(to);
-        return;
-      }
-      const t0 = performance.now();
-      const dur = 1000;
-      const step = (now: number) => {
-        const t = Math.min(1, Math.max(0, (now - t0) / dur));
-        const val = Math.round(to * (1 - Math.pow(2, -9 * t)));
-        el.textContent = fmt(val);
-        if (t < 1) requestAnimationFrame(step);
-        else el.textContent = fmt(to);
-      };
-      requestAnimationFrame(step);
+      el.textContent = padN ? String(to).padStart(padN, "0") : String(to);
     };
 
     const staggers = document.querySelectorAll<HTMLElement>("[data-stagger]");
     staggers.forEach((wrap) => {
       Array.from(wrap.children).forEach((child, idx) => {
-        (child as HTMLElement).style.setProperty("--d", `${Math.min(idx, 8) * 45}ms`);
+        (child as HTMLElement).style.setProperty("--d", `${Math.min(idx, 8) * 35}ms`);
       });
     });
 
-    const targets = document.querySelectorAll<HTMLElement>(
-      "[data-reveal],[data-count],[data-draw],[data-stagger]",
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-reveal],[data-count],[data-draw],[data-stagger]"),
     );
 
+    targets.forEach((el) => {
+      if (el.hasAttribute("data-count")) setFinalCount(el);
+    });
+
     if (reduce || typeof IntersectionObserver === "undefined") {
-      targets.forEach((el) => {
-        el.classList.add("is-in");
-        if (el.hasAttribute("data-count")) countUp(el);
-      });
+      targets.forEach((el) => el.classList.add("is-in"));
       return;
     }
+
+    const revealVisibleOrPassed = () => {
+      const cutoff = window.innerHeight + 140;
+      targets.forEach((el) => {
+        if (el.classList.contains("is-in")) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= cutoff) {
+          el.classList.add("is-in");
+        }
+      });
+    };
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -272,14 +295,26 @@ export function useV3Reveal(depKey: string) {
           if (!en.isIntersecting) return;
           const el = en.target as HTMLElement;
           el.classList.add("is-in");
-          if (el.hasAttribute("data-count")) countUp(el);
           io.unobserve(el);
         });
       },
-      { threshold: 0.04, rootMargin: "0px 0px -2% 0px" },
+      { threshold: 0.01, rootMargin: "140px 0px 140px 0px" },
     );
 
-    targets.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    targets.forEach((el) => {
+      if (!el.classList.contains("is-in")) io.observe(el);
+    });
+    revealVisibleOrPassed();
+
+    const raf = requestAnimationFrame(revealVisibleOrPassed);
+    window.addEventListener("scroll", revealVisibleOrPassed, { passive: true });
+    window.addEventListener("resize", revealVisibleOrPassed, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", revealVisibleOrPassed);
+      window.removeEventListener("resize", revealVisibleOrPassed);
+      io.disconnect();
+    };
   }, [depKey]);
 }

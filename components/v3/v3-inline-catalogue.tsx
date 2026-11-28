@@ -57,6 +57,7 @@ export function V3InlineCatalogue({
 
   const [cur, setCur] = useState(0);
   const [displayedIdx, setDisplayedIdx] = useState(0);
+  const [loadedSrc, setLoadedSrc] = useState("");
   const [turnPhase, setTurnPhase] = useState<"idle" | "out" | "in">("idle");
   const [turnDir, setTurnDir] = useState(1);
   const [zoomScale, setZoomScale] = useState(1);
@@ -183,10 +184,11 @@ export function V3InlineCatalogue({
       setTurnDir(d);
       setTurnPhase("out");
       if (turnTimerRef.current) window.clearTimeout(turnTimerRef.current);
+      const delay = Math.abs(clamped - cur) > 1 ? 45 : 90;
       turnTimerRef.current = window.setTimeout(() => {
         setDisplayedIdx(clamped);
         setTurnPhase("in");
-      }, 140);
+      }, delay);
       // Keep URL hash synced cleanly without creating spammy history entries
       if (typeof window !== "undefined") {
         const targetHash = `#catalogue-p${clamped + 1}`;
@@ -282,7 +284,7 @@ export function V3InlineCatalogue({
     };
   }, [fullscreen, bindStrip, cur, syncActiveStrip]);
 
-  // Lazy-hydrate directory grid when opened
+  // Lazy-hydrate directory grid when opened (eagerly hydrate first 24 + current neighborhood)
   useEffect(() => {
     if (!gridOpen) return;
     const grid = fullscreen ? fullGridRef.current : inlineGridRef.current;
@@ -294,6 +296,9 @@ export function V3InlineCatalogue({
         im.removeAttribute("data-src");
       }
     };
+    imgs.forEach((im, idx) => {
+      if (idx < 24 || Math.abs(idx - cur) <= 12) loadImg(im);
+    });
     let io: IntersectionObserver | null = null;
     if (typeof IntersectionObserver !== "undefined") {
       io = new IntersectionObserver(
@@ -304,13 +309,19 @@ export function V3InlineCatalogue({
             io?.unobserve(en.target);
           });
         },
-        { root: grid, rootMargin: "260px 0px", threshold: 0.01 },
+        { root: grid, rootMargin: "360px 0px", threshold: 0.01 },
       );
-      imgs.forEach((im) => io?.observe(im));
+      imgs.forEach((im) => {
+        if (im.dataset.src) io?.observe(im);
+      });
     } else {
       imgs.forEach(loadImg);
     }
-    grid.querySelector<HTMLElement>(`[data-go="${cur}"]`)?.scrollIntoView({ block: "center" });
+    if (cur > 0) {
+      grid.querySelector<HTMLElement>(`[data-go="${cur}"]`)?.scrollIntoView({ block: "center" });
+    } else {
+      grid.scrollTop = 0;
+    }
     return () => io?.disconnect();
   }, [gridOpen, fullscreen, cur]);
 
@@ -504,10 +515,17 @@ export function V3InlineCatalogue({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            key={displayed.readerSrc}
             src={displayed.readerSrc}
             alt={`${exhibition.title.zh} 第 ${displayed.index + 1} 页`}
             draggable={false}
+            onLoad={() => setLoadedSrc(displayed.readerSrc)}
             style={{
+              backgroundImage:
+                loadedSrc !== displayed.readerSrc ? `url("${displayed.thumbSrc}")` : undefined,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
               transformOrigin: zoomOrigin,
               transform:
                 zoomScale !== 1 || zoomPan.x !== 0 || zoomPan.y !== 0
@@ -518,6 +536,9 @@ export function V3InlineCatalogue({
               transition: gesturing ? "none" : undefined,
             }}
           />
+          {loadedSrc !== displayed.readerSrc ? (
+            <span className="reader-loading-dot" aria-hidden="true" />
+          ) : null}
         </div>
         <button
           type="button"
@@ -544,11 +565,21 @@ export function V3InlineCatalogue({
             onChange={(e) => showPage(Number(e.target.value) - 1)}
           />
           <span className="reader-hint">
-            <span className="t-zh">
-              {isFull ? "双指缩放 / 双击放大 · 左右滑动翻页" : "双指缩放 / 双击放大 · 点选下方缩略图"}
+            <span className="hint-touch">
+              <span className="t-zh">
+                {isFull ? "双指缩放 / 双击放大 · 左右滑动翻页" : "双指缩放 / 双击放大 · 点选下方缩略图"}
+              </span>
+              <span className="t-en" lang="en">
+                {isFull ? "Pinch or dbl-tap to zoom · Swipe to turn" : "Pinch or dbl-tap to zoom · Select spread"}
+              </span>
             </span>
-            <span className="t-en" lang="en">
-              {isFull ? "Pinch or dbl-tap to zoom · Swipe to turn" : "Pinch or dbl-tap to zoom · Select spread"}
+            <span className="hint-desktop">
+              <span className="t-zh">
+                {isFull ? "双击放大 · 左右方向键翻页 · Esc 退出" : "双击放大 · 拖动进度条或点选下方缩略图"}
+              </span>
+              <span className="t-en" lang="en">
+                {isFull ? "Double-click to zoom · Arrow keys to turn · Esc to exit" : "Double-click to zoom · Scrub or select spread below"}
+              </span>
             </span>
           </span>
         </div>

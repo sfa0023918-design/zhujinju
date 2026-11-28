@@ -57,8 +57,8 @@ export function V3AboutPage({
 
   const resolveDirectionCat = (dir: CollectingDirection): string => {
     const text = `${dir.name.zh} ${dir.name.en}`.toLowerCase();
-    if (/唐卡|thangka/.test(text)) return "painting";
-    if (/绘画|painting|卷轴|经/.test(text)) return "manuscript";
+    if (/唐卡|thangka|绘画|painting|卷轴/.test(text)) return "painting";
+    if (/经书|经板|贝叶|manuscript|sutra|经/.test(text)) return "manuscript";
     if (/工艺|法器|ritual/.test(text)) return "ritual";
     return "sculpture";
   };
@@ -131,7 +131,9 @@ export function V3AboutPage({
     <>
       <section className="container v3-about-hero">
         <div className="v3-about-hero-copy">
-          <p className="micro-label v3-eyebrow">ABOUT · 关于竹瑾居</p>
+          <p className="micro-label v3-eyebrow">
+            ABOUT<span className="t-zh"> · 关于竹瑾居</span>
+          </p>
           <h1 className="v3-h1">
             <span className="t-zh">
               以研究与眼光，
@@ -263,7 +265,7 @@ export function V3AboutPage({
           <div>
             <p className="micro-label v3-eyebrow v3-eyebrow-live">
               <i className="dot-spark" aria-hidden="true" />
-              VISIT · 到访
+              VISIT<span className="t-zh"> · 到访</span>
             </p>
             <h2 className="v3-visit-title">
               <span className="t-zh">成都 · 预约制会面</span>
@@ -309,7 +311,7 @@ export function V3ContactPage({
   siteConfig: SiteConfigContent;
   artworks: Artwork[];
 }) {
-  const { lang, toast, openWechatQr, setDarkHero } = useV3();
+  const { lang, toast, copyText, openWechatQr, setDarkHero } = useV3();
   const searchParams = useSearchParams();
   const workSlugParam = searchParams.get("work") || "";
   const requestParam = searchParams.get("request") || "";
@@ -433,7 +435,7 @@ export function V3ContactPage({
       <section className="v3-page-head container">
         <p className="micro-label v3-eyebrow v3-eyebrow-live">
           <i className="dot-spark" aria-hidden="true" />
-          CONTACT · 联系与预约
+          CONTACT<span className="t-zh"> · 联系与预约</span>
         </p>
         <h1 className="v3-h1">
           <span className="t-zh">
@@ -458,15 +460,27 @@ export function V3ContactPage({
                     Email
                   </span>
                 </span>
-                <a className="v3-contact-action" href={`mailto:${siteConfig.contact.email}`}>
-                  <b>{siteConfig.contact.email}</b>
-                  <em className="v3-action-pill">
-                    <span className="t-zh">发送邮件 ↗</span>
+                <div className="v3-contact-action-row">
+                  <a className="v3-contact-action" href={`mailto:${siteConfig.contact.email}`}>
+                    <b>{siteConfig.contact.email}</b>
+                    <em className="v3-action-pill">
+                      <span className="t-zh">发送邮件 ↗</span>
+                      <span className="t-en" lang="en">
+                        Email ↗
+                      </span>
+                    </em>
+                  </a>
+                  <button
+                    type="button"
+                    className="v3-action-pill v3-copy-pill"
+                    onClick={() => copyText(siteConfig.contact.email)}
+                  >
+                    <span className="t-zh">复制</span>
                     <span className="t-en" lang="en">
-                      Email ↗
+                      Copy
                     </span>
-                  </em>
-                </a>
+                  </button>
+                </div>
               </li>
             ) : null}
 
@@ -478,15 +492,27 @@ export function V3ContactPage({
                     WeChat
                   </span>
                 </span>
-                <button type="button" className="v3-contact-action" onClick={openWechatQr}>
-                  <b>{siteConfig.contact.wechat}</b>
-                  <em className="v3-action-pill">
-                    <span className="t-zh">查看二维码</span>
+                <div className="v3-contact-action-row">
+                  <button type="button" className="v3-contact-action" onClick={openWechatQr}>
+                    <b>{siteConfig.contact.wechat}</b>
+                    <em className="v3-action-pill">
+                      <span className="t-zh">查看二维码</span>
+                      <span className="t-en" lang="en">
+                        QR Code
+                      </span>
+                    </em>
+                  </button>
+                  <button
+                    type="button"
+                    className="v3-action-pill v3-copy-pill"
+                    onClick={() => copyText(siteConfig.contact.wechat)}
+                  >
+                    <span className="t-zh">复制</span>
                     <span className="t-en" lang="en">
-                      QR Code
+                      Copy
                     </span>
-                  </em>
-                </button>
+                  </button>
+                </div>
               </li>
             ) : null}
 

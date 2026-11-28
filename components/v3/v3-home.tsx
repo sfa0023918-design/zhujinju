@@ -6,7 +6,17 @@ import { useEffect, useRef, useState } from "react";
 import type { BilingualText } from "@/lib/data/types";
 import type { ExhibitionEditorial } from "@/lib/data/exhibition-editorial";
 import { padNumber } from "@/lib/v3-helpers";
+import { useV3 } from "./v3-shell";
 import { ArrowLink, attachDragScroll, Bi, SectionHead, useV3Reveal, V3Button } from "./v3-ui";
+
+const CHAPTER_INTRO_EN: Record<string, string> = {
+  "material-light":
+    "From casting and carving,\ndevotion takes a form that can be touched.",
+  "figure-presence":
+    "Bearing, visage, and posture\npreserve an understanding of the inner world.",
+  "image-narrative":
+    "Narrative and aspiration\nendure across palm leaf, canvas, and silk.",
+};
 
 export type V3HomePlate = {
   slug: string;
@@ -56,7 +66,8 @@ export function V3Home({
   chapters,
   articles,
 }: V3HomeProps) {
-  useV3Reveal("home");
+  const { lang } = useV3();
+  useV3Reveal(`home-${lang}`);
 
   const wrapRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -804,8 +815,14 @@ export function V3Home({
         <section className="v3-chapters" id="chapters">
           <div className="container v3-chapters-grid">
             <div className="v3-chapters-sticky">
-              <p className="micro-label v3-eyebrow">FORM &amp; DEVOTION · 专题导览</p>
-              <div className="ch-touch-tabs" role="tablist" aria-label="章节切换">
+              <p className="micro-label v3-eyebrow">
+                FORM &amp; DEVOTION<span className="t-zh"> · 专题导览</span>
+              </p>
+              <div
+                className="ch-touch-tabs"
+                role="tablist"
+                aria-label={lang === "en" ? "Chapter navigation" : "章节切换"}
+              >
                 {chapters.map((c, k) => (
                   <button
                     key={c.id}
@@ -862,7 +879,10 @@ export function V3Home({
                     <Bi text={c.title} />
                   </h3>
                   <p className="ch-intro" style={{ whiteSpace: "pre-line" }}>
-                    {c.introduction}
+                    <span className="t-zh">{c.introduction}</span>
+                    <span className="t-en" lang="en">
+                      {CHAPTER_INTRO_EN[c.id] || c.introduction}
+                    </span>
                   </p>
                   <ul className="ch-works">
                     {c.works.map((w) => (
