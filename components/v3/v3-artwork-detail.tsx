@@ -21,6 +21,32 @@ import { attachDragScroll, Bi, SectionHead, StatusPill, useV3Reveal } from "./v3
 
 type StageMode = "darkroom" | "daylight" | "compare";
 
+function formatEnYear(year?: string): string {
+  const s = (year ?? "").trim();
+  if (!s) return "";
+  return s
+    .replace(/\s*年至\s*/g, "–")
+    .replace(/\s*年/g, "")
+    .trim();
+}
+
+function RichEnText({ text }: { text: string }) {
+  const tokens = text.split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*)/g);
+  return (
+    <>
+      {tokens.map((tok, i) => {
+        if (tok.startsWith("**") && tok.endsWith("**") && tok.length > 4) {
+          return <strong key={i}>{tok.slice(2, -2)}</strong>;
+        }
+        if (tok.startsWith("*") && tok.endsWith("*") && tok.length > 2) {
+          return <em key={i}>{tok.slice(1, -1)}</em>;
+        }
+        return tok;
+      })}
+    </>
+  );
+}
+
 export function V3ArtworkDetail({
   artwork,
   index,
@@ -326,7 +352,7 @@ export function V3ArtworkDetail({
         en: "Exhibited",
         entries: exhs.map((e) => ({
           zh: [e.title.zh || e.title.en, e.venue?.zh, e.year].filter(Boolean).join("，"),
-          en: [e.title.en || e.title.zh, e.venue?.en || e.venue?.zh, e.year]
+          en: [e.title.en || e.title.zh, e.venue?.en || e.venue?.zh, formatEnYear(e.year)]
             .filter(Boolean)
             .join(", "),
         })),
@@ -343,7 +369,7 @@ export function V3ArtworkDetail({
             .join("，"),
           en: [
             p.title.en || p.title.zh,
-            p.year,
+            formatEnYear(p.year),
             p.pages?.en || p.pages?.zh,
             p.note?.en || p.note?.zh,
           ]
@@ -386,7 +412,12 @@ export function V3ArtworkDetail({
             <span className="micro-label stage-count">
               PLATE <b>{padNumber(photoIdx + 1)}</b> / {padNumber(photos.length)}
             </span>
-            <div ref={segRef} className="segmented-control stage-seg" role="group" aria-label="观看方式">
+            <div
+              ref={segRef}
+              className="segmented-control stage-seg"
+              role="group"
+              aria-label={lang === "en" ? "Viewing mode" : "观看方式"}
+            >
               <div ref={segThumbRef} className="seg-thumb" aria-hidden="true" />
               {(
                 [
@@ -477,7 +508,7 @@ export function V3ArtworkDetail({
               >
                 <div className="compare-layer compare-layer-base">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={currentSrc} alt={artwork.title.zh} />
+                  <img src={currentSrc} alt={primaryTitle} />
                 </div>
                 <div className="compare-layer compare-layer-top">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -505,7 +536,7 @@ export function V3ArtworkDetail({
                   <button
                     type="button"
                     className="stage-nav stage-prev"
-                    aria-label="上一张图版"
+                    aria-label={lang === "en" ? "Previous plate" : "上一张图版"}
                     onClick={() => stepPhoto(-1)}
                   >
                     ←
@@ -531,7 +562,7 @@ export function V3ArtworkDetail({
                   <button
                     type="button"
                     className="stage-nav stage-next"
-                    aria-label="下一张图版"
+                    aria-label={lang === "en" ? "Next plate" : "下一张图版"}
                     onClick={() => stepPhoto(1)}
                   >
                     →
@@ -548,7 +579,7 @@ export function V3ArtworkDetail({
                 key={`${src}-${i}`}
                 type="button"
                 className={`stage-thumb${i === photoIdx ? " is-active" : ""}`}
-                aria-label={`图 ${i + 1}`}
+                aria-label={lang === "en" ? `Plate ${i + 1}` : `图 ${i + 1}`}
                 onClick={() => {
                   setPhotoIdx(i);
                   if (mode === "compare") setMode("darkroom");
@@ -593,7 +624,7 @@ export function V3ArtworkDetail({
             <div className="dossier-nav">
               <Link
                 href={`/collection/${prevArtwork.slug}`}
-                aria-label="上一件"
+                aria-label={lang === "en" ? "Previous work" : "上一件"}
                 data-follow={prevCard}
               >
                 ←
@@ -603,7 +634,7 @@ export function V3ArtworkDetail({
               </span>
               <Link
                 href={`/collection/${nextArtwork.slug}`}
-                aria-label="下一件"
+                aria-label={lang === "en" ? "Next work" : "下一件"}
                 data-follow={nextCard}
               >
                 →
@@ -755,7 +786,9 @@ export function V3ArtworkDetail({
               <p className="v3-essay-meta">
                 <span className="t-zh">共 {zhParas.length} 段赏析</span>
                 <span className="t-en" lang="en">
-                  {enParas.length || zhParas.length} paragraphs
+                  {(enParas.length || zhParas.length) === 1
+                    ? "1 paragraph"
+                    : `${enParas.length || zhParas.length} paragraphs`}
                 </span>
               </p>
             ) : null}
@@ -778,7 +811,7 @@ export function V3ArtworkDetail({
               <div className="t-en" lang="en">
                 {(enParas.length ? enParas : zhParas).map((p, i) => (
                   <p key={i} className={i === 0 ? "is-lead" : undefined}>
-                    {p}
+                    <RichEnText text={p} />
                   </p>
                 ))}
               </div>
@@ -797,7 +830,9 @@ export function V3ArtworkDetail({
                   </div>
                   <div className="t-en" lang="en">
                     {(cmpEn.length ? cmpEn : cmpZh).map((p, i) => (
-                      <p key={i}>{p}</p>
+                      <p key={i}>
+                        <RichEnText text={p} />
+                      </p>
                     ))}
                   </div>
                 </>
@@ -866,14 +901,14 @@ export function V3ArtworkDetail({
               className={`v3-cat-band-spread${catalogue.images.length === 2 ? " is-paired" : ""}`}
               href={catalogue.href}
               data-cursor="view"
-              aria-label="翻到此页阅读"
+              aria-label={lang === "en" ? "Open at this page" : "翻到此页阅读"}
             >
               {catalogue.images.map((img, i) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={`${img}-${i}`}
                   src={withImageVersion(catalogueImageVariant(img, "reader"))}
-                  alt={i === 0 ? catalogue.title.zh : ""}
+                  alt={i === 0 ? (lang === "en" ? catalogue.title.en || catalogue.title.zh : catalogue.title.zh) : ""}
                   loading="lazy"
                 />
               ))}
@@ -906,7 +941,7 @@ export function V3ArtworkDetail({
                   <div className="rec-head">
                     <span className="rec-no">{padNumber(ci + 1)}</span>
                     <h3>
-                      <span className="rec-zh">{col.zh}</span>
+                      <span className="rec-zh t-zh">{col.zh}</span>
                       <span className="rec-en" lang="en">
                         {col.en}
                       </span>
@@ -960,7 +995,7 @@ export function V3ArtworkDetail({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getArtworkCardSrc(item)}
-                    alt={item.title.zh}
+                    alt={lang === "en" ? item.title.en || item.title.zh : item.title.zh}
                     loading="lazy"
                     draggable={false}
                   />

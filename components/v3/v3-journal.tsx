@@ -134,7 +134,7 @@ export function V3JournalIndex({ articles }: { articles: Article[] }) {
           <Link className="v3-feature" href={`/journal/${lead.slug}`}>
             <div className="v3-feature-media">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={leadCover} alt={lead.title.zh} />
+              <img src={leadCover} alt={lang === "en" ? lead.title.en || lead.title.zh : lead.title.zh} />
             </div>
             <div className="v3-feature-copy">
               <p className="micro-label v3-eyebrow v3-eyebrow-live">
@@ -165,7 +165,12 @@ export function V3JournalIndex({ articles }: { articles: Article[] }) {
 
       <section className="container v3-journal-list">
         <div className="v3-toolbar-inner v3-journal-filter">
-          <div ref={segRef} className="segmented-control" role="group" aria-label="分类">
+          <div
+            ref={segRef}
+            className="segmented-control"
+            role="group"
+            aria-label={lang === "en" ? "Category" : "分类"}
+          >
             <div ref={segThumbRef} className="seg-thumb" aria-hidden="true" />
             <button
               type="button"
@@ -292,7 +297,7 @@ export function V3ArticleDetail({
         {cover ? (
           <figure className="v3-art-cover">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={cover} alt={article.title.zh} />
+            <img src={cover} alt={primaryTitle} />
           </figure>
         ) : null}
 
@@ -317,7 +322,11 @@ export function V3ArticleDetail({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={withImageVersion(block.image)}
-                    alt={block.caption?.zh || article.title.zh}
+                    alt={
+                      lang === "en"
+                        ? block.caption?.en || block.caption?.zh || primaryTitle
+                        : block.caption?.zh || article.title.zh
+                    }
                     loading="lazy"
                   />
                   {block.caption?.zh || block.caption?.en ? (
@@ -337,7 +346,11 @@ export function V3ArticleDetail({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={withImageVersion(it.image)}
-                      alt={it.caption?.zh || article.title.zh}
+                      alt={
+                        lang === "en"
+                          ? it.caption?.en || it.caption?.zh || primaryTitle
+                          : it.caption?.zh || article.title.zh
+                      }
                       loading="lazy"
                     />
                     {it.caption?.zh || it.caption?.en ? (
@@ -394,7 +407,11 @@ export function V3ArticleDetail({
                 <Link key={work.slug} href={`/collection/${work.slug}`} className="tile" data-cursor="view">
                   <div className="tile-media">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={getArtworkCardSrc(work)} alt={work.title.zh} loading="lazy" />
+                    <img
+                      src={getArtworkCardSrc(work)}
+                      alt={lang === "en" ? work.title.en || work.title.zh : work.title.zh}
+                      loading="lazy"
+                    />
                   </div>
                   <div className="tile-meta">
                     <div className="tile-head">
@@ -469,7 +486,7 @@ export function V3ExhibitionEditorial({
   const navInnerRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLElement>(null);
 
-  useV3Reveal(`editorial-${article.slug}`);
+  useV3Reveal(`editorial-${article.slug}-${lang}`);
 
   useEffect(() => {
     setDarkHero(false);
@@ -545,21 +562,28 @@ export function V3ExhibitionEditorial({
                   {secondaryTitle}
                 </p>
               ) : null}
-              {e.eventLine ? <p className="ed-event">{e.eventLine}</p> : null}
-              <p className="ed-en-note t-en" lang="en">
-                This curatorial essay is currently published in Chinese; all featured works,
-                captions, and archival records below are presented bilingually.
-              </p>
+              {e.eventLine ? (
+                <p className="ed-event">
+                  <Bi text={{ zh: e.eventLine, en: e.eventLineEn || e.eventLine }} />
+                </p>
+              ) : null}
             </div>
             <figure className="ed-cover">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={withImageVersion(e.cover.src)} alt={e.cover.alt} />
-              {e.cover.alt ? <figcaption>{e.cover.alt}</figcaption> : null}
+              <img
+                src={withImageVersion(e.cover.src)}
+                alt={lang === "en" ? e.cover.altEn || e.cover.alt : e.cover.alt}
+              />
+              {e.cover.alt ? (
+                <figcaption>
+                  <Bi text={{ zh: e.cover.alt, en: e.cover.altEn || e.cover.alt }} />
+                </figcaption>
+              ) : null}
             </figure>
           </div>
         </header>
 
-        <nav className="ed-nav" aria-label="本文章节">
+        <nav className="ed-nav" aria-label={lang === "en" ? "Article chapters" : "本文章节"}>
           <div ref={navInnerRef} className="container ed-nav-inner">
             <a
               href="#ed-preface"
@@ -601,25 +625,30 @@ export function V3ExhibitionEditorial({
 
         <section className="container ed-preface" id="ed-preface" data-ed-sec="preface">
           <h2 className="v3-h3">
-            <span className="t-zh">{e.prefaceTitle || "序"}</span>
-            <span className="t-en" lang="en">
-              Preface
-            </span>
+            <Bi text={{ zh: e.prefaceTitle || "序", en: e.prefaceTitleEn || "Preface" }} />
           </h2>
-          {e.prefaceLead ? <p className="v3-preface-lead ed-lead">{e.prefaceLead}</p> : null}
+          {e.prefaceLead ? (
+            <p className="v3-preface-lead ed-lead">
+              <Bi text={{ zh: e.prefaceLead, en: e.prefaceLeadEn || e.prefaceLead }} />
+            </p>
+          ) : null}
           <div className="ed-preface-grid">
             <figure data-reveal="">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={withImageVersion(e.prefacePortrait.src)}
-                alt={e.prefacePortrait.alt}
+                alt={
+                  lang === "en"
+                    ? e.prefacePortrait.altEn || e.prefacePortrait.alt
+                    : e.prefacePortrait.alt
+                }
                 loading="lazy"
               />
             </figure>
             <div>
               {(e.prefaceFirst ?? []).map((p, i) => (
                 <p key={i} data-reveal="">
-                  {p}
+                  <Bi text={{ zh: p, en: e.prefaceFirstEn?.[i] || p }} />
                 </p>
               ))}
             </div>
@@ -628,19 +657,23 @@ export function V3ExhibitionEditorial({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={withImageVersion(e.prefaceLandscape.src)}
-              alt={e.prefaceLandscape.alt}
+              alt={
+                lang === "en"
+                  ? e.prefaceLandscape.altEn || e.prefaceLandscape.alt
+                  : e.prefaceLandscape.alt
+              }
               loading="lazy"
             />
           </figure>
           <div className="ed-col">
             {(e.prefaceSecond ?? []).map((p, i) => (
               <p key={i} data-reveal="">
-                {p}
+                <Bi text={{ zh: p, en: e.prefaceSecondEn?.[i] || p }} />
               </p>
             ))}
             {e.introduction ? (
               <p className="ed-intro" data-reveal="">
-                {e.introduction}
+                <Bi text={{ zh: e.introduction, en: e.introductionEn || e.introduction }} />
               </p>
             ) : null}
           </div>
@@ -660,13 +693,13 @@ export function V3ExhibitionEditorial({
                 <h2>
                   <Bi text={chapter.title} />
                 </h2>
-                <p>
-                  {chapter.introduction.split("\n").map((line, li, arr) => (
-                    <span key={li}>
-                      {line}
-                      {li < arr.length - 1 ? <br /> : null}
-                    </span>
-                  ))}
+                <p style={{ whiteSpace: "pre-line" }}>
+                  <Bi
+                    text={{
+                      zh: chapter.introduction,
+                      en: chapter.introductionEn || chapter.introduction,
+                    }}
+                  />
                 </p>
               </div>
             </div>
@@ -689,7 +722,11 @@ export function V3ExhibitionEditorial({
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={withImageVersion(w.image.src)}
-                        alt={w.image.alt || w.title.zh}
+                        alt={
+                          lang === "en"
+                            ? w.image.altEn || w.title.en || w.image.alt || w.title.zh
+                            : w.image.alt || w.title.zh
+                        }
                         loading="lazy"
                       />
                     </Link>
@@ -702,12 +739,12 @@ export function V3ExhibitionEditorial({
                       </h3>
                       {w.heading ? (
                         <p className="ed-work-heading" data-reveal="">
-                          {w.heading}
+                          <Bi text={{ zh: w.heading, en: w.headingEn || w.heading }} />
                         </p>
                       ) : null}
                       {(w.paragraphs ?? []).map((p, pi) => (
                         <p key={pi} data-reveal="">
-                          {p}
+                          <Bi text={{ zh: p, en: w.paragraphsEn?.[pi] || p }} />
                         </p>
                       ))}
                       {w.detail ? (
@@ -715,10 +752,14 @@ export function V3ExhibitionEditorial({
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={withImageVersion(w.detail.src)}
-                            alt={w.detail.alt}
+                            alt={lang === "en" ? w.detail.altEn || w.detail.alt : w.detail.alt}
                             loading="lazy"
                           />
-                          {w.detail.alt ? <figcaption>{w.detail.alt}</figcaption> : null}
+                          {w.detail.alt ? (
+                            <figcaption>
+                              <Bi text={{ zh: w.detail.alt, en: w.detail.altEn || w.detail.alt }} />
+                            </figcaption>
+                          ) : null}
                         </figure>
                       ) : null}
                       <details className="ed-records">
@@ -743,9 +784,16 @@ export function V3ExhibitionEditorial({
                             <h5>
                               <Bi text={r.label} />
                             </h5>
-                            {(r.lines ?? []).map((line, li) => (
-                              <p key={li}>{line}</p>
-                            ))}
+                            <div className="t-zh">
+                              {(r.lines ?? []).map((line, li) => (
+                                <p key={li}>{line}</p>
+                              ))}
+                            </div>
+                            <div className="t-en" lang="en">
+                              {(r.linesEn ?? r.lines ?? []).map((line, li) => (
+                                <p key={li}>{line}</p>
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </details>
@@ -768,14 +816,11 @@ export function V3ExhibitionEditorial({
 
         <section className="container ed-closing" id="ed-closing" data-ed-sec="closing">
           <h2 className="v3-h3">
-            <span className="t-zh">{e.closingTitle || "结语"}</span>
-            <span className="t-en" lang="en">
-              Closing
-            </span>
+            <Bi text={{ zh: e.closingTitle || "结语", en: e.closingTitleEn || "Closing" }} />
           </h2>
           {(e.closing ?? []).map((p, i) => (
             <p key={i} data-reveal="">
-              {p}
+              <Bi text={{ zh: p, en: e.closingEn?.[i] || p }} />
             </p>
           ))}
           <div className="v3-btn-row">

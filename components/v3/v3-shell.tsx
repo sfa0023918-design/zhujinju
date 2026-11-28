@@ -32,11 +32,15 @@ export function resolveInstagramHref(instagram: string) {
   return val.startsWith("http") ? val : `https://www.instagram.com/${val.replace(/^@/, "")}/`;
 }
 
-export function buildOfficialPlatforms(instagram: string): FooterPlatform[] {
+export function buildOfficialPlatforms(instagram: string, lang: V3Lang = "zh"): FooterPlatform[] {
   return [
-    { key: "douyin", label: "抖音", href: OFFICIAL_SOCIAL_LINKS.douyin },
-    { key: "xiaohongshu", label: "小红书", href: OFFICIAL_SOCIAL_LINKS.xiaohongshu },
-    { key: "wechat", label: "微信" },
+    { key: "douyin", label: lang === "en" ? "Douyin" : "抖音", href: OFFICIAL_SOCIAL_LINKS.douyin },
+    {
+      key: "xiaohongshu",
+      label: lang === "en" ? "Xiaohongshu" : "小红书",
+      href: OFFICIAL_SOCIAL_LINKS.xiaohongshu,
+    },
+    { key: "wechat", label: lang === "en" ? "WeChat" : "微信" },
     { key: "youtube", label: "YouTube", href: OFFICIAL_SOCIAL_LINKS.youtube },
     { key: "instagram", label: "Instagram", href: resolveInstagramHref(instagram) },
   ];
@@ -846,8 +850,8 @@ export function V3Shell({
   const whatsappHref = getWhatsAppHref(whatsappValue);
   const instagramHref = resolveInstagramHref(contact.instagram);
   const socialPlatforms = useMemo(
-    () => buildOfficialPlatforms(contact.instagram),
-    [contact.instagram],
+    () => buildOfficialPlatforms(contact.instagram, lang),
+    [contact.instagram, lang],
   );
 
   const ctxValue = useMemo<V3ContextValue>(
@@ -1067,7 +1071,7 @@ export function V3Shell({
               <img
                 className="v3-footer-logo"
                 src="/zhujinju-header-cream.png"
-                alt="竹瑾居"
+                alt={lang === "en" ? "Zhu Jin Ju" : "竹瑾居"}
               />
               <p className="v3-footer-note">
                 <span className="t-zh">
@@ -1625,7 +1629,7 @@ export function V3Shell({
           className={`lightbox${lightbox ? " is-open" : ""}`}
           role="dialog"
           aria-modal="true"
-          aria-label="全屏作品大图"
+          aria-label={lang === "en" ? "Full-screen artwork view" : "全屏作品大图"}
           aria-hidden={!lightbox}
         >
           <div className="lightbox-top">
@@ -1669,7 +1673,7 @@ export function V3Shell({
               <button
                 type="button"
                 className="lightbox-close-btn"
-                aria-label="关闭大图"
+                aria-label={lang === "en" ? "Close lightbox" : "关闭大图"}
                 onClick={closeLightbox}
               >
                 <span className="t-zh">关闭</span>
@@ -1901,7 +1905,7 @@ export function V3Shell({
               <button
                 type="button"
                 className={`lightbox-nav lightbox-prev${lbScale > 1.05 ? " is-hidden-zoom" : ""}`}
-                aria-label="上一张"
+                aria-label={lang === "en" ? "Previous plate" : "上一张"}
                 onClick={(e) => {
                   e.stopPropagation();
                   stepLightbox(-1);
@@ -1976,7 +1980,7 @@ export function V3Shell({
               <button
                 type="button"
                 className={`lightbox-nav lightbox-next${lbScale > 1.05 ? " is-hidden-zoom" : ""}`}
-                aria-label="下一张"
+                aria-label={lang === "en" ? "Next plate" : "下一张"}
                 onClick={(e) => {
                   e.stopPropagation();
                   stepLightbox(1);
@@ -1989,11 +1993,15 @@ export function V3Shell({
 
           <div className="lightbox-foot">
             {lightbox && lightbox.photos.length > 1 ? (
-              <div className="lightbox-pager" role="group" aria-label="图版切换">
+              <div
+                className="lightbox-pager"
+                role="group"
+                aria-label={lang === "en" ? "Plate selector" : "图版切换"}
+              >
                 <button
                   type="button"
                   className="lightbox-foot-arrow"
-                  aria-label="上一张"
+                  aria-label={lang === "en" ? "Previous plate" : "上一张"}
                   onClick={() => stepLightbox(-1)}
                 >
                   ←
@@ -2004,7 +2012,7 @@ export function V3Shell({
                       key={idx}
                       type="button"
                       className={`lightbox-dot${idx === lightbox.index ? " is-active" : ""}`}
-                      aria-label={`第 ${idx + 1} 张`}
+                      aria-label={lang === "en" ? `Plate ${idx + 1}` : `第 ${idx + 1} 张`}
                       aria-current={idx === lightbox.index ? "true" : undefined}
                       onClick={() => {
                         setLbGestureActive(false);
@@ -2019,7 +2027,7 @@ export function V3Shell({
                 <button
                   type="button"
                   className="lightbox-foot-arrow"
-                  aria-label="下一张"
+                  aria-label={lang === "en" ? "Next plate" : "下一张"}
                   onClick={() => stepLightbox(1)}
                 >
                   →

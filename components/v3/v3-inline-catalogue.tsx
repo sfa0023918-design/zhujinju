@@ -6,6 +6,7 @@ import { catalogueImageVariant, cataloguePageGeometry } from "@/lib/catalogue-me
 import type { Exhibition } from "@/lib/data/types";
 import { withImageVersion } from "@/lib/image-url";
 import { extractYear, padNumber } from "@/lib/v3-helpers";
+import { useV3 } from "./v3-shell";
 import { attachDragScroll, Bi } from "./v3-ui";
 
 type ResolvedCataloguePage = {
@@ -38,6 +39,7 @@ export function V3InlineCatalogue({
   exhibition: Exhibition;
   openFullscreenSignal?: number;
 }) {
+  const { lang } = useV3();
   const isSpreadMode = exhibition.catalogueViewMode !== "single-pages";
 
   const pages = useMemo<ResolvedCataloguePage[]>(() => {
@@ -376,7 +378,7 @@ export function V3InlineCatalogue({
         <button
           type="button"
           className="reader-hit reader-prev"
-          aria-label="上一页"
+          aria-label={lang === "en" ? "Previous page" : "上一页"}
           disabled={cur <= 0}
           onClick={() => showPage(cur - 1, -1)}
         >
@@ -517,7 +519,11 @@ export function V3InlineCatalogue({
           <img
             key={displayed.readerSrc}
             src={displayed.readerSrc}
-            alt={`${exhibition.title.zh} 第 ${displayed.index + 1} 页`}
+            alt={
+              lang === "en"
+                ? `${exhibition.title.en || exhibition.title.zh}, page ${displayed.index + 1}`
+                : `${exhibition.title.zh} 第 ${displayed.index + 1} 页`
+            }
             draggable={false}
             onLoad={() => setLoadedSrc(displayed.readerSrc)}
             style={{
@@ -543,7 +549,7 @@ export function V3InlineCatalogue({
         <button
           type="button"
           className="reader-hit reader-next"
-          aria-label="下一页"
+          aria-label={lang === "en" ? "Next page" : "下一页"}
           disabled={cur >= pages.length - 1}
           onClick={() => showPage(cur + 1, 1)}
         >
@@ -561,7 +567,7 @@ export function V3InlineCatalogue({
             min={1}
             max={pages.length}
             value={cur + 1}
-            aria-label="浏览图录页码"
+            aria-label={lang === "en" ? "Catalogue page scrubber" : "浏览图录页码"}
             onChange={(e) => showPage(Number(e.target.value) - 1)}
           />
           <span className="reader-hint">
@@ -588,7 +594,7 @@ export function V3InlineCatalogue({
           ref={isFull ? fullStripRef : inlineStripRef}
           className="reader-filmstrip"
           role="group"
-          aria-label="整册图录页面选择"
+          aria-label={lang === "en" ? "Catalogue page selector" : "整册图录页面选择"}
         >
           {pages.map((p, k) => {
             const eager = Math.abs(k - cur) <= 12;
@@ -599,7 +605,7 @@ export function V3InlineCatalogue({
                 type="button"
                 className={`rf-item${k === cur ? " is-active" : ""}${p.spread ? " is-spread" : ""}`}
                 data-rf={k}
-                aria-label={`第 ${k + 1} 页`}
+                aria-label={lang === "en" ? `Page ${k + 1}` : `第 ${k + 1} 页`}
                 aria-current={k === cur ? "page" : undefined}
                 onClick={() => showPage(k)}
               >
@@ -736,7 +742,7 @@ export function V3InlineCatalogue({
           className="v3-reader-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="电子图录全屏阅读器"
+          aria-label={lang === "en" ? "Full-screen digital catalogue" : "电子图录全屏阅读器"}
         >
           <section className="v3-reader">
             <div className="reader-top">

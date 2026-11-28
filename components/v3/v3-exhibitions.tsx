@@ -118,6 +118,7 @@ function ArchiveGallery({
   zhTitle: string;
   enTitle: string;
 }) {
+  const { lang } = useV3();
   if (!list.length) return null;
 
   return (
@@ -143,7 +144,11 @@ function ArchiveGallery({
             >
               <Link className="ex-archive-cover" href={href} data-cursor="view">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={resolveExhibitionCover(ex)} alt={ex.title.zh} loading="lazy" />
+                <img
+                  src={resolveExhibitionCover(ex)}
+                  alt={lang === "en" ? ex.title.en || ex.title.zh : ex.title.zh}
+                  loading="lazy"
+                />
               </Link>
               <div className="ex-archive-body">
                 <div className="ex-archive-meta">
@@ -205,7 +210,7 @@ export function V3FlagshipExhibition({
   allExhibitions: Exhibition[];
   worksCount: number;
 }) {
-  const { setDarkHero } = useV3();
+  const { lang, setDarkHero } = useV3();
   const [fullSignal, setFullSignal] = useState(0);
   const vajraRef = useRef<HTMLImageElement>(null);
 
@@ -269,7 +274,7 @@ export function V3FlagshipExhibition({
             <img
               ref={vajraRef}
               src="/uploads/artworks/five-pronged-vajra-cover-cutout-2026.png"
-              alt="五股金刚杵"
+              alt={lang === "en" ? "Five-Pronged Vajra" : "五股金刚杵"}
             />
           </div>
           <div className="v3-ex26-copy" data-reveal="">
@@ -400,7 +405,7 @@ export function V3PastExhibition({
   otherExhibitions: Exhibition[];
   allExhibitions: Exhibition[];
 }) {
-  const { setDarkHero } = useV3();
+  const { lang, setDarkHero } = useV3();
   const [fullSignal, setFullSignal] = useState(0);
 
   useV3Reveal(`ex-past-${exhibition.slug}`);
@@ -494,7 +499,10 @@ export function V3PastExhibition({
         </div>
         <figure className="v3-exd-cover">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={resolveExhibitionCover(exhibition)} alt={exhibition.title.zh} />
+          <img
+            src={resolveExhibitionCover(exhibition)}
+            alt={lang === "en" ? exhibition.title.en || exhibition.title.zh : exhibition.title.zh}
+          />
         </figure>
       </section>
 

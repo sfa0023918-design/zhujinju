@@ -336,7 +336,12 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
       <div ref={toolbarAnchorRef} className="v3-col-anchor" aria-hidden="true" />
       <div className="v3-toolbar" id="col-toolbar" ref={toolbarRef}>
         <div className="container v3-toolbar-inner">
-          <div className="segmented-control" role="group" aria-label="类别" ref={catSegRef}>
+          <div
+            className="segmented-control"
+            role="group"
+            aria-label={lang === "en" ? "Category" : "类别"}
+            ref={catSegRef}
+          >
             <div className="seg-thumb" aria-hidden="true" />
             {CAT_TABS.map((t) => (
               <button
@@ -357,7 +362,12 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
           </div>
 
           <div className="v3-toolbar-right">
-            <div className="segmented-control seg-sm" role="group" aria-label="状态" ref={statusSegRef}>
+            <div
+              className="segmented-control seg-sm"
+              role="group"
+              aria-label={lang === "en" ? "Status" : "状态"}
+              ref={statusSegRef}
+            >
               <div className="seg-thumb" aria-hidden="true" />
               {STATUS_TABS.map((t) => (
                 <button
@@ -401,12 +411,17 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
               />
             </label>
 
-            <div className="segmented-control seg-sm" role="group" aria-label="视图" ref={viewSegRef}>
+            <div
+              className="segmented-control seg-sm"
+              role="group"
+              aria-label={lang === "en" ? "View mode" : "视图"}
+              ref={viewSegRef}
+            >
               <div className="seg-thumb" aria-hidden="true" />
               <button
                 type="button"
                 className={`seg-btn${view === "wall" ? " is-active" : ""}`}
-                aria-label="展墙"
+                aria-label={lang === "en" ? "Gallery wall" : "展墙"}
                 onClick={() => {
                   pendingScrollRef.current = "toolbar-if-below";
                   setView("wall");
@@ -422,7 +437,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
               <button
                 type="button"
                 className={`seg-btn${view === "index" ? " is-active" : ""}`}
-                aria-label="索引"
+                aria-label={lang === "en" ? "Index list" : "索引"}
                 onClick={() => {
                   pendingScrollRef.current = "toolbar-if-below";
                   setView("index");
@@ -525,7 +540,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={cardSrc}
-                            alt={a.title.zh}
+                            alt={lang === "en" ? a.title.en || a.title.zh : a.title.zh}
                             loading={rIdx <= 1 ? "eager" : "lazy"}
                             decoding="async"
                           />
@@ -613,7 +628,11 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
         )}
 
         {totalPages > 1 ? (
-          <nav id="col-pager" className="v3-pagination" aria-label="藏品分页">
+          <nav
+            id="col-pager"
+            className="v3-pagination"
+            aria-label={lang === "en" ? "Collection pagination" : "藏品分页"}
+          >
             <p className="v3-page-summary">
               <span className="t-zh">
                 第 {from} – {to} 件 · 共 {filtered.length} 件作品
@@ -627,7 +646,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                 type="button"
                 className="pg-btn pg-arrow"
                 disabled={currentPage === 1}
-                aria-label="上一页"
+                aria-label={lang === "en" ? "Previous page" : "上一页"}
                 onClick={() => goPage(currentPage - 1)}
               >
                 ←
@@ -653,7 +672,7 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
                 type="button"
                 className="pg-btn pg-arrow"
                 disabled={currentPage === totalPages}
-                aria-label="下一页"
+                aria-label={lang === "en" ? "Next page" : "下一页"}
                 onClick={() => goPage(currentPage + 1)}
               >
                 →
