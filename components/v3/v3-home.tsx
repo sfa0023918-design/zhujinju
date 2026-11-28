@@ -429,7 +429,11 @@ export function V3Home({
               >
                 <div className="plate-frame">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={w.card} alt={w.title.zh} fetchPriority={idx === 2 ? "high" : "auto"} />
+                  <img
+                    src={w.card}
+                    alt={lang === "en" ? w.title.en || w.title.zh : w.title.zh}
+                    fetchPriority={idx === 2 ? "high" : "auto"}
+                  />
                 </div>
                 <div className="plate-caption">
                   <strong>
@@ -536,7 +540,12 @@ export function V3Home({
                     >
                       <div className="mob-deck-frame">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={w.card} alt={w.title.zh} fetchPriority="high" draggable={false} />
+                        <img
+                          src={w.card}
+                          alt={lang === "en" ? w.title.en || w.title.zh : w.title.zh}
+                          fetchPriority="high"
+                          draggable={false}
+                        />
                       </div>
                     </Link>
                   ) : (
@@ -545,14 +554,22 @@ export function V3Home({
                       type="button"
                       className={`mob-deck-card${mobDragging ? " is-dragging" : ""}`}
                       style={cardStyle}
-                      aria-label={`查看 ${w.title.zh}`}
+                      aria-label={
+                        lang === "en"
+                          ? `View ${w.title.en || w.title.zh}`
+                          : `查看 ${w.title.zh}`
+                      }
                       onClick={() => {
                         if (!mobSuppressClickRef.current) setMobIdx(idx);
                       }}
                     >
                       <div className="mob-deck-frame">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={w.card} alt={w.title.zh} draggable={false} />
+                        <img
+                          src={w.card}
+                          alt={lang === "en" ? w.title.en || w.title.zh : w.title.zh}
+                          draggable={false}
+                        />
                       </div>
                     </button>
                   );
@@ -588,14 +605,14 @@ export function V3Home({
                 );
               })()}
 
-              <div className="mob-deck-dock" role="tablist" aria-label="精选五件馆藏">
+                  <div className="mob-deck-dock" role="tablist" aria-label={lang === "en" ? "Five featured works" : "精选五件馆藏"}>
                 {plates.map((w, idx) => (
                   <button
                     key={w.slug}
                     type="button"
                     role="tab"
                     aria-selected={idx === mobIdx}
-                    aria-label={w.title.zh}
+                    aria-label={lang === "en" ? w.title.en || w.title.zh : w.title.zh}
                     className={`mob-dock-item${idx === mobIdx ? " is-active" : ""}`}
                     onClick={() => setMobIdx(idx)}
                   >
@@ -689,7 +706,7 @@ export function V3Home({
               <img
                 data-parallax="-0.06"
                 src="/uploads/artworks/five-pronged-vajra-cover-cutout-2026.png"
-                alt="五股金刚杵"
+                alt={lang === "en" ? "Five-Pronged Vajra" : "五股金刚杵"}
               />
             </div>
             <div className="v3-ex26-copy" data-reveal="">
@@ -755,7 +772,7 @@ export function V3Home({
                   <button
                     type="button"
                     className="v3-step-btn"
-                    aria-label="向左浏览"
+                    aria-label={lang === "en" ? "Scroll left" : "向左浏览"}
                     onClick={() => hrailRef.current?.scrollBy({ left: -360, behavior: "smooth" })}
                   >
                     ←
@@ -763,7 +780,7 @@ export function V3Home({
                   <button
                     type="button"
                     className="v3-step-btn"
-                    aria-label="向右浏览"
+                    aria-label={lang === "en" ? "Scroll right" : "向右浏览"}
                     onClick={() => hrailRef.current?.scrollBy({ left: 360, behavior: "smooth" })}
                   >
                     →
@@ -789,7 +806,12 @@ export function V3Home({
             >
               <div className="tile-media">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={a.card} alt={a.title.zh} loading="lazy" draggable={false} />
+                <img
+                  src={a.card}
+                  alt={lang === "en" ? a.title.en || a.title.zh : a.title.zh}
+                  loading="lazy"
+                  draggable={false}
+                />
               </div>
               <div className="hs-meta">
                 <span className="tile-no">{padNumber(i + 1)}</span>
@@ -881,7 +903,7 @@ export function V3Home({
                   <p className="ch-intro" style={{ whiteSpace: "pre-line" }}>
                     <span className="t-zh">{c.introduction}</span>
                     <span className="t-en" lang="en">
-                      {CHAPTER_INTRO_EN[c.id] || c.introduction}
+                      {c.introductionEn || CHAPTER_INTRO_EN[c.id] || c.introduction}
                     </span>
                   </p>
                   <ul className="ch-works">

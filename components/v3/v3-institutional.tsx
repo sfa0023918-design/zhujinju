@@ -39,7 +39,7 @@ export function V3AboutPage({
   exhibitionsCount: number;
   articlesCount: number;
 }) {
-  const { setDarkHero } = useV3();
+  const { lang, setDarkHero } = useV3();
   useV3Reveal("about-page");
 
   useEffect(() => {
@@ -163,7 +163,11 @@ export function V3AboutPage({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/uploads/branding/about-space-himalayan-art-20260930.png"
-            alt="竹瑾居艺术空间外立面与旋梯"
+            alt={
+              lang === "en"
+                ? "Exterior and spiral staircase of Zhu Jin Ju Gallery, Chengdu"
+                : "竹瑾居艺术空间外立面与旋梯"
+            }
           />
           <figcaption>
             <span className="t-zh">竹瑾居艺术空间 · 成都外立面与旋梯</span>
@@ -357,8 +361,8 @@ export function V3ContactPage({
   const whatsappHref = getWhatsAppHref(whatsappValue);
   const instagramHref = resolveInstagramHref(siteConfig.contact.instagram);
   const socialPlatforms = useMemo(
-    () => buildOfficialPlatforms(siteConfig.contact.instagram),
-    [siteConfig.contact.instagram],
+    () => buildOfficialPlatforms(siteConfig.contact.instagram, lang),
+    [siteConfig.contact.instagram, lang],
   );
 
   const handleSubmit = async (e: FormEvent) => {
@@ -592,7 +596,10 @@ export function V3ContactPage({
               We usually reply within 24 hours. Meetings in Chengdu are by appointment.
             </span>
           </p>
-          <div className="v3-contact-socials" aria-label="官方社交平台">
+          <div
+            className="v3-contact-socials"
+            aria-label={lang === "en" ? "Official social channels" : "官方社交平台"}
+          >
             {socialPlatforms.map((platform) =>
               platform.key === "wechat" ? (
                 <button
@@ -638,7 +645,10 @@ export function V3ContactPage({
           {selectedWork ? (
             <div className="v3-form-work">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={getArtworkCardSrc(selectedWork)} alt={selectedWork.title.zh} />
+              <img
+                src={getArtworkCardSrc(selectedWork)}
+                alt={lang === "en" ? selectedWork.title.en || selectedWork.title.zh : selectedWork.title.zh}
+              />
               <div>
                 <p className="micro-label">
                   <span className="t-zh">意向作品</span>
@@ -653,7 +663,11 @@ export function V3ContactPage({
                   <Bi text={getArtworkFacts(selectedWork, ["region", "period", "dimensions"])} />
                 </span>
               </div>
-              <Link href="/contact" className="v3-form-work-x" aria-label="移除">
+              <Link
+                href="/contact"
+                className="v3-form-work-x"
+                aria-label={lang === "en" ? "Remove" : "移除"}
+              >
                 ✕
               </Link>
             </div>
