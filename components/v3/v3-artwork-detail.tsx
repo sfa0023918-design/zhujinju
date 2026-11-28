@@ -50,7 +50,7 @@ export function V3ArtworkDetail({
   const [mode, setMode] = useState<StageMode>("darkroom");
   const [split, setSplit] = useState(50);
   const [lensOn, setLensOn] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(true);
   const [selectedReqs, setSelectedReqs] = useState<string[]>([]);
   const [essayOpen, setEssayOpen] = useState(false);
 
@@ -86,10 +86,19 @@ export function V3ArtworkDetail({
     });
   }, [photoIdx, photos]);
 
-  // Mark image loaded immediately if cached
+  const currentSrc = photos[photoIdx] || photos[0] || "";
+
+  // Smooth plate transition without ever leaving the main image stuck invisible
   useEffect(() => {
-    setImgLoaded(Boolean(stageImgRef.current?.complete));
-  }, [photoIdx, mode]);
+    const img = stageImgRef.current;
+    if (!img || (img.complete && img.naturalWidth > 0)) {
+      setImgLoaded(true);
+      return;
+    }
+    setImgLoaded(false);
+    const safety = window.setTimeout(() => setImgLoaded(true), 700);
+    return () => window.clearTimeout(safety);
+  }, [currentSrc, mode, artwork.slug]);
 
   // Sync segmented control thumb
   const syncSeg = useCallback((instant = false) => {
@@ -190,8 +199,6 @@ export function V3ArtworkDetail({
   // Draggable inertia rail for related works
   useEffect(() => attachDragScroll(railRef.current), [artwork.slug]);
 
-  const currentSrc = photos[photoIdx] || photos[0] || "";
-
   // Desktop 2.4x loupe movement
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!lensOn || mode === "compare") return;
@@ -247,17 +254,19 @@ export function V3ArtworkDetail({
     setSplit(next);
   };
 
-  const supportOptions = useMemo(
-    () =>
-      artwork.inquirySupport?.length
-        ? artwork.inquirySupport
-        : [
-            { zh: "高清局部图", en: "High-res details" },
-            { zh: "品相报告", en: "Condition report" },
-            { zh: "图录页", en: "Catalogue pages" },
-          ],
-    [artwork.inquirySupport],
-  );
+  const supportOptions = useMemo(() => {
+    const raw = artwork.inquirySupport?.length
+      ? artwork.inquirySupport
+      : [
+          { zh: "高清局部图", en: "High-res details" },
+          { zh: "品相报告", en: "Condition report" },
+          { zh: "图录页", en: "Catalogue pages" },
+        ];
+    return raw.map((opt) => ({
+      zh: opt.zh.replace(/^可索取/, "").trim() || opt.zh,
+      en: opt.en.replace(/\s+available on request\.?$/i, "").trim() || opt.en,
+    }));
+  }, [artwork.inquirySupport]);
 
   const toggleReq = (key: string) => {
     setSelectedReqs((prev) =>
@@ -507,9 +516,11 @@ export function V3ArtworkDetail({
                   ref={stageImgRef}
                   className={`stage-img${imgLoaded ? " is-loaded" : ""}`}
                   src={currentSrc}
-                  alt={artwork.title.zh}
+                  alt={primaryTitle}
+                  fetchPriority="high"
                   data-cursor="view"
                   onLoad={() => setImgLoaded(true)}
+                  onError={() => setImgLoaded(true)}
                   onClick={() => {
                     if (!lensOn) {
                       openLightbox(photos, photoIdx, artwork.title.zh, artwork.title.en);

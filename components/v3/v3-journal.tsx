@@ -40,7 +40,7 @@ export function V3JournalIndex({ articles }: { articles: Article[] }) {
   const segRef = useRef<HTMLDivElement>(null);
   const segThumbRef = useRef<HTMLDivElement>(null);
 
-  useV3Reveal("journal-index");
+  useV3Reveal(`journal-index-${cat}-${lang}`);
 
   useEffect(() => {
     setDarkHero(false);
@@ -118,7 +118,9 @@ export function V3JournalIndex({ articles }: { articles: Article[] }) {
   return (
     <>
       <section className="v3-page-head container">
-        <p className="micro-label v3-eyebrow">JOURNAL · 文章与动态</p>
+        <p className="micro-label v3-eyebrow">
+          JOURNAL<span className="t-zh"> · 文章与动态</span>
+        </p>
         <h1 className="v3-h1">
           <span className="t-zh">文章与动态</span>
           <span className="t-en" lang="en">
@@ -544,6 +546,10 @@ export function V3ExhibitionEditorial({
                 </p>
               ) : null}
               {e.eventLine ? <p className="ed-event">{e.eventLine}</p> : null}
+              <p className="ed-en-note t-en" lang="en">
+                This curatorial essay is currently published in Chinese; all featured works,
+                captions, and archival records below are presented bilingually.
+              </p>
             </div>
             <figure className="ed-cover">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -594,7 +600,12 @@ export function V3ExhibitionEditorial({
         </nav>
 
         <section className="container ed-preface" id="ed-preface" data-ed-sec="preface">
-          <h2 className="v3-h3">{e.prefaceTitle || "序"}</h2>
+          <h2 className="v3-h3">
+            <span className="t-zh">{e.prefaceTitle || "序"}</span>
+            <span className="t-en" lang="en">
+              Preface
+            </span>
+          </h2>
           {e.prefaceLead ? <p className="v3-preface-lead ed-lead">{e.prefaceLead}</p> : null}
           <div className="ed-preface-grid">
             <figure data-reveal="">
@@ -756,7 +767,12 @@ export function V3ExhibitionEditorial({
         ))}
 
         <section className="container ed-closing" id="ed-closing" data-ed-sec="closing">
-          <h2 className="v3-h3">{e.closingTitle || "结语"}</h2>
+          <h2 className="v3-h3">
+            <span className="t-zh">{e.closingTitle || "结语"}</span>
+            <span className="t-en" lang="en">
+              Closing
+            </span>
+          </h2>
           {(e.closing ?? []).map((p, i) => (
             <p key={i} data-reveal="">
               {p}

@@ -295,7 +295,9 @@ export function V3Collection({ artworks }: { artworks: CollectionArtworkSummary[
   return (
     <>
       <section className="v3-page-head container">
-        <p className="micro-label v3-eyebrow">COLLECTION · 藏品</p>
+        <p className="micro-label v3-eyebrow">
+          COLLECTION<span className="t-zh"> · 藏品</span>
+        </p>
         <div className="v3-head-row">
           <h1 className="v3-h1">
             <span className="t-zh">藏品</span>

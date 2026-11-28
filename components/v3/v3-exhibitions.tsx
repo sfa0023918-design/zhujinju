@@ -164,7 +164,7 @@ function ArchiveGallery({
                   </Link>
                 </h3>
                 <p className="ex-archive-sub">
-                  <Bi text={ex.venue} /> · {ex.period.zh}
+                  <Bi text={ex.venue} /> · <Bi text={ex.period} />
                 </p>
                 <p className="ex-archive-intro">
                   <Bi text={ex.catalogueIntro?.zh ? ex.catalogueIntro : ex.intro} />
@@ -257,7 +257,7 @@ export function V3FlagshipExhibition({
                     : { zh: "年度展览", en: "Annual exhibition" }
                 }
               />{" "}
-              · {exhibition.period.zh}
+              · <Bi text={exhibition.period} />
             </p>
             <h1 className="v3-display">
               Himalayan <em>Art {year}</em>
@@ -312,7 +312,9 @@ export function V3FlagshipExhibition({
                   Dates
                 </span>
               </dt>
-              <dd>{exhibition.period.zh}</dd>
+              <dd>
+                <Bi text={exhibition.period} />
+              </dd>
             </div>
             <div data-reveal="">
               <dt>
@@ -437,7 +439,9 @@ export function V3PastExhibition({
                   Dates
                 </span>
               </dt>
-              <dd>{exhibition.period.zh}</dd>
+              <dd>
+                <Bi text={exhibition.period} />
+              </dd>
             </div>
             <div>
               <dt>

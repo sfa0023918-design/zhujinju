@@ -517,6 +517,46 @@ export function V3Shell({
     [pathname],
   );
 
+  // Unified scroll-lock whenever any modal, drawer, or full-screen mobile menu is open.
+  // Uses fixed-body lock so neither wheel/trackpad nor iOS Safari touch rubber-banding can scroll the underlying page.
+  useEffect(() => {
+    const locked = menuOpen || drawerOpen || cmdOpen || wechatQrOpen;
+    if (!locked) return;
+    const savedY = window.scrollY;
+    const startPath = window.location.pathname;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevBodyPosition = document.body.style.position;
+    const prevBodyTop = document.body.style.top;
+    const prevBodyLeft = document.body.style.left;
+    const prevBodyRight = document.body.style.right;
+    const prevBodyWidth = document.body.style.width;
+    const prevTouchAction = document.body.style.touchAction;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${savedY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    if (menuOpen) document.body.style.touchAction = "none";
+
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.body.style.position = prevBodyPosition;
+      document.body.style.top = prevBodyTop;
+      document.body.style.left = prevBodyLeft;
+      document.body.style.right = prevBodyRight;
+      document.body.style.width = prevBodyWidth;
+      document.body.style.touchAction = prevTouchAction;
+      if (savedY > 0 && window.location.pathname === startPath) {
+        window.scrollTo({ top: savedY, left: 0, behavior: "instant" });
+      }
+    };
+  }, [menuOpen, drawerOpen, cmdOpen, wechatQrOpen]);
+
   // Unified scroll frame: header tuck, light-ink over dark hero, progress bar, parallax & float-top
   useEffect(() => {
     let ticking = false;
@@ -859,14 +899,14 @@ export function V3Shell({
             <Link
               href="/"
               className="brand-link"
-              aria-label="竹瑾居首页"
+              aria-label={lang === "en" ? "Zhu Jin Ju Home" : "竹瑾居首页"}
               onClick={() => handleSameRouteScrollTop("/")}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="brand-logo brand-logo-dark"
                 src="/zhujinju-header-ink.png"
-                alt="竹瑾居"
+                alt={lang === "en" ? "Zhu Jin Ju" : "竹瑾居"}
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -876,7 +916,7 @@ export function V3Shell({
               />
             </Link>
 
-            <nav ref={pillNavRef} className="pill-nav" aria-label="主导航">
+            <nav ref={pillNavRef} className="pill-nav" aria-label={lang === "en" ? "Primary navigation" : "主导航"}>
               <div ref={mercuryRef} className="mercury-indicator" aria-hidden="true" />
               {NAV_ITEMS.map((item) => (
                 <Link
@@ -899,7 +939,7 @@ export function V3Shell({
                 type="button"
                 id="open-cmd-btn"
                 className="cmd-trigger"
-                aria-label="检索作品与文章"
+                aria-label={lang === "en" ? "Search works and articles" : "检索作品与文章"}
                 onClick={openCmd}
               >
                 <svg
@@ -925,7 +965,7 @@ export function V3Shell({
                 ref={langSegRef}
                 className="segmented-mini"
                 role="group"
-                aria-label="语言切换"
+                aria-label={lang === "en" ? "Language switcher" : "语言切换"}
               >
                 <div ref={langThumbRef} className="seg-thumb" aria-hidden="true" />
                 <button
@@ -959,7 +999,7 @@ export function V3Shell({
                 type="button"
                 id="mobile-menu-btn"
                 className="mobile-menu-btn"
-                aria-label="打开菜单"
+                aria-label={lang === "en" ? "Open menu" : "打开菜单"}
                 aria-expanded={menuOpen}
                 onClick={() => setMenuOpen((prev) => !prev)}
               >
@@ -985,13 +1025,13 @@ export function V3Shell({
             <button
               type="button"
               className="modal-close"
-              aria-label="关闭菜单"
+              aria-label={lang === "en" ? "Close menu" : "关闭菜单"}
               onClick={() => setMenuOpen(false)}
             >
               ✕
             </button>
           </div>
-          <nav className="mobile-menu-links" aria-label="移动端导航">
+          <nav className="mobile-menu-links" aria-label={lang === "en" ? "Mobile navigation" : "移动端导航"}>
             {NAV_ITEMS.map((item, idx) => (
               <Link
                 key={item.key}
@@ -1106,11 +1146,16 @@ export function V3Shell({
                   </li>
                   <li>
                     {whatsappHref ? (
-                      <a href={whatsappHref} target="_blank" rel="noreferrer">
+                      <a
+                        className="v3-footer-nowrap"
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         WhatsApp · {whatsappValue}
                       </a>
                     ) : (
-                      <span>{contact.phone}</span>
+                      <span className="v3-footer-nowrap">{contact.phone}</span>
                     )}
                   </li>
                   <li>
@@ -1145,7 +1190,7 @@ export function V3Shell({
                     </span>
                   </li>
                 </ul>
-                <div className="v3-footer-socials" aria-label="官方社交平台">
+                <div className="v3-footer-socials" aria-label={lang === "en" ? "Official social channels" : "官方社交平台"}>
                   {socialPlatforms.map((platform) =>
                     platform.key === "wechat" ? (
                       <button
@@ -1204,9 +1249,10 @@ export function V3Shell({
             if (e.target === e.currentTarget) setCmdOpen(false);
           }}
         >
-          <div className="cmd-panel" role="dialog" aria-modal="true" aria-label="站内检索">
+          <div className="cmd-panel" role="dialog" aria-modal="true" aria-label={lang === "en" ? "Site search" : "站内检索"}>
             <div className="cmd-head">
               <svg
+                className="cmd-icon"
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -1231,10 +1277,23 @@ export function V3Shell({
                 value={cmdQuery}
                 onChange={(e) => setCmdQuery(e.target.value)}
               />
+              {cmdQuery ? (
+                <button
+                  type="button"
+                  className="cmd-clear"
+                  onClick={() => {
+                    setCmdQuery("");
+                    cmdInputRef.current?.focus();
+                  }}
+                >
+                  <span className="t-zh">清除</span>
+                  <span className="t-en">Clear</span>
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="modal-close"
-                aria-label="关闭检索"
+                aria-label={lang === "en" ? "Close search" : "关闭检索"}
                 onClick={() => setCmdOpen(false)}
               >
                 ✕
@@ -1257,8 +1316,18 @@ export function V3Shell({
                       href={`/collection/${a.slug}`}
                       onClick={() => setCmdOpen(false)}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="cmd-result-thumb" src={a.card} alt="" />
+                      {a.card ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          className="cmd-result-thumb"
+                          src={a.card}
+                          alt=""
+                          loading="eager"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span className="cmd-result-thumb cmd-result-thumb-empty" aria-hidden="true" />
+                      )}
                       <div>
                         <b>
                           <Bi text={a.title} />
@@ -1286,8 +1355,18 @@ export function V3Shell({
                       href={`/journal/${a.slug}`}
                       onClick={() => setCmdOpen(false)}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="cmd-result-thumb" src={a.cover} alt="" />
+                      {a.cover ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          className="cmd-result-thumb"
+                          src={a.cover}
+                          alt=""
+                          loading="eager"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span className="cmd-result-thumb cmd-result-thumb-empty" aria-hidden="true" />
+                      )}
                       <div>
                         <b>
                           <Bi text={a.title} />
@@ -1329,12 +1408,17 @@ export function V3Shell({
             if (e.target === e.currentTarget) setDrawerOpen(false);
           }}
         >
-          <aside className="inquiry-drawer" role="dialog" aria-modal="true" aria-label="作品洽询与预约">
+          <aside
+            className="inquiry-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label={lang === "en" ? "Private inquiry and viewing" : "作品洽询与预约"}
+          >
             <div className="drawer-head">
               <div>
                 <p className="micro-label drawer-eyebrow">
                   <i className="dot-spark" aria-hidden="true" />
-                  PRIVATE INQUIRY · 私人洽询
+                  PRIVATE INQUIRY<span className="t-zh"> · 私人洽询</span>
                 </p>
                 <h2 className="drawer-title">
                   <span className="t-zh">作品洽询与预约</span>
@@ -1346,7 +1430,7 @@ export function V3Shell({
               <button
                 type="button"
                 className="modal-close"
-                aria-label="关闭洽询"
+                aria-label={lang === "en" ? "Close inquiry" : "关闭洽询"}
                 onClick={() => setDrawerOpen(false)}
               >
                 ✕
@@ -1945,16 +2029,32 @@ export function V3Shell({
             <p className="lightbox-hint micro-label">
               {lightbox && lightbox.photos.length > 1 ? (
                 <>
-                  <span className="t-zh">双指缩放 / 双击放大 · 左右滑动切换 · 单击关闭</span>
-                  <span className="t-en" lang="en">
-                    Pinch or double-tap to zoom · Swipe to browse · Tap to close
+                  <span className="hint-touch">
+                    <span className="t-zh">双指缩放 / 双击放大 · 左右滑动切换 · 单击关闭</span>
+                    <span className="t-en" lang="en">
+                      Pinch or double-tap to zoom · Swipe to browse · Tap to close
+                    </span>
+                  </span>
+                  <span className="hint-desktop">
+                    <span className="t-zh">双击放大 · 左右方向键切换 · 单击或 Esc 关闭</span>
+                    <span className="t-en" lang="en">
+                      Double-click to zoom · Arrow keys to browse · Click or Esc to close
+                    </span>
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="t-zh">双指缩放 / 双击放大 · 单击关闭</span>
-                  <span className="t-en" lang="en">
-                    Pinch or double-tap to zoom · Tap to close
+                  <span className="hint-touch">
+                    <span className="t-zh">双指缩放 / 双击放大 · 单击关闭</span>
+                    <span className="t-en" lang="en">
+                      Pinch or double-tap to zoom · Tap to close
+                    </span>
+                  </span>
+                  <span className="hint-desktop">
+                    <span className="t-zh">双击放大 · 单击或 Esc 关闭</span>
+                    <span className="t-en" lang="en">
+                      Double-click to zoom · Click or Esc to close
+                    </span>
                   </span>
                 </>
               )}
@@ -1967,7 +2067,7 @@ export function V3Shell({
           className={`v3-qr-backdrop${wechatQrOpen ? " is-open" : ""}`}
           role="dialog"
           aria-modal="true"
-          aria-label="竹瑾居微信二维码"
+          aria-label={lang === "en" ? "Zhu Jin Ju WeChat QR code" : "竹瑾居微信二维码"}
           aria-hidden={!wechatQrOpen}
           onClick={(e) => {
             if (e.target === e.currentTarget) setWechatQrOpen(false);
@@ -1976,7 +2076,9 @@ export function V3Shell({
           <div className="v3-qr-card">
             <div className="v3-qr-head">
               <div>
-                <p className="micro-label">WECHAT · 微信</p>
+                <p className="micro-label">
+                  WECHAT<span className="t-zh"> · 微信</span>
+                </p>
                 <h3>
                   <span className="t-zh">竹瑾居微信联络</span>
                   <span className="t-en" lang="en">
@@ -1987,7 +2089,7 @@ export function V3Shell({
               <button
                 type="button"
                 className="v3-qr-close"
-                aria-label="关闭二维码"
+                aria-label={lang === "en" ? "Close QR code" : "关闭二维码"}
                 onClick={() => setWechatQrOpen(false)}
               >
                 <span className="t-zh">关闭</span>
@@ -1997,7 +2099,10 @@ export function V3Shell({
             </div>
             <div className="v3-qr-img-wrap">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/contact/wechat-qr.jpg" alt="竹瑾居微信二维码" />
+              <img
+                src="/contact/wechat-qr.jpg"
+                alt={lang === "en" ? "Zhu Jin Ju WeChat QR code" : "竹瑾居微信二维码"}
+              />
             </div>
             <p className="v3-qr-desc">
               <span className="t-zh">
@@ -2032,7 +2137,7 @@ export function V3Shell({
           type="button"
           id="float-top"
           className={`v3-float-top${showFloatTop ? " is-on" : ""}`}
-          aria-label="回到顶部"
+          aria-label={lang === "en" ? "Back to top" : "回到顶部"}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
           ↑
